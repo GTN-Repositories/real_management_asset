@@ -179,3 +179,11 @@
 #21 C:\\Freelance Garuda\\naj\\artisan(13): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
 #22 {main}
 "} 
+[2024-10-17 13:11:48] local.ERROR: Trait "App\Models\HasRoles" not found {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Trait \"App\\Models\\HasRoles\" not found at C:\\Freelance Garuda\\naj\\app\\Models\\User.php:10)
+[stacktrace]
+#0 {main}
+"} 
+[2024-10-17 13:12:37] local.ERROR: syntax error, unexpected token ";" {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): syntax error, unexpected token \";\" at C:\\Freelance Garuda\\naj\\app\\Models\\User.php:13)
+[stacktrace]
+#0 {main}
+"} 
