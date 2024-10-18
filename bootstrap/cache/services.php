@@ -34,8 +34,9 @@
     30 => 'Termwind\\Laravel\\TermwindServiceProvider',
     31 => 'Pest\\Laravel\\PestServiceProvider',
     32 => 'Spatie\\Permission\\PermissionServiceProvider',
-    33 => 'App\\Providers\\AppServiceProvider',
-    34 => 'App\\Providers\\TelescopeServiceProvider',
+    33 => 'Yajra\\DataTables\\DataTablesServiceProvider',
+    34 => 'App\\Providers\\AppServiceProvider',
+    35 => 'App\\Providers\\TelescopeServiceProvider',
   ),
   'eager' => 
   array (
@@ -56,8 +57,9 @@
     14 => 'Termwind\\Laravel\\TermwindServiceProvider',
     15 => 'Pest\\Laravel\\PestServiceProvider',
     16 => 'Spatie\\Permission\\PermissionServiceProvider',
-    17 => 'App\\Providers\\AppServiceProvider',
-    18 => 'App\\Providers\\TelescopeServiceProvider',
+    17 => 'Yajra\\DataTables\\DataTablesServiceProvider',
+    18 => 'App\\Providers\\AppServiceProvider',
+    19 => 'App\\Providers\\TelescopeServiceProvider',
   ),
   'deferred' => 
   array (
