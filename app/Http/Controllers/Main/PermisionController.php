@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -8,18 +8,18 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
-class RoleController extends Controller implements HasMiddleware
+class PermisionController extends Controller implements HasMiddleware
 {
     public static function middleware(): array
     {
         return [
-            new Middleware('permission::role read', ['only' => ['index', 'data', 'getData']]),
-            new Middleware('permission::role create', ['only' => ['create', 'store']]),
-            new Middleware('permission::role edit', ['only' => ['edit', 'update']]),
-            new Middleware('permission::role delete', ['only' => ['destroy']]),
+            new Middleware('permission::permission read', ['only' => ['index', 'data', 'getData']]),
+            new Middleware('permission::permission create', ['only' => ['create', 'store']]),
+            new Middleware('permission::permission edit', ['only' => ['edit', 'update']]),
+            new Middleware('permission::permission delete', ['only' => ['destroy']]),
         ];
     }
     /**
@@ -27,7 +27,7 @@ class RoleController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        return view('admin.role.index');
+        return view('admin.permission.index');
     }
 
     public function data(Request $request)
@@ -75,7 +75,7 @@ class RoleController extends Controller implements HasMiddleware
 
         $keyword = $request->keyword;
 
-        $data = Role::orderBy('id', 'desc')
+        $data = Permission::orderBy('id', 'desc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
@@ -92,8 +92,7 @@ class RoleController extends Controller implements HasMiddleware
 
     public function create()
     {
-        $permissions = Permission::orderBy('name', 'asc')->get();
-        return view('admin.role.create', compact('permissions'));
+        return view('admin.permission.create');
     }
 
     /**
@@ -101,25 +100,13 @@ class RoleController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
-        // Validasi data
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'permissions' => 'nullable|array',
-            'permissions.*' => 'string', // karena permission di-enkripsi sebagai string
-        ]);
+        $data = $request->all();
+
 
         try {
-            return $this->atomic(function () use ($validatedData) {
-                $validatedData['user_id'] = Auth::user()->id;
-
-                $role = Role::create(['name' => $validatedData['name'], 'user_id' => $validatedData['user_id']]);
-                if (!empty($validatedData['permissions'])) {
-                    foreach ($validatedData['permissions'] as $encryptedPermissionId) {
-                        $permissionId = Crypt::decrypt($encryptedPermissionId);
-                        $role->givePermissionTo(Permission::findOrFail($permissionId));
-                    }
-                }
-
+            return $this->atomic(function () use ($data) {
+                $data['user_id'] = Auth::user()->id;
+                Permission::create($data);
                 return response()->json([
                     'status' => true,
                     'message' => 'Data Berhasil di Tambahkan!',
@@ -128,11 +115,10 @@ class RoleController extends Controller implements HasMiddleware
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => 'Data Gagal di Tambahkan! ' . $th->getMessage(),
+                'message' => 'Data Gagal di Tambahkan!',
             ]);
         }
     }
-
 
     /**
      * Display the specified resource.
@@ -148,56 +134,34 @@ class RoleController extends Controller implements HasMiddleware
     public function edit(string $id)
     {
         $decryptedId = Crypt::decrypt($id);
-        $role = Role::findOrFail($decryptedId);
-        $permissions = Permission::orderBy('name', 'asc')->get();
-        $rolePermissions = $role->permissions->pluck('id')->toArray();
+        $data = Permission::findOrFail($decryptedId);
 
-        return view('admin.role.edit', [
-            'role' => $role,
-            'permissions' => $permissions,
-            'rolePermissions' => $rolePermissions,
-            'encryptedRoleId' => Crypt::encrypt($role->id)
-        ]);
+        return view('admin.permission.edit', compact('data'));
     }
-
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        $decryptedId = Crypt::decrypt($id);
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'permissions' => 'nullable|array',
-            'permissions.*' => 'string',
-        ]);
+        $data = $request->all();
 
         try {
-            return $this->atomic(function () use ($validatedData, $decryptedId) {
-                $role = Role::findOrFail($decryptedId);
-
-                $role->update(['name' => $validatedData['name']]);
-                if (!empty($validatedData['permissions'])) {
-                    $permissionIds = array_map(fn($encryptedId) => Crypt::decrypt($encryptedId), $validatedData['permissions']);
-                    $role->syncPermissions($permissionIds);
-                } else {
-                    $role->syncPermissions([]);
-                }
+            return $this->atomic(function () use ($data, $id) {
+                $update = Permission::find($id)->update($data);
 
                 return response()->json([
                     'status' => true,
-                    'message' => 'Data Berhasil Diupdate!',
+                    'message' => 'Data Berhasil di Diubah!',
                 ]);
             });
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => 'Data Gagal Diupdate! ' . $th->getMessage(),
+                'message' => 'Data Gagal di Diubah!',
             ]);
         }
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -208,7 +172,7 @@ class RoleController extends Controller implements HasMiddleware
         try {
             return $this->atomic(function () use ($decryptedId) {
                 // dd('akjvbaeouvbqaovb');
-                $deleted = Role::where('id', $decryptedId)
+                $deleted = Permission::where('id', $decryptedId)
                     ->delete();
                 if ($deleted) {
                     return response()->json([
@@ -235,7 +199,7 @@ class RoleController extends Controller implements HasMiddleware
         try {
             $ids = $request->ids;
             return $this->atomic(function () use ($ids) {
-                $delete = Role::whereIn('id', $ids)->delete();
+                $delete = Permission::whereIn('id', $ids)->delete();
 
                 return response()->json([
                     'status' => true,

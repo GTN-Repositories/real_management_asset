@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -41,9 +41,9 @@ class UserController extends Controller implements HasMiddleware
             ->addColumn('id', function ($data) {
                 $encryptedId = Crypt::encrypt($data->id);
                 $checkbox = '<div class="custom-control custom-checkbox">
-            <input class="custom-control-input checkbox" id="checkbox' . $encryptedId . '" type="checkbox" value="' . $encryptedId . '" />
-            <label class="custom-control-label" for="checkbox' . $encryptedId . '"></label>
-        </div>';
+                    <input class="custom-control-input checkbox" id="checkbox' . $encryptedId . '" type="checkbox" value="' . $encryptedId . '" />
+                    <label class="custom-control-label" for="checkbox' . $encryptedId . '"></label>
+                </div>';
 
                 return $checkbox;
             })
