@@ -27,7 +27,7 @@
               fill="#7367F0" />
           </svg>
         </span>
-        <span class="app-brand-text demo menu-text fw-bold">Vuexy</span>
+        <span class="app-brand-text demo menu-text fw-bold">NAJ</span>
       </a>
 
       <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
@@ -42,17 +42,22 @@
       <li class="menu-item active open">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
           <i class="menu-icon tf-icons ti ti-settings"></i>
-          <div data-i18n="Roles & Permissions">Roles & Permissions</div>
+          <div data-i18n="ACL">ACL</div>
         </a>
         <ul class="menu-sub">
-          <li class="menu-item">
-            <a href="app-access-roles.html" class="menu-link">
-              <div data-i18n="Roles">Roles</div>
+          <li class="menu-item {{ Route::is('role.*') ? 'active' : '' }}">
+            <a href="{{ route('role.index') }}" class="menu-link">
+              <div>Roles</div>
             </a>
           </li>
-          <li class="menu-item active">
-            <a href="app-access-permission.html" class="menu-link">
-              <div data-i18n="Permission">Permission</div>
+          <li class="menu-item {{ Route::is('permision.*') ? 'active' : '' }}">
+            <a href="{{ route('permision.index') }}" class="menu-link">
+              <div>Permission</div>
+            </a>
+          </li>
+          <li class="menu-item {{ Route::is('user.*') ? 'active' : '' }}">
+            <a href="{{ route('user.index') }}" class="menu-link">
+              <div>Users</div>
             </a>
           </li>
         </ul>

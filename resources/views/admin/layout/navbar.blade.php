@@ -21,8 +21,11 @@
                 </div>
             </div>
         </div>
-        <div class="navbar-nav flex-row align-items-center ms-auto  ">
-            <a href="auth-login-cover.html" target="_blank">
+        <div class="navbar-nav flex-row align-items-center ms-auto">
+            <form id="logoutForm" method="POST" action="{{ route('logout') }}" style="display: none;">
+                @csrf
+            </form>
+            <a href="javascript:void(0)" onclick="logout()">
                 <i class="ti ti-logout me-2 ti-sm"></i>
                 <span class="align-middle">Log Out</span>
             </a>
@@ -36,3 +39,22 @@
         <i class="ti ti-x ti-sm search-toggler cursor-pointer"></i>
     </div>
 </nav>
+
+<script>
+function logout() {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You will be logged out from your account!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, logout!",
+        cancelButtonText: "Cancel"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('logoutForm').submit();
+        }
+    });
+}
+</script>

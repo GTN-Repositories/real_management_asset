@@ -2,7 +2,7 @@
 
 <html
   lang="en"
-  class="light-style layout-navbar-fixed layout-menu-fixed layout-compact"
+  class="light-style layout-wide customizer-hide"
   dir="ltr"
   data-theme="theme-default"
   data-assets-path="../../tamplate/assets/"
@@ -13,7 +13,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-    <title>Permission - Apps | Vuexy - Bootstrap Admin Template</title>
+    <title>Login Basic - Pages | Vuexy - Bootstrap Admin Template</title>
 
     <meta name="description" content="" />
 
@@ -41,17 +41,12 @@
     <link rel="stylesheet" href="../../tamplate/assets/vendor/libs/node-waves/node-waves.css" />
     <link rel="stylesheet" href="../../tamplate/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
     <link rel="stylesheet" href="../../tamplate/assets/vendor/libs/typeahead-js/typeahead.css" />
-    <link rel="stylesheet" href="../../tamplate/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
-    <link rel="stylesheet" href="../../tamplate/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
-    <link rel="stylesheet" href="../../tamplate/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+    <!-- Vendor -->
     <link rel="stylesheet" href="../../tamplate/assets/vendor/libs/@form-validation/form-validation.css" />
 
     <!-- Page CSS -->
-    <style>
-      .swal2-container {
-        z-index: 1100 !important; /* Pastikan lebih tinggi dari modal Bootstrap (biasanya 1050) */
-      }
-    </style>
+    <!-- Page -->
+    <link rel="stylesheet" href="../../tamplate/assets/vendor/css/pages/page-auth.css" />
 
     <!-- Helpers -->
     <script src="../../tamplate/assets/vendor/js/helpers.js"></script>
@@ -61,44 +56,11 @@
   </head>
 
   <body>
-    <!-- Layout wrapper -->
-    <div class="layout-wrapper layout-content-navbar">
-      <div class="layout-container">
-        <!-- Menu -->
-        @include('admin.layout.sidebar')
-        <!-- / Menu -->
+    <!-- Content -->
 
-        <!-- Layout container -->
-        <div class="layout-page">
-          <!-- Navbar -->
-          @include('admin.layout.navbar')
-          <!-- / Navbar -->
+    @yield('content')
 
-          <!-- Content wrapper -->
-          <div class="content-wrapper">
-            <!-- Content -->
-
-            @yield('content')
-            <!-- / Content -->
-
-            <!-- Footer -->
-            @include('admin.layout.footer')
-            <!-- / Footer -->
-
-            <div class="content-backdrop fade"></div>
-          </div>
-          <!-- Content wrapper -->
-        </div>
-        <!-- / Layout page -->
-      </div>
-
-      <!-- Overlay -->
-      <div class="layout-overlay layout-menu-toggle"></div>
-
-      <!-- Drag Target Area To SlideIn Menu On Small Screens -->
-      <div class="drag-target"></div>
-    </div>
-    <!-- / Layout wrapper -->
+    <!-- / Content -->
 
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
@@ -113,13 +75,9 @@
     <script src="../../tamplate/assets/vendor/libs/typeahead-js/typeahead.js"></script>
     <script src="../../tamplate/assets/vendor/js/menu.js"></script>
 
-    {{-- ADVANCE --}}
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- endbuild -->
 
     <!-- Vendors JS -->
-    <script src="../../tamplate/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
-
     <script src="../../tamplate/assets/vendor/libs/@form-validation/popular.js"></script>
     <script src="../../tamplate/assets/vendor/libs/@form-validation/bootstrap5.js"></script>
     <script src="../../tamplate/assets/vendor/libs/@form-validation/auto-focus.js"></script>
@@ -128,10 +86,6 @@
     <script src="../../tamplate/assets/js/main.js"></script>
 
     <!-- Page JS -->
-    <script src="../../tamplate/assets/js/app-access-permission.js"></script>
-    <script src="../../tamplate/assets/js/modal-add-permission.js"></script>
-    <script src="../../tamplate/assets/js/modal-edit-permission.js"></script>
-
-    @yield('js')
+    <script src="../../tamplate/assets/js/pages-auth.js"></script>
   </body>
 </html>
