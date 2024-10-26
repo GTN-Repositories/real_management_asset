@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
-use App\Models\Unit;
+use App\Models\Asset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 
-class UnitController extends Controller
+class AssetController extends Controller
 {
     public function index()
     {
@@ -36,32 +37,35 @@ class UnitController extends Controller
 
                 return $checkbox;
             })
-            ->addColumn('police_number', function ($data) {
-                return $data->police_number ?? null;
+            ->addColumn('image', function ($data) {
+                return $data->image ? '<img src="' . asset('storage/' . $data->image) . '" alt="Image" width="50" height="50"/>' : null;
             })
-            ->addColumn('old_police_number', function ($data) {
-                return $data->old_police_number ?? null;
+            ->addColumn('name', function ($data) {
+                return $data->name ?? null;
             })
-            ->addColumn('frame_number', function ($data) {
-                return $data->frame_number ?? null;
+            ->addColumn('serial_number', function ($data) {
+                return $data->serial_number ?? null;
             })
-            ->addColumn('merk', function ($data) {
-                return $data->merk ?? null;
+            ->addColumn('model_number', function ($data) {
+                return $data->model_number ?? null;
             })
-            ->addColumn('type_vehicle', function ($data) {
-                return $data->type_vehicle ?? null;
+            ->addColumn('manager', function ($data) {
+                return $data->manager ?? null;
             })
-            ->addColumn('type', function ($data) {
-                return $data->type ?? null;
+            ->addColumn('category', function ($data) {
+                return $data->category ?? null;
             })
-            ->addColumn('year', function ($data) {
-                return $data->year ?? null;
+            ->addColumn('assets_location', function ($data) {
+                return $data->assets_location ?? null;
             })
-            ->addColumn('color', function ($data) {
-                return $data->color ?? null;
+            ->addColumn('cost', function ($data) {
+                return $data->cost ?? null;
             })
-            ->addColumn('physical_status', function ($data) {
-                return $data->physical_status ?? null;
+            ->addColumn('purchase_date', function ($data) {
+                return $data->purchase_date ?? null;
+            })
+            ->addColumn('created_at', function ($data) {
+                return $data->created_at ?? null;
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
@@ -79,20 +83,21 @@ class UnitController extends Controller
     {
         $columns = [
             'id',
-            'police_number',
-            'old_police_number',
-            'frame_number',
-            'merk',
-            'type_vehicle',
-            'type',
-            'year',
-            'color',
-            'physical_status',
+            'image',
+            'name',
+            'serial_number',
+            'model_number',
+            'manager',
+            'assets_location',
+            'category',
+            'cost',
+            'purchase_date',
+            'created_at',
         ];
 
         $keyword = $request->search['value'];
 
-        $data = Unit::orderBy('created_at', 'asc')
+        $data = Asset::orderBy('created_at', 'asc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
@@ -120,7 +125,10 @@ class UnitController extends Controller
 
         try {
             return $this->atomic(function () use ($data) {
-                $data = Unit::create($data);
+                if ($data['image'] !== null) {
+                    $data['image'] = $data['image']->store('assets', 'public');
+                }
+                $data = Asset::create($data);
 
                 return response()->json([
                     'status' => true,
@@ -149,7 +157,7 @@ class UnitController extends Controller
      */
     public function edit($id)
     {
-        $data = Unit::findByEncryptedId($id);
+        $data = Asset::findByEncryptedId($id);
 
         return view('main.unit.edit', compact('data'));
     }
@@ -164,7 +172,16 @@ class UnitController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id) {
-                $data = Unit::findByEncryptedId($id)->update($data);
+                $asset = Asset::findByEncryptedId($id);
+                if (!isset($data['image']) || !$data['image']) {
+                    $data['image'] = $asset->image;
+                } else {
+                    if ($asset->image && Storage::disk('public')->exists($asset->image)) {
+                        Storage::disk('public')->delete($asset->image);
+                        $data['image'] = $data['image']->store('assets', 'public');
+                    }
+                }
+                $data = $asset->update($data);
 
                 return response()->json([
                     'status' => true,
@@ -185,7 +202,7 @@ class UnitController extends Controller
     public function destroy($id)
     {
         try {
-            $data = Unit::findByEncryptedId($id);
+            $data = Asset::findByEncryptedId($id);
             $data->delete();
 
             return response()->json([
@@ -210,7 +227,7 @@ class UnitController extends Controller
                     $decryptedIds[] = Crypt::decrypt($encryptedId);
                 }
 
-                $delete = Unit::whereIn('id', $decryptedIds)->delete();
+                $delete = Asset::whereIn('id', $decryptedIds)->delete();
 
                 return response()->json([
                     'status' => true,

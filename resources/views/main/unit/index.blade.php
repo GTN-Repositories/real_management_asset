@@ -4,12 +4,12 @@
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Kendaraan / Unit</h4>
+    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Assets</h4>
 
     <!-- Product List Table -->
     <div class="card">
         <div class="card-header">
-            <h5 class="card-title mb-0">Kendaraan / Unit</h5>
+            <h5 class="card-title mb-0">Assets</h5>
             <div class="d-flex justify-content-end gap-2">
                 <!-- Tombol Hapus Masal -->
                 <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
@@ -30,15 +30,16 @@
                                 <input class="form-check-input" type="checkbox" id="checkAll" />
                             </div>
                         </th>
-                        <th>No Polisi</th>
-                        <th>No Polisi Lama</th>
-                        <th>No Rangka</th>
-                        <th>Merek</th>
-                        <th>Jenis Kendaraan</th>
-                        <th>Tipe</th>
-                        <th>Tahun</th>
-                        <th>Warna</th>
-                        <th>Status Fisik</th>
+                        <th>gambar aset</th>
+                        <th>nama aset</th>
+                        <th>nomor seri</th>
+                        <th>nomor model</th>
+                        <th>manajer aset</th>
+                        <th>lokasi aset</th>
+                        <th>kategori aset</th>
+                        <th>biaya pembelian</th>
+                        <th>tanggal pembelian</th>
+                        <th>dibuat pada</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -109,19 +110,20 @@
                         searchable: false
                     },
                 ],
-                
-                ajax: {type: "GET", url: "{{ route('unit.data') }}", data:{'keyword':keyword}},
+
+                ajax: {type: "GET", url: "{{ route('asset.data') }}", data:{'keyword':keyword}},
                 columns: [
                     {data: 'id', name: 'id', orderable: false, searchable: false},
-                    {data: 'police_number',name: 'police_number'},
-                    {data: 'old_police_number',name: 'old_police_number'},
-                    {data: 'frame_number',name: 'frame_number'},
-                    {data: 'merk',name: 'merk'},
-                    {data: 'type_vehicle',name: 'type_vehicle'},
-                    {data: 'type',name: 'type'},
-                    {data: 'year',name: 'year'},
-                    {data: 'color',name: 'color'},
-                    {data: 'physical_status',name: 'physical_status'},
+                    {data: 'image',name: 'image'},
+                    {data: 'name',name: 'name'},
+                    {data: 'serial_number',name: 'serial_number'},
+                    {data: 'model_number',name: 'model_number'},
+                    {data: 'manager',name: 'manager'},
+                    {data: 'assets_location',name: 'assets_location'},
+                    {data: 'category',name: 'category'},
+                    {data: 'cost',name: 'cost'},
+                    {data: 'purchase_date',name: 'purchase_date'},
+                    {data: 'created_at',name: 'created_at'},
                     {data: 'action',name: 'action',orderable: false,searchable: false}
                 ]
             });
@@ -144,8 +146,8 @@
                         '_method': 'DELETE',
                     };
                     $.ajax({
-                        url: "{{ route('unit.destroy', ':id') }}".replace(':id', id),
-                        type: 'POST', 
+                        url: "{{ route('asset.destroy', ':id') }}".replace(':id', id),
+                        type: 'POST',
                         data : postForm,
                         dataType  : 'json',
                     })
@@ -177,8 +179,8 @@
                         'ids': ids
                     };
                     $.ajax({
-                        url: "{{ route('unit.destroyAll') }}",
-                        type: 'POST', 
+                        url: "{{ route('asset.destroyAll') }}",
+                        type: 'POST',
                         data : postForm,
                         dataType  : 'json',
                     })
@@ -195,8 +197,8 @@
 
         function createData() {
             $.ajax({
-                url: "{{ route('unit.create') }}",
-                type: 'GET', 
+                url: "{{ route('asset.create') }}",
+                type: 'GET',
             })
             .done(function(data) {
                 $('#content-modal-ce').html(data);
@@ -210,10 +212,10 @@
 
         function editData(id) {
             console.log(id);
-            
+
             $.ajax({
-                url: "{{ route('unit.edit', ':id') }}".replace(':id', id),
-                type: 'GET', 
+                url: "{{ route('asset.edit', ':id') }}".replace(':id', id),
+                type: 'GET',
             })
             .done(function(data) {
                 $('#content-modal-ce').html(data);
