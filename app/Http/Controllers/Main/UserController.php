@@ -28,7 +28,7 @@ class UserController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        return view('admin.user.index');
+        return view('main.user.index');
     }
 
     public function data(Request $request)
@@ -98,7 +98,7 @@ class UserController extends Controller implements HasMiddleware
     public function create()
     {
         $roles = Role::orderBy('name', 'asc')->get();
-        return view('admin.user.create', compact('roles'));
+        return view('main.user.create', compact('roles'));
     }
 
     /**
@@ -160,7 +160,7 @@ class UserController extends Controller implements HasMiddleware
         $roles = Role::orderBy('name', 'asc')->get();
         $userRoles = $user->roles->pluck('id')->toArray();
         $encryptedUserId = Crypt::encrypt($user->id);
-        return view('admin.user.edit', compact('user', 'roles', 'userRoles', 'encryptedUserId'));
+        return view('main.user.edit', compact('user', 'roles', 'userRoles', 'encryptedUserId'));
     }
 
 

@@ -15,6 +15,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(MenuSeeder::class);
+        $this->call(FormSeeder::class);
+        $this->call(UnitSeeder::class);
+
         $permissions = [
             'role create',
             'role read',
@@ -28,21 +32,20 @@ class DatabaseSeeder extends Seeder
             'user read',
             'user update',
             'user delete',
+            'kendaraan create',
+            'kendaraan read',
+            'kendaraan update',
+            'kendaraan delete',
         ];
 
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);
         }
-
-
-
+        
         Role::create([
             'name' => 'superAdmin',
             'guard_name' => 'web',
         ]);
-
-
-
 
         $admin = User::create([
             'name' => 'Admin',

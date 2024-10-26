@@ -27,7 +27,7 @@ class PermisionController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        return view('admin.permission.index');
+        return view('main.permission.index');
     }
 
     public function data(Request $request)
@@ -92,7 +92,7 @@ class PermisionController extends Controller implements HasMiddleware
 
     public function create()
     {
-        return view('admin.permission.create');
+        return view('main.permission.create');
     }
 
     /**
@@ -136,7 +136,7 @@ class PermisionController extends Controller implements HasMiddleware
         $decryptedId = Crypt::decrypt($id);
         $data = Permission::findOrFail($decryptedId);
 
-        return view('admin.permission.edit', compact('data'));
+        return view('main.permission.edit', compact('data'));
     }
 
     /**

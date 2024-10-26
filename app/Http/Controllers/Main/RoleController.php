@@ -27,7 +27,7 @@ class RoleController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        return view('admin.role.index');
+        return view('main.role.index');
     }
 
     public function data(Request $request)
@@ -93,7 +93,7 @@ class RoleController extends Controller implements HasMiddleware
     public function create()
     {
         $permissions = Permission::orderBy('name', 'asc')->get();
-        return view('admin.role.create', compact('permissions'));
+        return view('main.role.create', compact('permissions'));
     }
 
     /**
@@ -152,7 +152,7 @@ class RoleController extends Controller implements HasMiddleware
         $permissions = Permission::orderBy('name', 'asc')->get();
         $rolePermissions = $role->permissions->pluck('id')->toArray();
 
-        return view('admin.role.edit', [
+        return view('main.role.edit', [
             'role' => $role,
             'permissions' => $permissions,
             'rolePermissions' => $rolePermissions,
