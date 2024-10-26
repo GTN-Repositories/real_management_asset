@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Main\AssetController;
 use App\Http\Controllers\Main\CategoryItemController;
 use App\Http\Controllers\Main\CustomerController;
 use App\Http\Controllers\Main\FormController;
@@ -48,9 +49,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/site/destroy-all', [SiteController::class, 'destroyAll'])->name('site.destroyAll');
     Route::resource('site', SiteController::class);
 
-    Route::get('/unit/data', [UnitController::class, 'data'])->name('unit.data');
-    Route::delete('/unit/destroy-all', [UnitController::class, 'destroyAll'])->name('unit.destroyAll');
-    Route::resource('unit', UnitController::class);
+    Route::get('/asset/data', [AssetController::class, 'data'])->name('asset.data');
+    Route::delete('/asset/destroy-all', [AssetController::class, 'destroyAll'])->name('asset.destroyAll');
+    Route::resource('asset', AssetController::class);
 
     Route::get('/customer/data', [CustomerController::class, 'data'])->name('customer.data');
     Route::delete('/customer/destroy-all', [CustomerController::class, 'destroyAll'])->name('customer.destroyAll');
