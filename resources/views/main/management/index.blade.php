@@ -195,7 +195,6 @@
         }
 
         function editData(id) {
-            console.log(id);
 
             $.ajax({
                 url: "{{ route('management.edit', ':id') }}".replace(':id', id),

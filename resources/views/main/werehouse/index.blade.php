@@ -102,7 +102,7 @@
                         searchable: false
                     },
                 ],
-                
+
                 ajax: {type: "GET", url: "{{ route('werehouse.data') }}", data:{'keyword':keyword}},
                 columns: [
                     {data: 'id', name: 'id', orderable: false, searchable: false},
@@ -132,7 +132,7 @@
                     };
                     $.ajax({
                         url: "{{ route('werehouse.destroy', ':id') }}".replace(':id', id),
-                        type: 'POST', 
+                        type: 'POST',
                         data : postForm,
                         dataType  : 'json',
                     })
@@ -165,7 +165,7 @@
                     };
                     $.ajax({
                         url: "{{ route('werehouse.destroyAll') }}",
-                        type: 'POST', 
+                        type: 'POST',
                         data : postForm,
                         dataType  : 'json',
                     })
@@ -183,7 +183,7 @@
         function createData() {
             $.ajax({
                 url: "{{ route('werehouse.create') }}",
-                type: 'GET', 
+                type: 'GET',
             })
             .done(function(data) {
                 $('#content-modal-ce').html(data);
@@ -196,11 +196,10 @@
         }
 
         function editData(id) {
-            console.log(id);
-            
+
             $.ajax({
                 url: "{{ route('werehouse.edit', ':id') }}".replace(':id', id),
-                type: 'GET', 
+                type: 'GET',
             })
             .done(function(data) {
                 $('#content-modal-ce').html(data);

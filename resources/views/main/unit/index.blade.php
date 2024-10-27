@@ -211,7 +211,6 @@
         }
 
         function editData(id) {
-            console.log(id);
 
             $.ajax({
                 url: "{{ route('asset.edit', ':id') }}".replace(':id', id),

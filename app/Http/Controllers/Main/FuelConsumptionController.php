@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Http\Controllers\main;
+namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
-use App\Models\ManagementProject;
+use App\Models\FuelConsumption;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
-class ManagementProjectController extends Controller
+class FuelConsumptionController extends Controller
 {
+    //
+
     public function index()
     {
-        return view('main.management.index');
+        return view('main.fuel_consumtion.index');
     }
 
     public function data(Request $request)
@@ -38,14 +38,26 @@ class ManagementProjectController extends Controller
 
                 return $checkbox;
             })
-            ->addColumn('managementRelationId', function ($data) {
+            ->addColumn('relationId', function ($data) {
                 return $data->id ?? null;
             })
-            ->addColumn('name', function ($data) {
-                return $data->name ?? null;
+            ->addColumn('management_project_id', function ($data) {
+                return $data->management_project->name ?? null;
             })
             ->addColumn('asset_id', function ($data) {
                 return $data->asset->name ?? null;
+            })
+            ->addColumn('receiver', function ($data) {
+                return $data->receiver ?? null;
+            })
+            ->addColumn('date', function ($data) {
+                return $data->date ?? null;
+            })
+            ->addColumn('liter', function ($data) {
+                return $data->liter ?? null;
+            })
+            ->addColumn('price', function ($data) {
+                return $data->price ?? null;
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
@@ -63,13 +75,17 @@ class ManagementProjectController extends Controller
     {
         $columns = [
             'id',
-            'name',
+            'management_project_id',
             'asset_id',
+            'receiver',
+            'date',
+            'liter',
+            'price',
         ];
 
         $keyword = $request->search['value'] ?? "";
 
-        $data = ManagementProject::orderBy('created_at', 'asc')
+        $data = FuelConsumption::orderBy('created_at', 'asc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
@@ -78,18 +94,14 @@ class ManagementProjectController extends Controller
                     }
                 }
             });
+
         return $data;
     }
 
-    public function getAssetsByProject(Request $request)
-    {
-        $project = ManagementProject::where('name', $request->projectName)->get();
-        return response()->json($project->pluck('asset.name', 'asset_id')->toArray());
-    }
 
     public function create()
     {
-        return view('main.management.create');
+        return view('main.fuel_consumtion.create');
     }
 
     /**
@@ -97,22 +109,12 @@ class ManagementProjectController extends Controller
      */
     public function store(Request $request)
     {
-
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'asset_id' => 'required',
-        ]);
+        $data = $request->all();
 
         try {
             return $this->atomic(function () use ($data) {
-                foreach ($data['asset_id'] as $encryptedAssetId) {
-                    $decryptedAssetId = Crypt::decrypt($encryptedAssetId);
-                    $projectData = [
-                        'name' => $data['name'],
-                        'asset_id' => $decryptedAssetId
-                    ];
-                    ManagementProject::create($projectData);
-                }
+                $data["management_project_id"] = crypt::decrypt($data["management_project_id"]);
+                $data = FuelConsumption::create($data);
 
                 return response()->json([
                     'status' => true,
@@ -141,9 +143,9 @@ class ManagementProjectController extends Controller
      */
     public function edit($id)
     {
-        $data = ManagementProject::findByEncryptedId($id);
+        $data = FuelConsumption::findByEncryptedId($id);
 
-        return view('main.management.edit', compact('data'));
+        return view('main.fuel_consumtion.edit', compact('data'));
     }
 
 
@@ -156,8 +158,8 @@ class ManagementProjectController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id) {
-                $data["asset_id"] = Crypt::decrypt($data["asset_id"]);
-                $data = ManagementProject::findByEncryptedId($id)->update($data);
+                $data["management_project_id"] = crypt::decrypt($data["management_project_id"]);
+                $data = FuelConsumption::findByEncryptedId($id)->update($data);
 
                 return response()->json([
                     'status' => true,
@@ -178,8 +180,7 @@ class ManagementProjectController extends Controller
     public function destroy($id)
     {
         try {
-            $data = ManagementProject::findByEncryptedId($id);
-
+            $data = FuelConsumption::findByEncryptedId($id);
             $data->delete();
 
             return response()->json([
@@ -204,7 +205,7 @@ class ManagementProjectController extends Controller
                     $decryptedIds[] = Crypt::decrypt($encryptedId);
                 }
 
-                $delete = ManagementProject::whereIn('id', $decryptedIds)->delete();
+                $delete = FuelConsumption::whereIn('id', $decryptedIds)->delete();
 
                 return response()->json([
                     'status' => true,

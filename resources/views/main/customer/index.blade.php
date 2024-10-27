@@ -104,7 +104,7 @@
                         searchable: false
                     },
                 ],
-                
+
                 ajax: {type: "GET", url: "{{ route('customer.data') }}", data:{'keyword':keyword}},
                 columns: [
                     {data: 'id', name: 'id', orderable: false, searchable: false},
@@ -135,7 +135,7 @@
                     };
                     $.ajax({
                         url: "{{ route('customer.destroy', ':id') }}".replace(':id', id),
-                        type: 'POST', 
+                        type: 'POST',
                         data : postForm,
                         dataType  : 'json',
                     })
@@ -168,7 +168,7 @@
                     };
                     $.ajax({
                         url: "{{ route('customer.destroyAll') }}",
-                        type: 'POST', 
+                        type: 'POST',
                         data : postForm,
                         dataType  : 'json',
                     })
@@ -186,7 +186,7 @@
         function createData() {
             $.ajax({
                 url: "{{ route('customer.create') }}",
-                type: 'GET', 
+                type: 'GET',
             })
             .done(function(data) {
                 $('#content-modal-ce').html(data);
@@ -199,11 +199,10 @@
         }
 
         function editData(id) {
-            console.log(id);
-            
+
             $.ajax({
                 url: "{{ route('customer.edit', ':id') }}".replace(':id', id),
-                type: 'GET', 
+                type: 'GET',
             })
             .done(function(data) {
                 $('#content-modal-ce').html(data);

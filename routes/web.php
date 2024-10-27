@@ -4,6 +4,7 @@ use App\Http\Controllers\Main\AssetController;
 use App\Http\Controllers\Main\CategoryItemController;
 use App\Http\Controllers\Main\CustomerController;
 use App\Http\Controllers\Main\FormController;
+use App\Http\Controllers\Main\FuelConsumptionController;
 use App\Http\Controllers\Main\InspectionScheduleController;
 use App\Http\Controllers\Main\ItemController;
 use App\Http\Controllers\main\ManagementProjectController;
@@ -53,6 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/asset/destroy-all', [AssetController::class, 'destroyAll'])->name('asset.destroyAll');
     Route::resource('asset', AssetController::class);
 
+    Route::get('/management/by-project', [ManagementProjectController::class, 'getAssetsByProject'])->name('management.by_project');
     Route::get('/management/data', [ManagementProjectController::class, 'data'])->name('management.data');
     Route::delete('/management/destroy-all', [ManagementProjectController::class, 'destroyAll'])->name('management.destroyAll');
     Route::resource('management', ManagementProjectController::class);
@@ -86,6 +88,10 @@ Route::middleware('auth')->group(function () {
     Route::get('quiz', function () {
         return view('main.quiz.index');
     })->name('quiz');
+
+    Route::get('/fuel/data', [FuelConsumptionController::class, 'data'])->name('fuel.data');
+    Route::delete('/fuel/destroy-all', [FuelConsumptionController::class, 'destroyAll'])->name('fuel.destroyAll');
+    Route::resource('fuel', FuelConsumptionController::class);
 });
 
 require __DIR__ . '/auth.php';

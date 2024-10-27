@@ -103,7 +103,7 @@
                         searchable: false
                     },
                 ],
-                
+
                 ajax: {type: "GET", url: "{{ route('site.data') }}", data:{'keyword':keyword}},
                 columns: [
                     {data: 'id', name: 'id', orderable: false, searchable: false},
@@ -133,7 +133,7 @@
                     };
                     $.ajax({
                         url: "{{ route('site.destroy', ':id') }}".replace(':id', id),
-                        type: 'POST', 
+                        type: 'POST',
                         data : postForm,
                         dataType  : 'json',
                     })
@@ -166,7 +166,7 @@
                     };
                     $.ajax({
                         url: "{{ route('site.destroyAll') }}",
-                        type: 'POST', 
+                        type: 'POST',
                         data : postForm,
                         dataType  : 'json',
                     })
@@ -184,7 +184,7 @@
         function createData() {
             $.ajax({
                 url: "{{ route('site.create') }}",
-                type: 'GET', 
+                type: 'GET',
             })
             .done(function(data) {
                 $('#content-modal-ce').html(data);
@@ -197,11 +197,10 @@
         }
 
         function editData(id) {
-            console.log(id);
-            
+
             $.ajax({
                 url: "{{ route('site.edit', ':id') }}".replace(':id', id),
-                type: 'GET', 
+                type: 'GET',
             })
             .done(function(data) {
                 $('#content-modal-ce').html(data);
