@@ -10,6 +10,7 @@ use App\Http\Controllers\Main\ItemController;
 use App\Http\Controllers\main\ManagementProjectController;
 use App\Http\Controllers\Main\MenuController;
 use App\Http\Controllers\Main\PermisionController;
+use App\Http\Controllers\Main\ReportFuelController;
 use App\Http\Controllers\Main\RoleController;
 use App\Http\Controllers\Main\SiteController;
 use App\Http\Controllers\Main\SupplierController;
@@ -92,6 +93,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/fuel/data', [FuelConsumptionController::class, 'data'])->name('fuel.data');
     Route::delete('/fuel/destroy-all', [FuelConsumptionController::class, 'destroyAll'])->name('fuel.destroyAll');
     Route::resource('fuel', FuelConsumptionController::class);
+
+    Route::post('report-fuel/export-pdf', [ReportFuelController::class, 'exportPDF'])->name('report-fuel.export-pdf');
+    Route::get('/report-fuel/chart', [ReportFuelController::class, 'getChartData'])->name('report-fuel.chart');
+    Route::get('/report-fuel/data', [ReportFuelController::class, 'data'])->name('report-fuel.data');
+    Route::resource('report-fuel', ReportFuelController::class);
 });
 
 require __DIR__ . '/auth.php';
