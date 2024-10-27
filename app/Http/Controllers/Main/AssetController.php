@@ -99,6 +99,9 @@ class AssetController extends Controller
         ];
 
         $keyword = $request->search['value'] ?? "";
+        $category = $request->category;
+        $assets_location = $request->assets_location;
+        $manager = $request->manager;
 
         $data = Asset::orderBy('created_at', 'asc')
             ->select($columns)
@@ -109,6 +112,16 @@ class AssetController extends Controller
                     }
                 }
             });
+
+        if ($category) {
+            $data->where('category', $category);
+        }
+        if ($assets_location) {
+            $data->where('assets_location', $assets_location);
+        }
+        if ($manager) {
+            $data->where('manager', $manager);
+        }
 
         return $data;
     }
