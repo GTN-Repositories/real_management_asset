@@ -1,6 +1,6 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Edit Kendaraan/Unit</h3>
+    <h3 class="mb-2">Edit Management Project</h3>
     <p class="text-muted">Edit Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
 <form method="POST" class="row g-3" id="formEdit" action="{{ route('management.update', $data->id) }}"
@@ -9,12 +9,12 @@
     @method('put')
 
     <div class="col-12 col-md-6">
-        <label class="form-label" for="name">name<span class="text-danger">*</span></label>
+        <label class="form-label" for="name">nama manajemen<span class="text-danger">*</span></label>
         <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name" required
             value="{{ $data->name }}" />
     </div>
     <div class="col-12 col-md-6" id="relationId">
-        <label class="form-label" for="asset_id">asset_id<span class="text-danger">*</span></label>
+        <label class="form-label" for="asset_id">nama aset<span class="text-danger">*</span></label>
         <select id="asset_id" name="asset_id" class="select2 form-select " data-allow-clear="true" required>
             <option value="{{ $data->asset->id }}" selected>{{ $data->asset->name }}</option>
         </select>

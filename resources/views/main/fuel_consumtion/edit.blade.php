@@ -21,13 +21,13 @@
         </select>
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="receiver">receiver<span class="text-danger">*</span></label>
-        <input type="text" id="receiver" name="receiver" class="form-control" placeholder="Masukkan receiver"
+        <label class="form-label" for="receiver">penerima<span class="text-danger">*</span></label>
+        <input type="text" id="receiver" name="receiver" class="form-control" placeholder="Masukkan penerima"
             required value="{{ $data->receiver }}" />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="date">date<span class="text-danger">*</span></label>
-        <input type="date" id="date" name="date" class="form-control" placeholder="Masukkan date"
+        <label class="form-label" for="date">tanggal<span class="text-danger">*</span></label>
+        <input type="date" id="date" name="date" class="form-control" placeholder="Masukkan tanggal"
             value="{{ date('Y-m-d') }}" required value="{{ $data->date }}" />
     </div>
     <div class="col-12 col-md-6">
@@ -36,8 +36,8 @@
             placeholder="Masukkan liter" required value="{{ $data->liter }}" />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="price">price<span class="text-danger">*</span></label>
-        <input type="text" id="price" name="price" class="form-control" placeholder="Masukkan price" required
+        <label class="form-label" for="price">harga/liter<span class="text-danger">*</span></label>
+        <input type="text" id="price" name="price" class="form-control" placeholder="Masukkan harga" required
             value="{{ $data->price }}" />
     </div>
     <div class="col-12 text-center">

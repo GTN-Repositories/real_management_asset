@@ -9,16 +9,16 @@
     @method('put')
 
     <div class="col-12 col-md-12">
-        <label class="form-label" for="image">image</label>
+        <label class="form-label" for="image">gambar</label>
         <input type="file" id="image" name="image" class="form-control" />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="name">name<span class="text-danger">*</span></label>
-        <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name"
+        <label class="form-label" for="name">nama<span class="text-danger">*</span></label>
+        <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan nama"
             value="{{ $data->name }}" />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="manager">manager<span class="text-danger">*</span></label>
+        <label class="form-label" for="manager">manajer<span class="text-danger">*</span></label>
         <select id="manager" name="manager" class="select2 form-select" data-allow-clear="true">
             <option value="">Pilih</option>
             <option value="lenz creative" {{ $data->manager == 'lenz creative' ? 'selected' : '' }}>lenz creative
@@ -26,7 +26,7 @@
         </select>
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="category">category<span class="text-danger">*</span></label>
+        <label class="form-label" for="category">kategori<span class="text-danger">*</span></label>
         <select name="category" id="category" class="select2 form-select" data-allow-clear="true">
             <option value="">Pilih</option>
             <option value="Technology" {{ $data->category == 'Technology' ? 'selected' : '' }}>Technology</option>
@@ -40,12 +40,12 @@
         </select>
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="cost">cost</label>
+        <label class="form-label" for="cost">biaya</label>
         <input type="number" min="1" id="cost" name="cost" class="form-control"
-            placeholder="Masukkan cost" value="{{ $data->cost }}" />
+            placeholder="Masukkan biaya" value="{{ $data->cost }}" />
     </div>
     <div class="col-12 col-md-12">
-        <label class="form-label" for="description">description</label>
+        <label class="form-label" for="description">deskripsi</label>
         <textarea name="description" id="description" class="form-control" cols="30" rows="5">{{ $data->description }}</textarea>
     </div>
     <div class="col-12">
@@ -65,23 +65,23 @@
                     style="">
                     <div class="accordion-body row">
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="serial_number">serial_number</label>
+                            <label class="form-label" for="serial_number">nomor seri</label>
                             <input type="text" id="serial_number" name="serial_number" class="form-control"
-                                placeholder="Masukkan serial_number" value="{{ $data->serial_number }}" />
+                                placeholder="Masukkan nomor seri" value="{{ $data->serial_number }}" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="model_number">model_number</label>
+                            <label class="form-label" for="model_number">nomor model</label>
                             <input type="text" id="model_number" name="model_number" class="form-control"
-                                placeholder="Masukkan model_number" value="{{ $data->model_number }}" />
+                                placeholder="Masukkan nomor model" value="{{ $data->model_number }}" />
                         </div>
                         <div class="col-12 col-md-12">
-                            <label class="form-label" for="warranty_period">warranty_period</label>
+                            <label class="form-label" for="warranty_period">waktu garansi</label>
                             <input type="number" min="1" id="warranty_period" name="warranty_period"
-                                class="form-control" placeholder="Masukkan warranty_period"
+                                class="form-control" placeholder="Masukkan waktu garansi"
                                 value="{{ $data->warranty_period }}" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="assets_location">assets_location</label>
+                            <label class="form-label" for="assets_location">lokasi aset</label>
                             <select name="assets_location" id="assets_location" class="form-select select2">
                                 <option value="">Pilih</option>
                                 <option value="Jatim" {{ $data->assets_location == 'Jatim' ? 'selected' : '' }}>Jatim
@@ -105,9 +105,9 @@
                             </select>
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="purchase_date">purchase_date</label>
+                            <label class="form-label" for="purchase_date">tanggal pembelian</label>
                             <input type="date" id="purchase_date" name="purchase_date" class="form-control"
-                                placeholder="Masukkan purchase_date" value="{{ $data->purchase_date }}" />
+                                placeholder="Masukkan tanggal pembelian" value="{{ $data->purchase_date }}" />
                         </div>
                     </div>
                 </div>
@@ -123,33 +123,33 @@
                     data-bs-parent="#accordionExample">
                     <div class="accordion-body row">
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="depreciation">depreciation</label>
+                            <label class="form-label" for="depreciation">penyusutan</label>
                             <input type="number" min="1" id="depreciation" name="depreciation"
-                                class="form-control" placeholder="Masukkan depreciation"
+                                class="form-control" placeholder="Masukkan penyusutan"
                                 value="{{ $data->depreciation }}" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="depreciation_percentage">depreciation_percentage</label>
+                            <label class="form-label" for="depreciation_percentage">persentase penyusutan</label>
                             <input type="text" id="depreciation_percentage" name="depreciation_percentage"
-                                class="form-control" placeholder="Masukkan depreciation_percentage"
+                                class="form-control" placeholder="Masukkan persentase penyusutan"
                                 value="{{ $data->depreciation_percentage }}" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="depreciation_method">depreciation_method</label>
+                            <label class="form-label" for="depreciation_method">metode penyusutan</label>
                             <select name="depreciation_method" id="depreciation_method" class="select2 form-select">
                                 <option value="">Pilih</option>
-                                <option value="Reducing Balance Depreciation"
-                                    {{ $data->depreciation_method == 'Reducing Balance Depreciation' ? 'selected' : '' }}>
-                                    Reducing Balance Depreciation</option>
-                                <option value="Straight-Line Depreciation"
-                                    {{ $data->depreciation_method == 'Straight-Line Depreciation' ? 'selected' : '' }}>
-                                    Straight-Line Depreciation</option>
+                                <option value="Penyusutan Saldo Menurun"
+                                    {{ $data->depreciation_method == 'Penyusutan Saldo Menurun' ? 'selected' : '' }}>
+                                    Penyusutan Saldo Menurun</option>
+                                <option value="Penyusutan Garis Lurus"
+                                    {{ $data->depreciation_method == 'Penyusutan Garis Lurus' ? 'selected' : '' }}>
+                                    Penyusutan Garis Lurus</option>
                             </select>
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="residual_value">residual_value</label>
+                            <label class="form-label" for="residual_value">nilai sisa</label>
                             <input type="number" min="1" id="residual_value" name="residual_value"
-                                class="form-control" placeholder="Masukkan residual_value"
+                                class="form-control" placeholder="Masukkan nilai sisa"
                                 value="{{ $data->residual_value }}" />
                         </div>
                     </div>
@@ -166,15 +166,15 @@
                     data-bs-parent="#accordionExample">
                     <div class="accordion-body row">
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="appreciation_rate">appreciation_rate</label>
+                            <label class="form-label" for="appreciation_rate">tingkat apresiasi</label>
                             <input type="number" min="1" id="appreciation_rate" name="appreciation_rate"
-                                class="form-control" placeholder="Masukkan appreciation_rate"
+                                class="form-control" placeholder="Masukkan tingkat apresiasi"
                                 value="{{ $data->appreciation_rate }}" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="appreciation_period">appreciation_period</label>
+                            <label class="form-label" for="appreciation_period">periode apresiasi</label>
                             <input type="number" min="1" id="appreciation_period" name="appreciation_period"
-                                class="form-control" placeholder="Masukkan appreciation_period"
+                                class="form-control" placeholder="Masukkan periode apresiasi"
                                 value="{{ $data->appreciation_period }}" />
                         </div>
                     </div>
@@ -191,20 +191,20 @@
                     data-bs-parent="#accordionExample">
                     <div class="accordion-body row">
                         <div class="col-12 col-md-12">
-                            <label class="form-label" for="supplier_name">supplier_name</label>
+                            <label class="form-label" for="supplier_name">nama pemasok</label>
                             <input type="text" id="supplier_name" name="supplier_name" class="form-control"
-                                placeholder="Masukkan supplier_name" value="{{ $data->supplier_name }}" />
+                                placeholder="Masukkan nama pemasok" value="{{ $data->supplier_name }}" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="supplier_phone_number">supplier_phone_number</label>
+                            <label class="form-label" for="supplier_phone_number">nomor telepon pemasok</label>
                             <input type="text" id="supplier_phone_number" name="supplier_phone_number"
-                                class="form-control" placeholder="Masukkan supplier_phone_number"
+                                class="form-control" placeholder="Masukkan nomor telepon pemasok"
                                 value="{{ $data->supplier_phone_number }}" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="supplier_address">supplier_address</label>
+                            <label class="form-label" for="supplier_address">alamat pemasok</label>
                             <input type="text" id="supplier_address" name="supplier_address" class="form-control"
-                                placeholder="Masukkan supplier_address" value="{{ $data->supplier_address }}" />
+                                placeholder="Masukkan alamat pemasok" value="{{ $data->supplier_address }}" />
                         </div>
                     </div>
                 </div>

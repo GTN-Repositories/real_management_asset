@@ -32,8 +32,6 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/rtl/theme-default.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/demo.css') }}" />
 
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
     <!-- Vendors CSS -->
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/node-waves/node-waves.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
@@ -116,10 +114,14 @@
 
     {{-- ADVANCE --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- endbuild -->
 
     <!-- Vendors JS -->
+    <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/typeahead-js/typeahead.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/bloodhound/bloodhound.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/apex-charts/apexcharts.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/popular.js') }}"></script>

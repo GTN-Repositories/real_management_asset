@@ -10,7 +10,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-12 col-md-4">
-                        <label class="form-label" for="category">category</label>
+                        <label class="form-label" for="category">Kategori</label>
                         <select name="category" id="category" class="select2 form-select " data-allow-clear="true" required>
                             <option value="">Pilih</option>
                             <option value="Technology">Technology</option>
@@ -23,7 +23,7 @@
                         </select>
                     </div>
                     <div class="col-12 col-md-4">
-                        <label class="form-label" for="assets_location">assets_location</label>
+                        <label class="form-label" for="assets_location">Lokasi Aset</label>
                         <select name="assets_location" id="assets_location" class="form-select select2">
                             <option value="">Pilih</option>
                             <option value="Jatim">Jatim</option>
@@ -38,7 +38,7 @@
                         </select>
                     </div>
                     <div class="col-12 col-md-4">
-                        <label class="form-label" for="manager">manager</label>
+                        <label class="form-label" for="manager">Manajer</label>
                         <select id="manager" name="manager" class="select2 form-select " data-allow-clear="true" required>
                             <option value="">Pilih</option>
                             <option value="lenz creative">lenz creative</option>

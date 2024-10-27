@@ -7,22 +7,22 @@
     @csrf
 
     <div class="col-12 col-md-12">
-        <label class="form-label" for="image">image</label>
+        <label class="form-label" for="image">gambar</label>
         <input type="file" id="image" name="image" class="form-control" />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="name">name<span class="text-danger">*</span></label>
+        <label class="form-label" for="name">nama aset<span class="text-danger">*</span></label>
         <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name" required/>
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="manager">manager<span class="text-danger">*</span></label>
+        <label class="form-label" for="manager">manajer<span class="text-danger">*</span></label>
         <select id="manager" name="manager" class="select2 form-select " data-allow-clear="true" required>
             <option value="">Pilih</option>
             <option value="lenz creative">lenz creative</option>
         </select>
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="category">category<span class="text-danger">*</span></label>
+        <label class="form-label" for="category">kategori<span class="text-danger">*</span></label>
         <select name="category" id="category" class="select2 form-select " data-allow-clear="true" required>
             <option value="">Pilih</option>
             <option value="Technology">Technology</option>
@@ -35,12 +35,12 @@
         </select>
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="cost">cost</label>
+        <label class="form-label" for="cost">biaya</label>
         <input type="number" min="1" id="cost" name="cost" class="form-control"
             placeholder="Masukkan cost" />
     </div>
     <div class="col-12 col-md-12">
-        <label class="form-label" for="description">description</label>
+        <label class="form-label" for="description">keterangan</label>
         <textarea name="description" id="description" class="form-control" cols="30" rows="5"></textarea>
     </div>
     <div class="col-12">
@@ -60,22 +60,22 @@
                     style="">
                     <div class="accordion-body row">
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="serial_number">serial_number</label>
+                            <label class="form-label" for="serial_number">nomor seri</label>
                             <input type="text" id="serial_number" name="serial_number" class="form-control"
                                 placeholder="Masukkan serial_number" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="model_number">model_number</label>
+                            <label class="form-label" for="model_number">nomor model</label>
                             <input type="text" id="model_number" name="model_number" class="form-control"
                                 placeholder="Masukkan model_number" />
                         </div>
                         <div class="col-12 col-md-12">
-                            <label class="form-label" for="warranty_period">warranty_period</label>
+                            <label class="form-label" for="warranty_period">waktu garansi</label>
                             <input type="number" min="1" id="warranty_period" name="warranty_period"
                                 class="form-control" placeholder="Masukkan warranty_period" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="assets_location">assets_location</label>
+                            <label class="form-label" for="assets_location">lokasi</label>
                             <select name="assets_location" id="assets_location" class="form-select select2">
                                 <option value="">Pilih</option>
                                 <option value="Jatim">Jatim</option>
@@ -90,7 +90,7 @@
                             </select>
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="purchase_date">purchase_date</label>
+                            <label class="form-label" for="purchase_date">tanggal pembelian</label>
                             <input type="date" id="purchase_date" name="purchase_date" class="form-control"
                                 placeholder="Masukkan purchase_date" />
                         </div>
@@ -108,25 +108,25 @@
                     data-bs-parent="#accordionExample">
                     <div class="accordion-body row">
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="depreciation">depreciation</label>
+                            <label class="form-label" for="depreciation">penyusutan</label>
                             <input type="number" min="1" id="depreciation" name="depreciation"
                                 class="form-control" placeholder="Masukkan depreciation" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="depreciation_percentage">depreciation_percentage</label>
+                            <label class="form-label" for="depreciation_percentage">persentase penyusutan</label>
                             <input type="text" id="depreciation_percentage" name="depreciation_percentage"
                                 class="form-control" placeholder="Masukkan depreciation_percentage" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="depreciation_method">depreciation_method</label>
+                            <label class="form-label" for="depreciation_method">metode penyusutan</label>
                             <select name="depreciation_method" id="depreciation_method" class="select2 form-select">
                                 <option value="">Pilih</option>
-                                <option value="Reducing Balance Depreciation">Reducing Balance Depreciation</option>
-                                <option value="Straight-Line Depreciation">Straight-Line Depreciation</option>
+                                <option value="Penyusutan Saldo Menurun">Penyusutan Saldo Menurun</option>
+                                <option value="Penyusutan Garis Lurus">Penyusutan Garis Lurus</option>
                             </select>
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="residual_value">residual_value</label>
+                            <label class="form-label" for="residual_value">nilai sisa</label>
                             <input type="number" min="1" id="residual_value" name="residual_value"
                                 class="form-control" placeholder="Masukkan residual_value" />
                         </div>
@@ -144,12 +144,12 @@
                     data-bs-parent="#accordionExample">
                     <div class="accordion-body row">
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="appreciation_rate">appreciation_rate</label>
+                            <label class="form-label" for="appreciation_rate">tingkat apresiasi</label>
                             <input type="number" min="1" id="appreciation_rate" name="appreciation_rate"
                                 class="form-control" placeholder="Masukkan appreciation_rate" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="appreciation_period">appreciation_period</label>
+                            <label class="form-label" for="appreciation_period">periode apresiasi</label>
                             <input type="number" min="1" id="appreciation_period" name="appreciation_period"
                                 class="form-control" placeholder="Masukkan appreciation_period" />
                         </div>
@@ -167,17 +167,17 @@
                     data-bs-parent="#accordionExample">
                     <div class="accordion-body row">
                         <div class="col-12 col-md-12">
-                            <label class="form-label" for="supplier_name">supplier_name</label>
+                            <label class="form-label" for="supplier_name">nama pemasok</label>
                             <input type="text" id="supplier_name" name="supplier_name" class="form-control"
                                 placeholder="Masukkan supplier_name" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="supplier_phone_number">supplier_phone_number</label>
+                            <label class="form-label" for="supplier_phone_number">nomor telepon pemasok</label>
                             <input type="text" id="supplier_phone_number" name="supplier_phone_number"
                                 class="form-control" placeholder="Masukkan supplier_phone_number" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="supplier_address">supplier_address</label>
+                            <label class="form-label" for="supplier_address">alamat pemasok</label>
                             <input type="text" id="supplier_address" name="supplier_address" class="form-control"
                                 placeholder="Masukkan supplier_address" />
                         </div>

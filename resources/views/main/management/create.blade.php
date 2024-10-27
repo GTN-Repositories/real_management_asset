@@ -8,15 +8,20 @@
     @csrf
 
     <div class="col-12 col-md-6">
-        <label class="form-label" for="name">name<span class="text-danger">*</span></label>
+        <label class="form-label" for="name">nama manajemen<span class="text-danger">*</span></label>
         <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name" required />
     </div>
-    <div class="col-12 col-md-6" id="relationId">
-        <label class="form-label" for="asset_id">asset_id<span class="text-danger">*</span></label>
-        <select id="asset_id" name="asset_id[]" class="select2 form-select select2-primary" multiple
-            data-allow-clear="true" required>
-        </select>
+    <div class="col-12 col-md-6 mb-4" id="relationId">
+        <label for="asset_id" class="form-label">nama aset<span class="text-danger">*</span></label>
+        <div class="select2-primary">
+            <div class="position-relative">
+                <select id="asset_id" name="asset_id[]" class="select2 form-select" multiple required>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+        </div>
     </div>
+
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
         <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
