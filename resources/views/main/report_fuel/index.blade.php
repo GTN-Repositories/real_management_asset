@@ -48,7 +48,7 @@
     <script type="text/javascript">
         $(document).ready(function() {
             init_table();
-            init_chart(); // Initialize chart after document is ready
+            init_chart();
             $('#exportPdfBtn').on('click', exportPDF);
         });
 
@@ -62,7 +62,7 @@
             var table = $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
-                destroy: true, // Add this to make sure it reinitializes the table correctly.
+                destroy: true,
                 columnDefs: [{
                     target: 0,
                     visible: true,
@@ -130,7 +130,7 @@
                             toolbar: {
                                 show: true
                             },
-                            background: '#ffffff' // Ensure white background for export
+                            background: '#ffffff'
                         },
                         dataLabels: {
                             enabled: false

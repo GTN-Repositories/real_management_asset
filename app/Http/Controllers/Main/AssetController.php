@@ -41,34 +41,34 @@ class AssetController extends Controller
                 return $data->id ?? null;
             })
             ->addColumn('image', function ($data) {
-                return $data->image ? '<img src="' . asset('storage/' . $data->image) . '" alt="Image" width="50" height="50"/>' : null;
+                return $data->image ? '<img src="' . asset('storage/' . $data->image) . '" alt="Image" width="50" height="50"/>' : "kosong";
             })
             ->addColumn('name', function ($data) {
-                return $data->name ?? null;
+                return $data->name ?? "kosong";
             })
             ->addColumn('serial_number', function ($data) {
-                return $data->serial_number ?? null;
+                return $data->serial_number ?? "kosong";
             })
             ->addColumn('model_number', function ($data) {
-                return $data->model_number ?? null;
+                return $data->model_number ?? "kosong";
             })
             ->addColumn('manager', function ($data) {
-                return $data->manager ?? null;
+                return $data->manager ?? "kosong";
             })
             ->addColumn('category', function ($data) {
-                return $data->category ?? null;
+                return $data->category ?? "kosong";
             })
             ->addColumn('assets_location', function ($data) {
-                return $data->assets_location ?? null;
+                return $data->assets_location ?? "kosong";
             })
             ->addColumn('cost', function ($data) {
-                return $data->cost ?? null;
+                return $data->cost ?? "kosong";
             })
             ->addColumn('purchase_date', function ($data) {
-                return $data->purchase_date ?? null;
+                return $data->purchase_date ?? "kosong";
             })
             ->addColumn('created_at', function ($data) {
-                return $data->created_at ?? null;
+                return $data->created_at ?? "kosong";
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
@@ -141,7 +141,7 @@ class AssetController extends Controller
 
         try {
             return $this->atomic(function () use ($data) {
-                if ($data['image'] !== null) {
+                if (isset($data['image'])) {
                     $data['image'] = $data['image']->store('assets', 'public');
                 }
                 $data = Asset::create($data);
