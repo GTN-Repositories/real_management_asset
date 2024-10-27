@@ -5,9 +5,11 @@
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Fuel Consumption</h4>
-        <button id="exportPdfBtn" class="btn btn-primary btn-sm">
-            <i class="bx bx-download me-1"></i>Export PDF
-        </button>
+        <div class="d-flex justify-content-end align-items-center mb-3">
+            <button id="exportPdfBtn" class="btn btn-primary">
+                <i class="fa-solid fa-file-pdf me-1"></i>Export PDF
+            </button>
+        </div>
         <!-- Chart Container -->
         <div class="card mb-4">
             <div class="card-header">
