@@ -84,9 +84,11 @@ class FuelConsumptionController extends Controller
         ];
 
         $keyword = $request->search['value'] ?? "";
+        $project_id = $this->projectId();
 
         $data = FuelConsumption::orderBy('created_at', 'asc')
             ->select($columns)
+            ->whereIn($project_id)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
                     foreach ($columns as $column) {
