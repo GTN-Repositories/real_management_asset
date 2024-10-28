@@ -3,15 +3,17 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
-use App\Models\Unit;
+use App\Models\FuelConsumption;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
-class UnitController extends Controller
+class FuelConsumptionController extends Controller
 {
+    //
+
     public function index()
     {
-        return view('main.unit.index');
+        return view('main.fuel_consumtion.index');
     }
 
     public function data(Request $request)
@@ -36,32 +38,26 @@ class UnitController extends Controller
 
                 return $checkbox;
             })
-            ->addColumn('police_number', function ($data) {
-                return $data->police_number ?? null;
+            ->addColumn('relationId', function ($data) {
+                return $data->id ?? null;
             })
-            ->addColumn('old_police_number', function ($data) {
-                return $data->old_police_number ?? null;
+            ->addColumn('management_project_id', function ($data) {
+                return $data->management_project->name ?? null;
             })
-            ->addColumn('frame_number', function ($data) {
-                return $data->frame_number ?? null;
+            ->addColumn('asset_id', function ($data) {
+                return $data->asset->name ?? null;
             })
-            ->addColumn('merk', function ($data) {
-                return $data->merk ?? null;
+            ->addColumn('receiver', function ($data) {
+                return $data->receiver ?? null;
             })
-            ->addColumn('type_vehicle', function ($data) {
-                return $data->type_vehicle ?? null;
+            ->addColumn('date', function ($data) {
+                return $data->date ?? null;
             })
-            ->addColumn('type', function ($data) {
-                return $data->type ?? null;
+            ->addColumn('liter', function ($data) {
+                return $data->liter ?? null;
             })
-            ->addColumn('year', function ($data) {
-                return $data->year ?? null;
-            })
-            ->addColumn('color', function ($data) {
-                return $data->color ?? null;
-            })
-            ->addColumn('physical_status', function ($data) {
-                return $data->physical_status ?? null;
+            ->addColumn('price', function ($data) {
+                return $data->price ?? null;
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
@@ -79,20 +75,17 @@ class UnitController extends Controller
     {
         $columns = [
             'id',
-            'police_number',
-            'old_police_number',
-            'frame_number',
-            'merk',
-            'type_vehicle',
-            'type',
-            'year',
-            'color',
-            'physical_status',
+            'management_project_id',
+            'asset_id',
+            'receiver',
+            'date',
+            'liter',
+            'price',
         ];
 
-        $keyword = $request->search['value'];
+        $keyword = $request->search['value'] ?? "";
 
-        $data = Unit::orderBy('created_at', 'asc')
+        $data = FuelConsumption::orderBy('created_at', 'asc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
@@ -108,7 +101,7 @@ class UnitController extends Controller
 
     public function create()
     {
-        return view('main.unit.create');
+        return view('main.fuel_consumtion.create');
     }
 
     /**
@@ -120,7 +113,8 @@ class UnitController extends Controller
 
         try {
             return $this->atomic(function () use ($data) {
-                $data = Unit::create($data);
+                $data["management_project_id"] = crypt::decrypt($data["management_project_id"]);
+                $data = FuelConsumption::create($data);
 
                 return response()->json([
                     'status' => true,
@@ -149,9 +143,9 @@ class UnitController extends Controller
      */
     public function edit($id)
     {
-        $data = Unit::findByEncryptedId($id);
+        $data = FuelConsumption::findByEncryptedId($id);
 
-        return view('main.unit.edit', compact('data'));
+        return view('main.fuel_consumtion.edit', compact('data'));
     }
 
 
@@ -164,7 +158,8 @@ class UnitController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id) {
-                $data = Unit::findByEncryptedId($id)->update($data);
+                $data["management_project_id"] = crypt::decrypt($data["management_project_id"]);
+                $data = FuelConsumption::findByEncryptedId($id)->update($data);
 
                 return response()->json([
                     'status' => true,
@@ -185,7 +180,7 @@ class UnitController extends Controller
     public function destroy($id)
     {
         try {
-            $data = Unit::findByEncryptedId($id);
+            $data = FuelConsumption::findByEncryptedId($id);
             $data->delete();
 
             return response()->json([
@@ -210,7 +205,7 @@ class UnitController extends Controller
                     $decryptedIds[] = Crypt::decrypt($encryptedId);
                 }
 
-                $delete = Unit::whereIn('id', $decryptedIds)->delete();
+                $delete = FuelConsumption::whereIn('id', $decryptedIds)->delete();
 
                 return response()->json([
                     'status' => true,

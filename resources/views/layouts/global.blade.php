@@ -1,17 +1,12 @@
 <!doctype html>
 
-<html
-  lang="en"
-  class="light-style layout-navbar-fixed layout-menu-fixed layout-compact"
-  dir="ltr"
-  data-theme="theme-default"
-  data-assets-path="assets/"
-  data-template="vertical-menu-template-no-customizer">
-  <head>
+<html lang="en" class="light-style layout-navbar-fixed layout-menu-fixed layout-compact" dir="ltr"
+    data-theme="theme-default" data-assets-path="assets/" data-template="vertical-menu-template-no-customizer">
+
+<head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
     <title>@yield('title') | Nirwana Anugrah Jaya</title>
 
@@ -24,8 +19,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&ampdisplay=swap"
-      rel="stylesheet" />
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&ampdisplay=swap"
+        rel="stylesheet" />
 
     <!-- Icons -->
     <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/fontawesome.css') }}" />
@@ -37,25 +32,24 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/rtl/theme-default.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/demo.css') }}" />
 
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
     <!-- Vendors CSS -->
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/node-waves/node-waves.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/typeahead-js/typeahead.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
+    <link rel="stylesheet"
+        href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/@form-validation/form-validation.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
-
-
-    @stack('css')
-    <!-- Page CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.css') }}" /
+        @stack('css') <!-- Page CSS -->
     <style>
-      .swal2-container {
-        z-index: 1100 !important; /* Pastikan lebih tinggi dari modal Bootstrap (biasanya 1050) */
-      }
+        .swal2-container {
+            z-index: 1100 !important;
+            /* Pastikan lebih tinggi dari modal Bootstrap (biasanya 1050) */
+        }
     </style>
 
     <!-- Helpers -->
@@ -63,50 +57,52 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/js/config.js') }}"></script>
-  </head>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
 
-  <body>
+<body>
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
-      <div class="layout-container">
-        <!-- Menu -->
-        @include('components.sidebar')
-        <!-- / Menu -->
+        <div class="layout-container">
+            <!-- Menu -->
+            @include('components.sidebar')
+            <!-- / Menu -->
 
-        <!-- Layout container -->
-        <div class="layout-page">
-          <!-- Navbar -->
-          @include('components.navbar')
-          <!-- / Navbar -->
+            <!-- Layout container -->
+            <div class="layout-page">
+                <!-- Navbar -->
+                @include('components.navbar')
+                <!-- / Navbar -->
 
-          <!-- Content wrapper -->
-          <div class="content-wrapper">
-            <!-- Content -->
+                <!-- Content wrapper -->
+                <div class="content-wrapper">
+                    <!-- Content -->
 
-            @yield('content')
-            <!-- / Content -->
+                    @yield('content')
+                    <!-- / Content -->
 
-            <!-- Footer -->
-            @include('components.footer')
-            <!-- / Footer -->
+                    <!-- Footer -->
+                    @include('components.footer')
+                    <!-- / Footer -->
 
-            <div class="content-backdrop fade"></div>
-          </div>
-          <!-- Content wrapper -->
+                    <div class="content-backdrop fade"></div>
+                </div>
+                <!-- Content wrapper -->
+            </div>
+            <!-- / Layout page -->
         </div>
-        <!-- / Layout page -->
-      </div>
 
-      <!-- Overlay -->
-      <div class="layout-overlay layout-menu-toggle"></div>
+        <!-- Overlay -->
+        <div class="layout-overlay layout-menu-toggle"></div>
 
-      <!-- Drag Target Area To SlideIn Menu On Small Screens -->
-      <div class="drag-target"></div>
+        <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+        <div class="drag-target"></div>
     </div>
     <!-- / Layout wrapper -->
 
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
+
 
     <script src="{{ asset('assets/vendor/libs/jquery/jquery.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/popper/popper.js') }}"></script>
@@ -120,10 +116,14 @@
 
     {{-- ADVANCE --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- endbuild -->
 
     <!-- Vendors JS -->
+    <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/typeahead-js/typeahead.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/bloodhound/bloodhound.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/apex-charts/apexcharts.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/popular.js') }}"></script>
@@ -142,5 +142,6 @@
 
 
     @stack('js')
-  </body>
+</body>
+
 </html>

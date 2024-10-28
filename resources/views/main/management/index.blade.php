@@ -1,15 +1,15 @@
 @extends('layouts.global')
 
-@section('title', 'Form')
+@section('title', 'Kendaraan / Unit')
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Master Data /</span> Form</h4>
+    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Management Project</h4>
 
     <!-- Product List Table -->
     <div class="card">
         <div class="card-header">
-            <h5 class="card-title mb-0">Form</h5>
+            <h5 class="card-title mb-0">Management Project</h5>
             <div class="d-flex justify-content-end gap-2">
                 <!-- Tombol Hapus Masal -->
                 <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
@@ -30,20 +30,20 @@
                                 <input class="form-check-input" type="checkbox" id="checkAll" />
                             </div>
                         </th>
-                        <th>Pertanyaan</th>
-                        <th>Tipe</th>
-                        <th>Kategori</th>
-                        <th>Dibuat Pada</th>
+                        <th>nama management project</th>
+                        <th>nama asset</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
             </table>
         </div>
     </div>
+
     <div class="modal fade" id="modal-ce" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-simple">
             <div class="modal-content p-3 p-md-5">
                 <div class="modal-body" id="content-modal-ce">
+
                 </div>
             </div>
         </div>
@@ -103,13 +103,11 @@
                     },
                 ],
 
-                ajax: {type: "GET", url: "{{ route('form.data') }}", data:{'keyword':keyword}},
+                ajax: {type: "GET", url: "{{ route('management.data') }}", data:{'keyword':keyword}},
                 columns: [
                     {data: 'id', name: 'id', orderable: false, searchable: false},
-                    {data: 'question',name: 'question'},
-                    {data: 'type',name: 'type'},
-                    {data: 'category',name: 'category'},
-                    {data: 'created_at',name: 'created_at'},
+                    {data: 'name',name: 'name'},
+                    {data: 'asset_id',name: 'asset_id'},
                     {data: 'action',name: 'action',orderable: false,searchable: false}
                 ]
             });
@@ -132,7 +130,7 @@
                         '_method': 'DELETE',
                     };
                     $.ajax({
-                        url: "{{ route('form.destroy', ':id') }}".replace(':id', id),
+                        url: "{{ route('management.destroy', ':id') }}".replace(':id', id),
                         type: 'POST',
                         data : postForm,
                         dataType  : 'json',
@@ -165,7 +163,7 @@
                         'ids': ids
                     };
                     $.ajax({
-                        url: "{{ route('form.destroyAll') }}",
+                        url: "{{ route('management.destroyAll') }}",
                         type: 'POST',
                         data : postForm,
                         dataType  : 'json',
@@ -183,7 +181,7 @@
 
         function createData() {
             $.ajax({
-                url: "{{ route('form.create') }}",
+                url: "{{ route('management.create') }}",
                 type: 'GET',
             })
             .done(function(data) {
@@ -199,7 +197,7 @@
         function editData(id) {
 
             $.ajax({
-                url: "{{ route('form.edit', ':id') }}".replace(':id', id),
+                url: "{{ route('management.edit', ':id') }}".replace(':id', id),
                 type: 'GET',
             })
             .done(function(data) {

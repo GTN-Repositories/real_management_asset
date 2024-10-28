@@ -4,53 +4,12 @@
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Assets</h4>
+        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Fuel Consumtion</h4>
 
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12 col-md-4">
-                        <label class="form-label" for="category">Kategori</label>
-                        <select name="category" id="category" class="select2 form-select " data-allow-clear="true" required>
-                            <option value="">Pilih</option>
-                            <option value="Technology">Technology</option>
-                            <option value="Construction">Construction</option>
-                            <option value="Medical Assets">Medical Assets</option>
-                            <option value="Education">Education</option>
-                            <option value="Lisences">Lisences</option>
-                            <option value="Real Estate">Real Estate</option>
-                            <option value="Legal Claims">Legal Claims</option>
-                        </select>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <label class="form-label" for="assets_location">Lokasi Aset</label>
-                        <select name="assets_location" id="assets_location" class="form-select select2">
-                            <option value="">Pilih</option>
-                            <option value="Jatim">Jatim</option>
-                            <option value="Jateng">Jateng</option>
-                            <option value="Jabar">Jabar</option>
-                            <option value="Kaltim">Kaltim</option>
-                            <option value="Kalteng">Kalteng</option>
-                            <option value="Kalsel">Kalsel</option>
-                            <option value="Bali">Bali</option>
-                            <option value="DKI">DKI</option>
-                            <option value="Aceh">Aceh</option>
-                        </select>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <label class="form-label" for="manager">Manajer</label>
-                        <select id="manager" name="manager" class="select2 form-select " data-allow-clear="true" required>
-                            <option value="">Pilih</option>
-                            <option value="lenz creative">lenz creative</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
         <!-- Product List Table -->
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Assets</h5>
+                <h5 class="card-title mb-0">Fuel Consumtion</h5>
                 <div class="d-flex justify-content-end gap-2">
                     <!-- Tombol Hapus Masal -->
                     <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
@@ -71,16 +30,12 @@
                                     <input class="form-check-input" type="checkbox" id="checkAll" />
                                 </div>
                             </th>
-                            <th>gambar aset</th>
+                            <th>nama project</th>
                             <th>nama aset</th>
-                            <th>nomor seri</th>
-                            <th>nomor model</th>
-                            <th>manajer aset</th>
-                            <th>lokasi aset</th>
-                            <th>kategori aset</th>
-                            <th>biaya pembelian</th>
-                            <th>tanggal pembelian</th>
-                            <th>dibuat pada</th>
+                            <th>penerima</th>
+                            <th>tanggal</th>
+                            <th>banyak penggunaan</th>
+                            <th>harga/liter</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -104,10 +59,6 @@
     <script type="text/javascript">
         $(document).ready(function() {
             init_table();
-
-            $('#category, #assets_location, #manager').on('change', function() {
-                init_table();
-            });
 
             $('#checkAll').on('click', function() {
                 $('tbody input[type="checkbox"]').prop('checked', $(this).prop('checked'));
@@ -144,13 +95,6 @@
 
         function init_table(keyword = '') {
             var csrf_token = $('meta[name="csrf-token"]').attr('content');
-            var category = $('#category').val();
-            var assets_location = $('#assets_location').val();
-            var manager = $('#manager').val();
-
-            if ($.fn.DataTable.isDataTable('#data-table')) {
-                $('#data-table').DataTable().clear().destroy();
-            }
 
             var table = $('#data-table').DataTable({
                 processing: true,
@@ -159,15 +103,13 @@
                     target: 0,
                     visible: true,
                     searchable: false
-                }],
+                }, ],
+
                 ajax: {
                     type: "GET",
-                    url: "{{ route('asset.data') }}",
+                    url: "{{ route('fuel.data') }}",
                     data: {
-                        'keyword': keyword,
-                        'category': category,
-                        'assets_location': assets_location,
-                        'manager': manager
+                        'keyword': keyword
                     }
                 },
                 columns: [{
@@ -177,44 +119,28 @@
                         searchable: false
                     },
                     {
-                        data: 'image',
-                        name: 'image'
+                        data: 'management_project_id',
+                        name: 'management_project_id'
                     },
                     {
-                        data: 'name',
-                        name: 'name'
+                        data: 'asset_id',
+                        name: 'asset_id'
                     },
                     {
-                        data: 'serial_number',
-                        name: 'serial_number'
+                        data: 'receiver',
+                        name: 'receiver'
                     },
                     {
-                        data: 'model_number',
-                        name: 'model_number'
+                        data: 'date',
+                        name: 'date'
                     },
                     {
-                        data: 'manager',
-                        name: 'manager'
+                        data: 'liter',
+                        name: 'liter'
                     },
                     {
-                        data: 'assets_location',
-                        name: 'assets_location'
-                    },
-                    {
-                        data: 'category',
-                        name: 'category'
-                    },
-                    {
-                        data: 'cost',
-                        name: 'cost'
-                    },
-                    {
-                        data: 'purchase_date',
-                        name: 'purchase_date'
-                    },
-                    {
-                        data: 'created_at',
-                        name: 'created_at'
+                        data: 'price',
+                        name: 'price'
                     },
                     {
                         data: 'action',
@@ -243,7 +169,7 @@
                         '_method': 'DELETE',
                     };
                     $.ajax({
-                            url: "{{ route('asset.destroy', ':id') }}".replace(':id', id),
+                            url: "{{ route('fuel.destroy', ':id') }}".replace(':id', id),
                             type: 'POST',
                             data: postForm,
                             dataType: 'json',
@@ -276,7 +202,7 @@
                         'ids': ids
                     };
                     $.ajax({
-                            url: "{{ route('asset.destroyAll') }}",
+                            url: "{{ route('fuel.destroyAll') }}",
                             type: 'POST',
                             data: postForm,
                             dataType: 'json',
@@ -294,7 +220,7 @@
 
         function createData() {
             $.ajax({
-                    url: "{{ route('asset.create') }}",
+                    url: "{{ route('fuel.create') }}",
                     type: 'GET',
                 })
                 .done(function(data) {
@@ -308,9 +234,8 @@
         }
 
         function editData(id) {
-
             $.ajax({
-                    url: "{{ route('asset.edit', ':id') }}".replace(':id', id),
+                    url: "{{ route('fuel.edit', ':id') }}".replace(':id', id),
                     type: 'GET',
                 })
                 .done(function(data) {

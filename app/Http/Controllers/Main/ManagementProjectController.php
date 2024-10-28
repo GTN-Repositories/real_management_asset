@@ -1,17 +1,19 @@
 <?php
 
-namespace App\Http\Controllers\Main;
+namespace App\Http\Controllers\main;
 
 use App\Http\Controllers\Controller;
-use App\Models\Unit;
+use App\Models\ManagementProject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
-class UnitController extends Controller
+class ManagementProjectController extends Controller
 {
     public function index()
     {
-        return view('main.unit.index');
+        return view('main.management.index');
     }
 
     public function data(Request $request)
@@ -36,32 +38,14 @@ class UnitController extends Controller
 
                 return $checkbox;
             })
-            ->addColumn('police_number', function ($data) {
-                return $data->police_number ?? null;
+            ->addColumn('managementRelationId', function ($data) {
+                return $data->id ?? null;
             })
-            ->addColumn('old_police_number', function ($data) {
-                return $data->old_police_number ?? null;
+            ->addColumn('name', function ($data) {
+                return $data->name ?? null;
             })
-            ->addColumn('frame_number', function ($data) {
-                return $data->frame_number ?? null;
-            })
-            ->addColumn('merk', function ($data) {
-                return $data->merk ?? null;
-            })
-            ->addColumn('type_vehicle', function ($data) {
-                return $data->type_vehicle ?? null;
-            })
-            ->addColumn('type', function ($data) {
-                return $data->type ?? null;
-            })
-            ->addColumn('year', function ($data) {
-                return $data->year ?? null;
-            })
-            ->addColumn('color', function ($data) {
-                return $data->color ?? null;
-            })
-            ->addColumn('physical_status', function ($data) {
-                return $data->physical_status ?? null;
+            ->addColumn('asset_id', function ($data) {
+                return $data->asset->name ?? null;
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
@@ -79,20 +63,13 @@ class UnitController extends Controller
     {
         $columns = [
             'id',
-            'police_number',
-            'old_police_number',
-            'frame_number',
-            'merk',
-            'type_vehicle',
-            'type',
-            'year',
-            'color',
-            'physical_status',
+            'name',
+            'asset_id',
         ];
 
-        $keyword = $request->search['value'];
+        $keyword = $request->search['value'] ?? "";
 
-        $data = Unit::orderBy('created_at', 'asc')
+        $data = ManagementProject::orderBy('created_at', 'asc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
@@ -101,14 +78,18 @@ class UnitController extends Controller
                     }
                 }
             });
-
         return $data;
     }
 
+    public function getAssetsByProject(Request $request)
+    {
+        $project = ManagementProject::where('name', $request->projectName)->get();
+        return response()->json($project->pluck('asset.name', 'asset_id')->toArray());
+    }
 
     public function create()
     {
-        return view('main.unit.create');
+        return view('main.management.create');
     }
 
     /**
@@ -116,11 +97,22 @@ class UnitController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->all();
+
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'asset_id' => 'required',
+        ]);
 
         try {
             return $this->atomic(function () use ($data) {
-                $data = Unit::create($data);
+                foreach ($data['asset_id'] as $encryptedAssetId) {
+                    $decryptedAssetId = Crypt::decrypt($encryptedAssetId);
+                    $projectData = [
+                        'name' => $data['name'],
+                        'asset_id' => $decryptedAssetId
+                    ];
+                    ManagementProject::create($projectData);
+                }
 
                 return response()->json([
                     'status' => true,
@@ -149,9 +141,9 @@ class UnitController extends Controller
      */
     public function edit($id)
     {
-        $data = Unit::findByEncryptedId($id);
+        $data = ManagementProject::findByEncryptedId($id);
 
-        return view('main.unit.edit', compact('data'));
+        return view('main.management.edit', compact('data'));
     }
 
 
@@ -164,7 +156,8 @@ class UnitController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id) {
-                $data = Unit::findByEncryptedId($id)->update($data);
+                $data["asset_id"] = Crypt::decrypt($data["asset_id"]);
+                $data = ManagementProject::findByEncryptedId($id)->update($data);
 
                 return response()->json([
                     'status' => true,
@@ -185,7 +178,8 @@ class UnitController extends Controller
     public function destroy($id)
     {
         try {
-            $data = Unit::findByEncryptedId($id);
+            $data = ManagementProject::findByEncryptedId($id);
+
             $data->delete();
 
             return response()->json([
@@ -210,7 +204,7 @@ class UnitController extends Controller
                     $decryptedIds[] = Crypt::decrypt($encryptedId);
                 }
 
-                $delete = Unit::whereIn('id', $decryptedIds)->delete();
+                $delete = ManagementProject::whereIn('id', $decryptedIds)->delete();
 
                 return response()->json([
                     'status' => true,
