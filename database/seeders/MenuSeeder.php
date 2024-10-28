@@ -24,7 +24,7 @@ class MenuSeeder extends Seeder
         $parent2Id = Menu::create([
             'name' => 'Master  Data',
             'icon' => null,
-            'parent_id' => null,
+            'parent_id' => null, 
             'route' => null,
             'order' => 6,
         ])->id;
@@ -38,14 +38,15 @@ class MenuSeeder extends Seeder
         ])->id;
 
         Menu::create([
-            'name' => 'Inspeksi',
+            'name' => 'Fuel Consumtion',
             'icon' => null,
             'parent_id' => null,
-            'route' => 'inspection-schedule',
+            'route' => 'fuel',
             'order' => 17,
         ]);
 
         Menu::insert([
+            // ACL
             [
                 'name' => 'Roles',
                 'icon' => null,
@@ -74,41 +75,22 @@ class MenuSeeder extends Seeder
                 'route' => 'menu',
                 'order' => 5,
             ],
+            // MASTER DATA
             [
-                'name' => 'Site',
+                'name' => 'Asset',
                 'icon' => null,
                 'parent_id' => $parent2Id,
-                'route' => 'site',
+                'route' => 'asset',
                 'order' => 7,
             ],
             [
-                'name' => 'Kontrak',
+                'name' => 'Management Project',
                 'icon' => null,
                 'parent_id' => $parent2Id,
-                'route' => 'kontrak',
+                'route' => 'management-project',
                 'order' => 8,
             ],
-            [
-                'name' => 'Pelanggan',
-                'icon' => null,
-                'parent_id' => $parent2Id,
-                'route' => 'pelanggan',
-                'order' => 9,
-            ],
-            [
-                'name' => 'Supplier',
-                'icon' => null,
-                'parent_id' => $parent2Id,
-                'route' => 'supplier',
-                'order' => 10,
-            ],
-            [
-                'name' => 'Kendaraan / Unit',
-                'icon' => null,
-                'parent_id' => $parent2Id,
-                'route' => 'unit',
-                'order' => 11,
-            ],
+            // INVENTORI
             [
                 'name' => 'Gudang',
                 'icon' => null,
@@ -130,14 +112,22 @@ class MenuSeeder extends Seeder
                 'route' => 'item',
                 'order' => 15,
             ],
-            [
-                'name' => 'Pertanyaan Inspeksi',
-                'icon' => null,
-                'parent_id' => $parent2Id,
-                'route' => 'form',
-                'order' => 16,
-            ],
-            
+        ]);
+
+        $menu_report = Menu::create([
+            'name' => 'Report',
+            'icon' => null,
+            'parent_id' => null,
+            'route' => null,
+            'order' => 13,
+        ])->id;
+
+        Menu::create([
+            'name' => 'Fuel Consumtion',
+            'icon' => null,
+            'parent_id' => $menu_report,
+            'route' => 'report-fuel',
+            'order' => 1,
         ]);
     }
 }
