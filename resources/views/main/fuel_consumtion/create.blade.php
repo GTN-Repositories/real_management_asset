@@ -53,7 +53,7 @@
             dropdownParent: $('#managementRelation'),
             placeholder: 'Pilih projek',
             ajax: {
-                url: "{{ route('management.data') }}",
+                url: "{{ route('management-project.data') }}",
                 dataType: 'json',
                 delay: 250,
                 data: function(params) {
@@ -85,7 +85,7 @@
             $('#asset_id').empty().trigger('change');
             if (projectName) {
                 $.ajax({
-                    url: "{{ route('management.by_project') }}",
+                    url: "{{ route('management-project.by_project') }}",
                     dataType: 'json',
                     delay: 250,
                     data: {

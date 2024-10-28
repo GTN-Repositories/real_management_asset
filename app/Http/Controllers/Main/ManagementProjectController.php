@@ -13,7 +13,7 @@ class ManagementProjectController extends Controller
 {
     public function index()
     {
-        return view('main.management.index');
+        return view('main.management_project.index');
     }
 
     public function data(Request $request)
@@ -89,7 +89,7 @@ class ManagementProjectController extends Controller
 
     public function create()
     {
-        return view('main.management.create');
+        return view('main.management_project.create');
     }
 
     /**
@@ -143,7 +143,7 @@ class ManagementProjectController extends Controller
     {
         $data = ManagementProject::findByEncryptedId($id);
 
-        return view('main.management.edit', compact('data'));
+        return view('main.management_project.edit', compact('data'));
     }
 
 

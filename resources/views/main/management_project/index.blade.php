@@ -1,6 +1,6 @@
 @extends('layouts.global')
 
-@section('title', 'Kendaraan / Unit')
+@section('title', 'Management Project')
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -103,7 +103,7 @@
                     },
                 ],
 
-                ajax: {type: "GET", url: "{{ route('management.data') }}", data:{'keyword':keyword}},
+                ajax: {type: "GET", url: "{{ route('management-project.data') }}", data:{'keyword':keyword}},
                 columns: [
                     {data: 'id', name: 'id', orderable: false, searchable: false},
                     {data: 'name',name: 'name'},
@@ -130,7 +130,7 @@
                         '_method': 'DELETE',
                     };
                     $.ajax({
-                        url: "{{ route('management.destroy', ':id') }}".replace(':id', id),
+                        url: "{{ route('management-project.destroy', ':id') }}".replace(':id', id),
                         type: 'POST',
                         data : postForm,
                         dataType  : 'json',
@@ -163,7 +163,7 @@
                         'ids': ids
                     };
                     $.ajax({
-                        url: "{{ route('management.destroyAll') }}",
+                        url: "{{ route('management-project.destroyAll') }}",
                         type: 'POST',
                         data : postForm,
                         dataType  : 'json',
@@ -181,7 +181,7 @@
 
         function createData() {
             $.ajax({
-                url: "{{ route('management.create') }}",
+                url: "{{ route('management-project.create') }}",
                 type: 'GET',
             })
             .done(function(data) {
@@ -197,7 +197,7 @@
         function editData(id) {
 
             $.ajax({
-                url: "{{ route('management.edit', ':id') }}".replace(':id', id),
+                url: "{{ route('management-project.edit', ':id') }}".replace(':id', id),
                 type: 'GET',
             })
             .done(function(data) {

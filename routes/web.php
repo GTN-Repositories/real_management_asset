@@ -55,10 +55,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/asset/destroy-all', [AssetController::class, 'destroyAll'])->name('asset.destroyAll');
     Route::resource('asset', AssetController::class);
 
-    Route::get('/management/by-project', [ManagementProjectController::class, 'getAssetsByProject'])->name('management.by_project');
-    Route::get('/management/data', [ManagementProjectController::class, 'data'])->name('management.data');
-    Route::delete('/management/destroy-all', [ManagementProjectController::class, 'destroyAll'])->name('management.destroyAll');
-    Route::resource('management', ManagementProjectController::class);
+    Route::get('/management-project/by-project', [ManagementProjectController::class, 'getAssetsByProject'])->name('management-project.by_project');
+    Route::get('/management-project/data', [ManagementProjectController::class, 'data'])->name('management-project.data');
+    Route::delete('/management-project/destroy-all', [ManagementProjectController::class, 'destroyAll'])->name('management-project.destroyAll');
+    Route::resource('management-project', ManagementProjectController::class);
 
     Route::get('/customer/data', [CustomerController::class, 'data'])->name('customer.data');
     Route::delete('/customer/destroy-all', [CustomerController::class, 'destroyAll'])->name('customer.destroyAll');
