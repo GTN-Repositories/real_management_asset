@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\ReportFuelExport;
 use App\Http\Controllers\Main\AssetController;
 use App\Http\Controllers\Main\CategoryItemController;
 use App\Http\Controllers\Main\CustomerController;
@@ -17,8 +18,9 @@ use App\Http\Controllers\Main\SupplierController;
 use App\Http\Controllers\Main\UserController;
 use App\Http\Controllers\Main\WerehouseController;
 use App\Http\Controllers\ProfileController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use Maatwebsite\Excel\Facades\Excel;
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
@@ -94,6 +96,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/fuel/destroy-all', [FuelConsumptionController::class, 'destroyAll'])->name('fuel.destroyAll');
     Route::resource('fuel', FuelConsumptionController::class);
 
+    Route::get('/report-fuel/export-excel', [ReportFuelController::class, 'exportExcel'])->name('report-fuel.export-excel');
     Route::post('report-fuel/export-pdf', [ReportFuelController::class, 'exportPDF'])->name('report-fuel.export-pdf');
     Route::get('/report-fuel/chart', [ReportFuelController::class, 'getChartData'])->name('report-fuel.chart');
     Route::get('/report-fuel/data', [ReportFuelController::class, 'data'])->name('report-fuel.data');

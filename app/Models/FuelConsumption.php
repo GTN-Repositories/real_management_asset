@@ -32,8 +32,9 @@ class FuelConsumption extends Model
     {
         return $this->belongsTo(ManagementProject::class, 'management_project_id', 'id');
     }
+
     public function asset(): BelongsTo
     {
-        return $this->belongsTo(Asset::class, 'asset_id');
+        return $this->belongsTo(Asset::class, 'asset_id', 'id');
     }
 }

@@ -8,7 +8,7 @@
     @csrf
     @method('put')
 
-    <div class="col-12 col-md-6" id="managementRelation">
+    <div class="col-12 col-md-12" id="managementRelation">
         <label class="form-label" for="management_project_id">nama projek<span class="text-danger">*</span></label>
         <select id="management_project_id" name="management_project_id"
             class="select2 form-select select2-primary"data-allow-clear="true" required>
@@ -29,6 +29,11 @@
         <label class="form-label" for="date">tanggal<span class="text-danger">*</span></label>
         <input type="date" id="date" name="date" class="form-control" placeholder="Masukkan tanggal"
             value="{{ date('Y-m-d') }}" required value="{{ $data->date }}" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="loadsheet">loadsheet<span class="text-danger">*</span></label>
+        <input type="number" min="1" id="loadsheet" name="loadsheet" class="form-control"
+            placeholder="Masukkan loadsheet" required value="{{ $data->loadsheet }}" />
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="liter">liter<span class="text-danger">*</span></label>

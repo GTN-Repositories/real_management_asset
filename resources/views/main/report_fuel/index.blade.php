@@ -5,10 +5,32 @@
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Fuel Consumption</h4>
-        <div class="d-flex justify-content-end align-items-center mb-3">
-            <button id="exportPdfBtn" class="btn btn-primary">
+        <div class="d-flex justify-content-end align-items-end mb-3 gap-3">
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    filter tanggal
+                </button>
+                <ul class="dropdown-menu" style="">
+                    <li><a class="dropdown-item" id="hari ini" href="javascript:void(0);">hari ini</a></li>
+                    <li><a class="dropdown-item" id="minggu ini" href="javascript:void(0);">minggu ini</a></li>
+                    <li><a class="dropdown-item" id="bulan ini" href="javascript:void(0);">bulan ini</a></li>
+                    <li><a class="dropdown-item" id="bulan kemarin" href="javascript:void(0);">bulan kemarin</a></li>
+                    <li><a class="dropdown-item" id="tahun ini" href="javascript:void(0);">tahun ini</a></li>
+                    <li><a class="dropdown-item" id="tahun kemarin" href="javascript:void(0);">tahun kemarin</a></li>
+                </ul>
+            </div>
+            <div>
+                <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
+                <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
+            </div>
+            <button id="exportPdfBtn" class="btn btn-primary" onclick="exportPDF()">
                 <i class="fa-solid fa-file-pdf me-1"></i>Export PDF
             </button>
+            <button onclick="exportExcel()" class="btn btn-success">
+                <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+            </button>
+
         </div>
         <!-- Chart Container -->
         <div class="card mb-4">
@@ -33,6 +55,7 @@
                             <th>tanggal</th>
                             <th>nama project</th>
                             <th>nama aset</th>
+                            <th>loadsheet</th>
                             <th>banyak penggunaan</th>
                             <th>harga/liter</th>
                             <th>total</th>
@@ -48,31 +71,70 @@
     <script type="text/javascript">
         $(document).ready(function() {
             init_table();
-            init_chart();
-            $('#exportPdfBtn').on('click', exportPDF);
+            init_chart(); // Initialize chart on page load
+
+            // Event listeners for filters
+            $('.dropdown-item').on('click', function(e) {
+                e.preventDefault();
+                $('.dropdown-item').removeClass('active'); // Hapus class active dari item lain
+                $(this).addClass('active'); // Tambah class active ke item yang dipilih
+
+                const filterType = $(this).text().trim();
+                const filterBtn = $('.btn.btn-outline-primary.dropdown-toggle');
+                filterBtn.text(filterType);
+                reloadTableWithFilters(null, null, filterType);
+                reloadChartWithFilters(null, null, filterType);
+            });
+
+            $('#date-range-picker').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
+
+            $('#date-range-picker').on('apply.daterangepicker', function(ev, picker) {
+                const startDate = picker.startDate.format('YYYY-MM-DD');
+                const endDate = picker.endDate.format('YYYY-MM-DD');
+                $(this).val(startDate + ' - ' + endDate);
+                reloadTableWithFilters(startDate, endDate);
+                reloadChartWithFilters(startDate, endDate);
+            });
+
+            $('#date-range-picker').on('cancel.daterangepicker', function() {
+                $(this).val('');
+                reloadTableWithFilters(); // Reload without date range
+                reloadChartWithFilters(); // Reload chart without date range
+            });
         });
 
         $(document).on('input', '#searchData', function() {
             init_table($(this).val());
         });
 
-        function init_table(keyword = '') {
-            var csrf_token = $('meta[name="csrf-token"]').attr('content');
+        function reloadTableWithFilters(startDate = '', endDate = '', predefinedFilter = '') {
+            $('#data-table').DataTable().destroy();
+            init_table(startDate, endDate, predefinedFilter);
+        }
 
-            var table = $('#data-table').DataTable({
+        function reloadChartWithFilters(startDate = '', endDate = '', predefinedFilter = '') {
+            if (fuelConsumptionChart) fuelConsumptionChart.destroy();
+            init_chart(startDate, endDate, predefinedFilter);
+        }
+
+
+        function init_table(startDate = '', endDate = '', predefinedFilter = '') {
+            $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
                 destroy: true,
-                columnDefs: [{
-                    target: 0,
-                    visible: true,
-                    searchable: false
-                }],
                 ajax: {
                     type: "GET",
                     url: "{{ route('report-fuel.data') }}",
                     data: {
-                        'keyword': keyword
+                        startDate: startDate,
+                        endDate: endDate,
+                        predefinedFilter: predefinedFilter
                     }
                 },
                 columns: [{
@@ -94,6 +156,10 @@
                         name: 'asset_id'
                     },
                     {
+                        data: 'loadsheet',
+                        name: 'loadsheet'
+                    },
+                    {
                         data: 'liter',
                         name: 'liter'
                     },
@@ -111,10 +177,15 @@
 
         let fuelConsumptionChart;
 
-        function init_chart() {
+        function init_chart(startDate = '', endDate = '', predefinedFilter = '') {
             $.ajax({
                 url: "{{ route('report-fuel.chart') }}",
                 method: 'GET',
+                data: {
+                    startDate: startDate,
+                    endDate: endDate,
+                    predefinedFilter: predefinedFilter
+                },
                 success: function(response) {
                     var options = {
                         series: [{
@@ -197,6 +268,10 @@
         }
 
         function exportPDF() {
+            const startDate = $('#date-range-picker').data('daterangepicker')?.startDate.format('YYYY-MM-DD') || '';
+            const endDate = $('#date-range-picker').data('daterangepicker')?.endDate.format('YYYY-MM-DD') || '';
+            const predefinedFilter = $('.dropdown-item.active').text().trim() || '';
+
             fuelConsumptionChart.dataURI().then(({
                 imgURI
             }) => {
@@ -213,26 +288,21 @@
                     type: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',
-                        chartImage: imgURI
+                        chartImage: imgURI,
+                        startDate: startDate,
+                        endDate: endDate,
+                        predefinedFilter: predefinedFilter
                     },
                     xhrFields: {
                         responseType: 'blob'
                     },
-                    success: function(response, status, xhr) {
-                        var filename = "";
-                        var disposition = xhr.getResponseHeader('Content-Disposition');
-                        if (disposition && disposition.indexOf('attachment') !== -1) {
-                            var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-                            var matches = filenameRegex.exec(disposition);
-                            if (matches !== null && matches[1]) filename = matches[1].replace(/['"]/g,
-                                '');
-                        }
-                        var blob = new Blob([response], {
+                    success: function(response) {
+                        const blob = new Blob([response], {
                             type: 'application/pdf'
                         });
-                        var link = document.createElement('a');
+                        const link = document.createElement('a');
                         link.href = window.URL.createObjectURL(blob);
-                        link.download = filename || 'FuelConsumptionReport.pdf';
+                        link.download = 'FuelConsumptionReport.pdf';
                         link.click();
                         Swal.close();
                     },
@@ -244,5 +314,17 @@
                 });
             });
         }
+
+        function exportExcel() {
+            const startDate = $('#date-range-picker').data('daterangepicker')?.startDate.format('YYYY-MM-DD') || '';
+            const endDate = $('#date-range-picker').data('daterangepicker')?.endDate.format('YYYY-MM-DD') || '';
+            const predefinedFilter = $('.dropdown-item.active').text().trim() || '';
+
+            const exportUrl = "{{ route('report-fuel.export-excel') }}" +
+                `?startDate=${startDate}&endDate=${endDate}&predefinedFilter=${predefinedFilter}`;
+
+            window.location.href = exportUrl;
+        }
+    </script>
     </script>
 @endpush

@@ -53,6 +53,9 @@ class FuelConsumptionController extends Controller
             ->addColumn('date', function ($data) {
                 return $data->date ?? null;
             })
+            ->addColumn('loadsheet', function ($data) {
+                return $data->loadsheet ?? null;
+            })
             ->addColumn('liter', function ($data) {
                 return $data->liter ?? null;
             })
@@ -79,16 +82,17 @@ class FuelConsumptionController extends Controller
             'asset_id',
             'receiver',
             'date',
+            'loadsheet',
             'liter',
             'price',
         ];
 
         $keyword = $request->search['value'] ?? "";
-        $project_id = $this->projectId();
+        // $project_id = $this->projectId();
 
         $data = FuelConsumption::orderBy('created_at', 'asc')
             ->select($columns)
-            ->whereIn($project_id)
+            // ->whereIn($project_id)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
                     foreach ($columns as $column) {

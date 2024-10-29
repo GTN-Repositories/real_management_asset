@@ -34,6 +34,7 @@
                             <th>nama aset</th>
                             <th>penerima</th>
                             <th>tanggal</th>
+                            <th>loadsheet</th>
                             <th>banyak penggunaan</th>
                             <th>harga/liter</th>
                             <th>Aksi</th>
@@ -133,6 +134,10 @@
                     {
                         data: 'date',
                         name: 'date'
+                    },
+                    {
+                        data: 'loadsheet',
+                        name: 'loadsheet'
                     },
                     {
                         data: 'liter',

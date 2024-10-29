@@ -32,6 +32,9 @@
                         </th>
                         <th>nama management project</th>
                         <th>nama asset</th>
+                        <th>tanggal awal</th>
+                        <th>tanggal akhir</th>
+                        <th>metode</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -108,6 +111,9 @@
                     {data: 'id', name: 'id', orderable: false, searchable: false},
                     {data: 'name',name: 'name'},
                     {data: 'asset_id',name: 'asset_id'},
+                    {data: 'start_date',name: 'start_date'},
+                    {data: 'end_date',name: 'end_date'},
+                    {data: 'calculation_method',name: 'calculation_method'},
                     {data: 'action',name: 'action',orderable: false,searchable: false}
                 ]
             });

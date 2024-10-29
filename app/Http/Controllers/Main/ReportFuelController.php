@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\ReportFuelExport;
 use App\Http\Controllers\Controller;
 use App\Models\FuelConsumption;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportFuelController extends Controller
 {
@@ -38,6 +40,9 @@ class ReportFuelController extends Controller
             ->addColumn('asset_id', function ($data) {
                 return $data->asset->name ?? null;
             })
+            ->addColumn('loadsheet', function ($data) {
+                return $data->loadsheet ?? null;
+            })
             ->addColumn('liter', function ($data) {
                 return $data->liter ?? null;
             })
@@ -51,42 +56,100 @@ class ReportFuelController extends Controller
             ->make(true);
     }
 
-
-
     public function getData(Request $request)
     {
         $columns = [
             'id',
             'management_project_id',
             'asset_id',
-            'receiver',
             'date',
+            'loadsheet',
             'liter',
-            'price',
+            'price'
         ];
 
-        $keyword = $request->search['value'] ?? "";
+        $query = FuelConsumption::orderBy('created_at', 'asc')
+            ->select($columns);
 
-        $data = FuelConsumption::orderBy('created_at', 'asc')
-            ->select($columns)
-            ->where(function ($query) use ($keyword, $columns) {
-                if ($keyword != '') {
-                    foreach ($columns as $column) {
-                        $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
-                    }
+        if ($request->filled('search.value')) {
+            $query->where(function ($q) use ($request, $columns) {
+                $keyword = $request->search['value'];
+                foreach ($columns as $column) {
+                    $q->orWhere($column, 'LIKE', "%$keyword%");
                 }
             });
+        }
 
-        return $data;
+        // Apply date range filter
+        if ($request->filled('startDate') && $request->filled('endDate')) {
+            $query->whereBetween('date', [$request->startDate, $request->endDate]);
+        }
+
+        // Apply predefined filters
+        if ($request->filled('predefinedFilter')) {
+            switch ($request->predefinedFilter) {
+                case 'hari ini':
+                    $query->whereDate('date', Carbon::today());
+                    break;
+                case 'minggu ini':
+                    $query->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                    break;
+                case 'bulan ini':
+                    $query->whereMonth('date', Carbon::now()->month);
+                    break;
+                case 'bulan kemarin':
+                    $query->whereMonth('date', Carbon::now()->subMonth()->month);
+                    break;
+                case 'tahun ini':
+                    $query->whereYear('date', Carbon::now()->year);
+                    break;
+                case 'tahun kemarin':
+                    $query->whereYear('date', Carbon::now()->subYear()->year);
+                    break;
+            }
+        }
+
+        return $query;
     }
 
-    public function getChartData()
-    {
-        $consumptions = FuelConsumption::selectRaw('DATE(date) as date, SUM(liter) as total_liters')
-            ->groupBy('date')
-            ->orderBy('date', 'asc')
-            ->get();
 
+    public function getChartData(Request $request)
+    {
+        $query = FuelConsumption::selectRaw('DATE(date) as date, SUM(liter) as total_liters')
+            ->groupBy('date')
+            ->orderBy('date', 'asc');
+
+        if ($request->filled('startDate') && $request->filled('endDate')) {
+            $query->whereBetween('date', [$request->startDate, $request->endDate]);
+        }
+
+        // Apply predefined filter if provided
+        if ($request->filled('predefinedFilter')) {
+            switch ($request->predefinedFilter) {
+                case 'hari ini':
+                    $query->whereDate('date', Carbon::today());
+                    break;
+                case 'minggu ini':
+                    $query->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                    break;
+                case 'bulan ini':
+                    $query->whereMonth('date', Carbon::now()->month);
+                    break;
+                case 'bulan kemarin':
+                    $query->whereMonth('date', Carbon::now()->subMonth()->month);
+                    break;
+                case 'tahun ini':
+                    $query->whereYear('date', Carbon::now()->year);
+                    break;
+                case 'tahun kemarin':
+                    $query->whereYear('date', Carbon::now()->subYear()->year);
+                    break;
+            }
+        }
+
+        $consumptions = $query->get();
+
+        // Prepare data for chart
         $dates = $consumptions->pluck('date')->toArray();
         $liters = $consumptions->pluck('total_liters')->toArray();
 
@@ -98,14 +161,73 @@ class ReportFuelController extends Controller
 
     public function exportPdf(Request $request)
     {
-        $chartImage = $request->input('chartImage'); // This is the base64 image from the chart
+        $query = $this->getFilteredDataQuery($request);
+        $data = $query->get();
 
-        // Fetch table data
-        $data = $this->getData($request)->get();
-
+        $chartImage = $request->input('chartImage');
         $pdf = Pdf::loadView('main.report_fuel.pdf', compact('data', 'chartImage'))
             ->setPaper('a4', 'landscape');
 
         return $pdf->download('FuelConsumptionReport.pdf');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $query = $this->getFilteredDataQuery($request);
+        $data = $query->get();
+
+        return Excel::download(new ReportFuelExport($data), 'FuelConsumptionReport.xlsx');
+    }
+
+    /**
+     * Returns a query with the applied filters for consistency across exports.
+     */
+    private function getFilteredDataQuery(Request $request)
+    {
+        $query = FuelConsumption::orderBy('date', 'asc');
+
+        if ($request->filled('predefinedFilter')) {
+            switch ($request->predefinedFilter) {
+                case 'hari ini':
+                    return $query->whereDate('date', Carbon::today());
+                case 'minggu ini':
+                    return $query->whereBetween('date', [
+                        Carbon::now()->startOfWeek(),
+                        Carbon::now()->endOfWeek()
+                    ]);
+                case 'bulan ini':
+                    return $query->whereBetween('date', [
+                        Carbon::now()->startOfMonth(),
+                        Carbon::now()->endOfMonth()
+                    ]);
+                case 'bulan kemarin':
+                    return $query->whereBetween('date', [
+                        Carbon::now()->subMonth()->startOfMonth(),
+                        Carbon::now()->subMonth()->endOfMonth()
+                    ]);
+                case 'tahun ini':
+                    return $query->whereBetween('date', [
+                        Carbon::now()->startOfYear(),
+                        Carbon::now()->endOfYear()
+                    ]);
+                case 'tahun kemarin':
+                    return $query->whereBetween('date', [
+                        Carbon::now()->subYear()->startOfYear(),
+                        Carbon::now()->subYear()->endOfYear()
+                    ]);
+                default:
+                    return $query;
+            }
+        }
+
+        if ($request->filled('startDate') && $request->filled('endDate')) {
+            $query->whereBetween('date', [
+                Carbon::parse($request->startDate)->startOfDay(),
+                Carbon::parse($request->endDate)->endOfDay()
+            ]);
+            return $query;
+        }
+
+        return $query;
     }
 }
