@@ -52,7 +52,9 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" />
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    @stack('css') <!-- Page CSS -->
+    @stack('css')
+    <!-- Page CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-profile.css') }}" />
     <style>
         .swal2-container {
             z-index: 1100 !important;
@@ -155,6 +157,7 @@
     <script src="{{ asset('assets/js/modal-edit-permission.js') }}"></script>
     <script src="{{ asset('assets/js/app-logistics-dashboard.js') }}"></script>
     <script src="{{ asset('assets/js/forms-selects.js') }}"></script>
+    <script src="{{ asset('assets/js/pages-profile.js') }}"></script>
 
     @stack('js')
 </body>
