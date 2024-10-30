@@ -24,76 +24,39 @@
                         </div>
                     </div>
                     <div class="dropdown-shortcuts-list scrollable-container ps">
-                        <div class="row row-bordered overflow-visible g-0">
-                            <div class="dropdown-shortcuts-item col">
-                                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                                    <i class="ti ti-calendar fs-4"></i>
-                                </span>
-                                <a href="app-calendar.html" class="stretched-link">Calendar</a>
-                                <small class="text-muted mb-0">Appointments</small>
-                            </div>
-                            <div class="dropdown-shortcuts-item col">
-                                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                                    <i class="ti ti-file-invoice fs-4"></i>
-                                </span>
-                                <a href="app-invoice-list.html" class="stretched-link">Invoice App</a>
-                                <small class="text-muted mb-0">Manage Accounts</small>
-                            </div>
-                        </div>
-                        <div class="row row-bordered overflow-visible g-0">
-                            <div class="dropdown-shortcuts-item col">
-                                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                                    <i class="ti ti-users fs-4"></i>
-                                </span>
-                                <a href="app-user-list.html" class="stretched-link">User App</a>
-                                <small class="text-muted mb-0">Manage Users</small>
-                            </div>
-                            <div class="dropdown-shortcuts-item col">
-                                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                                    <i class="ti ti-lock fs-4"></i>
-                                </span>
-                                <a href="app-access-roles.html" class="stretched-link">Role Management</a>
-                                <small class="text-muted mb-0">Permission</small>
-                            </div>
-                        </div>
-                        <div class="row row-bordered overflow-visible g-0">
-                            <div class="dropdown-shortcuts-item col">
-                                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                                    <i class="ti ti-chart-bar fs-4"></i>
-                                </span>
-                                <a href="index.html" class="stretched-link">Dashboard</a>
-                                <small class="text-muted mb-0">User Profile</small>
-                            </div>
-                            <div class="dropdown-shortcuts-item col">
-                                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                                    <i class="ti ti-settings fs-4"></i>
-                                </span>
-                                <a href="pages-account-settings-account.html" class="stretched-link">Setting</a>
-                                <small class="text-muted mb-0">Account Settings</small>
-                            </div>
-                        </div>
-                        <div class="row row-bordered overflow-visible g-0">
-                            <div class="dropdown-shortcuts-item col">
-                                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                                    <i class="ti ti-help fs-4"></i>
-                                </span>
-                                <a href="pages-faq.html" class="stretched-link">FAQs</a>
-                                <small class="text-muted mb-0">FAQs &amp; Articles</small>
-                            </div>
-                            <div class="dropdown-shortcuts-item col">
-                                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                                    <i class="ti ti-square fs-4"></i>
-                                </span>
-                                <a href="modal-examples.html" class="stretched-link">Modals</a>
-                                <small class="text-muted mb-0">Useful Popups</small>
-                            </div>
-                        </div>
-                        <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
-                            <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
-                        </div>
-                        <div class="ps__rail-y" style="top: 0px; right: 0px;">
-                            <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div>
-                        </div>
+                        @php
+                            $menus = \App\Helpers\Helper::getMenu();
+                        @endphp
+                        @foreach ($menus as $data)
+                            @if ($data->parent_id == null && $data->children->isNotEmpty())
+                                <div class="row row-bordered overflow-visible g-0">
+                                    <div class="dropdown-shortcuts-item col-6">
+                                        <span class="dropdown-shortcuts-icon rounded-circle mb-2">
+                                            <i class="ti ti-brand-tabler fs-4"></i>
+                                        </span>
+                                        <a href="{{ $data->route }}">
+                                            {{ $data->name }}
+                                        </a>
+                                    </div>
+                                    @foreach ($data->children as $child)
+                                        <div class="dropdown-shortcuts-item col-6">
+                                            <a href="{{ $child->route }}">
+                                                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
+                                                    <i class="ti ti-brand-tabler fs-4"></i>
+                                                </span>
+                                                {{ $child->name }}
+                                            </a>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                    <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+                        <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+                    </div>
+                    <div class="ps__rail-y" style="top: 0px; right: 0px;">
+                        <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div>
                     </div>
                 </div>
             </li>

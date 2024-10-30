@@ -2,11 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\Asset;
-use App\Models\FuelConsumption;
-use App\Models\ManagementProject;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
 use Maatwebsite\Excel\Concerns\FromView;
 
 class ReportFuelExport implements FromView

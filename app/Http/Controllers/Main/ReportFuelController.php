@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\MultiSheetExport;
 use App\Exports\ReportFuelExport;
 use App\Http\Controllers\Controller;
 use App\Models\FuelConsumption;
@@ -25,9 +26,6 @@ class ReportFuelController extends Controller
         return datatables()
             ->of($data)
             ->addIndexColumn()
-            ->addColumn('id', function ($data) {
-                return 1;
-            })
             ->addColumn('relationId', function ($data) {
                 return $data->id ?? null;
             })
@@ -176,13 +174,17 @@ class ReportFuelController extends Controller
         $query = $this->getFilteredDataQuery($request);
         $data = $query->get();
 
-        return Excel::download(new ReportFuelExport($data), 'FuelConsumptionReport.xlsx');
+        $name = 'FuelConsumptionReport';
+        $name .= '_' . $request->startDate . '_to_' . $request->endDate;
+
+        return Excel::download(new MultiSheetExport($data), $name . '.xlsx');
     }
+
 
     /**
      * Returns a query with the applied filters for consistency across exports.
      */
-    private function getFilteredDataQuery(Request $request)
+    private function getFilteredDataQuery(Request $request) 
     {
         $query = FuelConsumption::orderBy('date', 'asc');
 
