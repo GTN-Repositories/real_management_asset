@@ -56,6 +56,13 @@
 @include('components.select2_js')
 
 <script>
+    var management_project_id = '{{ $data->management_project_id }}';
+    var management_project_name = '{{ $data->management_project->name }}';
+    var asset_id = '{{ $data->asset_id }}';
+    var asset_name = '{{ $data->asset->name }}';
+    var user_id = '{{ $data->user_id }}';
+    var user_name = '{{ $data->user->name }}';
+
     $(document).ready(function() {
         $('#management_project_id').select2({
             dropdownParent: $('#managementRelation'),
@@ -118,8 +125,16 @@
                 });
             }
         });
-        // const autoSelectProjectId = "{{ $data->management_project_id }}";
-        // $('#management_project_id').val(autoSelectProjectId).trigger('change');
+
+        if (management_project_id) {
+            var option = new Option(management_project_name, management_project_id, true, true);
+            $('#management_project_id').append(option).trigger('change');
+        }
+        if (asset_id) {
+            var option = new Option(asset_name, asset_id, true, true);
+            $('#asset_id').append(option).trigger('change');
+        }
+
 
         $('#user_id').select2({
             dropdownParent: $('#driverRelation'),
@@ -153,6 +168,11 @@
             }
         });
     });
+
+    if (user_id) {
+        var option = new Option(user_name, user_id, true, true);
+        $('#user_id').append(option).trigger('change');
+    }
 </script>
 <script>
     document.getElementById('formEdit').addEventListener('submit', function(event) {

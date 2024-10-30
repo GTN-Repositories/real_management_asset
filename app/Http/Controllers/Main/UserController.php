@@ -59,6 +59,9 @@ class UserController extends Controller implements HasMiddleware
             ->addColumn('email', function ($data) {
                 return $data->email ?? null;
             })
+            ->addColumn('phone', function ($data) {
+                return $data->phone ?? null;
+            })
             ->addColumn('created', function ($data) {
                 return $data->created_at ? $data->created_at->format('d M Y') : null;
             })
@@ -81,6 +84,7 @@ class UserController extends Controller implements HasMiddleware
             'id',
             'name',
             'email',
+            'phone',
             'created_at',
         ];
 
@@ -117,6 +121,7 @@ class UserController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
+            'phone' => 'required|string',
             'roles' => 'required|array',
             'roles.*' => 'string',
         ]);
@@ -128,6 +133,7 @@ class UserController extends Controller implements HasMiddleware
                     'name' => $validatedData['name'],
                     'email' => $validatedData['email'],
                     'password' => $validatedData['password'],
+                    'phone' => $validatedData['phone'],
                 ]);
                 if (!empty($validatedData['roles'])) {
                     $roleIds = array_map(fn($encryptedId) => Crypt::decrypt($encryptedId), $validatedData['roles']);
@@ -179,6 +185,7 @@ class UserController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255',
             'password' => 'nullable|string|min:8',
+            'phone' => 'nullable|string',
             'roles' => 'required|array',
             'roles.*' => 'string',
         ]);
@@ -194,10 +201,12 @@ class UserController extends Controller implements HasMiddleware
                     $user->update([
                         'name' => $validatedData['name'],
                         'password' => $validatedData['password'],
+                        'phone' => $validatedData['phone'],
                     ]);
                 } else {
                     $user->update([
                         'name' => $validatedData['name'],
+                        'phone' => $validatedData['phone'],
                     ]);
                 }
                 if (!empty($validatedData['roles'])) {

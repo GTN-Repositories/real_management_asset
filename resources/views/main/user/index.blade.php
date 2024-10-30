@@ -35,6 +35,7 @@
                             </th>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Phone</th>
                             <th>Created Date</th>
                             <th>Actions</th>
                         </tr>
@@ -137,6 +138,10 @@
                     {
                         data: 'email',
                         name: 'email'
+                    },
+                    {
+                        data: 'phone',
+                        name: 'phone'
                     },
                     {
                         data: 'created',
