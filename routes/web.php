@@ -1,6 +1,5 @@
 <?php
 
-use App\Exports\ReportFuelExport;
 use App\Http\Controllers\Main\AssetController;
 use App\Http\Controllers\Main\CategoryItemController;
 use App\Http\Controllers\Main\CustomerController;
@@ -18,11 +17,10 @@ use App\Http\Controllers\Main\SupplierController;
 use App\Http\Controllers\Main\UserController;
 use App\Http\Controllers\Main\WerehouseController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Maatwebsite\Excel\Facades\Excel;
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
+
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');

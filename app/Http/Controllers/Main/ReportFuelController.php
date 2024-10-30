@@ -9,10 +9,19 @@ use App\Models\FuelConsumption;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Maatwebsite\Excel\Facades\Excel;
 
-class ReportFuelController extends Controller
+class ReportFuelController extends Controller implements HasMiddleware
 {
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission::report read', ['only' => ['index', 'data', 'getData', 'getChartData', 'exportPdf', 'exportExcel']]),
+        ];
+    }
 
     public function index()
     {
@@ -184,7 +193,7 @@ class ReportFuelController extends Controller
     /**
      * Returns a query with the applied filters for consistency across exports.
      */
-    private function getFilteredDataQuery(Request $request) 
+    private function getFilteredDataQuery(Request $request)
     {
         $query = FuelConsumption::orderBy('date', 'asc');
 

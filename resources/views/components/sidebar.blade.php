@@ -27,40 +27,66 @@
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
-        <li class="menu-item {{ request()->url() == url('/dashboard') ? 'active' : '' }}">
-            <a href="/dashboard" class="menu-link">
-                {{-- <i class="menu-icon tf-icons ti ti-home"></i> --}}
-                <div data-i18n="Dashboard">Dashboard</div>
-            </a>
-        </li>
+        @can('view-dashboard')
+            <li class="menu-item {{ request()->url() == url('/dashboard') ? 'active' : '' }}">
+                <a href="/dashboard" class="menu-link">
+                    <div data-i18n="Dashboard">Dashboard</div>
+                </a>
+            </li>
+        @endcan
+
         @php
             $menus = \App\Helpers\Helper::getMenu();
         @endphp
 
         @foreach ($menus as $data)
+            @php
+                // Generate permission name from menu name
+                $permissionName = 'view-' . Str::slug($data->name);
+            @endphp
+
             @if ($data->parent_id == null && $data->children->isEmpty())
-                <li class="menu-item {{ request()->url() == url($data->route) ? 'active' : '' }}">
-                    <a href="{{ $data->route }}" class="menu-link">
-                        {{-- <i class="menu-icon tf-icons ti ti-mail"></i> --}}
-                        <div data-i18n="{{ $data->name }}">{{ $data->name }}</div>
-                    </a>
-                </li>
+                @can($permissionName)
+                    <li class="menu-item {{ request()->url() == url($data->route) ? 'active' : '' }}">
+                        <a href="{{ $data->route }}" class="menu-link">
+                            <div data-i18n="{{ $data->name }}">{{ $data->name }}</div>
+                        </a>
+                    </li>
+                @endcan
             @elseif ($data->parent_id == null && $data->children->isNotEmpty())
-                <li class="menu-item {{ $data->children->contains(function($child) { return request()->url() == url($child->route); }) ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="menu-link menu-toggle">
-                        {{-- <i class="menu-icon tf-icons ti {{ $data->icon }}"></i> --}}
-                        <div data-i18n="{{ $data->name }}">{{ $data->name }}</div>
-                    </a>
-                    <ul class="menu-sub">
-                        @foreach ($data->children as $child)
-                            <li class="menu-item {{ request()->url() == url($child->route) ? 'active' : '' }}">
-                                <a href="{{ $child->route }}" class="menu-link">
-                                    <div>{{ $child->name }}</div>
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </li>
+                @php
+                    $hasPermission = false;
+                    foreach ($data->children as $child) {
+                        $childPermission = 'view-' . Str::slug($child->name);
+                        if (auth()->user()->can($childPermission)) {
+                            $hasPermission = true;
+                            break;
+                        }
+                    }
+                @endphp
+
+                @if ($hasPermission)
+                    <li
+                        class="menu-item {{ $data->children->contains(function ($child) {return request()->url() == url($child->route);})? 'active': '' }}">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                            <div data-i18n="{{ $data->name }}">{{ $data->name }}</div>
+                        </a>
+                        <ul class="menu-sub">
+                            @foreach ($data->children as $child)
+                                @php
+                                    $childPermission = 'view-' . Str::slug($child->name);
+                                @endphp
+                                @can($childPermission)
+                                    <li class="menu-item {{ request()->url() == url($child->route) ? 'active' : '' }}">
+                                        <a href="{{ $child->route }}" class="menu-link">
+                                            <div>{{ $child->name }}</div>
+                                        </a>
+                                    </li>
+                                @endcan
+                            @endforeach
+                        </ul>
+                    </li>
+                @endif
             @endif
         @endforeach
     </ul>

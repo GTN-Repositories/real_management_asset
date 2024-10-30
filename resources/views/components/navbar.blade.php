@@ -179,8 +179,16 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <span class="fw-medium d-block">John Doe</span>
-                                    <small class="text-muted">Admin</small>
+                                    <span class="fw-medium d-block">
+                                        @auth
+                                            {{ auth()->user()->name }}
+                                        @endauth
+                                    </span>
+                                    <small class="text-muted">
+                                        @auth
+                                            {{ auth()->user()->roles->pluck('name')->implode(', ') }}
+                                        @endauth
+                                    </small>
                                 </div>
                             </div>
                         </a>
