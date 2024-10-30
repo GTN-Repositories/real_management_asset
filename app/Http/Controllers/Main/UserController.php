@@ -47,6 +47,12 @@ class UserController extends Controller implements HasMiddleware
 
                 return $checkbox;
             })
+            ->addColumn('idRelation', function ($data) {
+                if ($data->hasRole('driver')) {
+                    return $data->id ?? null;
+                }
+                return null;
+            })
             ->addColumn('name', function ($data) {
                 return $data->name ?? null;
             })

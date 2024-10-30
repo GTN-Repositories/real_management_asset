@@ -47,8 +47,8 @@ class FuelConsumptionController extends Controller
             ->addColumn('asset_id', function ($data) {
                 return $data->asset->name ?? null;
             })
-            ->addColumn('receiver', function ($data) {
-                return $data->receiver ?? null;
+            ->addColumn('user_id', function ($data) {
+                return $data->user->name ?? null;
             })
             ->addColumn('date', function ($data) {
                 return $data->date ?? null;
@@ -80,7 +80,7 @@ class FuelConsumptionController extends Controller
             'id',
             'management_project_id',
             'asset_id',
-            'receiver',
+            'user_id',
             'date',
             'loadsheet',
             'liter',

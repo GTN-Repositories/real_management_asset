@@ -7,39 +7,41 @@
     @csrf
 
     <div class="col-12 col-md-12" id="managementRelation">
-        <label class="form-label" for="management_project_id">nama projek<span class="text-danger">*</span></label>
+        <label class="form-label" for="management_project_id">Nama Management Project<span
+                class="text-danger">*</span></label>
         <select id="management_project_id" name="management_project_id"
             class="select2 form-select select2-primary"data-allow-clear="true" required>
         </select>
     </div>
     <div class="col-12 col-md-6" id="assetRelation">
-        <label class="form-label" for="asset_id">nama aset<span class="text-danger">*</span></label>
+        <label class="form-label" for="asset_id">Nama Asset<span class="text-danger">*</span></label>
         <select id="asset_id" name="asset_id" class="select2 form-select select2-primary"data-allow-clear="true"
             required>
         </select>
     </div>
-    <div class="col-12 col-md-6">
-        <label class="form-label" for="receiver">penerima<span class="text-danger">*</span></label>
-        <input type="text" id="receiver" name="receiver" class="form-control" placeholder="Masukkan penerima"
-            required />
+    <div class="col-12 col-md-6" id="driverRelation">
+        <label class="form-label" for="user_id">Nama Driver<span class="text-danger">*</span></label>
+        <select id="user_id" name="user_id" class="select2 form-select select2-primary"data-allow-clear="true"
+            required>
+        </select>
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="date">tanggal<span class="text-danger">*</span></label>
+        <label class="form-label" for="date">Tanggal<span class="text-danger">*</span></label>
         <input type="date" id="date" name="date" class="form-control" placeholder="Masukkan tanggal"
             value="{{ date('Y-m-d') }}" required />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="loadsheet">loadsheet<span class="text-danger">*</span></label>
+        <label class="form-label" for="loadsheet">Loadsheet<span class="text-danger">*</span></label>
         <input type="number" min="1" id="loadsheet" name="loadsheet" class="form-control"
             placeholder="Masukkan loadsheet" required />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="liter">liter<span class="text-danger">*</span></label>
+        <label class="form-label" for="liter">Liter<span class="text-danger">*</span></label>
         <input type="number" min="1" id="liter" name="liter" class="form-control"
             placeholder="Masukkan liter" required />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="price">harga/liter<span class="text-danger">*</span></label>
+        <label class="form-label" for="price">Harga/Liter<span class="text-danger">*</span></label>
         <input type="text" id="price" name="price" class="form-control" placeholder="Masukkan harga"
             required />
     </div>
@@ -113,6 +115,38 @@
                         });
                     }
                 });
+            }
+        });
+
+        $('#user_id').select2({
+            dropdownParent: $('#driverRelation'),
+            placeholder: 'Pilih penerima',
+            ajax: {
+                url: "{{ route('user.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function(data) {
+                    apiResults = data.data
+                        .filter(function(item) {
+                            return item.idRelation !== null;
+                        })
+                        .map(function(item) {
+                            return {
+                                text: item.name,
+                                id: item.idRelation,
+                            };
+                        });
+
+                    return {
+                        results: apiResults
+                    };
+                },
+                cache: true
             }
         });
     })
