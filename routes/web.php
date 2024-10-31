@@ -95,16 +95,16 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/fuel/destroy-all', [FuelConsumptionController::class, 'destroyAll'])->name('fuel.destroyAll');
     Route::resource('fuel', FuelConsumptionController::class);
 
+    // driver
+    Route::post('/driver/select-project', [DriverProjectController::class, 'selectProject'])->name('driver.selectProject');
+    Route::get('/driver/project', [DriverProjectController::class, 'data'])->name('driver.data');
+    Route::resource('driver', DriverProjectController::class);
+
     Route::get('/report-fuel/export-excel', [ReportFuelController::class, 'exportExcel'])->name('report-fuel.export-excel');
     Route::post('report-fuel/export-pdf', [ReportFuelController::class, 'exportPDF'])->name('report-fuel.export-pdf');
     Route::get('/report-fuel/chart', [ReportFuelController::class, 'getChartData'])->name('report-fuel.chart');
     Route::get('/report-fuel/data', [ReportFuelController::class, 'data'])->name('report-fuel.data');
     Route::resource('report-fuel', ReportFuelController::class);
-
-    // driver
-    Route::post('/driver/select-project', [DriverProjectController::class, 'selectProject'])->name('driver.selectProject');
-    Route::get('/driver/project', [DriverProjectController::class, 'data'])->name('driver.data');
-    Route::resource('driver', DriverProjectController::class);
 });
 
 require __DIR__ . '/auth.php';

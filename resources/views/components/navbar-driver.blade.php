@@ -168,6 +168,12 @@
                             </a>
                         </li>
                         <li>
+                            <a class="dropdown-item" href="{{ route('driver.index') }}">
+                                <i class="ti ti-switch-3 me-2 ti-sm"></i>
+                                <span class="align-middle">Pilih Project</span>
+                            </a>
+                        </li>
+                        <li>
                             <div class="dropdown-divider"></div>
                         </li>
                         <li>

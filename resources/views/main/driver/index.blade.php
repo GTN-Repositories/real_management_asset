@@ -55,9 +55,8 @@
                 `);
                     });
 
-                    // Event listener untuk tombol pilih management project
                     $('.select-project-btn').click(function() {
-                        let managerName = $(this).data('manager-name'); // Ambil manager name
+                        let managerName = $(this).data('manager-name');
 
                         $.ajax({
                             url: "{{ route('driver.selectProject') }}",
@@ -67,7 +66,9 @@
                                 _token: '{{ csrf_token() }}'
                             },
                             success: function(response) {
-                                Swal.fire('Success!', response.message, 'success');
+                                if (response.status) {
+                                    window.location.href = "{{ route('report-fuel.index') }}";
+                                }
                             },
                             error: function() {
                                 Swal.fire('Error!',
