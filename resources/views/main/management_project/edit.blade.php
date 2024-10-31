@@ -8,15 +8,33 @@
     @csrf
     @method('put')
 
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-md-12">
         <label class="form-label" for="name">nama manajemen<span class="text-danger">*</span></label>
         <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name" required
             value="{{ $data->name }}" />
     </div>
-    <div class="col-12 col-md-6" id="relationId">
+    <div class="col-12 col-md-12" id="relationId">
         <label class="form-label" for="asset_id">nama aset<span class="text-danger">*</span></label>
         <select id="asset_id" name="asset_id" class="select2 form-select " data-allow-clear="true" required>
             <option value="{{ $data->asset->id }}" selected>{{ $data->asset->name }}</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-12">
+        <label for="date-range-picker" class="form-label">Periode Waktu</label>
+        <div class="input-group" id="date-range-picker">
+            <input type="date" id="start_date" name="start_date" class="form-control" placeholder="Start Date"
+                value="{{ $data->start_date }}" required>
+            <span class="input-group-text">to</span>
+            <input type="date" id="end_date" name="end_date" class="form-control" placeholder="End Date"
+                value="{{ $data->end_date }}" required>
+        </div>
+    </div>
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="calculation_method">Metode Kalkulasi</label>
+        <select name="calculation_method" id="calculation_method" class="form-select select2">
+            <option value="">Pilih</option>
+            <option value="Kubic" @if ($data->calculation_method == 'Kubic') selected @endif>Kubic</option>
+            <option value="Tonase" @if ($data->calculation_method == 'Tonase') selected @endif>Tonase</option>
         </select>
     </div>
     <div class="col-12 text-center">

@@ -47,17 +47,20 @@ class FuelConsumptionController extends Controller
             ->addColumn('asset_id', function ($data) {
                 return $data->asset->name ?? null;
             })
-            ->addColumn('receiver', function ($data) {
-                return $data->receiver ?? null;
+            ->addColumn('user_id', function ($data) {
+                return $data->user->name ?? null;
             })
             ->addColumn('date', function ($data) {
                 return $data->date ?? null;
             })
+            ->addColumn('loadsheet', function ($data) {
+                return number_format($data->loadsheet, 0, ',', '.') ?? null;
+            })
             ->addColumn('liter', function ($data) {
-                return $data->liter ?? null;
+                return number_format($data->liter, 0, ',', '.') . ' liter' ?? null;
             })
             ->addColumn('price', function ($data) {
-                return $data->price ?? null;
+                return 'Rp. ' . number_format($data->price, 0, ',', '.') ?? null;
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
@@ -77,18 +80,19 @@ class FuelConsumptionController extends Controller
             'id',
             'management_project_id',
             'asset_id',
-            'receiver',
+            'user_id',
             'date',
+            'loadsheet',
             'liter',
             'price',
         ];
 
         $keyword = $request->search['value'] ?? "";
-        $project_id = $this->projectId();
+        // $project_id = $this->projectId();
 
         $data = FuelConsumption::orderBy('created_at', 'asc')
             ->select($columns)
-            ->whereIn($project_id)
+            // ->whereIn($project_id)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
                     foreach ($columns as $column) {
@@ -115,6 +119,9 @@ class FuelConsumptionController extends Controller
 
         try {
             return $this->atomic(function () use ($data) {
+                $data['price'] = str_replace('.', '', $data['price']);
+                $data['loadsheet'] = str_replace('.', '', $data['loadsheet']);
+                $data['liter'] = str_replace('.', '', $data['liter']);
                 $data["management_project_id"] = crypt::decrypt($data["management_project_id"]);
                 $data = FuelConsumption::create($data);
 

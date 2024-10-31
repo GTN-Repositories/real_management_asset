@@ -136,7 +136,7 @@
 
 <!-- Page JS -->
 {{-- <script src="{{ asset('assets/js/app-calendar-events.js') }}"></script> --}}
-<script src="{{ asset('assets/js/app-calendar.js?update=5') }}"></script>
+<script src="{{ asset('assets/js/app-calendar.js?update=11') }}"></script>
 <script>
     function createData() {
         $.ajax({
@@ -150,6 +150,22 @@
         })
         .fail(function() {
             Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+        });
+    }
+
+    function editData(id) {
+
+        $.ajax({
+            url: "{{ route('inspection-schedule.edit', ':id') }}".replace(':id', id),
+            type: 'GET',
+        })
+        .done(function(data) {
+            $('#content-modal-ce').html(data);
+
+            $("#modal-ce").modal("show");
+        })
+        .fail(function() {
+            Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
         });
     }
 </script>
@@ -174,6 +190,5 @@
             calendar: event.type
         }
     }));
-
 </script>
 @endpush

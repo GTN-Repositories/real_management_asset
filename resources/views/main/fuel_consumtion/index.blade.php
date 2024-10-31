@@ -32,8 +32,9 @@
                             </th>
                             <th>nama project</th>
                             <th>nama aset</th>
-                            <th>penerima</th>
+                            <th>pengemudi</th>
                             <th>tanggal</th>
+                            <th>loadsheet</th>
                             <th>banyak penggunaan</th>
                             <th>harga/liter</th>
                             <th>Aksi</th>
@@ -127,12 +128,16 @@
                         name: 'asset_id'
                     },
                     {
-                        data: 'receiver',
-                        name: 'receiver'
+                        data: 'user_id',
+                        name: 'user_id'
                     },
                     {
                         data: 'date',
                         name: 'date'
+                    },
+                    {
+                        data: 'loadsheet',
+                        name: 'loadsheet'
                     },
                     {
                         data: 'liter',

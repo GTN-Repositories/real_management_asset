@@ -4,26 +4,28 @@
     <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
 
-<form method="POST" class="row g-3" id="formCreate" action="{{ route('inspection-schedule.store') }}"
+<form method="POST" class="row g-3" id="formUpdate" action="{{ route('inspection-schedule.update', $data->id) }}"
     enctype="multipart/form-data">
     @csrf
+    @method('PUT')
+    
     <div class="col-12 col-md-12">
         <label class="form-label">Judul Maintenance</label>
         <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" value="{{ old('name') }}" required />
+            placeholder="Masukan Nama Item" value="{{ old('name', $data->name) }}" required />
     </div>
 
     <div class="col-12 col-md-6">
         <label class="form-label">Tanggal</label>
         <input type="date" name="date" id="date" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" value="{{ old('date', date('Y-m-d')) }}" required />
+            placeholder="Masukan Nama Item" value="{{ old('date', $data->date) }}" required />
     </div>
 
     <div class="col-12 col-md-6">
         <label for="exampleFormControlSelect1" class="form-label">Jenis Maintenance</label>
         <select class="form-select" id="exampleFormControlSelect1" name="type" aria-label="Select Type">
-            <option value="p2h">P2H</option>
-            <option value="pm">PM</option>
+            <option value="p2h" {{ $data->type == 'p2h' ? 'selected' : ''}}>P2H</option>
+            <option value="pm" {{ $data->type == 'pm' ? 'selected' : ''}}>PM</option>
         </select>
     </div>
 
@@ -36,17 +38,19 @@
     <div class="col-12 col-md-12">
         <label class="form-label" for="alias">Catatan</label>
         <textarea name="note" id="" cols="30" rows="10" class="form-control"
-            placeholder="Masukkan Deskripsi"></textarea>
+            placeholder="Masukkan Deskripsi">{{ old('note', $data->note) }}</textarea>
     </div>
 
     <div class="col-12 text-center">
-        <button type="submit" class="btn btn-primary me-sm-3 me-1">Mulai Inspeksi</button>
-        <button type="button" class="btn btn-label-secondary">Simpan</button>
+        <button type="button" class="btn btn btn-primary">Simpan</button>
     </div>
 </form>
 
 <script type="text/javascript">
     $(document).ready(function() {
+        var asset_id = "{{ $data->asset_id }}";
+        var assetName = "{{ $data->asset->name ?? '' }}";
+
         $('#asset_id').select2({
             dropdownParent: $('#selectAsset'),
             placeholder: 'Pilih Asset',
@@ -79,9 +83,14 @@
                 cache: true
             }
         });
+
+        if (asset_id) {
+            var option = new Option(assetName, asset_id, true, true);
+            $('#asset_id').append(option).trigger('change');
+        }
     });
 
-    document.getElementById('formCreate').addEventListener('submit', function(event) {
+    document.getElementById('formUpdate').addEventListener('submit', function(event) {
         event.preventDefault();
 
         const form = event.target;

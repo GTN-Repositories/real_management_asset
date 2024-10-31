@@ -19,9 +19,14 @@
     </div>
     <div class="col-12 mb-4">
         <label class="form-label" for="password">Password</label>
-        <input type="text" id="password" name="password" class="form-control" placeholder="Enter a password"
+        <input type="password" id="password" name="password" class="form-control" placeholder="Enter a password"
             tabindex="-1" />
-    </div> 
+    </div>
+    <div class="col-12 mb-4">
+        <label class="form-label" for="phone">Phone</label>
+        <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter a phone"
+            tabindex="-1" />
+    </div>
     <div class="col-12">
         <h5>Users Role</h5>
         <!-- Permission table -->
@@ -56,6 +61,35 @@
     </div>
 </form>
 <!--/ Add role form -->
+
+<script>
+    function formatIndonesianPhoneNumber(angka, prefix) {
+        if (!angka) {
+            return (prefix || '') + '-';
+        }
+
+        angka = angka.toString();
+        const number_string = angka.replace(/[^0-9]/g, '').toString();
+        let formattedNumber = '';
+
+        if (number_string.length > 3) {
+            const first = number_string.substring(0, 4);
+            const middle = number_string.substring(4, 8);
+            const last = number_string.substring(8);
+
+            formattedNumber += first + '-' + middle + '-' + last;
+        } else {
+            formattedNumber += number_string;
+        }
+
+        return prefix === undefined ? formattedNumber : formattedNumber ? (prefix || '') + formattedNumber : '';
+    }
+
+    $(document).on('input', '#phone', function() {
+        value = formatIndonesianPhoneNumber($(this).val());
+        $(this).val(value);
+    });
+</script>
 
 <script>
     document.getElementById('addUserForm').addEventListener('submit', function(event) {

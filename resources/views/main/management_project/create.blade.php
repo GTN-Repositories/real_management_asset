@@ -11,7 +11,7 @@
         <label class="form-label" for="name">Nama project<span class="text-danger">*</span></label>
         <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name" required />
     </div>
-    <div class="col-12 col-md-12 mb-4" id="relationId">
+    <div class="col-12 col-md-12" id="relationId">
         <label for="asset_id" class="form-label">Asset<span class="text-danger">*</span></label>
         <div class="select2-primary">
             <div class="position-relative">
@@ -21,12 +21,24 @@
             </div>
         </div>
     </div>
-
+    <div class="col-12 col-md-12">
+        <label for="date-range-picker" class="form-label">Periode Waktu</label>
+        <input type="text" id="date-range-picker" name="date_range" class="form-control" placeholder="Select Date Range">
+    </div>
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="calculation_method">Metode Kalkulasi</label>
+        <select name="calculation_method" id="calculation_method" class="form-select select2">
+            <option value="">Pilih</option>
+            <option value="Kubic">Kubic</option>
+            <option value="Tonase">Tonase</option>
+        </select>
+    </div>
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
         <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
             aria-label="Close">Cancel</button>
     </div>
+
 </form>
 
 @include('components.select2_js')
@@ -59,6 +71,26 @@
                 },
                 cache: true
             }
+        });
+    });
+
+    $(document).ready(function() {
+        $('#date-range-picker').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
+
+        $('#date-range-picker').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate
+                .format('YYYY-MM-DD'));
+            applyDateRangeFilter(picker.startDate.format('YYYY-MM-DD'), picker.endDate
+                .format('YYYY-MM-DD'));
+        });
+
+        $('#date-range-picker').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
         });
     });
 </script>

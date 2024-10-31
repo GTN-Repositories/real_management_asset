@@ -166,7 +166,7 @@
 
         function deleteData(element) {
             var id = $(element).data('id');
-            
+
             Swal.fire({
                 title: 'Are you sure?',
                 text: 'You will not be able to recover this record!',
