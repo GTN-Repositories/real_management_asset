@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Models\Asset;
 use App\Models\Form;
 use App\Models\InspectionSchedule;
 use App\Models\Unit;
@@ -12,9 +13,11 @@ use Illuminate\Support\Facades\Crypt;
 
 class InspectionScheduleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('main.inspection_schedule.index');
+        $data = $this->data($request);
+
+        return view('main.inspection_schedule.index', compact('data'));
     }
 
     public function data(Request $request)
@@ -50,22 +53,16 @@ class InspectionScheduleController extends Controller
             ->get();
 
         foreach ($data as $key => $value) {
-            $value['idn'] = Crypt::decrypt($value['id']);
-            $value['date'] = $value['date']. ' 00:00:00';
+            $value['start'] = $value['date']. ' 00:00:00';
+            $value['end'] = $value['date']. ' 23:59:59';
         }
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Data has been retrieved',
-            'data' => $data
-        ]);
+        return $data;
     }
 
     public function create()
     {
-        $relation = Unit::all();
-
-        return view('main.inspection_schedule.create', compact('relation'));
+        return view('main.inspection_schedule.create');
     }
 
     public function store(Request $request)
