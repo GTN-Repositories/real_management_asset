@@ -16,9 +16,9 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable()->after('receiver')->index();
         });
 
-        DB::table('fuel_consumptions')->get()->each(function ($item) {
-            DB::table('fuel_consumptions')->where('id', $item->id)->update(['user_id' => $item->receiver]);
-        });
+        // DB::table('fuel_consumptions')->get()->each(function ($item) {
+        //     DB::table('fuel_consumptions')->where('id', $item->id)->update(['user_id' => $item->receiver]);
+        // });
 
         Schema::table('fuel_consumptions', function (Blueprint $table) {
             $table->dropColumn('receiver');

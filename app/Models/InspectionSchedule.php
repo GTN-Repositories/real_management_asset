@@ -21,9 +21,9 @@ class InspectionSchedule extends Model
         return self::findOrFail($decryptedId);
     }
 
-    public function unit()
+    public function asset()
     {
-        return $this->belongsTo(Unit::class, 'unit_id', 'id');
+        return $this->belongsTo(Asset::class, 'asset_id', 'id');
     }
     public function questions()
     {

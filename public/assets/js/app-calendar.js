@@ -292,7 +292,10 @@ document.addEventListener('DOMContentLoaded', function () {
         eventEndDate.value = date;
       },
       eventClick: function (info) {
-        eventClick(info);
+        console.log(info.event.id);
+
+        editData(info.event.id);
+        // eventClick(info);
       },
       datesSet: function () {
         modifyToggler();
