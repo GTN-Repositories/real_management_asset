@@ -3,6 +3,7 @@
 use App\Http\Controllers\Main\AssetController;
 use App\Http\Controllers\Main\CategoryItemController;
 use App\Http\Controllers\Main\CustomerController;
+use App\Http\Controllers\Main\DriverProjectController;
 use App\Http\Controllers\Main\FormController;
 use App\Http\Controllers\Main\FuelConsumptionController;
 use App\Http\Controllers\Main\InspectionScheduleController;
@@ -99,6 +100,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/report-fuel/chart', [ReportFuelController::class, 'getChartData'])->name('report-fuel.chart');
     Route::get('/report-fuel/data', [ReportFuelController::class, 'data'])->name('report-fuel.data');
     Route::resource('report-fuel', ReportFuelController::class);
+
+    // driver
+    Route::post('/driver/select-project', [DriverProjectController::class, 'selectProject'])->name('driver.selectProject');
+    Route::get('/driver/project', [DriverProjectController::class, 'data'])->name('driver.data');
+    Route::resource('driver', DriverProjectController::class);
 });
 
 require __DIR__ . '/auth.php';
