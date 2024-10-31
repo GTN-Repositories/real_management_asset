@@ -49,6 +49,7 @@
                 <th>Tanggal</th>
                 <th>Nama Project</th>
                 <th>Nama Aset</th>
+                <th>Loadsheet</th>
                 <th>Banyak Penggunaan (Liter)</th>
                 <th>Harga/Liter</th>
                 <th>Total</th>
@@ -61,11 +62,19 @@
                     <td>{{ $item->date }}</td>
                     <td>{{ $item->management_project->name }}</td>
                     <td>{{ $item->asset->name }}</td>
+                    <td>{{ $item->loadsheet }}</td>
                     <td>{{ $item->liter }}</td>
                     <td>{{ $item->price }}</td>
-                    <td>{{ $item->liter * $item->price }}</td>
+                    <td>{{ 'Rp. ' . number_format($item->liter * $item->price, 0, ',', '.') }}</td>
                 </tr>
             @endforeach
+            <tr>
+                <th colspan="4">Total</th>
+                <th>{{ $data->sum('loadsheet') }}</th>
+                <th>{{ $data->sum('liter') }}</th>
+                <th>{{ 'Rp. ' . number_format($data->sum('price'), 0, ',', '.') }}</th>
+                <th>{{ 'Rp. ' . number_format($data->sum('liter') * $data->sum('price'), 0, ',', '.') }}</th>
+            </tr>
         </tbody>
     </table>
 </body>

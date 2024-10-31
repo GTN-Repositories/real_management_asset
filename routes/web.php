@@ -19,8 +19,8 @@ use App\Http\Controllers\Main\WerehouseController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+Route::middleware(['auth'])->group(function () {
 
-Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
@@ -94,6 +94,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/fuel/destroy-all', [FuelConsumptionController::class, 'destroyAll'])->name('fuel.destroyAll');
     Route::resource('fuel', FuelConsumptionController::class);
 
+    Route::get('/report-fuel/export-excel', [ReportFuelController::class, 'exportExcel'])->name('report-fuel.export-excel');
     Route::post('report-fuel/export-pdf', [ReportFuelController::class, 'exportPDF'])->name('report-fuel.export-pdf');
     Route::get('/report-fuel/chart', [ReportFuelController::class, 'getChartData'])->name('report-fuel.chart');
     Route::get('/report-fuel/data', [ReportFuelController::class, 'data'])->name('report-fuel.data');

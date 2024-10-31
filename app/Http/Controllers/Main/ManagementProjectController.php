@@ -47,6 +47,15 @@ class ManagementProjectController extends Controller
             ->addColumn('asset_id', function ($data) {
                 return $data->asset->name ?? null;
             })
+            ->addColumn('start_date', function ($data) {
+                return $data->start_date ?? null;
+            })
+            ->addColumn('end_date', function ($data) {
+                return $data->end_date ?? null;
+            })
+            ->addColumn('calculation_method', function ($data) {
+                return $data->calculation_method ?? null;
+            })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
                 $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
@@ -65,6 +74,9 @@ class ManagementProjectController extends Controller
             'id',
             'name',
             'asset_id',
+            'start_date',
+            'end_date',
+            'calculation_method',
         ];
 
         $keyword = $request->search['value'] ?? "";
@@ -97,19 +109,22 @@ class ManagementProjectController extends Controller
      */
     public function store(Request $request)
     {
-
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'asset_id' => 'required',
-        ]);
-
+        $data = $request->all();
         try {
             return $this->atomic(function () use ($data) {
+                $dateRangeInput = $data['date_range'];
+                [$startDate, $endDate] = explode(' - ', $dateRangeInput);
+
+                $start_date = trim($startDate);
+                $end_date = trim($endDate);
                 foreach ($data['asset_id'] as $encryptedAssetId) {
                     $decryptedAssetId = Crypt::decrypt($encryptedAssetId);
                     $projectData = [
                         'name' => $data['name'],
-                        'asset_id' => $decryptedAssetId
+                        'asset_id' => $decryptedAssetId,
+                        'start_date' => $start_date,
+                        'end_date' => $end_date,
+                        'calculation_method' => $data['calculation_method'],
                     ];
                     ManagementProject::create($projectData);
                 }

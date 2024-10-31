@@ -18,32 +18,35 @@ class DatabaseSeeder extends Seeder
         $this->call(MenuSeeder::class);
         $this->call(FormSeeder::class);
         $this->call(UnitSeeder::class);
+        $this->call(MenuPermissionSeeder::class);
 
-        $permissions = [
-            'role create',
-            'role read',
-            'role update',
-            'role delete',
-            'permission create',
-            'permission read',
-            'permission update',
-            'permission delete',
-            'user create',
-            'user read',
-            'user update',
-            'user delete',
-            'kendaraan create',
-            'kendaraan read',
-            'kendaraan update',
-            'kendaraan delete',
-        ];
+        // $permissions = [
+        //     'role create',
+        //     'role read',
+        //     'role update',
+        //     'role delete',
+        //     'permission create',
+        //     'permission read',
+        //     'permission update',
+        //     'permission delete',
+        //     'user create',
+        //     'user read',
+        //     'user update',
+        //     'user delete',
+        //     'report read',
+        // ];
 
-        foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
-        }
-        
+        // foreach ($permissions as $permission) {
+        //     Permission::create(['name' => $permission]);
+        // }
+
         Role::create([
             'name' => 'superAdmin',
+            'guard_name' => 'web',
+        ]);
+
+        Role::create([
+            'name' => 'driver',
             'guard_name' => 'web',
         ]);
 
@@ -53,6 +56,13 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
 
+        $driver = User::create([
+            'name' => 'Supriman',
+            'email' => 'driver@gmail.com',
+            'password' => bcrypt('password'),
+        ]);
+
         $admin->assignRole('superAdmin');
+        $driver->assignRole('driver');
     }
 }
