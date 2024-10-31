@@ -1,6 +1,6 @@
 @extends('layouts.global')
 
-@section('title', 'Inspection')
+@section('title', 'Maintenance')
 
 @push('css')
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
@@ -21,7 +21,7 @@
                     <div class="d-grid">
                         <button class="btn btn-primary btn-toggle-sidebar" onclick="createData()">
                             <i class="ti ti-plus me-1"></i>
-                            <span class="align-middle">Add Event</span>
+                            <span class="align-middle">Tambah Maintenance</span>
                         </button>
                     </div>
                 </div>
@@ -117,7 +117,7 @@
         <div class="modal-dialog modal-lg modal-simple">
             <div class="modal-content p-3 p-md-5">
                 <div class="modal-body" id="content-modal-ce">
-    
+
                 </div>
             </div>
         </div>
@@ -136,55 +136,7 @@
 
 <!-- Page JS -->
 {{-- <script src="{{ asset('assets/js/app-calendar-events.js') }}"></script> --}}
-<script src="{{ asset('assets/js/app-calendar.js') }}"></script>
-
-<script>
-    window.events = [];
-
-    $(document).ready(function() {
-        fetchEvents();
-    });
-
-    async function fetchEvents() {
-        try {
-            'use strict';
-
-            let date = new Date();
-            let nextDay = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
-            // prettier-ignore
-            let nextMonth = date.getMonth() === 11 ? new Date(date.getFullYear() + 1, 0, 1) : new Date(date.getFullYear(), date.getMonth() + 1, 1);
-            // prettier-ignore
-            let prevMonth = date.getMonth() === 11 ? new Date(date.getFullYear() - 1, 0, 1) : new Date(date.getFullYear(), date.getMonth() - 1, 1);
-            
-            const response = await fetch('{{ route("inspection-schedule.data") }}');
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const data = await response.json();
-
-            if (Array.isArray(data.data)) {
-                window.events = data.data.map(event => ({
-                    id: event.idn,
-                    title: 'akjsdbjkasbd',
-                    url: '',
-                    start: new Date(date.getFullYear(), date.getMonth() + 1, -11),
-                    end: new Date(date.getFullYear(), date.getMonth() + 1, -10),
-                    allDay: false,
-                    extendedProps: {
-                        calendar: 'P2H'
-                    }
-                }));
-
-                console.log('Events fetched:', window.events);
-            } else {
-                console.error('Expected data.data to be an array:', data.data);
-            }
-        } catch (error) {
-            console.error('Error fetching events:', error);
-        }
-    }
-</script>
-
+<script src="{{ asset('assets/js/app-calendar.js?update=11') }}"></script>
 <script>
     function createData() {
         $.ajax({
@@ -200,5 +152,43 @@
             Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
         });
     }
+
+    function editData(id) {
+
+        $.ajax({
+            url: "{{ route('inspection-schedule.edit', ':id') }}".replace(':id', id),
+            type: 'GET',
+        })
+        .done(function(data) {
+            $('#content-modal-ce').html(data);
+
+            $("#modal-ce").modal("show");
+        })
+        .fail(function() {
+            Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
+        });
+    }
+</script>
+<script>
+    'use strict';
+
+    let date = new Date();
+    let nextDay = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+    // prettier-ignore
+    let nextMonth = date.getMonth() === 11 ? new Date(date.getFullYear() + 1, 0, 1) : new Date(date.getFullYear(), date.getMonth() + 1, 1);
+    // prettier-ignore
+    let prevMonth = date.getMonth() === 11 ? new Date(date.getFullYear() - 1, 0, 1) : new Date(date.getFullYear(), date.getMonth() - 1, 1);
+
+    window.events = @json($data);
+
+    window.events = window.events.map(event => ({
+        id: event.id,
+        title: event.name,
+        start: new Date(event.start),
+        end: new Date(event.end),
+        extendedProps: {
+            calendar: event.type
+        }
+    }));
 </script>
 @endpush

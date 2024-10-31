@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Models\Asset;
 use App\Models\Form;
 use App\Models\InspectionSchedule;
 use App\Models\Unit;
@@ -12,9 +13,11 @@ use Illuminate\Support\Facades\Crypt;
 
 class InspectionScheduleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('main.inspection_schedule.index');
+        $data = $this->data($request);
+
+        return view('main.inspection_schedule.index', compact('data'));
     }
 
     public function data(Request $request)
@@ -23,7 +26,7 @@ class InspectionScheduleController extends Controller
             'id',
             'name',
             'type',
-            'unit_id',
+            'asset_id',
             'note',
             'date',
         ];
@@ -50,22 +53,16 @@ class InspectionScheduleController extends Controller
             ->get();
 
         foreach ($data as $key => $value) {
-            $value['idn'] = Crypt::decrypt($value['id']);
-            $value['date'] = $value['date']. ' 00:00:00';
+            $value['start'] = $value['date']. ' 00:00:00';
+            $value['end'] = $value['date']. ' 23:59:59';
         }
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Data has been retrieved',
-            'data' => $data
-        ]);
+        return $data;
     }
 
     public function create()
     {
-        $relation = Unit::all();
-
-        return view('main.inspection_schedule.create', compact('relation'));
+        return view('main.inspection_schedule.create');
     }
 
     public function store(Request $request)
@@ -73,14 +70,15 @@ class InspectionScheduleController extends Controller
         $data = $request->all();
 
         try {
-            return $this->atomic(function () use ($request) {
-                $unit_id = Crypt::decrypt($request->input('unit_id'));
+            return $this->atomic(function () use ($data) {
+                $asset_id = Crypt::decrypt($data['asset_id']);
 
                 $schedule = InspectionSchedule::create([
-                    'name' => $request->input('name'),
-                    'type' => $request->input('type'),
-                    'unit_id' => $unit_id,
-                    'note' => $request->input('note')
+                    'name' => $data['name'],
+                    'date' => $data['date'],
+                    'type' => $data['type'],
+                    'asset_id' => $asset_id,
+                    'note' => $data['note']
                 ]);
 
                 return response()->json([
@@ -98,23 +96,33 @@ class InspectionScheduleController extends Controller
         }
     }
 
-    public function show(string $id)
+    public function edit(string $id)
     {
-        $decryptedId = Crypt::decrypt($id);
-        $schedule = InspectionSchedule::findOrFail($decryptedId);
-        $questionsGroupedByCategory = Form::where('type', $schedule->type)
-            ->with('categoryFrom')
-            ->get()
-            ->groupBy('category_form_id');
+        $data = InspectionSchedule::findByEncryptedId($id);
+        
+        return view('main.inspection_schedule.edit', compact('data'));
+    }
 
-        $categoryNames = [];
-        foreach ($questionsGroupedByCategory as $categoryId => $forms) {
-            if ($forms->first()->categoryFrom) {
-                $categoryNames[$categoryId] = $forms->first()->categoryFrom->name;
-            }
+    public function update(Request $request, string $id)
+    {
+        $data = $request->all();
+
+        try {
+            return $this->atomic(function () use ($data, $id) {
+                $data['asset_id'] = Crypt::decrypt($data['asset_id']);
+                $data = InspectionSchedule::findByEncryptedId($id)->update($data);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diperbarui!',
+                ]);
+            });
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data gagal diperbarui! ' . $th->getMessage(),
+            ]);
         }
-        $questionCount = Form::where('type', $schedule->type)->count();
-        return view('main.inspection_schedule.detail_inspection', compact('schedule', 'questionsGroupedByCategory', 'questionCount'));
     }
 
     public function showQuizDetails($scheduleId) {}
