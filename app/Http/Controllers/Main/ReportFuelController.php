@@ -116,6 +116,12 @@ class ReportFuelController extends Controller implements HasMiddleware
             }
         }
 
+        if (session('selected_manager_name')) {
+            $query->whereHas('management_project', function ($q) {
+                $q->where('name', session('selected_manager_name'));
+            });
+        }
+
         return $query;
     }
 
@@ -154,11 +160,18 @@ class ReportFuelController extends Controller implements HasMiddleware
             }
         }
 
+        if (session('selected_manager_name')) {
+            $query->whereHas('management_project', function ($q) {
+                $q->where('name', session('selected_manager_name'));
+            });
+        }
+        
         $consumptions = $query->get();
 
         // Prepare data for chart
         $dates = $consumptions->pluck('date')->toArray();
         $liters = $consumptions->pluck('total_liters')->toArray();
+
 
         return response()->json([
             'dates' => $dates,

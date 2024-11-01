@@ -3,6 +3,7 @@
 use App\Http\Controllers\Main\AssetController;
 use App\Http\Controllers\Main\CategoryItemController;
 use App\Http\Controllers\Main\CustomerController;
+use App\Http\Controllers\Main\DriverProjectController;
 use App\Http\Controllers\Main\FormController;
 use App\Http\Controllers\Main\FuelConsumptionController;
 use App\Http\Controllers\Main\InspectionScheduleController;
@@ -93,6 +94,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/fuel/data', [FuelConsumptionController::class, 'data'])->name('fuel.data');
     Route::delete('/fuel/destroy-all', [FuelConsumptionController::class, 'destroyAll'])->name('fuel.destroyAll');
     Route::resource('fuel', FuelConsumptionController::class);
+
+    // driver
+    Route::post('/driver/select-project', [DriverProjectController::class, 'selectProject'])->name('driver.selectProject');
+    Route::get('/driver/project', [DriverProjectController::class, 'data'])->name('driver.data');
+    Route::resource('driver', DriverProjectController::class);
 
     Route::get('/report-fuel/export-excel', [ReportFuelController::class, 'exportExcel'])->name('report-fuel.export-excel');
     Route::post('report-fuel/export-pdf', [ReportFuelController::class, 'exportPDF'])->name('report-fuel.export-pdf');
