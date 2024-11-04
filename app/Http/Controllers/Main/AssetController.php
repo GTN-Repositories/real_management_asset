@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class AssetController extends Controller
@@ -126,6 +128,101 @@ class AssetController extends Controller
         return $data;
     }
 
+    public function getStatusData()
+    {
+        try {
+            // Get base query
+            $query = Asset::query();
+
+            // Get operational status counts
+            $operationalStatus = $query->select(
+                DB::raw('COUNT(CASE WHEN status = "Idle" THEN 1 END) as idle'),
+                DB::raw('COUNT(CASE WHEN status = "StandBy" THEN 1 END) as standby'),
+                DB::raw('COUNT(CASE WHEN status = "UnderMaintenance" THEN 1 END) as underMaintenance'),
+                DB::raw('COUNT(CASE WHEN status = "Active" THEN 1 END) as active')
+            )->first();
+
+            // Get maintenance status counts
+            $maintenanceStatus = $query->select(
+                DB::raw('COUNT(CASE WHEN status = "OnHold" THEN 1 END) as onHold'),
+                DB::raw('COUNT(CASE WHEN status = "Finish" THEN 1 END) as finish'),
+                DB::raw('COUNT(CASE WHEN status = "Scheduled" THEN 1 END) as scheduled'),
+                DB::raw('COUNT(CASE WHEN status = "InProgress" THEN 1 END) as inProgress')
+            )->first();
+
+            // Get asset condition status counts
+            $assetStatus = $query->select(
+                DB::raw('COUNT(CASE WHEN status = "Damaged" THEN 1 END) as damaged'),
+                DB::raw('COUNT(CASE WHEN status = "Fair" THEN 1 END) as fair'),
+                DB::raw('COUNT(CASE WHEN status = "NeedsRepair" THEN 1 END) as needsRepair'),
+                DB::raw('COUNT(CASE WHEN status = "Good" THEN 1 END) as good')
+            )->first();
+
+            // Calculate percentages and totals
+            $totalAssets = $query->count();
+
+            $response = [
+                // Operational Status
+                'idle' => (int) $operationalStatus->idle,
+                'standby' => (int) $operationalStatus->standby,
+                'underMaintenance' => (int) $operationalStatus->underMaintenance,
+                'active' => (int) $operationalStatus->active,
+
+                // Maintenance Status
+                'onHold' => (int) $maintenanceStatus->onHold,
+                'finish' => (int) $maintenanceStatus->finish,
+                'scheduled' => (int) $maintenanceStatus->scheduled,
+                'inProgress' => (int) $maintenanceStatus->inProgress,
+
+                // Asset Condition Status
+                'damaged' => (int) $assetStatus->damaged,
+                'fair' => (int) $assetStatus->fair,
+                'needsRepair' => (int) $assetStatus->needsRepair,
+                'good' => (int) $assetStatus->good,
+
+                // Additional Statistics
+                'total_assets' => $totalAssets,
+                'percentages' => [
+                    'operational' => [
+                        'idle' => $totalAssets > 0 ? round(($operationalStatus->idle / $totalAssets) * 100, 1) : 0,
+                        'standby' => $totalAssets > 0 ? round(($operationalStatus->standby / $totalAssets) * 100, 1) : 0,
+                        'underMaintenance' => $totalAssets > 0 ? round(($operationalStatus->underMaintenance / $totalAssets) * 100, 1) : 0,
+                        'active' => $totalAssets > 0 ? round(($operationalStatus->active / $totalAssets) * 100, 1) : 0
+                    ],
+                    'maintenance' => [
+                        'onHold' => $totalAssets > 0 ? round(($maintenanceStatus->onHold / $totalAssets) * 100, 1) : 0,
+                        'finish' => $totalAssets > 0 ? round(($maintenanceStatus->finish / $totalAssets) * 100, 1) : 0,
+                        'scheduled' => $totalAssets > 0 ? round(($maintenanceStatus->scheduled / $totalAssets) * 100, 1) : 0,
+                        'inProgress' => $totalAssets > 0 ? round(($maintenanceStatus->inProgress / $totalAssets) * 100, 1) : 0
+                    ],
+                    'condition' => [
+                        'damaged' => $totalAssets > 0 ? round(($assetStatus->damaged / $totalAssets) * 100, 1) : 0,
+                        'fair' => $totalAssets > 0 ? round(($assetStatus->fair / $totalAssets) * 100, 1) : 0,
+                        'needsRepair' => $totalAssets > 0 ? round(($assetStatus->needsRepair / $totalAssets) * 100, 1) : 0,
+                        'good' => $totalAssets > 0 ? round(($assetStatus->good / $totalAssets) * 100, 1) : 0
+                    ]
+                ],
+                'timestamp' => now()->toDateTimeString()
+            ];
+
+            return response()->json($response);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Error retrieving status data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Helper method to calculate percentage safely
+     */
+    private function calculatePercentage($value, $total)
+    {
+        if ($total <= 0) return 0;
+        return round(($value / $total) * 100, 1);
+    }
+
 
     public function create()
     {
@@ -194,6 +291,8 @@ class AssetController extends Controller
                 } else {
                     if ($asset->image && Storage::disk('public')->exists($asset->image)) {
                         Storage::disk('public')->delete($asset->image);
+                        $data['image'] = $data['image']->store('assets', 'public');
+                    } else {
                         $data['image'] = $data['image']->store('assets', 'public');
                     }
                 }

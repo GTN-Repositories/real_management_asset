@@ -30,6 +30,6 @@ class ManagementProject extends Model
      */
     public function asset(): BelongsTo
     {
-        return $this->belongsTo(Asset::class, 'asset_id');
+        return $this->belongsTo(Asset::class, 'asset_id', 'id');
     }
 }

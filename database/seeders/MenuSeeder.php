@@ -24,7 +24,7 @@ class MenuSeeder extends Seeder
         $parent2Id = Menu::create([
             'name' => 'Master  Data',
             'icon' => null,
-            'parent_id' => null, 
+            'parent_id' => null,
             'route' => null,
             'order' => 6,
         ])->id;
@@ -128,6 +128,13 @@ class MenuSeeder extends Seeder
             'parent_id' => $menu_report,
             'route' => 'report-fuel',
             'order' => 1,
+        ]);
+        Menu::create([
+            'name' => 'Asset Project',
+            'icon' => null,
+            'parent_id' => $menu_report,
+            'route' => 'report-asset',
+            'order' => 2,
         ]);
     }
 }

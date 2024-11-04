@@ -29,6 +29,10 @@ class ProfileUpdateRequest extends FormRequest
                 'nullable',
                 'max:255',
             ],
+            'password' => [
+                'nullable',
+                'min:8',
+            ],
         ];
     }
 }
