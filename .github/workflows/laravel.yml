@@ -20,7 +20,7 @@ jobs:
         extensions: mbstring, xml, zip, curl, mysqli
 
     - name: Install Composer Dependencies
-      run: composer install --no-dev --optimize-autoloader
+      run: composer install --ignore-platform-reqs
 
     - name: Deploy to VPS
       env:
