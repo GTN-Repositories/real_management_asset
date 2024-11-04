@@ -1,35 +1,52 @@
-name: Deploy Laravel to VPS
-
 on:
   push:
     branches:
-      - dev
+      - main
+      - development
+  pull_request:
+    branches:
+      - main
+      - development
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.3'
-        extensions: mbstring, xml, zip, curl, mysqli
+      - name: Getting git commit data
+        uses: rlespinasse/git-commit-data-action@v1
 
-    - name: Install Composer Dependencies
-      run: composer install --ignore-platform-reqs
+      - name: Autodeployment Production
+        if: github.ref == 'refs/heads/main'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/html/real
+            git checkout main
+            git pull origin main
+            git push all main
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
 
-    - name: Deploy to VPS
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.NUSATECH_VPS }}
-        VPS_USER: nusatech
-        VPS_HOST: 103.127.138.23
-        VPS_PATH: /var/www/html/real
-      run: |
-        echo "$SSH_PRIVATE_KEY" > private_key
-        chmod 600 private_key
-        scp -o StrictHostKeyChecking=no -i private_key -r ./* $VPS_USER@$VPS_HOST:$VPS_PATH || { rm private_key; exit 1; }
-        ssh -o StrictHostKeyChecking=no -i private_key $VPS_USER@$VPS_HOST "cd $VPS_PATH && php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache"
+      - name: Autodeployment Development
+        if: github.ref == 'refs/heads/development'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/html/dev.real
+            git checkout dev
+            git pull origin dev
+            git push all dev
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
