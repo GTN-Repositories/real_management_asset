@@ -32,7 +32,7 @@ jobs:
             git checkout main
             git pull origin main
             git push all main
-            composer install --no-dev --optimize-autoloader
+            composer install --ignore-platform-reqs
             php artisan migrate --force
 
       - name: Autodeployment Development
@@ -48,5 +48,5 @@ jobs:
             git checkout dev
             git pull origin dev
             git push all dev
-            composer install --no-dev --optimize-autoloader
+            composer install --ignore-platform-reqs
             php artisan migrate --force
