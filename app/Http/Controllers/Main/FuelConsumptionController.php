@@ -70,6 +70,9 @@ class FuelConsumptionController extends Controller
 
                 return $btn;
             })
+            ->addColumn('literDashboard', function ($data) {
+                return $data->liter ?? null;
+            })
             ->escapeColumns([])
             ->make(true);
     }

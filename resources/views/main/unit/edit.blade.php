@@ -13,13 +13,13 @@
         <input type="file" id="image" name="image" class="form-control" />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="name">nama<span class="text-danger">*</span></label>
-        <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan nama"
+        <label class="form-label" for="name">nama aset<span class="text-danger">*</span></label>
+        <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name" required
             value="{{ $data->name }}" />
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="manager">manajer<span class="text-danger">*</span></label>
-        <select id="manager" name="manager" class="select2 form-select" data-allow-clear="true">
+        <select id="manager" name="manager" class="select2 form-select " data-allow-clear="true" required>
             <option value="">Pilih</option>
             <option value="lenz creative" {{ $data->manager == 'lenz creative' ? 'selected' : '' }}>lenz creative
             </option>
@@ -27,7 +27,7 @@
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="category">kategori<span class="text-danger">*</span></label>
-        <select name="category" id="category" class="select2 form-select" data-allow-clear="true">
+        <select name="category" id="category" class="select2 form-select " data-allow-clear="true" required>
             <option value="">Pilih</option>
             <option value="Technology" {{ $data->category == 'Technology' ? 'selected' : '' }}>Technology</option>
             <option value="Construction" {{ $data->category == 'Construction' ? 'selected' : '' }}>Construction</option>
@@ -42,7 +42,51 @@
     <div class="col-12 col-md-6">
         <label class="form-label" for="cost">biaya</label>
         <input type="number" min="1" id="cost" name="cost" class="form-control"
-            placeholder="Masukkan biaya" value="{{ $data->cost }}" />
+            placeholder="Masukkan cost" value="{{ $data->cost }}" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="unit">unit</label>
+        <input type="text" id="unit" name="unit" class="form-control" placeholder="Masukkan unit"
+            value="{{ $data->unit }}" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="license_plate">no polisi</label>
+        <input type="text" id="license_plate" name="license_plate" class="form-control"
+            placeholder="Masukkan nomor polisi" value="{{ $data->license_plate }}" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="classification">klasifikasi</label>
+        <input type="text" id="classification" name="classification" class="form-control"
+            placeholder="Masukkan classification" value="{{ $data->classification }}" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="machine_number">nomor mesin</label>
+        <input type="text" id="machine_number" name="machine_number" class="form-control"
+            placeholder="Masukkan nomor mesin" value="{{ $data->machine_number }}" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="color">warna</label>
+        <input type="text" id="color" name="color" class="form-control" placeholder="Masukkan warna"
+            value="{{ $data->color }}" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="status">status<span class="text-danger">*</span></label>
+        <select name="status" id="status" class="select2 form-select " data-allow-clear="true" required>
+            <option value="">Pilih</option>
+            <option value="Idle" {{ $data->status == 'Idle' ? 'selected' : '' }}>Idle</option>
+            <option value="StandBy" {{ $data->status == 'StandBy' ? 'selected' : '' }}>StandBy</option>
+            <option value="OnHold" {{ $data->status == 'OnHold' ? 'selected' : '' }}>OnHold</option>
+            <option value="Finish" {{ $data->status == 'Finish' ? 'selected' : '' }}>Finish</option>
+            <option value="Damaged" {{ $data->status == 'Damaged' ? 'selected' : '' }}>Damaged</option>
+            <option value="Fair" {{ $data->status == 'Fair' ? 'selected' : '' }}>Fair</option>
+            <option value="UnderMaintenance" {{ $data->status == 'UnderMaintenance' ? 'selected' : '' }}>
+                UnderMaintenance</option>
+            <option value="Active" {{ $data->status == 'Active' ? 'selected' : '' }}>Active</option>
+            <option value="Scheduled" {{ $data->status == 'Scheduled' ? 'selected' : '' }}>Scheduled</option>
+            <option value="InProgress" {{ $data->status == 'InProgress' ? 'selected' : '' }}>InProgress</option>
+            <option value="NeedsRepair" {{ $data->status == 'NeedsRepair' ? 'selected' : '' }}>NeedsRepair</option>
+            <option value="Good" {{ $data->status == 'Good' ? 'selected' : '' }}>Good</option>
+        </select>
     </div>
     <div class="col-12 col-md-12">
         <label class="form-label" for="description">deskripsi</label>

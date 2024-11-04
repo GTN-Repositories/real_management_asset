@@ -1,6 +1,6 @@
 @extends('layouts.global')
 
-@section('title', 'Kendaraan / Unit')
+@section('title', 'Laporan Fuel Consumtion')
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
