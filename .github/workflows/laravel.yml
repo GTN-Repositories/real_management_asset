@@ -2,11 +2,11 @@ on:
   push:
     branches:
       - main
-      - development
+      - dev
   pull_request:
     branches:
       - main
-      - development
+      - dev
 
 jobs:
   deploy:
@@ -26,7 +26,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd /var/www/html/real
             git checkout main
@@ -36,13 +36,13 @@ jobs:
             php artisan migrate --force
 
       - name: Autodeployment Development
-        if: github.ref == 'refs/heads/development'
+        if: github.ref == 'refs/heads/dev'
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd /var/www/html/dev.real
             git checkout dev
