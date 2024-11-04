@@ -1,35 +1,35 @@
-name: Laravel
+name: Deploy Laravel to VPS
 
 on:
   push:
-    branches: [ "dev" ]
-  pull_request:
-    branches: [ "dev" ]
+    branches:
+      - dev
 
 jobs:
-  laravel-tests:
-
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.0'
-    - uses: actions/checkout@v4
-    - name: Copy .env
-      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-    - name: Install Dependencies
-      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-    - name: Generate key
-      run: php artisan key:generate
-    - name: Directory Permissions
-      run: chmod -R 777 storage bootstrap/cache
-    - name: Create Database
-      run: |
-        mkdir -p database
-        touch database/database.sqlite
-    - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
+        php-version: '8.x' # sesuaikan dengan versi PHP Anda
+        extensions: mbstring, xml, zip, curl, mysqli
+
+    - name: Install Composer Dependencies
+      run: composer install --no-dev --optimize-autoloader
+
+    - name: Deploy to VPS
       env:
-        DB_CONNECTION: sqlite
-        DB_DATABASE: database/database.sqlite
-      run: php artisan test
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        VPS_USER: nusatech
+        VPS_HOST: 103.127.138.23
+        VPS_PATH: /var/www/html/real
+      run: |
+        echo "$NUSATECH_VPS" > private_key
+        chmod 600 private_key
+        scp -o StrictHostKeyChecking=no -i private_key -r ./* $VPS_USER@$VPS_HOST:$VPS_PATH
+        ssh -o StrictHostKeyChecking=no -i private_key $VPS_USER@$VPS_HOST "cd $VPS_PATH && php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache"
