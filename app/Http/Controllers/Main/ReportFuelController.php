@@ -165,7 +165,7 @@ class ReportFuelController extends Controller implements HasMiddleware
                 $q->where('name', session('selected_manager_name'));
             });
         }
-        
+
         $consumptions = $query->get();
 
         // Prepare data for chart

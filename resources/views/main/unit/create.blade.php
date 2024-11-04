@@ -12,7 +12,7 @@
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="name">nama aset<span class="text-danger">*</span></label>
-        <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name" required/>
+        <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name" required />
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="manager">manajer<span class="text-danger">*</span></label>
@@ -38,6 +38,45 @@
         <label class="form-label" for="cost">biaya</label>
         <input type="number" min="1" id="cost" name="cost" class="form-control"
             placeholder="Masukkan cost" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="unit">unit</label>
+        <input type="text" id="unit" name="unit" class="form-control" placeholder="Masukkan unit" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="license_plate">no polisi</label>
+        <input type="text" id="license_plate" name="license_plate" class="form-control" placeholder="Masukkan nomor polisi" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="classification">klasifikasi</label>
+        <input type="text" id="classification" name="classification" class="form-control"
+            placeholder="Masukkan classification" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="machine_number">nomor mesin</label>
+        <input type="text" id="machine_number" name="machine_number" class="form-control" placeholder="Masukkan nomor mesin" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="color">warna</label>
+        <input type="text" id="color" name="color" class="form-control" placeholder="Masukkan warna" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="status">status<span class="text-danger">*</span></label>
+        <select name="status" id="status" class="select2 form-select " data-allow-clear="true" required>
+            <option value="">Pilih</option>
+            <option value="Idle">Idle</option>
+            <option value="StandBy">StandBy</option>
+            <option value="OnHold">OnHold</option>
+            <option value="Finish">Finish</option>
+            <option value="Damaged">Damaged</option>
+            <option value="Fair">Fair</option>
+            <option value="UnderMaintenance">UnderMaintenance</option>
+            <option value="Active">Active</option>
+            <option value="Scheduled">Scheduled</option>
+            <option value="InProgress">InProgress</option>
+            <option value="NeedsRepair">NeedsRepair</option>
+            <option value="Good">Good</option>
+        </select>
     </div>
     <div class="col-12 col-md-12">
         <label class="form-label" for="description">keterangan</label>
