@@ -3,7 +3,7 @@ namespace App\Helpers;
 
 use App\Models\Menu;
 
-class Helper
+class Helpers
 {
     public static function getMenu()
     {
