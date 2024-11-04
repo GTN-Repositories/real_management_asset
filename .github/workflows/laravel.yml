@@ -16,7 +16,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.x' # sesuaikan dengan versi PHP Anda
+        php-version: '8.2'
         extensions: mbstring, xml, zip, curl, mysqli
 
     - name: Install Composer Dependencies
@@ -24,12 +24,12 @@ jobs:
 
     - name: Deploy to VPS
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SSH_PRIVATE_KEY: ${{ secrets.NUSATECH_VPS }}
         VPS_USER: nusatech
         VPS_HOST: 103.127.138.23
         VPS_PATH: /var/www/html/real
       run: |
-        echo "$NUSATECH_VPS" > private_key
+        echo "$SSH_PRIVATE_KEY" > private_key
         chmod 600 private_key
         scp -o StrictHostKeyChecking=no -i private_key -r ./* $VPS_USER@$VPS_HOST:$VPS_PATH
         ssh -o StrictHostKeyChecking=no -i private_key $VPS_USER@$VPS_HOST "cd $VPS_PATH && php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache"
