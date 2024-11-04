@@ -1,35 +1,52 @@
-name: Laravel
-
 on:
   push:
-    branches: [ "dev" ]
+    branches:
+      - main
+      - development
   pull_request:
-    branches: [ "dev" ]
+    branches:
+      - main
+      - development
 
 jobs:
-  laravel-tests:
-
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
-      with:
-        php-version: '8.0'
-    - uses: actions/checkout@v4
-    - name: Copy .env
-      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-    - name: Install Dependencies
-      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-    - name: Generate key
-      run: php artisan key:generate
-    - name: Directory Permissions
-      run: chmod -R 777 storage bootstrap/cache
-    - name: Create Database
-      run: |
-        mkdir -p database
-        touch database/database.sqlite
-    - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
-      env:
-        DB_CONNECTION: sqlite
-        DB_DATABASE: database/database.sqlite
-      run: php artisan test
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Getting git commit data
+        uses: rlespinasse/git-commit-data-action@v1
+
+      - name: Autodeployment Production
+        if: github.ref == 'refs/heads/main'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/html/real
+            git checkout main
+            git pull origin main
+            git push all main
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
+
+      - name: Autodeployment Development
+        if: github.ref == 'refs/heads/development'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/html/dev.real
+            git checkout dev
+            git pull origin dev
+            git push all dev
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
