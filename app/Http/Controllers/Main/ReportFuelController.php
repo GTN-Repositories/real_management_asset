@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Crypt;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportFuelController extends Controller implements HasMiddleware
@@ -116,9 +117,9 @@ class ReportFuelController extends Controller implements HasMiddleware
             }
         }
 
-        if (session('selected_manager_name')) {
+        if (session('selected_project_id')) {
             $query->whereHas('management_project', function ($q) {
-                $q->where('name', session('selected_manager_name'));
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
             });
         }
 
@@ -160,9 +161,9 @@ class ReportFuelController extends Controller implements HasMiddleware
             }
         }
 
-        if (session('selected_manager_name')) {
+        if (session('selected_project_id')) {
             $query->whereHas('management_project', function ($q) {
-                $q->where('name', session('selected_manager_name'));
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
             });
         }
 
@@ -171,7 +172,6 @@ class ReportFuelController extends Controller implements HasMiddleware
         // Prepare data for chart
         $dates = $consumptions->pluck('date')->toArray();
         $liters = $consumptions->pluck('total_liters')->toArray();
-
 
         return response()->json([
             'dates' => $dates,

@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 
 class DriverProjectController extends Controller
 {
-    //
     public function index()
     {
         return view('main.driver.index');
@@ -18,25 +17,25 @@ class DriverProjectController extends Controller
 
     public function data()
     {
-        $data = ManagementProject::select('name', 'asset_id')
+        $data = ManagementProject::select('id', 'name', 'asset_id')
             ->orderBy('created_at', 'asc')
             ->get()
-            ->groupBy('name')
-            ->map(function ($group) {
+            ->map(function ($project) {
+                $assetIds = $project->asset_id;
                 return [
-                    'name' => $group->first()->name,
-                    'assets' => Asset::whereIn('id', $group->pluck('asset_id'))->get(),
+                    'id' => $project->id,
+                    'name' => $project->name,
+                    'assets' => Asset::whereIn('id', $assetIds)->get(),
                 ];
-            })
-            ->values();
+            });
 
         return response()->json($data);
     }
 
     public function selectProject(Request $request)
     {
-        $managerName = $request->input('manager_name'); // Ambil manager name dari request
-        session(['selected_manager_name' => $managerName]); // Simpan manager name ke session
+        $projectId = $request->input('project_id');
+        session(['selected_project_id' => $projectId]);
 
         return response()->json(['status' => 'success', 'message' => 'Project selected successfully!']);
     }
