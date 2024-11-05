@@ -30,13 +30,13 @@
                                     <input class="form-check-input" type="checkbox" id="checkAll" />
                                 </div>
                             </th>
-                            <th>nama project</th>
-                            <th>nama aset</th>
-                            <th>pengemudi</th>
-                            <th>tanggal</th>
-                            <th>loadsheet</th>
-                            <th>banyak penggunaan</th>
-                            <th>harga/liter</th>
+                            <th>Nama Project</th>
+                            <th>Nama Aset</th>
+                            <th>Pengemudi</th>
+                            <th>Tanggal</th>
+                            <th>Loadsheet</th>
+                            <th>Banyak Penggunaan</th>
+                            <th>Harga/Liter</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
