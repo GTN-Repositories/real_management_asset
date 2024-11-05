@@ -9,7 +9,7 @@ use App\Http\Controllers\Main\FormController;
 use App\Http\Controllers\Main\FuelConsumptionController;
 use App\Http\Controllers\Main\InspectionScheduleController;
 use App\Http\Controllers\Main\ItemController;
-use App\Http\Controllers\main\ManagementProjectController;
+use App\Http\Controllers\Main\ManagementProjectController;
 use App\Http\Controllers\Main\MenuController;
 use App\Http\Controllers\Main\PermisionController;
 use App\Http\Controllers\Main\ReportFuelController;
