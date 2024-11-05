@@ -30,7 +30,7 @@
                     $.each(data, function(index, manager) {
                         container.append(`
                     <div class="col-md-4 mb-md-0 mb-4">
-                        <div class="card border rounded shadow-none" style="height: 30rem;">
+                        <div class="card border rounded shadow-none" style="height: 32rem;">
                             <div class="card-body">
                                 <div class="my-3 pt-2 text-center">
                                 <i class="ti ti-building text-primary display-3"></i>
@@ -40,15 +40,15 @@
                                     ${manager.assets.slice(0, 5).map(
                                         asset => (
                                             `<li class="mb-2 d-flex align-items-center">
-                                                            <i class="ti ti-point ti-lg"></i>
-                                                            ${asset.name}
-                                                        </li>`
+                                                                <i class="ti ti-point ti-lg"></i>
+                                                                ${asset.name}
+                                                            </li>`
                                         )
                                     ).join('')}
                                 </ul>
                             </div>
                             <div class="card-footer">
-                                <button class="btn btn-label-primary d-grid w-100 select-project-btn" data-manager-name="${manager.name}">Pilih Management Project</button>
+                                <button class="btn btn-label-primary d-grid w-100 select-project-btn" data-project-id="${manager.id}">Pilih Management Project</button>
                             </div>
                         </div>
                     </div>
@@ -56,18 +56,19 @@
                     });
 
                     $('.select-project-btn').click(function() {
-                        let managerName = $(this).data('manager-name');
+                        let projectId = $(this).data('project-id');
 
                         $.ajax({
                             url: "{{ route('driver.selectProject') }}",
                             type: 'POST',
                             data: {
-                                manager_name: managerName,
+                                project_id: projectId,
                                 _token: '{{ csrf_token() }}'
                             },
                             success: function(response) {
                                 if (response.status) {
-                                    window.location.href = "{{ route('report-fuel.index') }}";
+                                    window.location.href =
+                                        "{{ route('report-fuel.index') }}";
                                 }
                             },
                             error: function() {
@@ -79,7 +80,7 @@
                     });
                 },
                 error: function() {
-                    Swal.fire('Error!', 'An error occurred while fetching the pricing plans.', 'error');
+                    Swal.fire('Error!', 'An error occurred while fetching the management project.', 'error');
                 }
             });
         });

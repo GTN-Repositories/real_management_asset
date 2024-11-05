@@ -9,13 +9,13 @@
     @method('put')
 
     <div class="col-12 col-md-12" id="managementRelation">
-        <label class="form-label" for="management_project_id">nama projek<span class="text-danger">*</span></label>
+        <label class="form-label" for="management_project_id">Nama Management Project<span class="text-danger">*</span></label>
         <select id="management_project_id" name="management_project_id"
             class="select2 form-select select2-primary"data-allow-clear="true" required>
         </select>
     </div>
     <div class="col-12 col-md-6" id="assetRelation">
-        <label class="form-label" for="asset_id">nama aset<span class="text-danger">*</span></label>
+        <label class="form-label" for="asset_id">Nama Asset<span class="text-danger">*</span></label>
         <select id="asset_id" name="asset_id" class="select2 form-select select2-primary"data-allow-clear="true"
             required>
         </select>
@@ -27,22 +27,22 @@
         </select>
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="date">tanggal<span class="text-danger">*</span></label>
+        <label class="form-label" for="date">Tanggal<span class="text-danger">*</span></label>
         <input type="date" id="date" name="date" class="form-control" placeholder="Masukkan tanggal"
             value="{{ date('Y-m-d') }}" required value="{{ $data->date }}" />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="loadsheet">loadsheet<span class="text-danger">*</span></label>
+        <label class="form-label" for="loadsheet">Loadsheet<span class="text-danger">*</span></label>
         <input type="number" min="1" id="loadsheet" name="loadsheet" class="form-control"
             placeholder="Masukkan loadsheet" required value="{{ $data->loadsheet }}" />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="liter">liter<span class="text-danger">*</span></label>
+        <label class="form-label" for="liter">Liter<span class="text-danger">*</span></label>
         <input type="number" min="1" id="liter" name="liter" class="form-control"
             placeholder="Masukkan liter" required value="{{ $data->liter }}" />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="price">harga/liter<span class="text-danger">*</span></label>
+        <label class="form-label" for="price">Harga/Liter<span class="text-danger">*</span></label>
         <input type="text" id="price" name="price" class="form-control" placeholder="Masukkan harga" required
             value="{{ $data->price }}" />
     </div>
@@ -86,7 +86,6 @@
                         }
                         return unique;
                     }, []);
-
                     return {
                         results: apiResults
                     };
@@ -94,17 +93,16 @@
                 cache: true
             }
         }).on('change', function() {
-            var projectName = $('#management_project_id option:selected').text();
             var projectId = $(this).val();
 
             $('#asset_id').empty().trigger('change');
-            if (projectName) {
+            if (projectId) {
                 $.ajax({
                     url: "{{ route('management-project.by_project') }}",
                     dataType: 'json',
                     delay: 250,
                     data: {
-                        projectName: projectName
+                        projectId: projectId
                     },
                     success: function(data) {
                         var assetOptions = Object.entries(data).map(function([assetId,
@@ -120,7 +118,7 @@
                             dropdownParent: $('#assetRelation'),
                             data: assetOptions,
                             allowClear: true
-                        });
+                        }).trigger('change');
                     }
                 });
             }
@@ -129,10 +127,13 @@
         if (management_project_id) {
             var option = new Option(management_project_name, management_project_id, true, true);
             $('#management_project_id').append(option).trigger('change');
+            $('#management_project_id').val(management_project_id).trigger('change');
         }
+
         if (asset_id) {
-            var option = new Option(asset_name, asset_id, true, true);
-            $('#asset_id').append(option).trigger('change');
+            var assetOption = new Option(asset_name, asset_id, true, true);
+            $('#asset_id').append(assetOption).trigger('change');
+            $('#asset_id').val(asset_id).trigger('change');
         }
 
 

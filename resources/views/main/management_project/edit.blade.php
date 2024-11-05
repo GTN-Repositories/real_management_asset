@@ -9,15 +9,19 @@
     @method('put')
 
     <div class="col-12 col-md-12">
-        <label class="form-label" for="name">nama manajemen<span class="text-danger">*</span></label>
+        <label class="form-label" for="name">Nama Management Project<span class="text-danger">*</span></label>
         <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name" required
             value="{{ $data->name }}" />
     </div>
     <div class="col-12 col-md-12" id="relationId">
-        <label class="form-label" for="asset_id">nama aset<span class="text-danger">*</span></label>
-        <select id="asset_id" name="asset_id" class="select2 form-select " data-allow-clear="true" required>
-            <option value="{{ $data->asset->id }}" selected>{{ $data->asset->name }}</option>
-        </select>
+        <label class="form-label" for="asset_id">Nama Asset<span class="text-danger">*</span></label>
+        <div class="select2-primary">
+            <div class="position-relative">
+                <select id="asset_id" name="asset_id[]" class="select2 form-select" multiple required>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+        </div>
     </div>
     <div class="col-12 col-md-12">
         <label for="date-range-picker" class="form-label">Periode Waktu</label>
@@ -60,13 +64,12 @@
                     };
                 },
                 processResults: function(data) {
-                    apiResults = data.data.map(function(item) {
+                    var apiResults = data.data.map(function(item) {
                         return {
                             text: item.name,
                             id: item.relationId,
                         };
                     });
-
                     return {
                         results: apiResults
                     };
@@ -74,6 +77,18 @@
                 cache: true
             }
         });
+
+        var asset_ids = {!! json_encode($data->asset_id ?? []) !!};
+        var asset_names = {!! json_encode($data->assets->pluck('name') ?? []) !!};
+
+        // Pre-select opsi asset di select2
+        if (asset_ids && asset_names) {
+            asset_ids.forEach(function(id, index) {
+                var option = new Option(asset_names[index], id, true, true);
+                $('#asset_id').append(option);
+            });
+            $('#asset_id').trigger('change');
+        }
     });
 </script>
 <script>

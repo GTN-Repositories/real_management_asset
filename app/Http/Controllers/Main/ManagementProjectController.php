@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Models\Asset;
 use App\Models\ManagementProject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -45,7 +46,11 @@ class ManagementProjectController extends Controller
                 return $data->name ?? null;
             })
             ->addColumn('asset_id', function ($data) {
-                return $data->asset->name ?? null;
+                if (is_array($data->asset_id) && count($data->asset_id) > 0) {
+                    $assetNames = Asset::whereIn('id', $data->asset_id)->pluck('name')->toArray();
+                    return implode(', ', array_slice($assetNames, 0, 2)) . (count($assetNames) > 2 ? ', ...' : '');
+                }
+                return null;
             })
             ->addColumn('start_date', function ($data) {
                 return $data->start_date ?? null;
@@ -95,8 +100,23 @@ class ManagementProjectController extends Controller
 
     public function getAssetsByProject(Request $request)
     {
-        $project = ManagementProject::where('name', $request->projectName)->get();
-        return response()->json($project->pluck('asset.name', 'asset_id')->toArray());
+        try {
+            $project = ManagementProject::findByEncryptedId($request->projectId);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            $project = ManagementProject::findOrFail($request->projectId);
+        }
+        if (!$project) {
+            return response()->json([], 404);
+        }
+
+        $assetIds = $project->asset_id;
+        if (!is_array($assetIds)) {
+            return response()->json([], 200);
+        }
+
+        $assets = Asset::whereIn('id', $assetIds)->pluck('name', 'id')->toArray();
+
+        return response()->json($assets);
     }
 
     public function create()
@@ -117,17 +137,18 @@ class ManagementProjectController extends Controller
 
                 $start_date = trim($startDate);
                 $end_date = trim($endDate);
+                $decryptedAssetIds = [];
                 foreach ($data['asset_id'] as $encryptedAssetId) {
-                    $decryptedAssetId = Crypt::decrypt($encryptedAssetId);
-                    $projectData = [
-                        'name' => $data['name'],
-                        'asset_id' => $decryptedAssetId,
-                        'start_date' => $start_date,
-                        'end_date' => $end_date,
-                        'calculation_method' => $data['calculation_method'],
-                    ];
-                    ManagementProject::create($projectData);
+                    $decryptedAssetIds[] = Crypt::decrypt($encryptedAssetId);
                 }
+                $projectData = [
+                    'name' => $data['name'],
+                    'asset_id' => $decryptedAssetIds,
+                    'start_date' => $start_date,
+                    'end_date' => $end_date,
+                    'calculation_method' => $data['calculation_method'],
+                ];
+                ManagementProject::create($projectData);
 
                 return response()->json([
                     'status' => true,
@@ -157,6 +178,7 @@ class ManagementProjectController extends Controller
     public function edit($id)
     {
         $data = ManagementProject::findByEncryptedId($id);
+        $data->assets = $data->getAssetsAttribute();
 
         return view('main.management_project.edit', compact('data'));
     }
@@ -171,8 +193,26 @@ class ManagementProjectController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id) {
-                $data["asset_id"] = Crypt::decrypt($data["asset_id"]);
-                $data = ManagementProject::findByEncryptedId($id)->update($data);
+                $decryptedAssetIds = [];
+
+                foreach ($data['asset_id'] as $assetId) {
+                    try {
+                        $decryptedAssetIds[] = (int) Crypt::decrypt($assetId);
+                    } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                        $decryptedAssetIds[] = (int) $assetId;
+                    }
+                }
+
+                $projectData = [
+                    'name' => $data['name'],
+                    'asset_id' => $decryptedAssetIds,
+                    'start_date' => $data['start_date'],
+                    'end_date' => $data['end_date'],
+                    'calculation_method' => $data['calculation_method'],
+                ];
+
+                // Update the project data
+                ManagementProject::findByEncryptedId($id)->update($projectData);
 
                 return response()->json([
                     'status' => true,
