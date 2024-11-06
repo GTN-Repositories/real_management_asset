@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\Helper;
 use App\Http\Controllers\Main\AssetController;
 use App\Http\Controllers\Main\AssetReportController;
 use App\Http\Controllers\Main\CategoryItemController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\Main\SupplierController;
 use App\Http\Controllers\Main\UserController;
 use App\Http\Controllers\Main\WerehouseController;
 use App\Http\Controllers\ProfileController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -27,6 +29,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    Route::post('/encrypt', function (Request $request) {
+        $encrypted = Helper::encrypt($request->input('value'));
+        return response()->json(['encrypted' => $encrypted]);
+    })->name('encrypt');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
