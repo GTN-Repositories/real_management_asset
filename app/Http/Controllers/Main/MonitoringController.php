@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Models\FuelConsumption;
 use App\Models\Monitoring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -48,8 +49,12 @@ class MonitoringController extends Controller
             ->addColumn('latitude', function ($data) {
                 return $data->latitude ?? null;
             })
-            ->addColumn('status', function ($data) {
-                return $data->status ?? null;
+            ->addColumn('fuel_status', function ($data) {
+                $latestFuelConsumption = FuelConsumption::where('asset_id', $data->asset_id)->latest()->first();
+                return number_format($latestFuelConsumption->liter ?? 0, 0, ',', '.') . ' liter' ?? null;
+            })
+            ->addColumn('asset_status', function ($data) {
+                return $data->asset->status ?? null;
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
@@ -73,7 +78,6 @@ class MonitoringController extends Controller
             'asset_id',
             'longitude',
             'latitude',
-            'status',
         ];
 
         $keyword = $request->search['value'] ?? "";
