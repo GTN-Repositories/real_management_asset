@@ -11,6 +11,7 @@ use App\Http\Controllers\Main\InspectionScheduleController;
 use App\Http\Controllers\Main\ItemController;
 use App\Http\Controllers\Main\ManagementProjectController;
 use App\Http\Controllers\Main\MenuController;
+use App\Http\Controllers\Main\MonitoringController;
 use App\Http\Controllers\Main\PermisionController;
 use App\Http\Controllers\Main\ReportFuelController;
 use App\Http\Controllers\Main\RoleController;
@@ -113,6 +114,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/report-asset/chart', [AssetReportController::class, 'getChartData'])->name('report-asset.chart');
     Route::get('/report-asset/data', [AssetReportController::class, 'data'])->name('report-asset.data');
     Route::resource('report-asset', AssetReportController::class);
+
+    Route::get('/monitoring/data', [MonitoringController::class, 'data'])->name('monitoring.data');
+    Route::delete('/monitoring/destroy-all', [MonitoringController::class, 'destroyAll'])->name('monitoring.destroyAll');
+    Route::resource('monitoring', MonitoringController::class);
 });
 
 require __DIR__ . '/auth.php';
