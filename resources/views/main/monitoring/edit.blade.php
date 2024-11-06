@@ -8,7 +8,7 @@
     @csrf
     @method('put')
 
-    <div class="col-12 col-md-6" id="assetRelation">
+    <div class="col-12 col-md-12" id="assetRelation">
         <label class="form-label" for="asset_id">Nama Asset<span class="text-danger">*</span></label>
         <select id="asset_id" name="asset_id" class="select2 form-select select2-primary"data-allow-clear="true"
             required>
@@ -23,11 +23,6 @@
         <label class="form-label" for="latitude">Latitude<span class="text-danger">*</span></label>
         <input type="text" id="latitude" name="latitude" class="form-control" placeholder="Masukkan latitude"
             required value="{{ $data->latitude }}" />
-    </div>
-    <div class="col-12 col-md-6">
-        <label class="form-label" for="status">Status<span class="text-danger">*</span></label>
-        <input type="number" id="status" name="status" class="form-control" placeholder="Masukkan status" required
-            value="{{ $data->status }}" />
     </div>
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>

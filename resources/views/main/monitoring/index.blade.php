@@ -33,7 +33,8 @@
                             <th>Nama Asset</th>
                             <th>Longitude</th>
                             <th>Latitude</th>
-                            <th>status</th>
+                            <th>Status Bahan Bakar</th>
+                            <th>Status Asset</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -129,8 +130,12 @@
                         name: 'latitude'
                     },
                     {
-                        data: 'status',
-                        name: 'status'
+                        data: 'fuel_status',
+                        name: 'fuel_status'
+                    },
+                    {
+                        data: 'asset_status',
+                        name: 'asset_status'
                     },
                     {
                         data: 'action',
