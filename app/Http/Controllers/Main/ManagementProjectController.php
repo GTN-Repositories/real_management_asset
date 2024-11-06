@@ -100,11 +100,10 @@ class ManagementProjectController extends Controller
 
     public function getAssetsByProject(Request $request)
     {
-        try {
-            $project = ManagementProject::findByEncryptedId($request->projectId);
-        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            $project = ManagementProject::findOrFail($request->projectId);
-        }
+        $projectId = Crypt::decrypt($request->projectId);
+
+        $project = ManagementProject::find($projectId);
+
         if (!$project) {
             return response()->json([], 404);
         }

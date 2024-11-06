@@ -9,7 +9,8 @@
     @method('put')
 
     <div class="col-12 col-md-12" id="managementRelation">
-        <label class="form-label" for="management_project_id">Nama Management Project<span class="text-danger">*</span></label>
+        <label class="form-label" for="management_project_id">Nama Management Project<span
+                class="text-danger">*</span></label>
         <select id="management_project_id" name="management_project_id"
             class="select2 form-select select2-primary"data-allow-clear="true" required>
         </select>
@@ -63,6 +64,23 @@
     var user_id = '{{ $data->user_id }}';
     var user_name = '{{ $data->user->name }}';
 
+    async function encryptData(value) {
+        try {
+            const response = await $.ajax({
+                url: "{{ route('encrypt') }}",
+                method: 'POST',
+                data: {
+                    value: value,
+                    _token: '{{ csrf_token() }}'
+                }
+            });
+            return response.encrypted;
+        } catch (error) {
+            console.error('Encryption failed:', error);
+            return null;
+        }
+    }
+
     $(document).ready(function() {
         $('#management_project_id').select2({
             dropdownParent: $('#managementRelation'),
@@ -92,35 +110,40 @@
                 },
                 cache: true
             }
-        }).on('change', function() {
+        }).on('change', async function() {
             var projectId = $(this).val();
 
             $('#asset_id').empty().trigger('change');
             if (projectId) {
-                $.ajax({
-                    url: "{{ route('management-project.by_project') }}",
-                    dataType: 'json',
-                    delay: 250,
-                    data: {
-                        projectId: projectId
-                    },
-                    success: function(data) {
-                        var assetOptions = Object.entries(data).map(function([assetId,
-                            assetName
-                        ]) {
-                            return {
-                                id: assetId,
-                                text: assetName
-                            };
-                        });
+                const encryptedProjectId = await encryptData(projectId);
 
-                        $('#asset_id').select2({
-                            dropdownParent: $('#assetRelation'),
-                            data: assetOptions,
-                            allowClear: true
-                        }).trigger('change');
-                    }
-                });
+                if (encryptedProjectId) {
+                    $.ajax({
+                        url: "{{ route('management-project.by_project') }}",
+                        dataType: 'json',
+                        delay: 250,
+                        data: {
+                            projectId: encryptedProjectId
+                        },
+                        success: function(data) {
+                            var assetOptions = Object.entries(data).map(function([
+                                assetId,
+                                assetName
+                            ]) {
+                                return {
+                                    id: assetId,
+                                    text: assetName
+                                };
+                            });
+
+                            $('#asset_id').select2({
+                                dropdownParent: $('#assetRelation'),
+                                data: assetOptions,
+                                allowClear: true
+                            }).trigger('change');
+                        }
+                    });
+                }
             }
         });
 
@@ -135,7 +158,6 @@
             $('#asset_id').append(assetOption).trigger('change');
             $('#asset_id').val(asset_id).trigger('change');
         }
-
 
         $('#user_id').select2({
             dropdownParent: $('#driverRelation'),

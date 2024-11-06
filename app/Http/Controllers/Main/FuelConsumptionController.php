@@ -153,9 +153,11 @@ class FuelConsumptionController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit(string $id)
     {
-        $data = FuelConsumption::findByEncryptedId($id);
+        
+        $decryptedId = Crypt::decrypt($id);
+        $data = FuelConsumption::findOrFail($decryptedId);
 
         return view('main.fuel_consumtion.edit', compact('data'));
     }
