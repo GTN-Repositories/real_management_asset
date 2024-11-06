@@ -34,18 +34,23 @@
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="loadsheet">Loadsheet<span class="text-danger">*</span></label>
-        <input type="number" min="1" id="loadsheet" name="loadsheet" class="form-control"
-            placeholder="Masukkan loadsheet" required value="{{ $data->loadsheet }}" />
+        <input type="text" id="loadsheet" name="loadsheet" class="form-control" placeholder="Masukkan loadsheet"
+            required value="{{ $data->loadsheet }}" />
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="liter">Liter<span class="text-danger">*</span></label>
-        <input type="number" min="1" id="liter" name="liter" class="form-control"
-            placeholder="Masukkan liter" required value="{{ $data->liter }}" />
+        <input type="text" id="liter" name="liter" class="form-control" placeholder="Masukkan liter" required
+            value="{{ $data->liter }}" />
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="price">Harga/Liter<span class="text-danger">*</span></label>
         <input type="text" id="price" name="price" class="form-control" placeholder="Masukkan harga" required
             value="{{ $data->price }}" />
+    </div>
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="category">Kategori<span class="text-danger">*</span></label>
+        <input type="text" id="category" name="category" class="form-control" placeholder="Masukkan kategori"
+            required value="{{ $data->category }}" />
     </div>
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
@@ -195,6 +200,34 @@
     if (user_id) {
         var option = new Option(user_name, user_id, true, true);
         $('#user_id').append(option).trigger('change');
+    }
+
+    $(document).on('input', '#price, #loadsheet, #liter', function() {
+        value = formatCurrency($(this).val());
+        $(this).val(value);
+    });
+
+    function formatCurrency(angka, prefix) {
+        if (!angka) {
+            return (prefix || '') + '-';
+        }
+
+        angka = angka.toString();
+        const splitDecimal = angka.split('.');
+        let number_string = angka.replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        // tambahkan titik jika yang di input sudah menjadi angka ribuan
+        if (ribuan) {
+            const separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+        return prefix === undefined ? rupiah : rupiah ? (prefix || '') + rupiah : '';
     }
 </script>
 <script>

@@ -62,6 +62,9 @@ class FuelConsumptionController extends Controller
             ->addColumn('price', function ($data) {
                 return 'Rp. ' . number_format($data->price, 0, ',', '.') ?? null;
             })
+            ->addColumn('category', function ($data) {
+                return $data->category ?? null;
+            })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
                 $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
@@ -88,6 +91,7 @@ class FuelConsumptionController extends Controller
             'loadsheet',
             'liter',
             'price',
+            'category',
         ];
 
         $keyword = $request->search['value'] ?? "";
@@ -155,7 +159,7 @@ class FuelConsumptionController extends Controller
      */
     public function edit(string $id)
     {
-        
+
         $decryptedId = Crypt::decrypt($id);
         $data = FuelConsumption::findOrFail($decryptedId);
 
@@ -172,6 +176,9 @@ class FuelConsumptionController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id) {
+                $data['price'] = str_replace('.', '', $data['price']);
+                $data['loadsheet'] = str_replace('.', '', $data['loadsheet']);
+                $data['liter'] = str_replace('.', '', $data['liter']);
                 try {
                     $data["management_project_id"] = Crypt::decrypt($data["management_project_id"]);
                 } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
