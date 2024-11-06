@@ -32,17 +32,22 @@
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="loadsheet">Loadsheet<span class="text-danger">*</span></label>
-        <input type="number" min="1" id="loadsheet" name="loadsheet" class="form-control"
-            placeholder="Masukkan loadsheet" required />
+        <input type="text" id="loadsheet" name="loadsheet" class="form-control" placeholder="Masukkan loadsheet"
+            required />
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="liter">Liter<span class="text-danger">*</span></label>
-        <input type="number" min="1" id="liter" name="liter" class="form-control"
-            placeholder="Masukkan liter" required />
+        <input type="text" id="liter" name="liter" class="form-control" placeholder="Masukkan liter"
+            required />
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="price">Harga/Liter<span class="text-danger">*</span></label>
         <input type="text" id="price" name="price" class="form-control" placeholder="Masukkan harga"
+            required />
+    </div>
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="category">Kategori<span class="text-danger">*</span></label>
+        <input type="text" id="category" name="category" class="form-control" placeholder="Masukkan kategori"
             required />
     </div>
     <div class="col-12 text-center">
