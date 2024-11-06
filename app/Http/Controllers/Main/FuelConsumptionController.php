@@ -170,7 +170,11 @@ class FuelConsumptionController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id) {
-                $data["management_project_id"] = crypt::decrypt($data["management_project_id"]);
+                try {
+                    $data["management_project_id"] = Crypt::decrypt($data["management_project_id"]);
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                    $data["management_project_id"] = $data["management_project_id"];
+                }
                 $data = FuelConsumption::findByEncryptedId($id)->update($data);
 
                 return response()->json([
