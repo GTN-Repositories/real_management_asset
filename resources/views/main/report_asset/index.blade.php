@@ -73,8 +73,7 @@
     <script type="text/javascript">
         $(document).ready(function() {
             init_table();
-            // init_chart();
-
+            
             // Event listeners for filters
             $('.dropdown-item').on('click', function(e) {
                 e.preventDefault();

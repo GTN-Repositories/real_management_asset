@@ -205,10 +205,10 @@
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="{{ route('driver.index') }}">
+                        <div class="d-flex align-items-center ms-4">
                             <i class="ti ti-switch-3 me-2 ti-sm"></i>
-                            <span class="align-middle">Pilih Project</span>
-                        </a>
+                            <a href="{{ route('driver.index') }}">Pilih Project Lain</a>
+                        </div>
                     </li>
                     <li>
                         <div class="dropdown-divider"></div>
