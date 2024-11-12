@@ -34,6 +34,11 @@ class Asset extends Model
         return $this->hasMany(ManagementProject::class, 'asset_id', 'id');
     }
 
+    public function fuel_consumptions(): HasMany
+    {
+        return $this->hasMany(FuelConsumption::class, 'asset_id', 'id');
+    }
+
     public static function getStatusTypes()
     {
         return [

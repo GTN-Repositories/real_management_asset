@@ -53,6 +53,11 @@ class AssetReportController extends Controller
             ->addColumn('purchase_date', function ($data) {
                 return $data->purchase_date ?? "kosong";
             })
+            ->addColumn('liter', function ($data) {
+                $query = \App\Models\FuelConsumption::where('asset_id', Crypt::decrypt($data->id));
+                $totalLiter = $query->sum('liter');
+                return number_format($totalLiter, 0, ',', '.') ?? "kosong";
+            })
             ->escapeColumns([])
             ->make(true);
     }
