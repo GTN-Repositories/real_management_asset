@@ -203,6 +203,13 @@ class ManagementProjectController extends Controller
                     }
                 }
 
+                $project = ManagementProject::findByEncryptedId($id);
+                $previousAssetIds = $project->asset_id;
+
+                $assetsToIdle = array_diff($previousAssetIds, $decryptedAssetIds);
+
+                $assetsToActivate = array_diff($decryptedAssetIds, $previousAssetIds);
+
                 $projectData = [
                     'name' => $data['name'],
                     'asset_id' => $decryptedAssetIds,
@@ -210,9 +217,11 @@ class ManagementProjectController extends Controller
                     'end_date' => $data['end_date'],
                     'calculation_method' => $data['calculation_method'],
                 ];
+                $project->update($projectData);
 
-                // Update the project data
-                ManagementProject::findByEncryptedId($id)->update($projectData);
+                Asset::whereIn('id', $assetsToIdle)->update(['status' => 'Idle']);
+
+                Asset::whereIn('id', $assetsToActivate)->update(['status' => 'Active']);
 
                 return response()->json([
                     'status' => true,
