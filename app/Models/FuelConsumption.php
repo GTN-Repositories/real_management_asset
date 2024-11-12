@@ -11,6 +11,7 @@ class FuelConsumption extends Model
 {
     //
     protected $guarded = ['id'];
+    protected $table = 'fuel_consumptions'; 
 
     public function getIdAttribute()
     {

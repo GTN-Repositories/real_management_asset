@@ -61,6 +61,7 @@
                             <th>kategori aset</th>
                             <th>biaya pembelian</th>
                             <th>tanggal pembelian</th>
+                            <th>jumlah bbm</th>
                         </tr>
                     </thead>
                 </table>
@@ -73,7 +74,7 @@
     <script type="text/javascript">
         $(document).ready(function() {
             init_table();
-            
+
             // Event listeners for filters
             $('.dropdown-item').on('click', function(e) {
                 e.preventDefault();
@@ -173,6 +174,10 @@
                     {
                         data: 'purchase_date',
                         name: 'purchase_date'
+                    },
+                    {
+                        data: 'liter',
+                        name: 'liter'
                     },
                 ]
             });
