@@ -62,24 +62,6 @@
         <label class="form-label" for="color">Warna</label>
         <input type="text" id="color" name="color" class="form-control" placeholder="Masukkan warna" />
     </div>
-    <div class="col-12 col-md-6">
-        <label class="form-label" for="status">Status<span class="text-danger">*</span></label>
-        <select name="status" id="status" class="select2 form-select " data-allow-clear="true" required>
-            <option value="">Pilih</option>
-            <option value="Idle">Idle</option>
-            <option value="StandBy">Stand By</option>
-            <option value="OnHold">On Hold</option>
-            <option value="Finish">Finish</option>
-            <option value="Damaged">Damaged</option>
-            <option value="Fair">Fair</option>
-            <option value="UnderMaintenance">Under Maintenance</option>
-            <option value="Active">Active</option>
-            <option value="Scheduled">Scheduled</option>
-            <option value="InProgress">In Progress</option>
-            <option value="NeedsRepair">Needs Repair</option>
-            <option value="Good">Good</option>
-        </select>
-    </div>
     <div class="col-12 col-md-12">
         <label class="form-label" for="description">Keterangan</label>
         <textarea name="description" id="description" class="form-control" cols="30" rows="5"></textarea>

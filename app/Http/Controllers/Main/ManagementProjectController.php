@@ -148,6 +148,7 @@ class ManagementProjectController extends Controller
                     'calculation_method' => $data['calculation_method'],
                 ];
                 ManagementProject::create($projectData);
+                Asset::whereIn('id', $decryptedAssetIds)->update(['status' => 'Active']);
 
                 return response()->json([
                     'status' => true,

@@ -238,9 +238,16 @@ class AssetController extends Controller
 
         try {
             return $this->atomic(function () use ($data) {
+                $lastAsset = Asset::latest('id')->first();
+                $lastNumber = $lastAsset ? intval(str_replace('ast-', '', $lastAsset->asset_number)) : 0;
+
+                $data['asset_number'] = 'ast-' . ($lastNumber + 1);
+                $data['status'] = "Idle";
+
                 if (isset($data['image'])) {
                     $data['image'] = $data['image']->store('assets', 'public');
                 }
+
                 $data = Asset::create($data);
 
                 return response()->json([
