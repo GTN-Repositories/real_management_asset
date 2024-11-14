@@ -34,15 +34,20 @@ class CheckMenuPermission
         // Get menu from database based on route
         $menu = $this->getMenuByRoute($currentPath);
 
-        if (!$menu) {
-            return redirect()->back()->with('error', 'Menu not found for this route.');
-        }
+        if ($menu) {
+            // Jika menu ditemukan, gunakan permission berdasarkan nama menu
+            $permissionName = 'view-' . strtolower(str_replace(' ', '-', $menu->name));
 
-        // Generate expected permission name based on menu name
-        $permissionName = 'view-' . strtolower(str_replace(' ', '-', $menu->name));
+            if (!$user || !$user->hasPermissionTo($permissionName)) {
+                return redirect()->back()->with('error', 'Forbidden: You do not have permission.');
+            }
+        } else {
+            // Jika menu tidak ditemukan, cek permission berdasarkan URL path
+            $pathBasedPermission = 'view-' . strtolower(str_replace('/', '-', $currentPath));
 
-        if (!$user || !$user->hasPermissionTo($permissionName)) {
-            return redirect()->back()->with('error', 'Forbidden: You do not have permission.');
+            if (!$user || !$user->hasPermissionTo($pathBasedPermission)) {
+                return redirect()->back()->with('error', 'Forbidden: You do not have permission.');
+            }
         }
 
         return $next($request);
