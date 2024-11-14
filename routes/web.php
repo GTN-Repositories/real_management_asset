@@ -24,7 +24,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'check_menu_permission'])->group(function () {
 
     Route::get('/dashboard', function () {
         return view('dashboard');
