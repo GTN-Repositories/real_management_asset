@@ -100,12 +100,16 @@ class PermisionController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
-        $data = $request->all();
+        $validated = $request->validate([
+            'name' => 'required|string|unique:permissions,name',
+        ]);
 
+        $data = $request->all();
 
         try {
             return $this->atomic(function () use ($data) {
                 $data['user_id'] = Auth::user()->id;
+                $data['guard_name'] = 'web';
                 Permission::create($data);
                 return response()->json([
                     'status' => true,
@@ -115,7 +119,7 @@ class PermisionController extends Controller implements HasMiddleware
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => 'Data Gagal di Tambahkan!',
+                'message' => 'Data Gagal di Tambahkan! ' . $th->getMessage(),
             ]);
         }
     }
