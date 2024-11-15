@@ -39,26 +39,32 @@ class ReportFuelController extends Controller implements HasMiddleware
             ->addColumn('relationId', function ($data) {
                 return $data->id ?? null;
             })
-            ->addColumn('date', function ($data) {
-                return $data->date ?? null;
-            })
             ->addColumn('management_project_id', function ($data) {
                 return $data->management_project->name ?? null;
             })
             ->addColumn('asset_id', function ($data) {
                 return $data->asset->name ?? null;
             })
-            ->addColumn('loadsheet', function ($data) {
-                return $data->loadsheet ?? null;
+            ->addColumn('start_date', function ($data) {
+                return \Carbon\Carbon::parse($data->management_project->start_date)->format('d-M-y') ?? null;
+            })
+            ->addColumn('end_date', function ($data) {
+                return \Carbon\Carbon::parse($data->management_project->end_date)->format('d-M-y') ?? null;
+            })
+            ->addColumn('day_total', function ($data) {
+                return \Carbon\Carbon::parse($data->management_project->start_date)->diffInDays(\Carbon\Carbon::parse($data->management_project->end_date)) ?? null;
             })
             ->addColumn('liter', function ($data) {
-                return $data->liter ?? null;
+                return number_format($data->liter, 0, ',', '.') ?? null;
             })
-            ->addColumn('price', function ($data) {
-                return $data->price ?? null;
+            ->addColumn('loadsheet', function ($data) {
+                return number_format($data->loadsheet, 0, ',', '.') ?? null;
             })
-            ->addColumn('total', function ($data) {
-                return $data->liter * $data->price ?? null;
+            ->addColumn('liter_trip', function ($data) {
+                return number_format($data->liter / max($data->loadsheet, 1), 2) ?? null;
+            })
+            ->addColumn('avarage_day', function ($data) {
+                return number_format($data->liter / max(\Carbon\Carbon::parse($data->management_project->start_date)->diffInDays(\Carbon\Carbon::parse($data->management_project->end_date)), 1), 2) ?? null;
             })
             ->escapeColumns([])
             ->make(true);

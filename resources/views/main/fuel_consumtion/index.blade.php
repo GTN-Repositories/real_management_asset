@@ -16,11 +16,9 @@
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button>
                     <!-- Tombol Tambah -->
-                    @if (auth()->user()->hasPermissionTo('fuel-create'))
-                        <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                            <i class="fas fa-plus"></i> Tambah
-                        </button>
-                    @endif
+                    <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
+                        <i class="fas fa-plus"></i> Tambah
+                    </button>
                 </div>
             </div>
             <div class="card-datatable table-responsive">

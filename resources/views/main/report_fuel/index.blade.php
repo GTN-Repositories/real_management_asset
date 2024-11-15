@@ -52,13 +52,15 @@
                     <thead class="border-top">
                         <tr>
                             <th>#</th>
-                            <th>tanggal</th>
-                            <th>nama project</th>
-                            <th>nama aset</th>
-                            <th>loadsheet</th>
-                            <th>banyak penggunaan</th>
-                            <th>harga/liter</th>
-                            <th>total</th>
+                            <th>Management Project</th>
+                            <th>Unit</th>
+                            <th>Tanggal Awal</th>
+                            <th>Tanggal Akhir</th>
+                            <th>Total Hari</th>
+                            <th>Pemakaian Solar</th>
+                            <th>Total Loadsheet</th>
+                            <th>Liter/Trip</th>
+                            <th>Rata-rata/Hari</th>
                         </tr>
                     </thead>
                 </table>
@@ -144,10 +146,6 @@
                         searchable: false
                     },
                     {
-                        data: 'date',
-                        name: 'date'
-                    },
-                    {
                         data: 'management_project_id',
                         name: 'management_project_id'
                     },
@@ -156,21 +154,33 @@
                         name: 'asset_id'
                     },
                     {
-                        data: 'loadsheet',
-                        name: 'loadsheet'
+                        data: 'start_date',
+                        name: 'start_date'
+                    },
+                    {
+                        data: 'end_date',
+                        name: 'end_date'
+                    },
+                    {
+                        data: 'day_total',
+                        name: 'day_total'
                     },
                     {
                         data: 'liter',
                         name: 'liter'
                     },
                     {
-                        data: 'price',
-                        name: 'price'
+                        data: 'loadsheet',
+                        name: 'loadsheet'
                     },
                     {
-                        data: 'total',
-                        name: 'total'
-                    }
+                        data: 'liter_trip',
+                        name: 'liter_trip'
+                    },
+                    {
+                        data: 'avarage_day',
+                        name: 'avarage_day'
+                    },
                 ]
             });
         }
