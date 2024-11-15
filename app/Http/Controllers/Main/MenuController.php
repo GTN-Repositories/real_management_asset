@@ -57,8 +57,12 @@ class MenuController extends Controller
             ->addColumn('action', function ($data) {
                 $encryptedId = Crypt::encrypt($data->id);
                 $btn = '<div class="d-flex">';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" data-id="' . $encryptedId . '" onclick="editData(this)"><i class="ti ti-pencil"></i></a>';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" data-id="' . $encryptedId . '" onclick="deleteData(this)"><i class="ti ti-trash"></i></a>';
+                if (auth()->user()->hasPermissionTo('menu-edit')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" data-id="' . $encryptedId . '" onclick="editData(this)"><i class="ti ti-pencil"></i></a>';
+                }
+                if (auth()->user()->hasPermissionTo('menu-delete')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" data-id="' . $encryptedId . '" onclick="deleteData(this)"><i class="ti ti-trash"></i></a>';
+                }
                 $btn .= '</div>';
 
                 return $btn;

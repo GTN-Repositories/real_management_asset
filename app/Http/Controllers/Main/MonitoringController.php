@@ -7,6 +7,7 @@ use App\Models\FuelConsumption;
 use App\Models\Monitoring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Gate;
 
 class MonitoringController extends Controller
 {
@@ -58,8 +59,12 @@ class MonitoringController extends Controller
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                if (auth()->user()->hasPermissionTo('monitoring-edit')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                }
+                if (auth()->user()->hasPermissionTo('monitoring-delete')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                }
                 $btn .= '</div>';
 
                 return $btn;

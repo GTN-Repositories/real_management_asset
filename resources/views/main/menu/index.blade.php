@@ -20,9 +20,11 @@
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button>
                     <!-- Tombol Tambah -->
-                    <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                        <i class="fas fa-plus"></i> Tambah
-                    </button>
+                    @if (auth()->user()->hasPermissionTo('menu-create'))
+                        <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
+                            <i class="fas fa-plus"></i> Tambah
+                        </button>
+                    @endif
                 </div>
             </div>
             <div class="card-datatable table-responsive">
@@ -50,23 +52,23 @@
         <!-- Add Menu Modal -->
         <div class="modal fade" id="modalAddMenu" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-simple modal-edit-user">
-              <div class="modal-content p-3 p-md-5">
-                <div class="modal-body" id="content-modal-add">
+                <div class="modal-content p-3 p-md-5">
+                    <div class="modal-body" id="content-modal-add">
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
+        </div>
         <!--/ Add Menu Modal -->
 
         <!-- Edit Menu Modal -->
         <div class="modal fade" id="modalEditMenu" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-simple modal-edit-user">
-              <div class="modal-content p-3 p-md-5">
-                <div class="modal-body" id="content-modal-edit">
+                <div class="modal-content p-3 p-md-5">
+                    <div class="modal-body" id="content-modal-edit">
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
+        </div>
         <!--/ Edit Menu Modal -->
 
         <!-- /Modal -->
@@ -194,7 +196,7 @@
                         },
                         error: function() {
                             Swal.fire('Error!', 'An error occurred while deleting the record.',
-                            'error');
+                                'error');
                         }
                     });
                 }

@@ -18,6 +18,17 @@ class CheckMenuPermission
     private const CACHE_DURATION = 60;
 
     /**
+     * Permission action mapping
+     */
+    private const ACTION_MAPPING = [
+        'create' => 'create',
+        'edit' => 'edit',
+        'update' => 'edit',     // map update to edit permission
+        'delete' => 'delete',
+        'destroy' => 'delete',  // map destroy to delete permission
+    ];
+
+    /**
      * Handle the incoming request.
      */
     public function handle(Request $request, Closure $next): Response
@@ -29,11 +40,23 @@ class CheckMenuPermission
             return $next($request);
         }
 
-        $currentPath = $this->getCurrentPath($request);
+        $pathInfo = $this->parsePathInfo($request);
+        $currentPath = $pathInfo['resource'];
+        $action = $pathInfo['action'];
 
         // Get menu from database based on route
         $menu = $this->getMenuByRoute($currentPath);
 
+        // Jika ada action khusus (create, edit, delete), cek permission khusus
+        if ($action && isset(self::ACTION_MAPPING[$action])) {
+            $permissionName = $this->getActionPermission($currentPath, $action);
+            if (!$user || !$user->hasPermissionTo($permissionName)) {
+                return redirect()->back()->with('error', "Forbidden: You don't have permission to {$action} {$currentPath}.");
+            }
+            return $next($request);
+        }
+
+        // Jika tidak ada action khusus, gunakan logika view permission yang lama
         if ($menu) {
             // Jika menu ditemukan, gunakan permission berdasarkan nama menu
             $permissionName = 'view-' . strtolower(str_replace(' ', '-', $menu->name));
@@ -51,6 +74,64 @@ class CheckMenuPermission
         }
 
         return $next($request);
+    }
+
+    /**
+     * Parse path info from request
+     *
+     * @param Request $request
+     * @return array{resource: string, action: ?string}
+     */
+    private function parsePathInfo(Request $request): array
+    {
+        $path = trim($request->path(), '/');
+        $segments = explode('/', $path);
+
+        // Default values
+        $result = [
+            'resource' => $segments[0],
+            'action' => null
+        ];
+
+        // Handle different URL patterns
+        if (count($segments) >= 2) {
+            // Check for specific actions in URL
+            if (in_array($segments[1], ['create', 'edit', 'delete'])) {
+                $result['action'] = $segments[1];
+            }
+            // Check for edit/delete with ID: users/1/edit or users/1/delete
+            elseif (count($segments) >= 3 && in_array($segments[2], ['edit', 'delete'])) {
+                $result['action'] = $segments[2];
+            }
+            // Check HTTP method for updates and deletes
+            elseif (is_numeric($segments[1])) {
+                $result['action'] = $this->getActionFromMethod($request->method());
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get action from HTTP method
+     */
+    private function getActionFromMethod(string $method): ?string
+    {
+        return match (strtoupper($method)) {
+            'POST' => 'create',
+            'PUT', 'PATCH' => 'edit',
+            'DELETE' => 'delete',
+            default => null,
+        };
+    }
+
+    /**
+     * Get the appropriate permission name based on action
+     */
+    private function getActionPermission(string $resource, string $action): string
+    {
+        $mappedAction = self::ACTION_MAPPING[strtolower($action)] ?? $action;
+        return "{$resource}-{$mappedAction}";
     }
 
     /**
@@ -77,16 +158,6 @@ class CheckMenuPermission
         // return $user->is_super_admin === true;
 
         return false;
-    }
-
-    /**
-     * Get the current path from the request
-     */
-    private function getCurrentPath(Request $request): string
-    {
-        // Remove leading slash and get first segment of the URL
-        $path = trim($request->path(), '/');
-        return explode('/', $path)[0];
     }
 
     /**
