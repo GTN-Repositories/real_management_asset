@@ -20,9 +20,11 @@
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button>
                     <!-- Tombol Tambah -->
+                    @if (auth()->user()->hasPermissionTo('permission-create'))
                     <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
                         <i class="fas fa-plus"></i> Tambah
                     </button>
+                    @endif
                 </div>
             </div>
             <div class="card-datatable table-responsive">
@@ -156,7 +158,7 @@
 
         function deleteData(element) {
             var id = $(element).data('id');
-            
+
             Swal.fire({
                 title: 'Are you sure?',
                 text: 'You will not be able to recover this record!',
