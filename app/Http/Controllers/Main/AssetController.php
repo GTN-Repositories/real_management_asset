@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
+use App\Models\ManagementProject;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -129,6 +130,15 @@ class AssetController extends Controller
             $data->where('manager', $manager);
         }
 
+        if (session('selected_project_id')) {
+            $managementProject = ManagementProject::find(Crypt::decrypt(session('selected_project_id')));
+
+            if ($managementProject) {
+                $assetIds = $managementProject->asset_id;
+                $data->whereIn('id', $assetIds);
+            }
+        }
+
         return $data;
     }
 
@@ -136,34 +146,43 @@ class AssetController extends Controller
     {
         try {
             // Get base query
-            $query = Asset::query();
+            $baseQuery = Asset::query();
 
-            // Get operational status counts
-            $operationalStatus = $query->select(
+            // Add project filter
+            if (session('selected_project_id')) {
+                $managementProject = ManagementProject::find(Crypt::decrypt(session('selected_project_id')));
+
+                if ($managementProject) {
+                    $assetIds = $managementProject->asset_id;
+                    $baseQuery->whereIn('id', $assetIds);
+                }
+            }
+
+            // Clone queries for each count to avoid interference
+            $operationalStatus = (clone $baseQuery)->select(
                 DB::raw('COUNT(CASE WHEN status = "Idle" THEN 1 END) as idle'),
                 DB::raw('COUNT(CASE WHEN status = "StandBy" THEN 1 END) as standby'),
                 DB::raw('COUNT(CASE WHEN status = "UnderMaintenance" THEN 1 END) as underMaintenance'),
                 DB::raw('COUNT(CASE WHEN status = "Active" THEN 1 END) as active')
             )->first();
 
-            // Get maintenance status counts
-            $maintenanceStatus = $query->select(
+            $maintenanceStatus = (clone $baseQuery)->select(
                 DB::raw('COUNT(CASE WHEN status = "OnHold" THEN 1 END) as onHold'),
                 DB::raw('COUNT(CASE WHEN status = "Finish" THEN 1 END) as finish'),
                 DB::raw('COUNT(CASE WHEN status = "Scheduled" THEN 1 END) as scheduled'),
                 DB::raw('COUNT(CASE WHEN status = "InProgress" THEN 1 END) as inProgress')
             )->first();
 
-            // Get asset condition status counts
-            $assetStatus = $query->select(
+            $assetStatus = (clone $baseQuery)->select(
                 DB::raw('COUNT(CASE WHEN status = "Damaged" THEN 1 END) as damaged'),
                 DB::raw('COUNT(CASE WHEN status = "Fair" THEN 1 END) as fair'),
                 DB::raw('COUNT(CASE WHEN status = "NeedsRepair" THEN 1 END) as needsRepair'),
                 DB::raw('COUNT(CASE WHEN status = "Good" THEN 1 END) as good')
             )->first();
 
-            // Calculate percentages and totals
-            $totalAssets = $query->count();
+            $totalAssets = $baseQuery->count();
+
+            // Rest of the response building code remains the same...
 
             $response = [
                 // Operational Status
