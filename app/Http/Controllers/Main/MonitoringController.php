@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
 use App\Models\FuelConsumption;
+use App\Models\ManagementProject;
 use App\Models\Monitoring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -98,6 +99,15 @@ class MonitoringController extends Controller
                     }
                 }
             });
+
+        if (session('selected_project_id')) {
+            $managementProject = ManagementProject::find(Crypt::decrypt(session('selected_project_id')));
+
+            if ($managementProject) {
+                $assetIds = $managementProject->asset_id;
+                $data->whereIn('asset_id', $assetIds);
+            }
+        }
 
         return $data;
     }

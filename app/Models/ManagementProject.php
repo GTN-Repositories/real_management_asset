@@ -36,4 +36,16 @@ class ManagementProject extends Model
     protected $casts = [
         'asset_id' => 'array',
     ];
+
+    public function monitorings()
+    {
+        return $this->hasManyThrough(
+            Monitoring::class,
+            Asset::class,
+            'id', // Foreign key on assets table
+            'asset_id', // Foreign key on monitorings table
+            'asset_id', // Local key on management_projects table
+            'id' // Local key on assets table
+        );
+    }
 }

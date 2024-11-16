@@ -78,7 +78,14 @@ class FuelConsumptionController extends Controller
                 return $btn;
             })
             ->addColumn('literDashboard', function ($data) {
-                return $data->liter ?? null;
+                $liter = $data->liter ?? null;
+                if (session('selected_project_id')) {
+                    $selectedProjectId = Crypt::decrypt(session('selected_project_id'));
+                    if ($data->management_project_id == $selectedProjectId) {
+                        return $liter;
+                    }
+                }
+                return $liter;
             })
             ->escapeColumns([])
             ->make(true);
@@ -111,6 +118,12 @@ class FuelConsumptionController extends Controller
                     }
                 }
             });
+
+        if (session('selected_project_id')) {
+            $data->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
 
         return $data;
     }
