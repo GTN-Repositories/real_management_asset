@@ -2,6 +2,7 @@
 
 use App\Helpers\Helper;
 use App\Http\Controllers\Main\AssetController;
+use App\Http\Controllers\Main\AssetNoteController;
 use App\Http\Controllers\Main\AssetReportController;
 use App\Http\Controllers\Main\CategoryItemController;
 use App\Http\Controllers\Main\CustomerController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Main\FormController;
 use App\Http\Controllers\Main\FuelConsumptionController;
 use App\Http\Controllers\Main\InspectionScheduleController;
 use App\Http\Controllers\Main\ItemController;
+use App\Http\Controllers\Main\LogActivityController;
 use App\Http\Controllers\Main\ManagementProjectController;
 use App\Http\Controllers\Main\MenuController;
 use App\Http\Controllers\Main\MonitoringController;
@@ -17,6 +19,7 @@ use App\Http\Controllers\Main\PermisionController;
 use App\Http\Controllers\Main\ReportFuelController;
 use App\Http\Controllers\Main\RoleController;
 use App\Http\Controllers\Main\SiteController;
+use App\Http\Controllers\Main\StatusAssetController;
 use App\Http\Controllers\Main\SupplierController;
 use App\Http\Controllers\Main\UserController;
 use App\Http\Controllers\Main\WerehouseController;
@@ -24,7 +27,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'check_menu_permission'])->group(function () {
+Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(function () {
 
     Route::get('/dashboard', function () {
         return view('dashboard');
@@ -61,6 +64,10 @@ Route::middleware(['auth', 'check_menu_permission'])->group(function () {
     Route::delete('/site/destroy-all', [SiteController::class, 'destroyAll'])->name('site.destroyAll');
     Route::resource('site', SiteController::class);
 
+    Route::get('/asset/update-files', [AssetController::class, 'updateFiles'])->name('asset.updateFiles');
+    Route::post('/asset/note/{id}', [AssetController::class, 'note'])->name('asset.note');
+    Route::get('/asset/appreciation-data', [AssetController::class, 'getAppreciationData'])->name('asset.appreciation-data');
+    Route::get('/asset/depreciation-data', [AssetController::class, 'getDepreciationData'])->name('asset.depreciation-data');
     Route::get('/asset/status-data', [AssetController::class, 'getStatusData'])->name('asset.statusData');
     Route::get('/asset/data', [AssetController::class, 'data'])->name('asset.data');
     Route::delete('/asset/destroy-all', [AssetController::class, 'destroyAll'])->name('asset.destroyAll');
@@ -125,6 +132,10 @@ Route::middleware(['auth', 'check_menu_permission'])->group(function () {
     Route::get('/monitoring/data', [MonitoringController::class, 'data'])->name('monitoring.data');
     Route::delete('/monitoring/destroy-all', [MonitoringController::class, 'destroyAll'])->name('monitoring.destroyAll');
     Route::resource('monitoring', MonitoringController::class);
+
+    Route::get('/status-asset/data', [StatusAssetController::class, 'data'])->name('status-asset.data');
+    Route::get('/log-activity/data', [LogActivityController::class, 'data'])->name('log-activity.data');
+    Route::get('/asset-note/data', [AssetNoteController::class, 'data'])->name('asset-note.data');
 });
 
 require __DIR__ . '/auth.php';

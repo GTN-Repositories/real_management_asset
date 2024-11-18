@@ -70,6 +70,10 @@
             value="{{ $data->color }}" />
     </div>
     <div class="col-12 col-md-6">
+        <label class="form-label" for="nik">Nik</label>
+        <input type="text" id="nik" name="nik" class="form-control" placeholder="Masukkan nik" value="{{ $data->nik }}"/>
+    </div>
+    <div class="col-12 col-md-12">
         <label class="form-label" for="status">Status<span class="text-danger">*</span></label>
         <select name="status" id="status" class="select2 form-select " data-allow-clear="true" required>
             <option value="">Pilih</option>

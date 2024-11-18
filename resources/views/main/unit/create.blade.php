@@ -62,6 +62,10 @@
         <label class="form-label" for="color">Warna</label>
         <input type="text" id="color" name="color" class="form-control" placeholder="Masukkan warna" />
     </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="nik">Nik</label>
+        <input type="text" id="nik" name="nik" class="form-control" placeholder="Masukkan nik" />
+    </div>
     <div class="col-12 col-md-12">
         <label class="form-label" for="description">Keterangan</label>
         <textarea name="description" id="description" class="form-control" cols="30" rows="5"></textarea>

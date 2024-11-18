@@ -324,5 +324,19 @@
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
                 });
         }
+
+        function detailData(id) {
+
+            $.ajax({
+                    url: "{{ route('asset.show', ':id') }}".replace(':id', id),
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    window.location.href = "{{ route('asset.show', ':id') }}".replace(':id', id);
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
+                });
+        }
     </script>
 @endpush
