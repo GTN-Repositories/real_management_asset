@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
+use App\Models\AssetNote;
+use App\Models\LogActivity;
 use App\Models\ManagementProject;
+use App\Models\StatusAsset;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -17,6 +20,7 @@ class AssetController extends Controller
     {
         return view('main.unit.index');
     }
+
 
     public function data(Request $request)
     {
@@ -75,6 +79,9 @@ class AssetController extends Controller
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
+                if (auth()->user()->hasPermissionTo('asset-detail')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-info btn-sm me-1" title="Detail Data" onclick="detailData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
+                }
                 if (auth()->user()->hasPermissionTo('asset-edit')) {
                     $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
                 }
@@ -237,13 +244,110 @@ class AssetController extends Controller
         }
     }
 
-    /**
-     * Helper method to calculate percentage safely
-     */
-    private function calculatePercentage($value, $total)
+    public function getAppreciationData(Request $request)
     {
-        if ($total <= 0) return 0;
-        return round(($value / $total) * 100, 1);
+        $assetId = $request->query('asset_id');
+
+        $assetsQuery = Asset::select('purchase_date', 'cost', 'appreciation_rate', 'appreciation_period');
+
+        if ($assetId) {
+            $assetsQuery->where('id', $assetId);
+        }
+
+        $assets = $assetsQuery->get();
+
+        $chartData = [];
+        foreach ($assets as $asset) {
+            $purchaseDate = \Carbon\Carbon::parse($asset->purchase_date);
+            $data = [];
+            $cost = $asset->cost;
+
+            $rate = $asset->appreciation_rate;
+            $period = $asset->appreciation_period;
+
+            if ($rate !== null && $period !== null && $cost > 0) {
+                for ($i = 0; $i <= $period; $i++) {
+                    $value = $cost * pow(1 + ($rate / 100), $i);
+
+                    if (is_finite($value)) {
+                        $data[] = [
+                            'date' => $purchaseDate->copy()->addMonths($i)->format('Y-m-d'),
+                            'value' => $value
+                        ];
+                    }
+                }
+            }
+
+            $chartData[] = [
+                'label' => 'Asset on ' . $asset->purchase_date,
+                'data' => $data
+            ];
+        }
+
+        return response()->json($chartData);
+    }
+
+    public function getDepreciationData(Request $request)
+    {
+        $assetId = $request->query('asset_id'); // Retrieve asset_id from the request
+
+        // Fetch the specific asset if asset_id is provided, or fetch all if no ID is given
+        $assetsQuery = Asset::select('purchase_date', 'cost', 'residual_value', 'depreciation', 'depreciation_method');
+
+        if ($assetId) {
+            $assetsQuery->where('id', $assetId); // Filter by asset_id
+        }
+
+        $assets = $assetsQuery->get();
+
+        $chartData = [];
+        foreach ($assets as $asset) {
+            $purchaseDate = \Carbon\Carbon::parse($asset->purchase_date);
+            $cost = $asset->cost;
+            $residualValue = $asset->residual_value;
+            $depreciationMonths = $asset->depreciation;
+            $method = $asset->depreciation_method;
+            $data = [];
+
+            // Check for valid depreciation data
+            if ($depreciationMonths > 0 && $cost > $residualValue) {
+                if ($method === 'Penyusutan Garis Lurus') {
+                    // Straight-Line Depreciation
+                    $monthlyDepreciation = ($cost - $residualValue) / $depreciationMonths;
+                    for ($i = 0; $i <= $depreciationMonths; $i++) {
+                        $depreciatedValue = $cost - ($monthlyDepreciation * $i);
+                        $data[] = [
+                            'date' => $purchaseDate->copy()->addMonths($i)->format('Y-m-d'),
+                            'value' => max($depreciatedValue, $residualValue) // Ensure value doesn’t drop below residual
+                        ];
+                    }
+                } elseif ($method === 'Penyusutan Saldo Menurun') {
+                    // Declining Balance Depreciation
+                    $rate = 1 - pow($residualValue / $cost, 1 / $depreciationMonths); // Calculate depreciation rate
+                    for ($i = 0; $i <= $depreciationMonths; $i++) {
+                        $depreciatedValue = $cost * pow(1 - $rate, $i);
+                        $data[] = [
+                            'date' => $purchaseDate->copy()->addMonths($i)->format('Y-m-d'),
+                            'value' => max($depreciatedValue, $residualValue) // Ensure value doesn’t drop below residual
+                        ];
+                    }
+                }
+            }
+
+            $chartData[] = [
+                'label' => 'Asset on ' . $asset->purchase_date,
+                'data' => $data
+            ];
+        }
+
+        return response()->json($chartData);
+    }
+
+    public function updateFiles(Request $request)
+    {
+        $data = Asset::findByEncryptedId($request->id);
+        $data->kategori = $request->kategori;
+        return view('main.unit.update-files', compact('data'));
     }
 
 
@@ -286,6 +390,28 @@ class AssetController extends Controller
         }
     }
 
+    public function note(Request $request, $id)
+    {
+        $data = $request->all();
+
+        try {
+            return $this->atomic(function () use ($data, $id) {
+                $data['asset_id'] = Crypt::decrypt($id);
+
+                AssetNote::create($data);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil ditambahkan!',
+                ]);
+            });
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data gagal ditambahkan! ' . $th->getMessage(),
+            ]);
+        }
+    }
 
     /**
      * Display the specified resource.
@@ -293,6 +419,12 @@ class AssetController extends Controller
     public function show(string $id)
     {
         //
+        $asset = Asset::findByEncryptedId($id);
+        $decryptedId = Crypt::decrypt($asset->id);
+        $projects = ManagementProject::whereJsonContains('asset_id', $decryptedId)->get();
+        $notes = AssetNote::where('asset_id', $decryptedId)->get();
+        $logs = LogActivity::where('asset_id', $decryptedId)->get();
+        return view('main.unit.show', compact('asset', 'projects', 'notes', 'logs'));
     }
 
     /**
@@ -316,6 +448,7 @@ class AssetController extends Controller
         try {
             return $this->atomic(function () use ($data, $id) {
                 $asset = Asset::findByEncryptedId($id);
+                $statusBefore = $asset->status;
                 if (!isset($data['image']) || !$data['image']) {
                     $data['image'] = $asset->image;
                 } else {
@@ -326,7 +459,38 @@ class AssetController extends Controller
                         $data['image'] = $data['image']->store('assets', 'public');
                     }
                 }
+
+                if (!isset($data['stnk']) || !$data['stnk']) {
+                    $data['stnk'] = $asset->stnk;
+                } else {
+                    if ($asset->stnk && Storage::disk('public')->exists($asset->stnk)) {
+                        Storage::disk('public')->delete($asset->stnk);
+                        $data['stnk'] = $data['stnk']->store('assets', 'public');
+                    } else {
+                        $data['stnk'] = $data['stnk']->store('assets', 'public');
+                    }
+                }
+
+                if (!isset($data['asuransi']) || !$data['asuransi']) {
+                    $data['asuransi'] = $asset->asuransi;
+                } else {
+                    if ($asset->asuransi && Storage::disk('public')->exists($asset->asuransi)) {
+                        Storage::disk('public')->delete($asset->asuransi);
+                        $data['asuransi'] = $data['asuransi']->store('assets', 'public');
+                    } else {
+                        $data['asuransi'] = $data['asuransi']->store('assets', 'public');
+                    }
+                }
+
                 $data = $asset->update($data);
+
+                if ($statusBefore !== $asset->status) {
+                    StatusAsset::create([
+                        'asset_id' => Crypt::decrypt($asset->id),
+                        'status_before' => $statusBefore,
+                        'status_after' => $asset->status,
+                    ]);
+                }
 
                 return response()->json([
                     'status' => true,

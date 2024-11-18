@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\CheckMenuPermission;
+use App\Http\Middleware\LogActivity;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,7 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-            'check_menu_permission' => CheckMenuPermission::class
+            'check_menu_permission' => CheckMenuPermission::class,
+            'log_activity' => LogActivity::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
