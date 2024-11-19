@@ -141,7 +141,7 @@
     function createData() {
         $.ajax({
             url: "{{ route('inspection-schedule.create') }}",
-            type: 'GET', 
+            type: 'GET',
         })
         .done(function(data) {
             $('#content-modal-ce').html(data);

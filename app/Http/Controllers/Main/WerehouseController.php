@@ -40,8 +40,8 @@ class WerehouseController extends Controller
             ->addColumn('name', function ($data) {
                 return $data->name ?? null;
             })
-            ->addColumn('site', function ($data) {
-                return $data->site->name ?? null;
+            ->addColumn('location', function ($data) {
+                return $data->location ?? null;
             })
             ->addColumn('created_at', function ($data) {
                 return $data->created_at->format('d-m-Y');
@@ -51,7 +51,7 @@ class WerehouseController extends Controller
                 $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
                 $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
                 $btn .= '</div>';
-            
+
                 return $btn;
             })
             ->escapeColumns([])
@@ -63,7 +63,7 @@ class WerehouseController extends Controller
         $columns = [
             'id',
             'name',
-            'site_id',
+            'location',
             'created_at',
         ];
 
@@ -85,8 +85,7 @@ class WerehouseController extends Controller
 
     public function create()
     {
-        $data = Site::all();
-        return view('main.werehouse.create', compact('data'));
+        return view('main.werehouse.create');
     }
 
     /**
@@ -98,10 +97,8 @@ class WerehouseController extends Controller
 
         try {
             return $this->atomic(function () use ($data) {
-                $siteIdEncrypted = Crypt::decrypt($data['site_id']);
-                $data['site_id'] = $siteIdEncrypted;
                 $data = Werehouse::create($data);
-                
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Data berhasil ditambahkan!',
@@ -130,8 +127,7 @@ class WerehouseController extends Controller
     public function edit($id)
     {
         $data = Werehouse::findByEncryptedId($id);
-        $relation = Site::all();
-        return view('main.werehouse.edit', compact('data', 'relation'));
+        return view('main.werehouse.edit', compact('data'));
     }
 
 
@@ -144,8 +140,6 @@ class WerehouseController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id) {
-                $siteIdEncrypted = Crypt::decrypt($data['site_id']);
-                $data['site_id'] = $siteIdEncrypted;
                 $data = Werehouse::findByEncryptedId($id)->update($data);
 
                 return response()->json([

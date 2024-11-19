@@ -9,11 +9,9 @@
         <label class="form-label" for="name">Nama <span class="text-danger">*</span></label>
         <input type="text" id="name" name="name" class="form-control" placeholder="BSS TGR" />
     </div>
-    <div class="col-12 col-md-6 mb-4" id="formSiteId">
-        <label for="select2Basic" class="form-label">Site</label>
-        <select id="select2Basic" class="select2 form-select form-select-lg" name="site_id" data-allow-clear="true">
-            <option></option>
-        </select>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="location">Lokasi <span class="text-danger">*</span></label>
+        <input type="text" id="location" name="location" class="form-control" placeholder="Surabaya" />
     </div>
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
@@ -22,21 +20,6 @@
     </div>
 </form>
 
-<script>
-    $(document).ready(function() {
-        var siteData = @json($data);
-        $('#select2Basic').select2({
-            dropdownParent: $('#formSiteId'),
-            placeholder: 'Pilih Site',
-            data: siteData.map(function(site) {
-                return {
-                    id: site.id,
-                    text: site.name + ' - ' + site.code
-                };
-            })
-        });
-    });
-</script>
 <script>
     document.getElementById('formCreate').addEventListener('submit', function(event) {
         event.preventDefault();

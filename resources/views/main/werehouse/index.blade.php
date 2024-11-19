@@ -31,7 +31,7 @@
                             </div>
                         </th>
                         <th>Nama</th>
-                        <th>Site</th>
+                        <th>Lokasi</th>
                         <th>Dibuat Pada</th>
                         <th>Aksi</th>
                     </tr>
@@ -107,7 +107,7 @@
                 columns: [
                     {data: 'id', name: 'id', orderable: false, searchable: false},
                     {data: 'name',name: 'name'},
-                    {data: 'site',name: 'site'},
+                    {data: 'location',name: 'location'},
                     {data: 'created_at',name: 'created_at'},
                     {data: 'action',name: 'action',orderable: false,searchable: false}
                 ]
