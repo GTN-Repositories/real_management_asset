@@ -30,7 +30,7 @@ class MenuSeeder extends Seeder
         ])->id;
 
         $parent3Id = Menu::create([
-            'name' => 'Inventory',
+            'name' => 'Sparepart Management',
             'icon' => null,
             'parent_id' => null,
             'route' => null,

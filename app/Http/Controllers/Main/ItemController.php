@@ -38,6 +38,9 @@ class ItemController extends Controller
 
                 return $checkbox;
             })
+            ->addColumn('item_id', function ($data) {
+                return $data->id ?? null;
+            })
             ->addColumn('part', function ($data) {
                 return $data->part ?? null;
             })
@@ -98,7 +101,7 @@ class ItemController extends Controller
             'created_at',
         ];
 
-        $keyword = $request->search['value'];
+        $keyword = $request->search['value'] ?? '';
 
         $data = Item::orderBy('created_at', 'asc')
             ->select($columns)
