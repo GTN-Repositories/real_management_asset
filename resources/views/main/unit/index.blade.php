@@ -57,6 +57,9 @@
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button>
                     <!-- Tombol Tambah -->
+                    <button type="button" class="btn btn-success btn-sm d-flex align-items-center" onclick="importExcel()">
+                        <i class="fas fa-file-excel me-2"></i> Import Excel
+                    </button>
                     @if (auth()->user()->hasPermissionTo('asset-create'))
                         <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
                             <i class="fas fa-plus"></i> Tambah
@@ -297,6 +300,21 @@
         function createData() {
             $.ajax({
                     url: "{{ route('asset.create') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+                });
+        }
+
+        function importExcel() {
+            $.ajax({
+                    url: "{{ route('asset.import.form') }}",
                     type: 'GET',
                 })
                 .done(function(data) {

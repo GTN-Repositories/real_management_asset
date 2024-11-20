@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Imports\AssetsImport;
 use App\Models\Asset;
 use App\Models\AssetNote;
 use App\Models\LogActivity;
@@ -12,7 +13,10 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AssetController extends Controller
 {
@@ -20,7 +24,6 @@ class AssetController extends Controller
     {
         return view('main.unit.index');
     }
-
 
     public function data(Request $request)
     {
@@ -341,6 +344,111 @@ class AssetController extends Controller
         }
 
         return response()->json($chartData);
+    }
+
+    public function importForm()
+    {
+        return view('main.unit.import');
+    }
+    protected $statusMapping = [
+        'aktif' => 'Active',
+        'tidak aktif' => 'Idle',
+        'siaga' => 'StandBy',
+        'selesai' => 'Finish',
+        'rusak' => 'Damaged',
+        'cukup' => 'Fair',
+        'perawatan' => 'UnderMaintenance',
+        'dijadwalkan' => 'Scheduled',
+        'proses' => 'InProgress',
+        'butuh perbaikan' => 'NeedsRepair',
+        'baik' => 'Good',
+        'ditahan' => 'OnHold'
+    ];
+
+    protected function mapStatus($status)
+    {
+        return $this->statusMapping[strtolower($status)] ?? 'Idle';
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            if (!$request->hasFile('excel_file')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No file uploaded!'
+                ], 400);
+            }
+
+            $file = $request->file('excel_file');
+            $spreadsheet = IOFactory::load($file->getPathname());
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $rows = $worksheet->toArray();
+            $startRow = 4;
+            $failed = [];
+            $success = 0;
+
+            $headers = array_slice($rows[$startRow - 1], 1);
+
+            for ($i = $startRow; $i < count($rows); $i++) {
+                $row = array_slice($rows[$i], 1);
+
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+                $data = [
+                    'category' => $row[2],
+                    'name' => $row[3],
+                    'unit' => $row[4],
+                    'type' => $row[5],
+                    'license_plate' => $row[6],
+                    'classification' => $row[7],
+                    'asset_number' => $row[8],
+                    'chassis_number' => $row[9],
+                    'machine_number' => $row[10],
+                    'nik' => $row[11],
+                    'color' => $row[12],
+                    'manager' => $row[13],
+                    'assets_location' => $row[32],
+                    'image' => $row[33],
+                    'status' => $this->mapStatus($row[34]),
+                ];
+
+                try {
+                    DB::beginTransaction();
+
+                    Asset::create($data);
+
+                    DB::commit();
+                    $success++;
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    $failed[] = [
+                        'row' => $i + 1,
+                        'errors' => [$e->getMessage()],
+                        'data' => $data
+                    ];
+                }
+            }
+
+            $message = "Import completed. Successfully imported $success records.";
+            if (count($failed) > 0) {
+                $message .= " Failed to import " . count($failed) . " records.";
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => $message,
+                'failed_rows' => $failed,
+                'success_count' => $success
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error processing file: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function updateFiles(Request $request)

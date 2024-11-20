@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
             'asset-create',
             'asset-edit',
             'asset-delete',
+            'asset-detail',
             'management-create',
             'management-edit',
             'management-delete',
