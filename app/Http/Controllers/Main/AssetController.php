@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class AssetController extends Controller
 {
@@ -450,6 +452,60 @@ class AssetController extends Controller
             ], 500);
         }
     }
+
+    public function generateTemplate()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header sesuai format yang diminta
+        $headers = [
+            'No',
+            'No Aset',
+            'Kategori',
+            'Merek',
+            'Unit',
+            'Type',
+            'No Polisi',
+            'Klasifikasi',
+            'Nomor Asset',
+            'No Rangka',
+            'No Mesin',
+            'NIK',
+            'Warna',
+            'Pemilik'
+        ];
+
+        $additionalHeaders = [
+            'Project',
+            'Lokasi',
+            'PIC',
+            'Status'
+        ];
+
+        // Menulis header di B4 hingga O4
+        foreach ($headers as $index => $header) {
+            $sheet->setCellValueByColumnAndRow($index + 2, 4, $header); // Kolom B adalah index 2
+        }
+
+        // Menulis header tambahan dari AG4 hingga AJ4
+        foreach ($additionalHeaders as $index => $header) {
+            $sheet->setCellValueByColumnAndRow($index + 33, 4, $header); // Kolom AG adalah index 33
+        }
+
+        // Menyembunyikan kolom P hingga AF
+        for ($col = 16; $col <= 32; $col++) { // Kolom P = 16, AF = 32
+            $sheet->getColumnDimensionByColumn($col)->setVisible(false);
+        }
+
+        // Menyimpan template ke dalam file Excel
+        $writer = new Xlsx($spreadsheet);
+        $filePath = storage_path('app/public/asset_import_template.xlsx');
+        $writer->save($filePath);
+
+        return response()->download($filePath, 'asset_import_template.xlsx');
+    }
+
 
     public function updateFiles(Request $request)
     {
