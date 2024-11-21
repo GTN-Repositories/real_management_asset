@@ -11,6 +11,9 @@
         <input type="file" class="form-control" id="excel_file" name="excel_file" accept=".xlsx, .xls" required>
     </div>
     <div class="col-12 text-center">
+        <a href="{{ route('asset.downloadTemplate') }}" class="btn btn-info me-sm-3 me-1">
+            Download Template
+        </a>
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
         <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
             aria-label="Close">Cancel</button>

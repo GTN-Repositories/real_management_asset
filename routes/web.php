@@ -64,6 +64,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/site/destroy-all', [SiteController::class, 'destroyAll'])->name('site.destroyAll');
     Route::resource('site', SiteController::class);
 
+    Route::get('/asset/download-template', [AssetController::class, 'generateTemplate'])->name('asset.downloadTemplate');
     Route::get('/asset/import', [AssetController::class, 'importForm'])->name('asset.import.form');
     Route::post('/asset/import', [AssetController::class, 'import'])->name('asset.import');
     Route::get('/asset/update-files', [AssetController::class, 'updateFiles'])->name('asset.updateFiles');
