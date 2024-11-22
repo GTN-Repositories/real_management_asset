@@ -399,22 +399,23 @@ class AssetController extends Controller
                 if (empty(array_filter($row))) {
                     continue;
                 }
+
                 $data = [
+                    'asset_number' => $row[1],
                     'category' => $row[2],
                     'name' => $row[3],
                     'unit' => $row[4],
                     'type' => $row[5],
                     'license_plate' => $row[6],
                     'classification' => $row[7],
-                    'asset_number' => $row[8],
-                    'chassis_number' => $row[9],
-                    'machine_number' => $row[10],
-                    'nik' => $row[11],
-                    'color' => $row[12],
-                    'manager' => $row[13],
-                    'assets_location' => $row[32],
-                    'image' => $row[33],
-                    'status' => $this->mapStatus($row[34]),
+                    'chassis_number' => $row[8],
+                    'machine_number' => $row[9],
+                    'nik' => $row[10],
+                    'color' => $row[11],
+                    'manager' => $row[12],
+                    'assets_location' => $row[31],
+                    'image' => $row[32],
+                    'status' => $this->mapStatus($row[33]),
                 ];
 
                 try {
