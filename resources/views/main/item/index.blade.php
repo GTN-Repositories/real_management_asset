@@ -39,6 +39,7 @@
                         <th>Ukuran</th>
                         <th>Merek</th>
                         <th>Warna</th>
+                        <th>Stock</th>
                         <th>Dibuat Pada</th>
                         <th>Aksi</th>
                     </tr>
@@ -122,6 +123,7 @@
                     {data: 'size',name: 'size'},
                     {data: 'brand',name: 'brand'},
                     {data: 'color',name: 'color'},
+                    {data: 'stock',name: 'stock'},
                     {data: 'created_at',name: 'created_at'},
                     {data: 'action',name: 'action',orderable: false,searchable: false}
                 ]
@@ -213,6 +215,22 @@
 
             $.ajax({
                 url: "{{ route('item.edit', ':id') }}".replace(':id', id),
+                type: 'GET',
+            })
+            .done(function(data) {
+                $('#content-modal-ce').html(data);
+
+                $("#modal-ce").modal("show");
+            })
+            .fail(function() {
+                Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
+            });
+        }
+
+        function editStock(id) {
+
+            $.ajax({
+                url: "{{ route('item.stock', ':id') }}".replace(':id', id),
                 type: 'GET',
             })
             .done(function(data) {

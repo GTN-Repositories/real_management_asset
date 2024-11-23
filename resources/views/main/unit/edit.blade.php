@@ -17,12 +17,10 @@
         <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name" required
             value="{{ $data->name }}" />
     </div>
-    <div class="col-12 col-md-6">
-        <label class="form-label" for="manager">Manajer<span class="text-danger">*</span></label>
-        <select id="manager" name="manager" class="select2 form-select " data-allow-clear="true" required>
-            <option value="">Pilih</option>
-            <option value="lenz creative" {{ $data->manager == 'lenz creative' ? 'selected' : '' }}>lenz creative
-            </option>
+    <div class="col-12 col-md-6" id="userRelation">
+        <label class="form-label" for="pic">pic<span class="text-danger">*</span></label>
+        <select id="pic" name="pic" class="select2 form-select select2-primary"data-allow-clear="true"
+            required>
         </select>
     </div>
     <div class="col-12 col-md-6">
@@ -71,7 +69,8 @@
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="nik">Nik</label>
-        <input type="text" id="nik" name="nik" class="form-control" placeholder="Masukkan nik" value="{{ $data->nik }}"/>
+        <input type="text" id="nik" name="nik" class="form-control" placeholder="Masukkan nik"
+            value="{{ $data->nik }}" />
     </div>
     <div class="col-12 col-md-12">
         <label class="form-label" for="status">Status<span class="text-danger">*</span></label>
@@ -266,6 +265,50 @@
     </div>
 </form>
 
+<script>
+    var pic = "{{ $data->pic ?? '' }}";
+    var user_name = "{{ $data->user->name ?? '' }}";
+
+    $('document').ready(function() {
+        $('#pic').select2({
+            dropdownParent: $('#userRelation'),
+            placeholder: 'Pilih PIC',
+            ajax: {
+                url: "{{ route('user.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function(data) {
+                    apiResults = data.data
+                        .filter(function(item) {
+                            return item.idRelationAll !== null;
+                        })
+                        .map(function(item) {
+                            return {
+                                text: item.name,
+                                id: item.idRelationAll,
+                            };
+                        });
+
+                    return {
+                        results: apiResults
+                    };
+                },
+                cache: true
+            }
+        });
+
+    });
+
+    if (pic) {
+        var option = new Option(user_name, pic, true, true);
+        $('#pic').append(option).trigger('change');
+    }
+</script>
 <script>
     document.getElementById('formEdit').addEventListener('submit', function(event) {
         event.preventDefault();

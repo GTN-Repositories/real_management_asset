@@ -53,6 +53,9 @@ class UserController extends Controller implements HasMiddleware
                 }
                 return null;
             })
+            ->addColumn('idRelationAll', function ($data) {
+                return $data->id ?? null;
+            })
             ->addColumn('name', function ($data) {
                 return $data->name ?? null;
             })

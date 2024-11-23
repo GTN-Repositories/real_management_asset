@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Crypt;
 
@@ -21,6 +22,11 @@ class Asset extends Model
         $decryptedId = Crypt::decrypt($encryptedId);
 
         return self::findOrFail($decryptedId);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'pic', 'id');
     }
 
     /**

@@ -14,11 +14,10 @@
         <label class="form-label" for="name">Nama Asset<span class="text-danger">*</span></label>
         <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name" required />
     </div>
-    <div class="col-12 col-md-6">
-        <label class="form-label" for="manager">Manajer<span class="text-danger">*</span></label>
-        <select id="manager" name="manager" class="select2 form-select " data-allow-clear="true" required>
-            <option value="">Pilih</option>
-            <option value="lenz creative">lenz creative</option>
+    <div class="col-12 col-md-6" id="userRelation">
+        <label class="form-label" for="pic">pic<span class="text-danger">*</span></label>
+        <select id="pic" name="pic" class="select2 form-select select2-primary"data-allow-clear="true"
+            required>
         </select>
     </div>
     <div class="col-12 col-md-6">
@@ -221,6 +220,41 @@
 </form>
 
 @include('components.select2_js')
+<script>
+    $('document').ready(function() {
+        $('#pic').select2({
+            dropdownParent: $('#userRelation'),
+            placeholder: 'Pilih PIC',
+            ajax: {
+                url: "{{ route('user.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function(data) {
+                    apiResults = data.data
+                        .filter(function(item) {
+                            return item.idRelationAll !== null;
+                        })
+                        .map(function(item) {
+                            return {
+                                text: item.name,
+                                id: item.idRelationAll,
+                            };
+                        });
+
+                    return {
+                        results: apiResults
+                    };
+                },
+                cache: true
+            }
+        });
+    });
+</script>
 <script>
     document.getElementById('formCreate').addEventListener('submit', function(event) {
         event.preventDefault();
