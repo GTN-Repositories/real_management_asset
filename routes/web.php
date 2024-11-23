@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\Helper;
+use App\Http\Controllers\Main\AssetAttachmentController;
 use App\Http\Controllers\Main\AssetController;
 use App\Http\Controllers\Main\AssetNoteController;
 use App\Http\Controllers\Main\AssetReportController;
@@ -64,6 +65,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/site/destroy-all', [SiteController::class, 'destroyAll'])->name('site.destroyAll');
     Route::resource('site', SiteController::class);
 
+    Route::get('/asset/download/{encryptedId}', [AssetController::class, 'download'])->name('asset.download');
     Route::get('/asset/download-template', [AssetController::class, 'generateTemplate'])->name('asset.downloadTemplate');
     Route::get('/asset/import', [AssetController::class, 'importForm'])->name('asset.import.form');
     Route::post('/asset/import', [AssetController::class, 'import'])->name('asset.import');
@@ -85,7 +87,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/customer/destroy-all', [CustomerController::class, 'destroyAll'])->name('customer.destroyAll');
     Route::resource('customer', CustomerController::class);
 
-    Route::get('/category-item/data', [CategoryItemController::class, 'data'])->name('category-item.data');
+    Route::get('/category-item/data', [CategoryItemController::class, 'editStock'])->name('category-item.data');
     Route::delete('/category-item/destroy-all', [CategoryItemController::class, 'destroyAll'])->name('category-item.destroyAll');
     Route::resource('category-item', CategoryItemController::class);
 
@@ -93,6 +95,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/supplier/destroy-all', [SupplierController::class, 'destroyAll'])->name('supplier.destroyAll');
     Route::resource('supplier', SupplierController::class);
 
+    Route::get('/item/stock/{id}', [ItemController::class, 'editStock'])->name('item.stock');
     Route::get('/item/data', [ItemController::class, 'data'])->name('item.data');
     Route::delete('/item/destroy-all', [ItemController::class, 'destroyAll'])->name('item.destroyAll');
     Route::resource('item', ItemController::class);
@@ -143,6 +146,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/status-asset/data', [StatusAssetController::class, 'data'])->name('status-asset.data');
     Route::get('/log-activity/data', [LogActivityController::class, 'data'])->name('log-activity.data');
     Route::get('/asset-note/data', [AssetNoteController::class, 'data'])->name('asset-note.data');
+
+    Route::get('/asset-attachment/data', [AssetAttachmentController::class, 'data'])->name('asset-attachment.data');
+    Route::post('/asset-attachment/{id}', [AssetAttachmentController::class, 'store'])->name('asset-attachment.store');
 });
 
 require __DIR__ . '/auth.php';

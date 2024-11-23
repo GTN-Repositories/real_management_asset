@@ -71,8 +71,23 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="navs-justified-general" role="tabpanel">
-                    <h4>Asset Information</h4>
-                    <div class="row">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4>Asset Information</h4>
+                        <a href="{{ asset('storage/qr_codes/' . $encryptedId . '.png') }}" class="btn btn-success"
+                            download="qr_code_{{ $encryptedId }}.png">Download QR Code</a>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <img src="{{ $asset->image ? asset('storage/' . $asset->image) : 'https://ca.shop.runningroom.com/media/catalog/product/placeholder/default/placeholder-image-square.jpg' }}"
+                                alt="{{ $asset->name ?? '' }}" width="200" height="200" class="object-fit-cover">
+                        </div>
+                        <div class="col-md-6 d-flex justify-content-end">
+                            <img src="{{ asset('storage/qr_codes/' . $encryptedId . '.png') }}" alt="QR Code"
+                                width="200">
+                        </div>
+                    </div>
+                    <div class="row mt-4">
                         <div class="col-md-6">
                             <table class="table">
                                 <thead>
@@ -277,7 +292,8 @@
                             <tr>
                                 <td>gambar asset</td>
                                 <td><img src="{{ asset('storage/' . $asset->image) }}" alt="gambar asset"
-                                        width="50"></td>
+                                        width="50">
+                                </td>
                                 <td>never</td>
                                 <td>
                                     <button type="button" class="btn btn-primary btn-sm" onclick="createFile('asset')">
@@ -306,10 +322,37 @@
                                         onclick="createFile('asuransi')">
                                         <i class="fas fa-pencil me-2"></i> Edit
                                     </button>
-
                                 </td>
                             </tr>
                         </tbody>
+                    </table>
+
+                    <form method="POST" class="row g-3 my-4" id="formAttachment"
+                        action="{{ route('asset-attachment.store', $asset->id) }}" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row col-12">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="attachment">attachment</label>
+                                    <input type="file" class="form-control" name="attachment" id="attachment">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+
+                    <table class="datatables table" id="data-table-attachment">
+                        <thead class="border-top">
+                            <tr>
+                                <th>
+                                    #
+                                </th>
+                                <th>gambar</th>
+                            </tr>
+                        </thead>
                     </table>
                 </div>
                 <div class="tab-pane fade" id="navs-justified-appresiations" role="tabpanel">
@@ -383,9 +426,15 @@
             init_table();
             init_table_log();
             init_table_note();
+            init_table_attachment();
             loadAppreciationChart();
             loadDepreciationChart();
         })
+
+        document.getElementById('download-btn').addEventListener('mouseover', function() {
+            const encryptedId = this.getAttribute('data-encrypted-id');
+            this.href = "{{ url('asset/download') }}/" + encryptedId;
+        });
 
         $(document).on('input', '#searchData', function() {
             init_table($(this).val());
@@ -522,6 +571,43 @@
             });
         }
 
+        function init_table_attachment(keyword = '') {
+            var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+            if ($.fn.DataTable.isDataTable('#data-table-attachment')) {
+                $('#data-table-attachment').DataTable().clear().destroy();
+            }
+
+            var table = $('#data-table-attachment').DataTable({
+                processing: true,
+                serverSide: true,
+                columnDefs: [{
+                    target: 0,
+                    visible: true,
+                    searchable: false
+                }],
+                ajax: {
+                    type: "GET",
+                    url: "{{ route('asset-attachment.data') }}",
+                    data: {
+                        'keyword': keyword,
+                        'asset_id': asset_id,
+                    }
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'attachment',
+                        name: 'attachment'
+                    },
+                ]
+            });
+        }
+
         function createFile($kategori) {
             $.ajax({
                     url: "{{ route('asset.updateFiles') }}",
@@ -573,6 +659,60 @@
                             icon: 'error',
                             title: 'Oops...',
                             text: data.message
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: data.message
+                        }).then(() => {
+                            $('#modal-ce').modal('hide');
+                            window.location.reload();
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!'
+                    });
+                });
+        });
+
+        document.getElementById('formAttachment').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const url = form.action;
+
+            fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.errors) {
+                        let errorMessages = '';
+                        for (const [field, messages] of Object.entries(data.errors)) {
+                            errorMessages += messages.join('<br>') + '<br>';
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            html: errorMessages
+                        });
+                    } else if (!data.status) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.message
                         })
                     } else {
                         Swal.fire({
@@ -580,7 +720,9 @@
                             title: 'Success',
                             text: data.message
                         }).then(() => {
-                            location.reload();
+                            $("#modal-ce").modal("hide");
+
+                            $('#data-table').DataTable().ajax.reload();
                         });
                     }
                 })

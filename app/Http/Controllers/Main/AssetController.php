@@ -9,6 +9,8 @@ use App\Models\AssetNote;
 use App\Models\LogActivity;
 use App\Models\ManagementProject;
 use App\Models\StatusAsset;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -53,34 +55,34 @@ class AssetController extends Controller
                 return $data->id ?? null;
             })
             ->addColumn('image', function ($data) {
-                return $data->image ? '<img src="' . asset('storage/' . $data->image) . '" alt="Image" width="50" height="50"/>' : "kosong";
+                return $data->image ? '<img src="' . asset('storage/' . $data->image) . '" alt="Image" width="50" height="50"/>' : "-";
             })
             ->addColumn('name', function ($data) {
-                return $data->name ?? "kosong";
+                return $data->name ?? "-";
             })
             ->addColumn('serial_number', function ($data) {
-                return $data->serial_number ?? "kosong";
+                return $data->serial_number ?? "-";
             })
             ->addColumn('model_number', function ($data) {
-                return $data->model_number ?? "kosong";
+                return $data->model_number ?? "-";
             })
             ->addColumn('manager', function ($data) {
-                return $data->manager ?? "kosong";
+                return $data->manager ?? "-";
             })
             ->addColumn('category', function ($data) {
-                return $data->category ?? "kosong";
+                return $data->category ?? "-";
             })
             ->addColumn('assets_location', function ($data) {
-                return $data->assets_location ?? "kosong";
+                return $data->assets_location ?? "-";
             })
             ->addColumn('cost', function ($data) {
-                return $data->cost ?? "kosong";
+                return $data->cost ?? "-";
             })
             ->addColumn('purchase_date', function ($data) {
-                return $data->purchase_date ?? "kosong";
+                return $data->purchase_date ?? "-";
             })
             ->addColumn('created_at', function ($data) {
-                return $data->created_at ?? "kosong";
+                return $data->created_at ?? "-";
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
@@ -469,7 +471,6 @@ class AssetController extends Controller
             'Type',
             'No Polisi',
             'Klasifikasi',
-            'Nomor Asset',
             'No Rangka',
             'No Mesin',
             'NIK',
@@ -491,11 +492,11 @@ class AssetController extends Controller
 
         // Menulis header tambahan dari AG4 hingga AJ4
         foreach ($additionalHeaders as $index => $header) {
-            $sheet->setCellValueByColumnAndRow($index + 33, 4, $header); // Kolom AG adalah index 33
+            $sheet->setCellValueByColumnAndRow($index + 32, 4, $header); // Kolom AG adalah index 33
         }
 
         // Menyembunyikan kolom P hingga AF
-        for ($col = 16; $col <= 32; $col++) { // Kolom P = 16, AF = 32
+        for ($col = 15; $col <= 31; $col++) { // Kolom P = 16, AF = 32
             $sheet->getColumnDimensionByColumn($col)->setVisible(false);
         }
 
@@ -581,16 +582,50 @@ class AssetController extends Controller
     /**
      * Display the specified resource.
      */
+
     public function show(string $id)
     {
-        //
         $asset = Asset::findByEncryptedId($id);
         $decryptedId = Crypt::decrypt($asset->id);
+
         $projects = ManagementProject::whereJsonContains('asset_id', $decryptedId)->get();
         $notes = AssetNote::where('asset_id', $decryptedId)->get();
         $logs = LogActivity::where('asset_id', $decryptedId)->get();
-        return view('main.unit.show', compact('asset', 'projects', 'notes', 'logs'));
+
+        $path = public_path('storage/qr_codes/');
+
+        $encryptedId = Crypt::encrypt($decryptedId);
+        $qrCodeFile = $path . $encryptedId . '.png';
+
+        if (!file_exists($qrCodeFile)) {
+            $qrCode = new QrCode(route('asset.show', $asset->id));
+            $writer = new PngWriter();
+
+            if (!file_exists($path)) {
+                mkdir($path, 0777, true);
+            }
+
+            $result = $writer->write($qrCode);
+            $result->saveToFile($qrCodeFile);
+        }
+
+        return view('main.unit.show', compact('asset', 'projects', 'notes', 'logs', 'encryptedId'));
     }
+
+    public function download(string $encryptedId)
+    {
+        $decryptedId = Crypt::decrypt($encryptedId);
+
+        $path = public_path('storage/qr_codes/' . $encryptedId . '.png');
+
+        if (file_exists($path)) {
+            return response()->download($path);
+        }
+
+        return redirect()->back()->with('error', 'File not found.');
+    }
+
+
 
     /**
      * Show the form for editing the specified resource.
