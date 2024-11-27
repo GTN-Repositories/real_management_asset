@@ -66,7 +66,7 @@
                 processResults: function(data) {
                     var apiResults = data.data.map(function(item) {
                         return {
-                            text: item.name,
+                            text: item.nameWithNumber,
                             id: item.relationId,
                         };
                     });
@@ -80,11 +80,11 @@
 
         var asset_ids = {!! json_encode($data->asset_id ?? []) !!};
         var asset_names = {!! json_encode($data->assets->pluck('name') ?? []) !!};
+        var asset_numbers = {!! json_encode($data->assets->pluck('asset_number') ?? []) !!};
 
-        // Pre-select opsi asset di select2
-        if (asset_ids && asset_names) {
+        if (asset_ids && asset_names && asset_numbers) {
             asset_ids.forEach(function(id, index) {
-                var option = new Option(asset_names[index], id, true, true);
+                var option = new Option(`${asset_names[index]} - ${asset_numbers[index]}`, id, true, true);
                 $('#asset_id').append(option);
             });
             $('#asset_id').trigger('change');

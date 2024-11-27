@@ -65,7 +65,7 @@
     var management_project_id = '{{ $data->management_project_id }}';
     var management_project_name = '{{ $data->management_project->name }}';
     var asset_id = '{{ $data->asset_id }}';
-    var asset_name = '{{ $data->asset->name }}';
+    var asset_name = "{{ $data->asset->name . ' - ' . $data->asset->asset_number }}";
     var user_id = '{{ $data->user_id }}';
     var user_name = '{{ $data->user->name }}';
 
@@ -100,7 +100,7 @@
                     };
                 },
                 processResults: function(data) {
-                    apiResults = data.data.reduce((unique, item) => {
+                    let uniqueResults = data.data.reduce((unique, item) => {
                         if (!unique.some((i) => i.text === item.name)) {
                             unique.push({
                                 text: item.name,
@@ -110,7 +110,7 @@
                         return unique;
                     }, []);
                     return {
-                        results: apiResults
+                        results: uniqueResults
                     };
                 },
                 cache: true
@@ -131,21 +131,23 @@
                             projectId: encryptedProjectId
                         },
                         success: function(data) {
-                            var assetOptions = Object.entries(data).map(function([
-                                assetId,
-                                assetName
-                            ]) {
-                                return {
-                                    id: assetId,
-                                    text: assetName
-                                };
-                            });
+                            const uniqueAssets = Object.entries(data).reduce((unique, [
+                                assetId, assetName
+                            ]) => {
+                                if (!unique.some((i) => i.id === assetId)) {
+                                    unique.push({
+                                        id: assetId,
+                                        text: assetName
+                                    });
+                                }
+                                return unique;
+                            }, []);
 
                             $('#asset_id').select2({
                                 dropdownParent: $('#assetRelation'),
-                                data: assetOptions,
+                                data: uniqueAssets,
                                 allowClear: true
-                            }).trigger('change');
+                            }).val(asset_id).trigger('change');
                         }
                     });
                 }
@@ -153,15 +155,13 @@
         });
 
         if (management_project_id) {
-            var option = new Option(management_project_name, management_project_id, true, true);
-            $('#management_project_id').append(option).trigger('change');
-            $('#management_project_id').val(management_project_id).trigger('change');
+            var projectOption = new Option(management_project_name, management_project_id, true, true);
+            $('#management_project_id').append(projectOption).trigger('change');
         }
 
         if (asset_id) {
             var assetOption = new Option(asset_name, asset_id, true, true);
             $('#asset_id').append(assetOption).trigger('change');
-            $('#asset_id').val(asset_id).trigger('change');
         }
 
         $('#user_id').select2({

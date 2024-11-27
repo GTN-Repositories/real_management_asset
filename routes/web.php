@@ -5,15 +5,19 @@ use App\Http\Controllers\Main\AssetAttachmentController;
 use App\Http\Controllers\Main\AssetController;
 use App\Http\Controllers\Main\AssetNoteController;
 use App\Http\Controllers\Main\AssetReportController;
+use App\Http\Controllers\Main\CategoryController;
 use App\Http\Controllers\Main\CategoryItemController;
 use App\Http\Controllers\Main\CustomerController;
 use App\Http\Controllers\Main\DriverProjectController;
 use App\Http\Controllers\Main\FormController;
 use App\Http\Controllers\Main\FuelConsumptionController;
 use App\Http\Controllers\Main\InspectionScheduleController;
+use App\Http\Controllers\Main\IpbController;
 use App\Http\Controllers\Main\ItemController;
+use App\Http\Controllers\Main\LocationController;
 use App\Http\Controllers\Main\LogActivityController;
 use App\Http\Controllers\Main\ManagementProjectController;
+use App\Http\Controllers\Main\ManagerController;
 use App\Http\Controllers\Main\MenuController;
 use App\Http\Controllers\Main\MonitoringController;
 use App\Http\Controllers\Main\PermisionController;
@@ -104,6 +108,11 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/form/destroy-all', [FormController::class, 'destroyAll'])->name('form.destroyAll');
     Route::resource('form', FormController::class);
 
+    Route::post('/fuel-ipb/total-liter', [IpbController::class, 'getTotalLiter'])->name('fuel-ipb.total-liter');
+    Route::get('/fuel-ipb/data', [IpbController::class, 'data'])->name('fuel-ipb.data');
+    Route::delete('/fuel-ipb/destroy-all', [IpbController::class, 'destroyAll'])->name('fuel-ipb.destroyAll');
+    Route::resource('fuel-ipb', IpbController::class);
+
     Route::get('/werehouse/data', [WerehouseController::class, 'data'])->name('werehouse.data');
     Route::delete('/werehouse/destroy-all', [WerehouseController::class, 'destroyAll'])->name('werehouse.destroyAll');
     Route::resource('werehouse', WerehouseController::class);
@@ -144,8 +153,16 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::resource('monitoring', MonitoringController::class);
 
     Route::get('/status-asset/data', [StatusAssetController::class, 'data'])->name('status-asset.data');
+
     Route::get('/log-activity/data', [LogActivityController::class, 'data'])->name('log-activity.data');
+
     Route::get('/asset-note/data', [AssetNoteController::class, 'data'])->name('asset-note.data');
+
+    Route::get('/location/data', [LocationController::class, 'data'])->name('location.data');
+
+    Route::get('/manager/data', [ManagerController::class, 'data'])->name('manager.data');
+
+    Route::get('/category/data', [CategoryController::class, 'data'])->name('category.data');
 
     Route::get('/asset-attachment/data', [AssetAttachmentController::class, 'data'])->name('asset-attachment.data');
     Route::post('/asset-attachment/{id}', [AssetAttachmentController::class, 'store'])->name('asset-attachment.store');

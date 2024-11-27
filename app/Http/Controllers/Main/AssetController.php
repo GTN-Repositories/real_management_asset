@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
-use App\Imports\AssetsImport;
 use App\Models\Asset;
 use App\Models\AssetNote;
 use App\Models\LogActivity;
@@ -15,9 +14,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -57,6 +54,9 @@ class AssetController extends Controller
             ->addColumn('image', function ($data) {
                 return $data->image ? '<img src="' . asset('storage/' . $data->image) . '" alt="Image" width="50" height="50"/>' : "-";
             })
+            ->addColumn('nameWithNumber', function ($data) {
+                return $data->name . " - " . $data->asset_number ?? "-";
+            })
             ->addColumn('name', function ($data) {
                 return $data->name ?? "-";
             })
@@ -70,10 +70,10 @@ class AssetController extends Controller
                 return $data->manager ?? "-";
             })
             ->addColumn('category', function ($data) {
-                return $data->category ?? "-";
+                return $data->asset_category->name ?? "-";
             })
             ->addColumn('assets_location', function ($data) {
-                return $data->assets_location ?? "-";
+                return $data->location->name ?? "-";
             })
             ->addColumn('cost', function ($data) {
                 return $data->cost ?? "-";
@@ -107,6 +107,7 @@ class AssetController extends Controller
     {
         $columns = [
             'id',
+            'asset_number',
             'image',
             'name',
             'serial_number',
@@ -296,13 +297,12 @@ class AssetController extends Controller
 
     public function getDepreciationData(Request $request)
     {
-        $assetId = $request->query('asset_id'); // Retrieve asset_id from the request
+        $assetId = $request->query('asset_id');
 
-        // Fetch the specific asset if asset_id is provided, or fetch all if no ID is given
         $assetsQuery = Asset::select('purchase_date', 'cost', 'residual_value', 'depreciation', 'depreciation_method');
 
         if ($assetId) {
-            $assetsQuery->where('id', $assetId); // Filter by asset_id
+            $assetsQuery->where('id', $assetId);
         }
 
         $assets = $assetsQuery->get();
@@ -316,26 +316,23 @@ class AssetController extends Controller
             $method = $asset->depreciation_method;
             $data = [];
 
-            // Check for valid depreciation data
             if ($depreciationMonths > 0 && $cost > $residualValue) {
                 if ($method === 'Penyusutan Garis Lurus') {
-                    // Straight-Line Depreciation
                     $monthlyDepreciation = ($cost - $residualValue) / $depreciationMonths;
                     for ($i = 0; $i <= $depreciationMonths; $i++) {
                         $depreciatedValue = $cost - ($monthlyDepreciation * $i);
                         $data[] = [
                             'date' => $purchaseDate->copy()->addMonths($i)->format('Y-m-d'),
-                            'value' => max($depreciatedValue, $residualValue) // Ensure value doesn’t drop below residual
+                            'value' => max($depreciatedValue, $residualValue)
                         ];
                     }
                 } elseif ($method === 'Penyusutan Saldo Menurun') {
-                    // Declining Balance Depreciation
-                    $rate = 1 - pow($residualValue / $cost, 1 / $depreciationMonths); // Calculate depreciation rate
+                    $rate = 1 - pow($residualValue / $cost, 1 / $depreciationMonths);
                     for ($i = 0; $i <= $depreciationMonths; $i++) {
                         $depreciatedValue = $cost * pow(1 - $rate, $i);
                         $data[] = [
                             'date' => $purchaseDate->copy()->addMonths($i)->format('Y-m-d'),
-                            'value' => max($depreciatedValue, $residualValue) // Ensure value doesn’t drop below residual
+                            'value' => max($depreciatedValue, $residualValue)
                         ];
                     }
                 }
@@ -528,14 +525,23 @@ class AssetController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-
         try {
             return $this->atomic(function () use ($data) {
                 $lastAsset = Asset::latest('id')->first();
                 $lastNumber = $lastAsset ? intval(str_replace('ast-', '', $lastAsset->asset_number)) : 0;
 
-                $data['asset_number'] = 'ast-' . ($lastNumber + 1);
+                if (isset($data['assets_location'])) {
+                    $data['assets_location'] = Crypt::decrypt($data['assets_location']);
+                }
+                if (isset($data['manager'])) {
+                    $data['manager'] = Crypt::decrypt($data['manager']);
+                }
+                if (isset($data['category'])) {
+                    $data['category'] = Crypt::decrypt($data['category']);
+                }
+
                 $data['status'] = "Idle";
+                $data['asset_number'] = 'ast-' . ($lastNumber + 1);
 
                 if (isset($data['image'])) {
                     $data['image'] = $data['image']->store('assets', 'public');

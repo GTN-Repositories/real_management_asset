@@ -9,6 +9,7 @@ use App\Models\InspectionSchedule;
 use App\Models\Item;
 use App\Models\Unit;
 use Carbon\Carbon;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
@@ -66,93 +67,43 @@ class InspectionScheduleController extends Controller
         return view('main.inspection_schedule.create');
     }
 
-
-    public function addItemToSession(Request $request)
-    {
-        $itemId = $request->item_id;
-
-        $sessionItems = $request->session()->get('selected_item_ids', []);
-
-        if (!in_array($itemId, $sessionItems)) {
-            $sessionItems[] = $itemId;
-            $request->session()->put('selected_item_ids', $sessionItems);
-        }
-
-        return response()->json(['message' => 'Item ID added to session successfully']);
-    }
-
-    public function getSelectedItems(Request $request)
-    {
-        $selectedItemIds = $request->session()->get('selected_item_ids', []);
-        $items = [];
-
-        if (!empty($selectedItemIds)) {
-            try {
-                $decryptedSelected = array_map(fn($id) => Crypt::decrypt($id), $selectedItemIds);
-                $items = Item::whereIn('id', $decryptedSelected)->get();
-            } catch (\Exception $e) {
-                $items = [];
-            }
-        }
-
-        return response()->json($items);
-    }
-
-    public function removeItemFromSession(Request $request)
-    {
-        $itemId = $request->item_id;
-        $sessionItems = $request->session()->get('selected_item_ids', []);
-
-        $updatedItems = array_filter($sessionItems, function ($id) use ($itemId) {
-            try {
-                return Crypt::decrypt($id) != Crypt::decrypt($itemId);
-            } catch (\Exception $e) {
-                return true;
-            }
-        });
-
-        $request->session()->put('selected_item_ids', array_values($updatedItems));
-
-        return response()->json(['message' => 'Item removed from session successfully']);
-    }
-
-    public function clearAllItemsFromSession(Request $request)
-    {
-        $request->session()->forget('selected_item_ids');
-        return response()->json(['message' => 'All items removed from session successfully']);
-    }
-
     public function store(Request $request)
     {
         $data = $request->all();
-
         try {
             return $this->atomic(function () use ($data, $request) {
                 $asset_id = Crypt::decrypt($data['asset_id']);
-
-                $selectedItemIds = $request->session()->get('selected_item_ids', []);
+                $asset_kanibal_id = isset($data['asset_kanibal_id']) ? Crypt::decrypt($data['asset_kanibal_id']) : null;
 
                 $decryptedItemIds = [];
-                foreach ($selectedItemIds as $encryptedItemId) {
-                    try {
-                        $decryptedItemIds[] = Crypt::decrypt($encryptedItemId);
-                    } catch (\Exception $e) {
-                        continue;
+                $itemStocks = [];
+                if (isset($data['selected_items'])) {
+                    foreach ($data['selected_items'] as $encryptedItemId) {
+                        try {
+                            $decryptedItemId = Crypt::decrypt($encryptedItemId['id']);
+                            $decryptedItemIds[] = $decryptedItemId;
+                            $itemStocks[$decryptedItemId] = $encryptedItemId['stock'];
+                        } catch (\Exception $e) {
+                            continue;
+                        }
                     }
                 }
 
-                // Create schedule
                 $schedule = InspectionSchedule::create([
                     'name' => $data['name'],
                     'date' => $data['date'],
                     'type' => $data['type'],
                     'asset_id' => $asset_id,
                     'note' => $data['note'],
-                    'item_id' => json_encode($decryptedItemIds)
+                    'item_id' => json_encode($decryptedItemIds) ?? null,
+                    'item_stock' => json_encode($itemStocks) ?? null,
+                    'asset_kanibal_id' => $asset_kanibal_id,
                 ]);
 
-                // Clear the session after successful save
-                $request->session()->forget('selected_item_ids');
+                foreach ($decryptedItemIds as $itemId) {
+                    $item = Item::findOrFail($itemId);
+                    $item->decrement('stock', $itemStocks[$itemId]);
+                }
 
                 return response()->json([
                     'status' => true,
@@ -174,14 +125,12 @@ class InspectionScheduleController extends Controller
             $data = InspectionSchedule::findByEncryptedId($id);
 
             $itemIds = json_decode($data->item_id, true) ?? [];
-            $encryptedIds = array_map(function ($id) {
-                return Crypt::encrypt($id);
-            }, $itemIds);
+            $itemStocks = json_decode($data->item_stock, true) ?? [];
 
-            session(['selected_item_ids' => $encryptedIds]);
-
-            $items = Item::whereIn('id', $itemIds)->get();
-
+            $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemStocks) {
+                $item->stock_in_schedule = $itemStocks[$item->id] ?? 1;
+                return $item;
+            });
             return view('main.inspection_schedule.edit', compact('data', 'items'));
         } catch (\Exception $e) {
             return back()->with('error', 'Error loading data: ' . $e->getMessage());
@@ -190,25 +139,52 @@ class InspectionScheduleController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $data = $request->all();
-
-        $selectedItemIds = $request->session()->get('selected_item_ids', []);
-        $decryptedItemIds = [];
-        foreach ($selectedItemIds as $encryptedItemId) {
-            try {
-                $decryptedItemIds[] = Crypt::decrypt($encryptedItemId);
-            } catch (\Exception $e) {
-                continue;
-            }
-        }
-
         try {
-            return $this->atomic(function () use ($data, $id, $decryptedItemIds, $request) {
-                $uniqueDecryptedItemIds = array_values(array_unique($decryptedItemIds));
-                $data['item_id'] = $uniqueDecryptedItemIds;
-                $schedule = InspectionSchedule::findByEncryptedId($id)->update($data);
+            return $this->atomic(function () use ($request, $id) {
+                $schedule = InspectionSchedule::findByEncryptedId($id);
 
-                $request->session()->forget('selected_item_ids');
+                $data = $request->all();
+
+                $data['asset_id'] = Crypt::decrypt($data['asset_id']);
+                $data['asset_kanibal_id'] = isset($data['asset_kanibal_id']) ? Crypt::decrypt($data['asset_kanibal_id']) : null;
+
+                $decryptedItemIds = [];
+                $itemStocks = [];
+
+
+                if (isset($data['selected_items'])) {
+                    foreach ($data['selected_items'] as $encryptedItemId) {
+                        try {
+                            $decryptedItemId = Crypt::decrypt($encryptedItemId['id']);
+                            $decryptedItemIds[] = $decryptedItemId;
+                            $itemStocks[$decryptedItemId] = $encryptedItemId['stock'];
+                        } catch (\Exception $e) {
+                            continue;
+                        }
+                    }
+                }
+
+                $data['item_id'] = json_encode($decryptedItemIds);
+                $data['item_stock'] = json_encode($itemStocks);
+
+                $previousStocks = json_decode($schedule->item_stock, true) ?? [];
+                foreach ($decryptedItemIds as $itemId) {
+                    $item = Item::findOrFail($itemId);
+                    $previousStock = $previousStocks[$itemId] ?? 0;
+                    $currentStock = $itemStocks[$itemId];
+
+                    if ($previousStock !== $currentStock) {
+                        $item->decrement('stock', $currentStock - $previousStock);
+                    }
+                }
+
+                $removedItemIds = array_diff(array_keys($previousStocks), $decryptedItemIds);
+                foreach ($removedItemIds as $removedItemId) {
+                    $removedItem = Item::findOrFail($removedItemId);
+                    $removedItem->increment('stock', $previousStocks[$removedItemId]);
+                }
+                
+                $schedule->update($data);
 
                 return response()->json([
                     'status' => true,
@@ -219,9 +195,7 @@ class InspectionScheduleController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Data gagal diperbarui! ' . $th->getMessage(),
-            ]);
+            ], 500);
         }
     }
-
-    public function showQuizDetails($scheduleId) {}
 }

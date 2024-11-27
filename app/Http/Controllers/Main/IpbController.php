@@ -4,16 +4,16 @@ namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
 use App\Models\FuelConsumption;
+use App\Models\Ipb;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
-class FuelConsumptionController extends Controller
+class IpbController extends Controller
 {
     //
-
     public function index()
     {
-        return view('main.fuel_consumtion.index');
+        return view('main.ipb.index');
     }
 
     public function data(Request $request)
@@ -41,38 +41,47 @@ class FuelConsumptionController extends Controller
             ->addColumn('relationId', function ($data) {
                 return $data->id ?? null;
             })
-            ->addColumn('management_project_id', function ($data) {
-                return $data->management_project->name ?? null;
+            ->addColumn('date', function ($data) {
+                return $data->date ?? null;
             })
-            ->addColumn('asset_id', function ($data) {
-                return $data->asset->name . ' - ' . $data->asset->asset_number ?? null;
+            ->addColumn('issued_liter', function ($data) {
+                return number_format($data->issued_liter, 0, ',', '.') ?? null;
+            })
+            ->addColumn('usage_liter', function ($data) {
+                return number_format($data->usage_liter, 0, ',', '.') ?? null;
+            })
+            ->addColumn('balance', function ($data) {
+                return number_format($data->balance, 0, ',', '.') ?? null;
+            })
+            ->addColumn('unit_price', function ($data) {
+                return 'Rp. ' . number_format($data->unit_price, 0, ',', '.') ?? null;
+            })
+            ->addColumn('total_harga', function ($data) {
+                return 'Rp. ' . number_format($data->unit_price * $data->usage_liter, 0, ',', '.') ?? null;
+            })
+            ->addColumn('ppn', function ($data) {
+                return 'Rp. ' . number_format(($data->unit_price * $data->usage_liter) * 0.11, 0, ',', '.') ?? null;
+            })
+            ->addColumn('jumlah', function ($data) {
+                return 'Rp. ' . number_format(($data->unit_price * $data->usage_liter) + (($data->unit_price * $data->usage_liter) * 0.11), 0, ',', '.') ?? null;
+            })
+            ->addColumn('fuel_truck', function ($data) {
+                return $data->fuel_truck ?? null;
             })
             ->addColumn('user_id', function ($data) {
                 return $data->user->name ?? null;
             })
-            ->addColumn('date', function ($data) {
-                return $data->date ?? null;
-            })
-            ->addColumn('loadsheet', function ($data) {
-                return number_format($data->loadsheet, 0, ',', '.') ?? null;
-            })
-            ->addColumn('liter', function ($data) {
-                return number_format($data->liter, 0, ',', '.') . ' liter' ?? null;
-            })
-            ->addColumn('price', function ($data) {
-                return 'Rp. ' . number_format($data->price, 0, ',', '.') ?? null;
-            })
-            ->addColumn('category', function ($data) {
-                return $data->category ?? null;
+            ->addColumn('location', function ($data) {
+                return $data->location ?? null;
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
-                if (auth()->user()->hasPermissionTo('fuel-edit')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
-                }
-                if (auth()->user()->hasPermissionTo('fuel-delete')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
-                }
+                // if (auth()->user()->hasPermissionTo('fuel-edit')) {
+                $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                // }
+                // if (auth()->user()->hasPermissionTo('fuel-delete')) {
+                $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                // }
                 $btn .= '</div>';
 
                 return $btn;
@@ -95,22 +104,21 @@ class FuelConsumptionController extends Controller
     {
         $columns = [
             'id',
-            'management_project_id',
-            'asset_id',
-            'user_id',
             'date',
-            'loadsheet',
-            'liter',
-            'price',
-            'category',
+            'management_project_id',
+            'issued_liter',
+            'usage_liter',
+            'balance',
+            'unit_price',
+            'fuel_truck',
+            'user_id',
+            'location',
         ];
 
         $keyword = $request->search['value'] ?? "";
-        // $project_id = $this->projectId();
 
-        $data = FuelConsumption::orderBy('created_at', 'asc')
+        $data = Ipb::orderBy('created_at', 'asc')
             ->select($columns)
-            // ->whereIn($project_id)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
                     foreach ($columns as $column) {
@@ -131,7 +139,21 @@ class FuelConsumptionController extends Controller
 
     public function create()
     {
-        return view('main.fuel_consumtion.create');
+        return view('main.ipb.create');
+    }
+
+    public function getTotalLiter(Request $request)
+    {
+        $managementProjectId = $request->management_project_id;
+        $date = $request->date;
+
+        $totalLiter = FuelConsumption::where('management_project_id', Crypt::decrypt($managementProjectId))
+            ->whereDate('date', $date)
+            ->sum('liter');
+
+        return response()->json([
+            'total_liter' => $totalLiter
+        ]);
     }
 
     /**
@@ -140,15 +162,25 @@ class FuelConsumptionController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-
         try {
             return $this->atomic(function () use ($data) {
-                $data['price'] = str_replace('.', '', $data['price']);
-                $data['loadsheet'] = str_replace('.', '', $data['loadsheet']);
-                $data['liter'] = str_replace('.', '', $data['liter']);
-                $data["asset_id"] = crypt::decrypt($data["asset_id"]);
                 $data["management_project_id"] = crypt::decrypt($data["management_project_id"]);
-                $data = FuelConsumption::create($data);
+                $data['issued_liter'] = str_replace('.', '', $data['issued_liter']);
+                $data['usage_liter'] = str_replace('.', '', $data['usage_liter']);
+                $data['unit_price'] = str_replace('.', '', $data['unit_price']);
+
+                $lastBalance = Ipb::where('management_project_id', $data["management_project_id"])
+                    ->orderBy('id', 'desc')
+                    ->value('balance');
+
+                $lastBalance = $lastBalance ?? 0;
+
+                $issuedLiter = $data['issued_liter'] ?? 0;
+                $usageLiter = $data['usage_liter'] ?? 0;
+
+                $data['balance'] = ($lastBalance + $issuedLiter) - $usageLiter;
+
+                $data = Ipb::create($data);
 
                 return response()->json([
                     'status' => true,
@@ -179,9 +211,9 @@ class FuelConsumptionController extends Controller
     {
 
         $decryptedId = Crypt::decrypt($id);
-        $data = FuelConsumption::findOrFail($decryptedId);
+        $data = Ipb::findOrFail($decryptedId);
 
-        return view('main.fuel_consumtion.edit', compact('data'));
+        return view('main.ipb.edit', compact('data'));
     }
 
 
@@ -194,17 +226,35 @@ class FuelConsumptionController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id) {
-                $data['price'] = str_replace('.', '', $data['price']);
-                $data['loadsheet'] = str_replace('.', '', $data['loadsheet']);
-                $data['liter'] = str_replace('.', '', $data['liter']);
+
                 try {
                     $data["management_project_id"] = Crypt::decrypt($data["management_project_id"]);
-                    $data["asset_id"] = crypt::decrypt($data["asset_id"]);
                 } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
                     $data["management_project_id"] = $data["management_project_id"];
-                    $data["asset_id"] = $data["asset_id"];
                 }
-                $data = FuelConsumption::findByEncryptedId($id)->update($data);
+
+                $data['issued_liter'] = str_replace('.', '', $data['issued_liter']);
+                $data['usage_liter'] = str_replace('.', '', $data['usage_liter']);
+                $data['unit_price'] = str_replace('.', '', $data['unit_price']);
+
+                $record = Ipb::findByEncryptedId($id);
+                if (!$record) {
+                    throw new \Exception('Data tidak ditemukan!');
+                }
+
+                $lastBalance = Ipb::where('management_project_id', $data["management_project_id"])
+                    ->where('id', '<>', $record->id)
+                    ->orderBy('id', 'desc')
+                    ->value('balance');
+
+                $lastBalance = $lastBalance ?? 0;
+
+                $issuedLiter = $data['issued_liter'] ?? 0;
+                $usageLiter = $data['usage_liter'] ?? 0;
+
+                $data['balance'] = ($lastBalance + $issuedLiter) - $usageLiter;
+
+                $record->update($data);
 
                 return response()->json([
                     'status' => true,
@@ -225,7 +275,7 @@ class FuelConsumptionController extends Controller
     public function destroy($id)
     {
         try {
-            $data = FuelConsumption::findByEncryptedId($id);
+            $data = Ipb::findByEncryptedId($id);
             $data->delete();
 
             return response()->json([
@@ -250,7 +300,7 @@ class FuelConsumptionController extends Controller
                     $decryptedIds[] = Crypt::decrypt($encryptedId);
                 }
 
-                $delete = FuelConsumption::whereIn('id', $decryptedIds)->delete();
+                $delete = Ipb::whereIn('id', $decryptedIds)->delete();
 
                 return response()->json([
                     'status' => true,

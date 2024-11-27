@@ -60,7 +60,7 @@
                 processResults: function(data) {
                     apiResults = data.data.map(function(item) {
                         return {
-                            text: item.name,
+                            text: item.nameWithNumber,
                             id: item.relationId,
                         };
                     });

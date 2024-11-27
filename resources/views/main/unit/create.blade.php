@@ -20,17 +20,9 @@
             required>
         </select>
     </div>
-    <div class="col-12 col-md-6">
-        <label class="form-label" for="category">Kategori<span class="text-danger">*</span></label>
-        <select name="category" id="category" class="select2 form-select " data-allow-clear="true" required>
-            <option value="">Pilih</option>
-            <option value="Technology">Technology</option>
-            <option value="Construction">Construction</option>
-            <option value="Medical Assets">Medical Assets</option>
-            <option value="Education">Education</option>
-            <option value="Lisences">Lisences</option>
-            <option value="Real Estate">Real Estate</option>
-            <option value="Legal Claims">Legal Claims</option>
+    <div class="col-12 col-md-6" id="categoryParent">
+        <label class="form-label" for="category">Kategori</label>
+        <select id="category_id" name="category" class="select2 form-select select2-primary"data-allow-clear="true">
         </select>
     </div>
     <div class="col-12 col-md-6">
@@ -100,19 +92,10 @@
                             <input type="number" min="1" id="warranty_period" name="warranty_period"
                                 class="form-control" placeholder="Masukkan warranty_period" />
                         </div>
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-md-6" id="assets_locationParent">
                             <label class="form-label" for="assets_location">Lokasi</label>
-                            <select name="assets_location" id="assets_location" class="form-select select2">
-                                <option value="">Pilih</option>
-                                <option value="Jatim">Jatim</option>
-                                <option value="Jateng">Jateng</option>
-                                <option value="Jabar">Jabar</option>
-                                <option value="Kaltim">Kaltim</option>
-                                <option value="Kalteng">Kalteng</option>
-                                <option value="Kalsel">Kalsel</option>
-                                <option value="Bali">Bali</option>
-                                <option value="DKI">DKI</option>
-                                <option value="Aceh">Aceh</option>
+                            <select id="assets_location_id" name="assets_location"
+                                class="select2 form-select select2-primary"data-allow-clear="true">
                             </select>
                         </div>
                         <div class="col-12 col-md-6">
@@ -222,6 +205,58 @@
 @include('components.select2_js')
 <script>
     $('document').ready(function() {
+        $('#category_id').select2({
+            dropdownParent: $('#categoryParent'),
+            placeholder: 'Pilih Kategori',
+            ajax: {
+                url: "{{ route('category.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.data.map(function(item) {
+                            return {
+                                text: item.name,
+                                id: item.id
+                            };
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $('#assets_location_id').select2({
+            dropdownParent: $('#assets_locationParent'),
+            placeholder: 'Pilih lokasi',
+            ajax: {
+                url: "{{ route('location.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.data.map(function(item) {
+                            return {
+                                text: item.name,
+                                id: item.id
+                            };
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
+
         $('#pic').select2({
             dropdownParent: $('#userRelation'),
             placeholder: 'Pilih PIC',

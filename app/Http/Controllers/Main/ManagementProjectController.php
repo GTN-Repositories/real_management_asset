@@ -48,7 +48,8 @@ class ManagementProjectController extends Controller
             ->addColumn('asset_id', function ($data) {
                 if (is_array($data->asset_id) && count($data->asset_id) > 0) {
                     $assetNames = Asset::whereIn('id', $data->asset_id)->pluck('name')->toArray();
-                    return implode(', ', array_slice($assetNames, 0, 2)) . (count($assetNames) > 2 ? ', ...' : '');
+                    $assetNumbers = Asset::whereIn('id', $data->asset_id)->pluck('asset_number')->toArray();
+                    return implode(', ', array_slice($assetNames, 0, 2)) . (count($assetNames) > 2 ? ', ...' : '') . ' - ' . implode(', ', array_slice($assetNumbers, 0, 2)) . (count($assetNumbers) > 2 ? ', ...' : '');
                 }
                 return null;
             })
@@ -117,7 +118,9 @@ class ManagementProjectController extends Controller
             return response()->json([], 200);
         }
 
-        $assets = Asset::whereIn('id', $assetIds)->pluck('name', 'id')->toArray();
+        $assets = Asset::whereIn('id', $assetIds)->get()->mapWithKeys(function ($asset) {
+            return [$asset->id => $asset->name . ' - ' . $asset->asset_number];
+        })->toArray();
 
         return response()->json($assets);
     }

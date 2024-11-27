@@ -23,7 +23,13 @@ class LogActivity
         'asset.appreciation-data',
         'asset.depreciation-data',
         'asset.statusData',
-        'asset.updateFiles'
+        'asset.updateFiles',
+        'inspection-schedule.store',
+        'inspection-schedule.update',
+        'management-project.store',
+        'management-project.update',
+        'fuel.store',
+        'fuel.update',
     ];
 
     /**
@@ -85,6 +91,10 @@ class LogActivity
 
             if ($request->input('asset_id')) {
                 return $this->decryptId($request->input('asset_id'));
+            }
+
+            if ($request->input('asset_kanibal_id')) {
+                return $this->decryptId($request->input('asset_kanibal_id'));
             }
 
             if ($request->route('id')) {
