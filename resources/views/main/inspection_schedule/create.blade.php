@@ -39,7 +39,21 @@
             placeholder="Masukkan Deskripsi"></textarea>
     </div>
 
-    <div class="col-12" id="selectItem">
+    <div class="col-12 col-md-12" id="jenisMetode">
+        <label for="jenis_metode" class="form-label">Jenis Penggunaan</label>
+        <select id="jenis_metode" class="select2 form-select form-select-lg" name="jenis_metode">
+            <option value="stock">Pengurangan Stock</option>
+            <option value="kanibal">Kanibal Asset Lain</option>
+        </select>
+    </div>
+
+    <div class="col-12" id="selectAssetKanibal" style="display: none">
+        <label for="asset_kanibal_id" class="form-label">Asset Yang Dipilih</label>
+        <select id="asset_kanibal_id" class="form-select form-select-lg" name="asset_kanibal_id">
+        </select>
+    </div>
+
+    <div class="col-12 col-md-12" id="selectItem">
         <label for="item_id" class="form-label">Sparepart</label>
         <select id="item_id" class="form-select form-select-lg" name="item_id">
         </select>
@@ -62,7 +76,24 @@
 @include('components.select2_js')
 
 <script type="text/javascript">
+    let selectedItems = [];
+
     $(document).ready(function() {
+
+        $('#jenis_metode').on('change', function() {
+            const value = $(this).val();
+
+            if (value === 'stock') {
+                $('#selectAssetKanibal').hide();
+                $('#selectItem').show();
+                $('#selectedItemsContainer').show();
+            } else if (value === 'kanibal') {
+                $('#selectAssetKanibal').show();
+                $('#selectItem').hide();
+                $('#selectedItemsContainer').hide();
+            }
+        });
+
         $('#item_id').select2({
             dropdownParent: $('#selectItem'),
             placeholder: 'Pilih Sparepart',
@@ -79,7 +110,10 @@
                     return {
                         results: data.data.map(item => ({
                             text: item.name,
-                            id: item.item_id
+                            id: item.item_id,
+                            code: item.code,
+                            part: item.part,
+                            available_stock: item.stock || 0
                         }))
                     };
                 },
@@ -87,94 +121,74 @@
             }
         });
 
-        loadSelectedItems();
-
         $('#item_id').on('change', function() {
             const itemId = $(this).val();
+            const selectedOption = $(this).select2('data')[0];
+            const stockInput = $('#stock').val() || 1;
 
-            if (itemId) {
-                $.ajax({
-                    url: "{{ route('add.item.session') }}",
-                    type: "POST",
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        item_id: itemId
-                    },
-                    success: function(response) {
-                        loadSelectedItems();
-                    },
-                    error: function(xhr) {
-                        console.error("Error adding item_id to session:", xhr.responseText);
-                        alert("Failed to add item_id to session");
-                    }
+            if (itemId && !selectedItems.some(item => item.id === itemId)) {
+                selectedItems.push({
+                    id: itemId,
+                    name: selectedOption.text,
+                    code: selectedOption.code,
+                    part: selectedOption.part,
+                    stock: stockInput,
+                    availableStock: selectedOption.available_stock
                 });
+                updateSelectedItemsTable();
             }
+
+            $('#stock').val('');
         });
 
-        function loadSelectedItems() {
-            $.ajax({
-                url: "{{ route('get.selected.items') }}",
-                type: "GET",
-                success: function(items) {
-                    $('#selectedItemsTable tbody').empty();
+        function updateSelectedItemsTable() {
+            const tableBody = $('#selectedItemsTable tbody');
+            tableBody.empty();
 
-                    items.forEach(function(item) {
-                        $('#selectedItemsTable tbody').append(`
-                        <tr>
-                            <td>${item.code}</td>
-                            <td>${item.name}</td>
-                            <td>${item.part}</td>
-                            <td>
-                                <button type="button" class="btn btn-danger btn-sm remove-item" data-item-id="${item.id}">Hapus</button>
-                            </td>
-                        </tr>
-                    `);
-                    });
-
-                    $('.remove-item').off('click').on('click', function() {
-                        const itemId = $(this).data('item-id');
-                        removeItemFromSession(itemId);
-                    });
-                }
+            selectedItems.forEach(function(item) {
+                tableBody.append(`
+            <tr>
+                <td>${item.code}</td>
+                <td>${item.name}</td>
+                <td>${item.part}</td>
+                <td>
+                    <input type="number"
+                           class="form-control item-stock"
+                           data-item-id="${item.id}"
+                           value="${item.stock}"
+                           min="1"
+                           max="${item.availableStock}"
+                    >
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm remove-item" data-item-id="${item.id}">Hapus</button>
+                </td>
+            </tr>
+        `);
             });
-        }
 
-        function removeItemFromSession(itemId) {
-            $.ajax({
-                url: "{{ route('remove.item.session') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    item_id: itemId
-                },
-                success: function(response) {
-                    loadSelectedItems
-                        ();
-                },
-                error: function(xhr) {
-                    console.error("Error removing item_id from session:", xhr.responseText);
-                    alert("Failed to remove item_id from session");
-                }
+            $('.item-stock').on('change', function() {
+                const itemId = $(this).data('item-id');
+                const newStock = $(this).val();
+
+                selectedItems = selectedItems.map(item =>
+                    item.id === itemId ? {
+                        ...item,
+                        stock: newStock
+                    } : item
+                );
+            });
+
+            $('.remove-item').on('click', function() {
+                const itemId = $(this).data('item-id');
+                selectedItems = selectedItems.filter(item => item.id !== itemId);
+                updateSelectedItemsTable();
             });
         }
 
         $('#clearAllButton').on('click', function() {
-            $.ajax({
-                url: "{{ route('clear.items.session') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function(response) {
-                    loadSelectedItems
-                        ();
-                },
-                error: function(xhr) {
-                    console.error("Error clearing all items from session:", xhr
-                        .responseText);
-                    alert("Failed to clear all items from session");
-                }
-            });
+            selectedItems = [];
+            updateSelectedItemsTable();
         });
     });
 
@@ -210,6 +224,37 @@
                 cache: true
             }
         });
+
+        $('#asset_kanibal_id').select2({
+            dropdownParent: $('#selectAssetKanibal'),
+            placeholder: 'Pilih Asset',
+            ajax: {
+                url: "{{ route('asset.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function(data) {
+                    apiResults = data.data.reduce((unique, item) => {
+                        if (!unique.some((i) => i.text === item.name)) {
+                            unique.push({
+                                text: item.name,
+                                id: item.relationId,
+                            });
+                        }
+                        return unique;
+                    }, []);
+
+                    return {
+                        results: apiResults
+                    };
+                },
+                cache: true
+            }
+        });
     });
 
     document.getElementById('formCreate').addEventListener('submit', function(event) {
@@ -217,6 +262,12 @@
 
         const form = event.target;
         const formData = new FormData(form);
+
+        selectedItems.forEach((item, index) => {
+            formData.append(`selected_items[${index}][id]`, item.id);
+            formData.append(`selected_items[${index}][stock]`, item.stock);
+        });
+
         const url = form.action;
 
         fetch(url, {
@@ -245,7 +296,7 @@
                         icon: 'error',
                         title: 'Oops...',
                         text: data.message
-                    })
+                    });
                 } else {
                     Swal.fire({
                         icon: 'success',

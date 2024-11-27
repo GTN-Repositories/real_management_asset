@@ -53,4 +53,19 @@ class Asset extends Model
             'condition' => ['Damaged', 'Fair', 'NeedsRepair', 'Good']
         ];
     }
+
+    public function asset_category(): BelongsTo
+    {
+        return $this->belongsTo(AssetCategory::class, 'category', 'id');
+    }
+
+    public function asset_manager(): BelongsTo
+    {
+        return $this->belongsTo(AssetManager::class, 'manager', 'id');
+    }
+
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class, 'assets_location', 'id');
+    }
 }

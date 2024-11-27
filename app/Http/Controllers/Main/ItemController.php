@@ -199,7 +199,7 @@ class ItemController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id, $request) {
-                $item = Item::findByEncryptedId($id)->first();
+                $item = Item::findByEncryptedId($id);
                 if ($request->hasFile('image')) {
                     if ($item && $item->image) {
                         $oldImagePath = public_path('storage/images/item/' . $item->image);
