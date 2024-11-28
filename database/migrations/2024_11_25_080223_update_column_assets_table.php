@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('assets', function (Blueprint $table) {
-            $table->unsignedBigInteger('manager')->index()->nullable()->change();
-            $table->unsignedBigInteger('category')->index()->nullable()->change();
-            $table->unsignedBigInteger('assets_location')->index()->nullable()->change();
+            $table->string('manager')->index()->nullable()->change();
+            $table->string('category')->index()->nullable()->change();
+            $table->string('assets_location')->index()->nullable()->change();
         });
     }
 
@@ -24,9 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('assets', function (Blueprint $table) {
-            $table->unsignedBigInteger('manager')->nullable()->change();
-            $table->unsignedBigInteger('category')->nullable()->change();
-            $table->unsignedBigInteger('assets_location')->nullable()->change();
+            $table->string('manager')->nullable()->change();
+            $table->string('category')->nullable()->change();
+            $table->string('assets_location')->nullable()->change();
         });
     }
 };
