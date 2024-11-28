@@ -103,6 +103,7 @@ class FuelConsumptionController extends Controller
             'liter',
             'price',
             'category',
+            'hours',
         ];
 
         $keyword = $request->search['value'] ?? "";
@@ -146,6 +147,8 @@ class FuelConsumptionController extends Controller
                 $data['price'] = str_replace('.', '', $data['price']);
                 $data['loadsheet'] = str_replace('.', '', $data['loadsheet']);
                 $data['liter'] = str_replace('.', '', $data['liter']);
+                $data['hours'] = str_replace('.', '', $data['hours']);
+
                 $data["asset_id"] = crypt::decrypt($data["asset_id"]);
                 $data["management_project_id"] = crypt::decrypt($data["management_project_id"]);
                 $data["user_id"] = crypt::decrypt($data["user_id"]);
