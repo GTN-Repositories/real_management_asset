@@ -626,115 +626,6 @@
                 });
         }
 
-        document.getElementById('formNotes').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const form = event.target;
-            const formData = new FormData(form);
-            const url = form.action;
-
-            fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.errors) {
-                        let errorMessages = '';
-                        for (const [field, messages] of Object.entries(data.errors)) {
-                            errorMessages += messages.join('<br>') + '<br>';
-                        }
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            html: errorMessages
-                        });
-                    } else if (!data.status) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: data.message
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: data.message
-                        }).then(() => {
-                            $('#modal-ce').modal('hide');
-                            window.location.reload();
-                        });
-                    }
-                })
-                .catch(error => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Something went wrong!'
-                    });
-                });
-        });
-
-        document.getElementById('formAttachment').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const form = event.target;
-            const formData = new FormData(form);
-            const url = form.action;
-
-            fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.errors) {
-                        let errorMessages = '';
-                        for (const [field, messages] of Object.entries(data.errors)) {
-                            errorMessages += messages.join('<br>') + '<br>';
-                        }
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            html: errorMessages
-                        });
-                    } else if (!data.status) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: data.message
-                        })
-                    } else {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: data.message
-                        }).then(() => {
-                            $("#modal-ce").modal("hide");
-
-                            $('#data-table').DataTable().ajax.reload();
-                        });
-                    }
-                })
-                .catch(error => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Something went wrong!'
-                    });
-                });
-        });
-
         function loadAppreciationChart(assetId) {
             $.ajax({
                 url: "{{ route('asset.appreciation-data') }}",
@@ -887,5 +778,118 @@
                 }
             });
         }
+    </script>
+    <script>
+        document.getElementById('formNotes').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const url = form.action;
+
+            fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.errors) {
+                        let errorMessages = '';
+                        for (const [field, messages] of Object.entries(data.errors)) {
+                            errorMessages += messages.join('<br>') + '<br>';
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            html: errorMessages
+                        });
+                    } else if (!data.status) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.message
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: data.message
+                        }).then(() => {
+                            $('#modal-ce').modal('hide');
+
+                            $('#data-table-note').DataTable().ajax.reload();
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!'
+                    });
+                });
+        });
+    </script>
+
+    <script>
+        document.getElementById('formAttachment').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const url = form.action;
+
+            fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.errors) {
+                        let errorMessages = '';
+                        for (const [field, messages] of Object.entries(data.errors)) {
+                            errorMessages += messages.join('<br>') + '<br>';
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            html: errorMessages
+                        });
+                    } else if (!data.status) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.message
+                        })
+                    } else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: data.message
+                        }).then(() => {
+                            $("#modal-ce").modal("hide");
+
+                            $('#data-table-attachment').DataTable().ajax.reload();
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!'
+                    });
+                });
+        });
     </script>
 @endpush

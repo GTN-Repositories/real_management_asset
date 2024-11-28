@@ -21,4 +21,6 @@ class AssetCategory extends Model
 
         return self::findOrFail($decryptedId);
     }
+
+    
 }
