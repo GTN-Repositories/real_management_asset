@@ -11,7 +11,7 @@ class FuelConsumption extends Model
 {
     //
     protected $guarded = ['id'];
-    protected $table = 'fuel_consumptions'; 
+    protected $table = 'fuel_consumptions';
 
     public function getIdAttribute()
     {
@@ -40,8 +40,8 @@ class FuelConsumption extends Model
         return $this->belongsTo(Asset::class, 'asset_id', 'id');
     }
 
-    public function user(): BelongsTo
+    public function employee(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(Employee::class, 'user_id', 'id');
     }
 }

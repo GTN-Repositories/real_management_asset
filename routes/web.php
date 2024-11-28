@@ -9,11 +9,13 @@ use App\Http\Controllers\Main\CategoryController;
 use App\Http\Controllers\Main\CategoryItemController;
 use App\Http\Controllers\Main\CustomerController;
 use App\Http\Controllers\Main\DriverProjectController;
+use App\Http\Controllers\Main\EmployeeController;
 use App\Http\Controllers\Main\FormController;
 use App\Http\Controllers\Main\FuelConsumptionController;
 use App\Http\Controllers\Main\InspectionScheduleController;
 use App\Http\Controllers\Main\IpbController;
 use App\Http\Controllers\Main\ItemController;
+use App\Http\Controllers\Main\JobTitleController;
 use App\Http\Controllers\Main\LocationController;
 use App\Http\Controllers\Main\LogActivityController;
 use App\Http\Controllers\Main\ManagementProjectController;
@@ -151,6 +153,12 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/monitoring/data', [MonitoringController::class, 'data'])->name('monitoring.data');
     Route::delete('/monitoring/destroy-all', [MonitoringController::class, 'destroyAll'])->name('monitoring.destroyAll');
     Route::resource('monitoring', MonitoringController::class);
+
+    Route::get('/employee/data', [EmployeeController::class, 'data'])->name('employee.data');
+    Route::delete('/employee/destroy-all', [EmployeeController::class, 'destroyAll'])->name('employee.destroyAll');
+    Route::resource('employee', EmployeeController::class);
+
+    Route::get('/job-title/data', [JobTitleController::class, 'data'])->name('job-title.data');
 
     Route::get('/status-asset/data', [StatusAssetController::class, 'data'])->name('status-asset.data');
 

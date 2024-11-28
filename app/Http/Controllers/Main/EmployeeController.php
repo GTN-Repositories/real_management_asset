@@ -3,17 +3,16 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
-use App\Models\FuelConsumption;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
-class FuelConsumptionController extends Controller
+class EmployeeController extends Controller
 {
     //
-
     public function index()
     {
-        return view('main.fuel_consumtion.index');
+        return view('main.employee.index');
     }
 
     public function data(Request $request)
@@ -41,51 +40,19 @@ class FuelConsumptionController extends Controller
             ->addColumn('relationId', function ($data) {
                 return $data->id ?? null;
             })
-            ->addColumn('management_project_id', function ($data) {
-                return $data->management_project->name ?? null;
+            ->addColumn('name', function ($data) {
+                return $data->name ?? null;
             })
-            ->addColumn('asset_id', function ($data) {
-                return $data->asset->name . ' - ' . $data->asset->asset_number ?? null;
-            })
-            ->addColumn('user_id', function ($data) {
-                return $data->employee->name ?? null;
-            })
-            ->addColumn('date', function ($data) {
-                return $data->date ?? null;
-            })
-            ->addColumn('loadsheet', function ($data) {
-                return number_format($data->loadsheet, 0, ',', '.') ?? null;
-            })
-            ->addColumn('liter', function ($data) {
-                return number_format($data->liter, 0, ',', '.') . ' liter' ?? null;
-            })
-            ->addColumn('price', function ($data) {
-                return 'Rp. ' . number_format($data->price, 0, ',', '.') ?? null;
-            })
-            ->addColumn('category', function ($data) {
-                return $data->category ?? null;
+            ->addColumn('job_title', function ($data) {
+                return $data->jobTitle->name ?? null;
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
-                if (auth()->user()->hasPermissionTo('fuel-edit')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
-                }
-                if (auth()->user()->hasPermissionTo('fuel-delete')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
-                }
+                $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
                 $btn .= '</div>';
 
                 return $btn;
-            })
-            ->addColumn('literDashboard', function ($data) {
-                $liter = $data->liter ?? null;
-                if (session('selected_project_id')) {
-                    $selectedProjectId = Crypt::decrypt(session('selected_project_id'));
-                    if ($data->management_project_id == $selectedProjectId) {
-                        return $liter;
-                    }
-                }
-                return $liter;
             })
             ->escapeColumns([])
             ->make(true);
@@ -95,20 +62,14 @@ class FuelConsumptionController extends Controller
     {
         $columns = [
             'id',
-            'management_project_id',
-            'asset_id',
-            'user_id',
-            'date',
-            'loadsheet',
-            'liter',
-            'price',
-            'category',
+            'job_title_id',
+            'name',
         ];
 
         $keyword = $request->search['value'] ?? "";
         // $project_id = $this->projectId();
 
-        $data = FuelConsumption::orderBy('created_at', 'asc')
+        $data = Employee::orderBy('created_at', 'asc')
             ->select($columns)
             // ->whereIn($project_id)
             ->where(function ($query) use ($keyword, $columns) {
@@ -119,19 +80,13 @@ class FuelConsumptionController extends Controller
                 }
             });
 
-        if (session('selected_project_id')) {
-            $data->whereHas('management_project', function ($q) {
-                $q->where('id', Crypt::decrypt(session('selected_project_id')));
-            });
-        }
-
         return $data;
     }
 
 
     public function create()
     {
-        return view('main.fuel_consumtion.create');
+        return view('main.employee.create');
     }
 
     /**
@@ -143,13 +98,8 @@ class FuelConsumptionController extends Controller
 
         try {
             return $this->atomic(function () use ($data) {
-                $data['price'] = str_replace('.', '', $data['price']);
-                $data['loadsheet'] = str_replace('.', '', $data['loadsheet']);
-                $data['liter'] = str_replace('.', '', $data['liter']);
-                $data["asset_id"] = crypt::decrypt($data["asset_id"]);
-                $data["management_project_id"] = crypt::decrypt($data["management_project_id"]);
-                $data["user_id"] = crypt::decrypt($data["user_id"]);
-                $data = FuelConsumption::create($data);
+                $data['job_title_id'] = Crypt::decrypt($data['job_title_id']);
+                $data = Employee::create($data);
 
                 return response()->json([
                     'status' => true,
@@ -176,13 +126,11 @@ class FuelConsumptionController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
+        $data = Employee::findByEncryptedId($id);
 
-        $decryptedId = Crypt::decrypt($id);
-        $data = FuelConsumption::findOrFail($decryptedId);
-
-        return view('main.fuel_consumtion.edit', compact('data'));
+        return view('main.employee.edit', compact('data'));
     }
 
 
@@ -195,19 +143,8 @@ class FuelConsumptionController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id) {
-                $data['price'] = str_replace('.', '', $data['price']);
-                $data['loadsheet'] = str_replace('.', '', $data['loadsheet']);
-                $data['liter'] = str_replace('.', '', $data['liter']);
-                try {
-                    $data["management_project_id"] = Crypt::decrypt($data["management_project_id"]);
-                    $data["asset_id"] = crypt::decrypt($data["asset_id"]);
-                    $data["user_id"] = crypt::decrypt($data["user_id"]);
-                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-                    $data["management_project_id"] = $data["management_project_id"];
-                    $data["asset_id"] = $data["asset_id"];
-                    $data["user_id"] = crypt::decrypt($data["user_id"]);
-                }
-                $data = FuelConsumption::findByEncryptedId($id)->update($data);
+                $data['job_title_id'] = Crypt::decrypt($data['job_title_id']);
+                $data = Employee::findByEncryptedId($id)->update($data);
 
                 return response()->json([
                     'status' => true,
@@ -228,7 +165,7 @@ class FuelConsumptionController extends Controller
     public function destroy($id)
     {
         try {
-            $data = FuelConsumption::findByEncryptedId($id);
+            $data = Employee::findByEncryptedId($id);
             $data->delete();
 
             return response()->json([
@@ -253,7 +190,7 @@ class FuelConsumptionController extends Controller
                     $decryptedIds[] = Crypt::decrypt($encryptedId);
                 }
 
-                $delete = FuelConsumption::whereIn('id', $decryptedIds)->delete();
+                $delete = Employee::whereIn('id', $decryptedIds)->delete();
 
                 return response()->json([
                     'status' => true,
