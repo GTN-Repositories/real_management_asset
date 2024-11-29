@@ -16,4 +16,15 @@ class Helper
     {
         return Crypt::encrypt($value);
     }
+
+    public static function statusPettyCash($value)
+    {
+        if ($value == 1) {
+            return 'Process';
+        } else if ($value == 2) {
+            return 'Approve';
+        } else if ($value == 3) {
+            return 'Reject';
+        }
+    }
 }

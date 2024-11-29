@@ -48,4 +48,9 @@ class ManagementProject extends Model
             'id' // Local key on assets table
         );
     }
+
+    public function pettyCash()
+    {
+        return $this->hasMany(PettyCash::class);
+    }
 }
