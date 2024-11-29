@@ -64,6 +64,8 @@
     </div>
 </form>
 
+
+
 @include('components.select2_js')
 
 <script>

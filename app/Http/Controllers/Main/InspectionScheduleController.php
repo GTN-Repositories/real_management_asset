@@ -77,12 +77,20 @@ class InspectionScheduleController extends Controller
 
                 $decryptedItemIds = [];
                 $itemStocks = [];
+                $kanibalStocks = [];
                 if (isset($data['selected_items'])) {
                     foreach ($data['selected_items'] as $encryptedItemId) {
                         try {
                             $decryptedItemId = Crypt::decrypt($encryptedItemId['id']);
                             $decryptedItemIds[] = $decryptedItemId;
-                            $itemStocks[$decryptedItemId] = $encryptedItemId['stock'];
+
+                            if (isset($encryptedItemId['item_stock'])) {
+                                $itemStocks[$decryptedItemId] = $encryptedItemId['item_stock'];
+                            }
+
+                            if (isset($encryptedItemId['kanibal_stock'])) {
+                                $kanibalStocks[$decryptedItemId] = $encryptedItemId['kanibal_stock'];
+                            }
                         } catch (\Exception $e) {
                             continue;
                         }
@@ -97,13 +105,17 @@ class InspectionScheduleController extends Controller
                     'note' => $data['note'],
                     'item_id' => json_encode($decryptedItemIds) ?? null,
                     'item_stock' => json_encode($itemStocks) ?? null,
+                    'kanibal_stock' => json_encode($kanibalStocks) ?? null,
                     'asset_kanibal_id' => $asset_kanibal_id,
                 ]);
 
                 foreach ($decryptedItemIds as $itemId) {
                     $item = Item::findOrFail($itemId);
-                    $item->decrement('stock', $itemStocks[$itemId]);
-                }
+
+                    if (isset($itemStocks[$itemId])) {
+                        $item->decrement('stock', $itemStocks[$itemId]);
+                    }
+                };
 
                 return response()->json([
                     'status' => true,
@@ -126,9 +138,11 @@ class InspectionScheduleController extends Controller
 
             $itemIds = json_decode($data->item_id, true) ?? [];
             $itemStocks = json_decode($data->item_stock, true) ?? [];
+            $kanibalStocks = json_decode($data->kanibal_stock, true) ?? [];
 
-            $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemStocks) {
+            $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemStocks, $kanibalStocks) {
                 $item->stock_in_schedule = $itemStocks[$item->id] ?? 1;
+                $item->kanibal_stock_in_schedule = $kanibalStocks[$item->id] ?? 0;
                 return $item;
             });
             return view('main.inspection_schedule.edit', compact('data', 'items'));
@@ -183,7 +197,7 @@ class InspectionScheduleController extends Controller
                     $removedItem = Item::findOrFail($removedItemId);
                     $removedItem->increment('stock', $previousStocks[$removedItemId]);
                 }
-                
+
                 $schedule->update($data);
 
                 return response()->json([
