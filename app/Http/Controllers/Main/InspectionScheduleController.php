@@ -73,11 +73,11 @@ class InspectionScheduleController extends Controller
         try {
             return $this->atomic(function () use ($data, $request) {
                 $asset_id = Crypt::decrypt($data['asset_id']);
-                $asset_kanibal_id = isset($data['asset_kanibal_id']) ? Crypt::decrypt($data['asset_kanibal_id']) : null;
 
                 $decryptedItemIds = [];
                 $itemStocks = [];
                 $kanibalStocks = [];
+                $assetKanibalIds = [];
                 if (isset($data['selected_items'])) {
                     foreach ($data['selected_items'] as $encryptedItemId) {
                         try {
@@ -90,6 +90,10 @@ class InspectionScheduleController extends Controller
 
                             if (isset($encryptedItemId['kanibal_stock'])) {
                                 $kanibalStocks[$decryptedItemId] = $encryptedItemId['kanibal_stock'];
+                            }
+
+                            if (isset($encryptedItemId['asset_kanibal_id'])) {
+                                $assetKanibalIds[$decryptedItemId] = Crypt::decrypt($encryptedItemId['asset_kanibal_id']);
                             }
                         } catch (\Exception $e) {
                             continue;
@@ -106,7 +110,7 @@ class InspectionScheduleController extends Controller
                     'item_id' => json_encode($decryptedItemIds) ?? null,
                     'item_stock' => json_encode($itemStocks) ?? null,
                     'kanibal_stock' => json_encode($kanibalStocks) ?? null,
-                    'asset_kanibal_id' => $asset_kanibal_id,
+                    'asset_kanibal_id' => json_encode($assetKanibalIds) ?? null,
                 ]);
 
                 foreach ($decryptedItemIds as $itemId) {
@@ -139,6 +143,7 @@ class InspectionScheduleController extends Controller
             $itemIds = json_decode($data->item_id, true) ?? [];
             $itemStocks = json_decode($data->item_stock, true) ?? [];
             $kanibalStocks = json_decode($data->kanibal_stock, true) ?? [];
+            $assetKanibalIds = json_decode($data->asset_kanibal_id, true) ?? [];
 
             $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemStocks, $kanibalStocks) {
                 $itemId = (string) $item->id;
@@ -147,7 +152,7 @@ class InspectionScheduleController extends Controller
                 return $item;
             });
 
-            return view('main.inspection_schedule.edit', compact('data', 'items'));
+            return view('main.inspection_schedule.edit', compact('data', 'items', 'assetKanibalIds'));
         } catch (\Exception $e) {
             return back()->with('error', 'Error loading data: ' . $e->getMessage());
         }
