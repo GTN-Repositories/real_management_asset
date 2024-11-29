@@ -43,14 +43,14 @@ class CategoryItemController extends Controller
                 return $data->description ?? null;
             })
             ->addColumn('created_at', function ($data) {
-                return $data->created_at->format('d-m-Y');
+                return $data->created_at->format('d-m-Y') ?? null;
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
                 $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
                 $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
                 $btn .= '</div>';
-            
+
                 return $btn;
             })
             ->escapeColumns([])
@@ -97,7 +97,7 @@ class CategoryItemController extends Controller
         try {
             return $this->atomic(function () use ($data) {
                 $data = CategoryItem::create($data);
-                
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Data berhasil ditambahkan!',
