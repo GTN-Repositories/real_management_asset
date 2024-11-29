@@ -63,6 +63,7 @@
                     <th>Nama</th>
                     <th>Stok Normal</th>
                     <th>Stok Kanibal</th>
+                    <th>Asset Kanibal ID</th>
                 </tr>
             </thead>
             <tbody>
@@ -77,6 +78,9 @@
                         <td>
                             <input type="number" class="form-control kanibal-stock" data-item-id="{{ $item->id }}"
                                 value="{{ $item->kanibal_stock_in_schedule }}" readonly>
+                        </td>
+                        <td>
+                            {{ $assetKanibalIds[$item->id] ?? '-' }}
                         </td>
                     </tr>
                 @endforeach
@@ -103,6 +107,7 @@
         @php
             $existingItemStocks = json_decode($data->item_stock ?? '{}', true) ?? [];
             $existingKanibalStocks = json_decode($data->kanibal_stock ?? '{}', true) ?? [];
+            $existingAssetKanibalIds = json_decode($data->asset_kanibal_id ?? '{}', true) ?? [];
         @endphp
         @foreach ($items as $item)
             {
@@ -111,6 +116,7 @@
                 code: "{{ $item->code }}",
                 stock: {{ $existingItemStocks[Crypt::decrypt($item->id)] ?? 0 }},
                 kanibalStock: {{ $existingKanibalStocks[Crypt::decrypt($item->id)] ?? 0 }},
+                assetKanibalId: {{ $existingAssetKanibalIds[Crypt::decrypt($item->id)] ?? null }},
             },
         @endforeach
     ];
@@ -123,25 +129,29 @@
             selectedItems.forEach(function(item) {
                 tableBody.append(
                     `<tr>
-                    <td>${item.code}</td>
-                    <td>${item.name}</td>
-                    <td>
-                        <input type="number" class="form-control item-stock"
-                            data-item-id="${item.id}"
-                            value="${item.stock}" readonly>
-                    </td>
-                    <td>
-                        <input type="number" class="form-control kanibal-stock"
-                            data-item-id="${item.id}"
-                            value="${item.kanibalStock}" readonly>
-                    </td>
-                </tr>`
+                <td>${item.code}</td>
+                <td>${item.name}</td>
+                <td>
+                    <input type="number" class="form-control item-stock"
+                        data-item-id="${item.id}"
+                        value="${item.stock}" readonly>
+                </td>
+                <td>
+                    <input type="number" class="form-control kanibal-stock"
+                        data-item-id="${item.id}"
+                        value="${item.kanibalStock}" readonly>
+                </td>
+                <td>
+                    ${item.assetKanibalId ?? '-'}
+                </td>
+            </tr>`
                 );
             });
         }
 
         updateSelectedItemsTable();
     })
+
 
     $(document).ready(function() {
         $('#asset_id').select2({
