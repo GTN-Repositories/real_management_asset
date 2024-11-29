@@ -77,12 +77,20 @@ class InspectionScheduleController extends Controller
 
                 $decryptedItemIds = [];
                 $itemStocks = [];
+                $kanibalStocks = [];
                 if (isset($data['selected_items'])) {
                     foreach ($data['selected_items'] as $encryptedItemId) {
                         try {
                             $decryptedItemId = Crypt::decrypt($encryptedItemId['id']);
                             $decryptedItemIds[] = $decryptedItemId;
-                            $itemStocks[$decryptedItemId] = $encryptedItemId['stock'];
+
+                            if (isset($encryptedItemId['item_stock'])) {
+                                $itemStocks[$decryptedItemId] = $encryptedItemId['item_stock'];
+                            }
+
+                            if (isset($encryptedItemId['kanibal_stock'])) {
+                                $kanibalStocks[$decryptedItemId] = $encryptedItemId['kanibal_stock'];
+                            }
                         } catch (\Exception $e) {
                             continue;
                         }
@@ -97,13 +105,17 @@ class InspectionScheduleController extends Controller
                     'note' => $data['note'],
                     'item_id' => json_encode($decryptedItemIds) ?? null,
                     'item_stock' => json_encode($itemStocks) ?? null,
+                    'kanibal_stock' => json_encode($kanibalStocks) ?? null,
                     'asset_kanibal_id' => $asset_kanibal_id,
                 ]);
 
                 foreach ($decryptedItemIds as $itemId) {
                     $item = Item::findOrFail($itemId);
-                    $item->decrement('stock', $itemStocks[$itemId]);
-                }
+
+                    if (isset($itemStocks[$itemId])) {
+                        $item->decrement('stock', $itemStocks[$itemId]);
+                    }
+                };
 
                 return response()->json([
                     'status' => true,
@@ -126,11 +138,15 @@ class InspectionScheduleController extends Controller
 
             $itemIds = json_decode($data->item_id, true) ?? [];
             $itemStocks = json_decode($data->item_stock, true) ?? [];
+            $kanibalStocks = json_decode($data->kanibal_stock, true) ?? [];
 
-            $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemStocks) {
-                $item->stock_in_schedule = $itemStocks[$item->id] ?? 1;
+            $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemStocks, $kanibalStocks) {
+                $itemId = (string) $item->id;
+                $item->stock_in_schedule = isset($itemStocks[$itemId]) ? $itemStocks[$itemId] : 1;
+                $item->kanibal_stock_in_schedule = isset($kanibalStocks[$itemId]) ? $kanibalStocks[$itemId] : 0;
                 return $item;
             });
+
             return view('main.inspection_schedule.edit', compact('data', 'items'));
         } catch (\Exception $e) {
             return back()->with('error', 'Error loading data: ' . $e->getMessage());
@@ -143,52 +159,13 @@ class InspectionScheduleController extends Controller
             return $this->atomic(function () use ($request, $id) {
                 $schedule = InspectionSchedule::findByEncryptedId($id);
 
-                $data = $request->all();
+                $data = $request->only(['status', 'note']);
 
-                $data['asset_id'] = Crypt::decrypt($data['asset_id']);
-                $data['asset_kanibal_id'] = isset($data['asset_kanibal_id']) ? Crypt::decrypt($data['asset_kanibal_id']) : null;
-
-                $decryptedItemIds = [];
-                $itemStocks = [];
-
-
-                if (isset($data['selected_items'])) {
-                    foreach ($data['selected_items'] as $encryptedItemId) {
-                        try {
-                            $decryptedItemId = Crypt::decrypt($encryptedItemId['id']);
-                            $decryptedItemIds[] = $decryptedItemId;
-                            $itemStocks[$decryptedItemId] = $encryptedItemId['stock'];
-                        } catch (\Exception $e) {
-                            continue;
-                        }
-                    }
-                }
-
-                $data['item_id'] = json_encode($decryptedItemIds);
-                $data['item_stock'] = json_encode($itemStocks);
-
-                $previousStocks = json_decode($schedule->item_stock, true) ?? [];
-                foreach ($decryptedItemIds as $itemId) {
-                    $item = Item::findOrFail($itemId);
-                    $previousStock = $previousStocks[$itemId] ?? 0;
-                    $currentStock = $itemStocks[$itemId];
-
-                    if ($previousStock !== $currentStock) {
-                        $item->decrement('stock', $currentStock - $previousStock);
-                    }
-                }
-
-                $removedItemIds = array_diff(array_keys($previousStocks), $decryptedItemIds);
-                foreach ($removedItemIds as $removedItemId) {
-                    $removedItem = Item::findOrFail($removedItemId);
-                    $removedItem->increment('stock', $previousStocks[$removedItemId]);
-                }
-                
                 $schedule->update($data);
 
                 return response()->json([
                     'status' => true,
-                    'message' => 'Data berhasil diperbarui!',
+                    'message' => 'Status berhasil diperbarui!',
                 ]);
             });
         } catch (\Throwable $th) {

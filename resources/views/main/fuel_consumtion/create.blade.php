@@ -45,9 +45,14 @@
         <input type="text" id="price" name="price" class="form-control" placeholder="Masukkan harga"
             required />
     </div>
-    <div class="col-12 col-md-12">
+    <div class="col-12 col-md-6">
         <label class="form-label" for="category">Kategori<span class="text-danger">*</span></label>
         <input type="text" id="category" name="category" class="form-control" placeholder="Masukkan kategori"
+            required />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="hours">Jam Kerja<span class="text-danger">*</span></label>
+        <input type="text" id="hours" name="hours" class="form-control" placeholder="Masukkan jam kerja"
             required />
     </div>
     <div class="col-12 text-center">
@@ -167,7 +172,7 @@
         });
     })
 
-    $(document).on('input', '#price, #loadsheet, #liter', function() {
+    $(document).on('input', '#price, #loadsheet, #liter, #hours', function() {
         value = formatCurrency($(this).val());
         $(this).val(value);
     });

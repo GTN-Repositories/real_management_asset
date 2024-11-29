@@ -47,10 +47,15 @@
         <input type="text" id="price" name="price" class="form-control" placeholder="Masukkan harga" required
             value="{{ $data->price }}" />
     </div>
-    <div class="col-12 col-md-12">
+    <div class="col-12 col-md-6">
         <label class="form-label" for="category">Kategori<span class="text-danger">*</span></label>
         <input type="text" id="category" name="category" class="form-control" placeholder="Masukkan kategori"
             required value="{{ $data->category }}" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="hours">Jam Kerja<span class="text-danger">*</span></label>
+        <input type="text" id="hours" name="hours" class="form-control" placeholder="Masukkan jam kerja"
+            required value="{{ $data->hours }}" />
     </div>
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
@@ -58,6 +63,8 @@
             aria-label="Close">Cancel</button>
     </div>
 </form>
+
+
 
 @include('components.select2_js')
 
@@ -202,7 +209,7 @@
         $('#user_id').append(option).trigger('change');
     }
 
-    $(document).on('input', '#price, #loadsheet, #liter', function() {
+    $(document).on('input', '#price, #loadsheet, #liter, #hours', function() {
         value = formatCurrency($(this).val());
         $(this).val(value);
     });
