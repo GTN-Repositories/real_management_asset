@@ -39,6 +39,12 @@
     </div>
 
     <div class="col-12 col-md-12">
+        <label class="form-label" for="alias">Catatan</label>
+        <textarea name="note" id="note" cols="30" rows="6" class="form-control" placeholder="Deskripsi"
+            readonly>{{ old('note', $data->note) }}</textarea>
+    </div>
+
+    <div class="col-12 col-md-12">
         <label for="exampleFormControlSelect1" class="form-label">Status</label>
         <select class="form-select select2" id="exampleFormControlSelect1" name="status" aria-label="Select Status">
             <option value="scheduled" {{ $data->status == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
@@ -89,10 +95,25 @@
     </div>
 
     <div class="col-12 col-md-12">
-        <label class="form-label" for="alias">Catatan</label>
-        <textarea name="note" id="editor" cols="30" rows="10" class="form-control"
-            placeholder="Masukkan Deskripsi">{{ old('note', $data->note) }}</textarea>
+        <label class="form-label" for="alias">Komentar</label>
+        <textarea name="comment" id="editor" cols="30" rows="10" class="form-control"
+            placeholder="Masukkan Komentar"></textarea>
     </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Komentar</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($comments as $comment)
+                <tr>
+                    <td>{{ strip_tags($comment->comment) }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-2">Simpan</button>
@@ -102,6 +123,19 @@
 </form>
 
 @include('components.select2_js')
+<script>
+    CKEDITOR.replace('editor', {
+        language: 'id', // Indonesian language
+        height: 300,
+        toolbar: [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList'],
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
+            ['Link', 'Unlink'],
+            ['Undo', 'Redo']
+        ]
+    });
+</script>
 <script type="text/javascript">
     let selectedItems = [
         @php
@@ -185,6 +219,8 @@
 
         const form = event.target;
         const formData = new FormData(form);
+
+        CKEDITOR.instances.editor.updateElement();
 
         selectedItems.forEach((item, index) => {
             formData.append(`selected_items[${index}][id]`, item.id);
