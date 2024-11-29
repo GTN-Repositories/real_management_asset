@@ -33,7 +33,7 @@
         <label for="asset_id" class="form-label">Plat Nomor</label>
         <select id="asset_id" class="form-select form-select-lg" name="asset_id" disabled>
             @if ($data->asset)
-                <option value="{{ encrypt($data->asset_id) }}" selected>{{ $data->asset->name }}</option>
+                <option value="{{ encrypt($data->asset_id) }}" selected>{{ $data->asset->name . ' - ' . $data->asset->asset_number }}</option>
             @endif
         </select>
     </div>
@@ -69,7 +69,7 @@
                     <th>Nama</th>
                     <th>Stok Normal</th>
                     <th>Stok Kanibal</th>
-                    <th>Asset Kanibal ID</th>
+                    <th>Asset Kanibal</th>
                 </tr>
             </thead>
             <tbody>
@@ -151,6 +151,7 @@
                 stock: {{ $existingItemStocks[Crypt::decrypt($item->id)] ?? 0 }},
                 kanibalStock: {{ $existingKanibalStocks[Crypt::decrypt($item->id)] ?? 0 }},
                 assetKanibalId: {{ $existingAssetKanibalIds[Crypt::decrypt($item->id)] ?? null }},
+                assetKanibalName: "{{ $existingAssetKanibalIds[Crypt::decrypt($item->id)] ? \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->name . ' - ' . \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->asset_number : '-' }}",
             },
         @endforeach
     ];
@@ -176,7 +177,7 @@
                         value="${item.kanibalStock}" readonly>
                 </td>
                 <td>
-                    ${item.assetKanibalId ?? '-'}
+                    ${item.assetKanibalName}
                 </td>
             </tr>`
                 );
@@ -203,7 +204,7 @@
                 processResults: function(data) {
                     return {
                         results: data.data.map(item => ({
-                            text: item.name,
+                            text: item.nameWithNumber,
                             id: item.relationId,
                         }))
                     };
