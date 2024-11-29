@@ -282,6 +282,8 @@
 
         selectedItems.forEach((item, index) => {
             formData.append(`selected_items[${index}][id]`, item.id);
+            const assetKanibalId = $(`#asset_kanibal_id_${item.id}`).val();
+            formData.append(`selected_items[${index}][asset_kanibal_id]`, assetKanibalId);
             if (item.jenisMetode === 'stock') {
                 formData.append(`selected_items[${index}][item_stock]`, item.stock);
             } else if (item.jenisMetode === 'kanibal') {
