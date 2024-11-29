@@ -171,10 +171,12 @@ class InspectionScheduleController extends Controller
 
                 $schedule->update($data);
 
-                $comment = InspectionComment::create([
-                    'inspection_schedule_id' => Crypt::decrypt($schedule->id),
-                    'comment' => $data['comment'],
-                ]);
+                if (isset($data['comment'])) {
+                    $comment = InspectionComment::create([
+                        'inspection_schedule_id' => Crypt::decrypt($schedule->id),
+                        'comment' => $data['comment'],
+                    ]);
+                }
 
                 return response()->json([
                     'status' => true,
