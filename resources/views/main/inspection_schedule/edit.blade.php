@@ -12,18 +12,18 @@
     <div class="col-12 col-md-12">
         <label class="form-label">Judul Maintenance</label>
         <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" value="{{ old('name', $data->name) }}" required />
+            placeholder="Masukan Nama Item" value="{{ old('name', $data->name) }}" required readonly />
     </div>
 
     <div class="col-12 col-md-6">
         <label class="form-label">Tanggal</label>
         <input type="date" name="date" id="date" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Tanggal" value="{{ old('date', $data->date) }}" required />
+            placeholder="Masukan Tanggal" value="{{ old('date', $data->date) }}" required readonly />
     </div>
 
     <div class="col-12 col-md-6">
         <label for="exampleFormControlSelect1" class="form-label">Jenis Maintenance</label>
-        <select class="form-select" id="exampleFormControlSelect1" name="type" aria-label="Select Type">
+        <select class="form-select" id="exampleFormControlSelect1" name="type" aria-label="Select Type" disabled>
             <option value="p2h" {{ $data->type == 'p2h' ? 'selected' : '' }}>P2H</option>
             <option value="pm" {{ $data->type == 'pm' ? 'selected' : '' }}>PM</option>
         </select>
@@ -31,7 +31,7 @@
 
     <div class="col-12" id="selectAsset">
         <label for="asset_id" class="form-label">Plat Nomor</label>
-        <select id="asset_id" class="form-select form-select-lg" name="asset_id">
+        <select id="asset_id" class="form-select form-select-lg" name="asset_id" disabled>
             @if ($data->asset)
                 <option value="{{ encrypt($data->asset_id) }}" selected>{{ $data->asset->name }}</option>
             @endif
@@ -39,38 +39,55 @@
     </div>
 
     <div class="col-12 col-md-12">
-        <label class="form-label" for="alias">Catatan</label>
-        <textarea name="note" id="" cols="30" rows="10" class="form-control"
-            placeholder="Masukkan Deskripsi">{{ old('note', $data->note) }}</textarea>
-    </div>
-
-    <div class="col-12 col-md-12" id="jenisMetode">
-        <label for="jenis_metode" class="form-label">Jenis Penggunaan</label>
-        <select id="jenis_metode" class="select2 form-select form-select-lg" name="jenis_metode">
-            <option value="stock">Pengurangan Stock</option>
-            <option value="kanibal">Kanibal Asset Lain</option>
-        </select>
-    </div>
-
-    <div class="col-12" id="selectAssetKanibal" style="display: none">
-        <label for="asset_kanibal_id" class="form-label">Asset Yang Dipilih</label>
-        <select id="asset_kanibal_id" class="form-select form-select-lg" name="asset_kanibal_id">
+        <label for="exampleFormControlSelect1" class="form-label">Status</label>
+        <select class="form-select select2" id="exampleFormControlSelect1" name="status" aria-label="Select Status">
+            <option value="scheduled" {{ $data->status == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+            <option value="in_progress" {{ $data->status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+            <option value="on_hold" {{ $data->status == 'on_hold' ? 'selected' : '' }}>On Hold</option>
+            <option value="finish" {{ $data->status == 'finish' ? 'selected' : '' }}>Finish</option>
         </select>
     </div>
 
     <div class="col-12 col-md-12" id="selectItem">
         <label for="item_id" class="form-label">Sparepart</label>
-        <select id="item_id" class="form-select form-select-lg" name="item_id">
+        <select id="item_id" class="form-select form-select-lg" name="item_id" disabled>
         </select>
     </div>
 
     <div class="col-12 mt-3" id="selectedItemsContainer">
         <label class="form-label">Item yang Dipilih:</label>
         <table class="table" id="selectedItemsTable">
+            <thead>
+                <tr>
+                    <th>Kode</th>
+                    <th>Nama</th>
+                    <th>Stok Normal</th>
+                    <th>Stok Kanibal</th>
+                </tr>
+            </thead>
             <tbody>
+                @foreach ($items as $item)
+                    <tr>
+                        <td>{{ $item->code }}</td>
+                        <td>{{ $item->name }}</td>
+                        <td>
+                            <input type="number" class="form-control item-stock" data-item-id="{{ $item->id }}"
+                                value="{{ $item->stock_in_schedule }}" readonly>
+                        </td>
+                        <td>
+                            <input type="number" class="form-control kanibal-stock" data-item-id="{{ $item->id }}"
+                                value="{{ $item->kanibal_stock_in_schedule }}" readonly>
+                        </td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
-        <button id="clearAllButton" class="btn btn-warning btn-sm mt-2">Clear All</button>
+    </div>
+
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="alias">Catatan</label>
+        <textarea name="note" id="editor" cols="30" rows="10" class="form-control"
+            placeholder="Masukkan Deskripsi">{{ old('note', $data->note) }}</textarea>
     </div>
 
     <div class="col-12 text-center">
@@ -81,42 +98,52 @@
 </form>
 
 @include('components.select2_js')
-
 <script type="text/javascript">
     let selectedItems = [
         @php
             $existingItemStocks = json_decode($data->item_stock ?? '{}', true) ?? [];
+            $existingKanibalStocks = json_decode($data->kanibal_stock ?? '{}', true) ?? [];
         @endphp
         @foreach ($items as $item)
             {
-                @php
-                    $decryptId = Crypt::decrypt($item->id);
-                @endphp
                 id: "{{ $item->id }}",
-                    name: "{{ $item->name }}",
-                    code: "{{ $item->code }}",
-                    part: "{{ $item->part }}",
-                    stock: {{ (int) $existingItemStocks[$decryptId] }},
-                    availableStock: {{ $item->stock }}
+                name: "{{ $item->name }}",
+                code: "{{ $item->code }}",
+                stock: {{ $existingItemStocks[Crypt::decrypt($item->id)] ?? 0 }},
+                kanibalStock: {{ $existingKanibalStocks[Crypt::decrypt($item->id)] ?? 0 }},
             },
         @endforeach
     ];
 
     $(document).ready(function() {
-        $('#jenis_metode').on('change', function() {
-            const value = $(this).val();
+        function updateSelectedItemsTable() {
+            const tableBody = $('#selectedItemsTable tbody');
+            tableBody.empty();
 
-            if (value === 'stock') {
-                $('#selectAssetKanibal').hide();
-                $('#selectItem').show();
-                $('#selectedItemsContainer').show();
-            } else if (value === 'kanibal') {
-                $('#selectAssetKanibal').show();
-                $('#selectItem').hide();
-                $('#selectedItemsContainer').hide();
-            }
-        });
+            selectedItems.forEach(function(item) {
+                tableBody.append(
+                    `<tr>
+                    <td>${item.code}</td>
+                    <td>${item.name}</td>
+                    <td>
+                        <input type="number" class="form-control item-stock"
+                            data-item-id="${item.id}"
+                            value="${item.stock}" readonly>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control kanibal-stock"
+                            data-item-id="${item.id}"
+                            value="${item.kanibalStock}" readonly>
+                    </td>
+                </tr>`
+                );
+            });
+        }
 
+        updateSelectedItemsTable();
+    })
+
+    $(document).ready(function() {
         $('#asset_id').select2({
             dropdownParent: $('#selectAsset'),
             placeholder: 'Pilih Asset',
@@ -140,145 +167,9 @@
                 cache: true
             }
         });
-
-        $('#asset_kanibal_id').select2({
-            dropdownParent: $('#selectAssetKanibal'),
-            placeholder: 'Pilih Asset',
-            ajax: {
-                url: "{{ route('asset.data') }}",
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        keyword: params.term
-                    };
-                },
-                processResults: function(data) {
-                    apiResults = data.data.reduce((unique, item) => {
-                        if (!unique.some((i) => i.text === item.name)) {
-                            unique.push({
-                                text: item.name,
-                                id: item.relationId,
-                            });
-                        }
-                        return unique;
-                    }, []);
-
-                    return {
-                        results: apiResults
-                    };
-                },
-                cache: true
-            }
-        });
-
-        $('#item_id').select2({
-            dropdownParent: $('#selectItem'),
-            placeholder: 'Pilih Sparepart',
-            ajax: {
-                url: "{{ route('item.data') }}",
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        keyword: params.term
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.data.map(item => ({
-                            text: item.name,
-                            id: item.item_id,
-                            code: item.code,
-                            part: item.part,
-                            available_stock: item.stock || 0
-                        }))
-                    };
-                },
-                cache: true
-            }
-        });
-
-        function updateSelectedItemsTable() {
-            const tableBody = $('#selectedItemsTable tbody');
-            tableBody.empty();
-
-            selectedItems.forEach(function(item) {
-                tableBody.append(
-                    `<tr>
-                <td>${item.code}</td>
-                <td>${item.name}</td>
-                <td>${item.part}</td>
-                <td>
-                    <input type="number" class="form-control item-stock"
-                        data-item-id="${item.id}"
-                        value="${item.stock}">
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm remove-item" data-item-id="${item.id}">Hapus</button>
-                </td>
-            </tr>`
-                );
-            });
-
-            $('.item-stock').on('change', function() {
-                const itemId = $(this).data('item-id');
-                const newStock = $(this).val();
-
-                selectedItems = selectedItems.map(item => {
-                    if (item.id === itemId) {
-                        item.stock = parseInt(newStock,
-                        10);
-                    }
-                    return item;
-                });
-            });
-
-            $('.remove-item').on('click', function() {
-                const itemId = $(this).data('item-id');
-                selectedItems = selectedItems.filter(item => item.id !== itemId);
-                updateSelectedItemsTable();
-            });
-        }
-
-
-        updateSelectedItemsTable();
-
-        $('#item_id').on('change', function() {
-            const itemId = $(this).val();
-            const selectedOption = $(this).select2('data')[0];
-
-            const existingItemIndex = selectedItems.findIndex(item => item.id === itemId);
-
-            if (itemId && existingItemIndex === -1) {
-                selectedItems.push({
-                    id: itemId,
-                    name: selectedOption.text,
-                    code: selectedOption.code,
-                    part: selectedOption.part,
-                    stock: 1,
-                    availableStock: selectedOption.available_stock
-                });
-                updateSelectedItemsTable();
-            }
-        });
-
-        $('#clearAllButton').on('click', function() {
-            selectedItems = [];
-            updateSelectedItemsTable();
-        });
-
-        @if ($data->asset_kanibal_id)
-            $('#asset_kanibal_id').append(new Option('{{ $data->assetKanibal->name }}',
-                '{{ encrypt($data->asset_kanibal_id) }}', true, true)).trigger('change');
-        @endif
-
-        @if ($data->asset_id)
-            $('#asset_id').append(new Option('{{ $data->asset->name }}',
-                '{{ encrypt($data->asset_id) }}', true, true)).trigger('change');
-        @endif
     });
-
+</script>
+<script>
     document.getElementById('formUpdate').addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -288,6 +179,7 @@
         selectedItems.forEach((item, index) => {
             formData.append(`selected_items[${index}][id]`, item.id);
             formData.append(`selected_items[${index}][stock]`, item.stock);
+            formData.append(`selected_items[${index}][kanibal_stock]`, item.kanibalStock);
         });
 
         const url = form.action;
