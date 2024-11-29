@@ -141,10 +141,12 @@ class InspectionScheduleController extends Controller
             $kanibalStocks = json_decode($data->kanibal_stock, true) ?? [];
 
             $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemStocks, $kanibalStocks) {
-                $item->stock_in_schedule = $itemStocks[$item->id] ?? 1;
-                $item->kanibal_stock_in_schedule = $kanibalStocks[$item->id] ?? 0;
+                $itemId = (string) $item->id;
+                $item->stock_in_schedule = isset($itemStocks[$itemId]) ? $itemStocks[$itemId] : 1;
+                $item->kanibal_stock_in_schedule = isset($kanibalStocks[$itemId]) ? $kanibalStocks[$itemId] : 0;
                 return $item;
             });
+
             return view('main.inspection_schedule.edit', compact('data', 'items'));
         } catch (\Exception $e) {
             return back()->with('error', 'Error loading data: ' . $e->getMessage());
@@ -157,52 +159,13 @@ class InspectionScheduleController extends Controller
             return $this->atomic(function () use ($request, $id) {
                 $schedule = InspectionSchedule::findByEncryptedId($id);
 
-                $data = $request->all();
-
-                $data['asset_id'] = Crypt::decrypt($data['asset_id']);
-                $data['asset_kanibal_id'] = isset($data['asset_kanibal_id']) ? Crypt::decrypt($data['asset_kanibal_id']) : null;
-
-                $decryptedItemIds = [];
-                $itemStocks = [];
-
-
-                if (isset($data['selected_items'])) {
-                    foreach ($data['selected_items'] as $encryptedItemId) {
-                        try {
-                            $decryptedItemId = Crypt::decrypt($encryptedItemId['id']);
-                            $decryptedItemIds[] = $decryptedItemId;
-                            $itemStocks[$decryptedItemId] = $encryptedItemId['stock'];
-                        } catch (\Exception $e) {
-                            continue;
-                        }
-                    }
-                }
-
-                $data['item_id'] = json_encode($decryptedItemIds);
-                $data['item_stock'] = json_encode($itemStocks);
-
-                $previousStocks = json_decode($schedule->item_stock, true) ?? [];
-                foreach ($decryptedItemIds as $itemId) {
-                    $item = Item::findOrFail($itemId);
-                    $previousStock = $previousStocks[$itemId] ?? 0;
-                    $currentStock = $itemStocks[$itemId];
-
-                    if ($previousStock !== $currentStock) {
-                        $item->decrement('stock', $currentStock - $previousStock);
-                    }
-                }
-
-                $removedItemIds = array_diff(array_keys($previousStocks), $decryptedItemIds);
-                foreach ($removedItemIds as $removedItemId) {
-                    $removedItem = Item::findOrFail($removedItemId);
-                    $removedItem->increment('stock', $previousStocks[$removedItemId]);
-                }
+                $data = $request->only(['status', 'note']);
 
                 $schedule->update($data);
 
                 return response()->json([
                     'status' => true,
-                    'message' => 'Data berhasil diperbarui!',
+                    'message' => 'Status berhasil diperbarui!',
                 ]);
             });
         } catch (\Throwable $th) {

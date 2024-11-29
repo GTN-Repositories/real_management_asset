@@ -35,7 +35,7 @@
 
     <div class="col-12 col-md-12">
         <label class="form-label" for="alias">Catatan</label>
-        <textarea name="note" id="" cols="30" rows="10" class="form-control"
+        <textarea name="note" id="editor" cols="30" rows="10" class="form-control"
             placeholder="Masukkan Deskripsi"></textarea>
     </div>
 
@@ -54,13 +54,24 @@
     </div>
 
     <div class="col-12 text-center">
-        <button type="submit" class="btn btn-primary me-sm-3 me-1">Mulai Inspeksi</button>
-        <button type="button" class="btn btn-label-secondary">Simpan</button>
+        <button type="submit" class="btn btn-primary me-sm-3 me-1">Simpan</button>
     </div>
 </form>
 
 @include('components.select2_js')
-
+<script>
+    CKEDITOR.replace('editor', {
+        language: 'id', // Indonesian language
+        height: 300,
+        toolbar: [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList'],
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
+            ['Link', 'Unlink'],
+            ['Undo', 'Redo']
+        ]
+    });
+</script>
 <script type="text/javascript">
     let selectedItems = [];
 
@@ -261,9 +272,10 @@
             }
         });
     });
-
     document.getElementById('formCreate').addEventListener('submit', function(event) {
         event.preventDefault();
+
+        CKEDITOR.instances.editor.updateElement();
 
         const form = event.target;
         const formData = new FormData(form);
