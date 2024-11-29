@@ -93,7 +93,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/customer/destroy-all', [CustomerController::class, 'destroyAll'])->name('customer.destroyAll');
     Route::resource('customer', CustomerController::class);
 
-    Route::get('/category-item/data', [CategoryItemController::class, 'editStock'])->name('category-item.data');
+    Route::get('/category-item/data', [CategoryItemController::class, 'data'])->name('category-item.data');
     Route::delete('/category-item/destroy-all', [CategoryItemController::class, 'destroyAll'])->name('category-item.destroyAll');
     Route::resource('category-item', CategoryItemController::class);
 
