@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Main;
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\ManagementProject;
+use App\Models\PettyCash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -64,6 +66,7 @@ class ManagementProjectController extends Controller
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
+                $btn .= '<a href="javascript:void(0);" class="btn btn-info btn-sm me-1" title="Detail Data" onclick="detailData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
                 if (auth()->user()->hasPermissionTo('management-edit')) {
                     $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
                 }
@@ -176,7 +179,18 @@ class ManagementProjectController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $data = ManagementProject::findByEncryptedId($id);
+        if (is_array($data->asset_id) && count($data->asset_id) > 0) {
+            $assetNames = Asset::whereIn('id', $data->asset_id)->pluck('name')->toArray();
+            $assetNumbers = Asset::whereIn('id', $data->asset_id)->pluck('asset_number')->toArray();
+            $data['asset'] = implode(', ', array_slice($assetNames, 0, 2)) . (count($assetNames) > 2 ? ', ...' : '') . ' - ' . implode(', ', array_slice($assetNumbers, 0, 2)) . (count($assetNumbers) > 2 ? ', ...' : '');
+        } else {
+            $data['asset'] = '';
+        }
+        
+        $petty_cash = PettyCash::where('project_id', Crypt::decrypt($data->id))->get();
+
+        return view('main.management_project.detail', compact('data', 'petty_cash'));
     }
 
     /**
@@ -286,6 +300,76 @@ class ManagementProjectController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Data Gagal Dihapus!',
+            ]);
+        }
+    }
+
+    public function todoRequestPettyCash()
+    {
+        $petty_cash = PettyCash::whereIn('status', [1, 3])->get();
+
+        return view('main.management_project.request_petty_cash', compact('petty_cash'));
+    }
+
+    public function requestPettyCash(Request $request)
+    {
+        $data = $request->all();
+        try {
+            return $this->atomic(function () use ($data) {
+                $data['created_by'] = Auth::user()->id;
+                $data['project_id'] = Crypt::decrypt($data['project_id']);
+                $data['status'] = 1;
+
+                $create = PettyCash::create($data);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil ditambahkan!',
+                ]);
+            });
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data gagal ditambahkan! ' . $th->getMessage(),
+            ]);
+        }
+    }
+
+
+    public function approvePettyCash(Request $request, $id)
+    {
+        $data = $request->all();
+        try {
+            return $this->atomic(function () use ($data, $id) {
+                $data['approved_by'] = Auth::user()->id;
+                $data['status'] = $data['status'];
+
+                $create = PettyCash::findByEncryptedId($id);
+                
+
+                if ($data['status'] == 2 && ($create->status == 1 || $create->status == 3)) {
+                    $project = ManagementProject::find($create->project_id);
+                    $project->petty_cash = $project->petty_cash + $create->amount;
+                    $project->save();
+                }
+
+                if ($data['status'] == 3 && $create->status == 2) {
+                    $project = ManagementProject::find($create->project_id);
+                    $project->petty_cash = $project->petty_cash - $create->amount;
+                    $project->save();
+                }
+
+                $create->update($data);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil ditambahkan!',
+                ]);
+            });
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data gagal ditambahkan! ' . $th->getMessage(),
             ]);
         }
     }

@@ -21,6 +21,9 @@
                     <i class="fas fa-plus"></i> Tambah
                 </button>
                 @endif
+                <button type="button" class="btn btn-warning btn-sm" onclick="requestPettyCash()">
+                    <i class="fas fa-dollar"></i> Request Petty Cash
+                </button>
             </div>
         </div>
         <div class="card-datatable table-responsive">
@@ -212,6 +215,34 @@
                 $('#content-modal-ce').html(data);
 
                 $("#modal-ce").modal("show");
+            })
+            .fail(function() {
+                Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
+            });
+        }
+
+        function requestPettyCash() {
+            $.ajax({
+                url: "{{ route('management-project.todoRequestPettyCash') }}",
+                type: 'GET',
+            })
+            .done(function(data) {
+                $('#content-modal-ce').html(data);
+
+                $("#modal-ce").modal("show");
+            })
+            .fail(function() {
+                Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+            });
+        }
+
+        function detailData(id) {
+            $.ajax({
+                url: "{{ route('management-project.show', ':id') }}".replace(':id', id),
+                type: 'GET',
+            })
+            .done(function(data) {
+                window.location.href = "{{ route('management-project.show', ':id') }}".replace(':id', id);
             })
             .fail(function() {
                 Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
