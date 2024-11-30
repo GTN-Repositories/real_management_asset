@@ -114,7 +114,7 @@
     </div>
 
     <div class="modal fade" id="modal-ce" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-simple">
+        <div class="modal-dialog modal-xl modal-simple">
             <div class="modal-content p-3 p-md-5">
                 <div class="modal-body" id="content-modal-ce">
 
