@@ -33,9 +33,15 @@
         <label for="asset_id" class="form-label">Plat Nomor</label>
         <select id="asset_id" class="form-select form-select-lg" name="asset_id" disabled>
             @if ($data->asset)
-                <option value="{{ encrypt($data->asset_id) }}" selected>{{ $data->asset->name }}</option>
+                <option value="{{ encrypt($data->asset_id) }}" selected>{{ $data->asset->name . ' - ' . $data->asset->asset_number }}</option>
             @endif
         </select>
+    </div>
+
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="alias">Catatan</label>
+        <textarea name="note" id="note" cols="30" rows="6" class="form-control" placeholder="Deskripsi"
+            readonly>{{ old('note', $data->note) }}</textarea>
     </div>
 
     <div class="col-12 col-md-12">
@@ -63,7 +69,7 @@
                     <th>Nama</th>
                     <th>Stok Normal</th>
                     <th>Stok Kanibal</th>
-                    <th>Asset Kanibal ID</th>
+                    <th>Asset Kanibal</th>
                 </tr>
             </thead>
             <tbody>
@@ -89,10 +95,25 @@
     </div>
 
     <div class="col-12 col-md-12">
-        <label class="form-label" for="alias">Catatan</label>
-        <textarea name="note" id="editor" cols="30" rows="10" class="form-control"
-            placeholder="Masukkan Deskripsi">{{ old('note', $data->note) }}</textarea>
+        <label class="form-label" for="alias">Komentar</label>
+        <textarea name="comment" id="editor" cols="30" rows="10" class="form-control"
+            placeholder="Masukkan Komentar"></textarea>
     </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Komentar</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($comments as $comment)
+                <tr>
+                    <td>{{ strip_tags($comment->comment) }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-2">Simpan</button>
@@ -102,6 +123,19 @@
 </form>
 
 @include('components.select2_js')
+<script>
+    CKEDITOR.replace('editor', {
+        language: 'id', // Indonesian language
+        height: 300,
+        toolbar: [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList'],
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
+            ['Link', 'Unlink'],
+            ['Undo', 'Redo']
+        ]
+    });
+</script>
 <script type="text/javascript">
     let selectedItems = [
         @php
@@ -117,6 +151,7 @@
                 stock: {{ $existingItemStocks[Crypt::decrypt($item->id)] ?? 0 }},
                 kanibalStock: {{ $existingKanibalStocks[Crypt::decrypt($item->id)] ?? 0 }},
                 assetKanibalId: {{ $existingAssetKanibalIds[Crypt::decrypt($item->id)] ?? null }},
+                assetKanibalName: "{{ $existingAssetKanibalIds[Crypt::decrypt($item->id)] ? \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->name . ' - ' . \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->asset_number : '-' }}",
             },
         @endforeach
     ];
@@ -142,7 +177,7 @@
                         value="${item.kanibalStock}" readonly>
                 </td>
                 <td>
-                    ${item.assetKanibalId ?? '-'}
+                    ${item.assetKanibalName}
                 </td>
             </tr>`
                 );
@@ -169,7 +204,7 @@
                 processResults: function(data) {
                     return {
                         results: data.data.map(item => ({
-                            text: item.name,
+                            text: item.nameWithNumber,
                             id: item.relationId,
                         }))
                     };
@@ -185,6 +220,8 @@
 
         const form = event.target;
         const formData = new FormData(form);
+
+        CKEDITOR.instances.editor.updateElement();
 
         selectedItems.forEach((item, index) => {
             formData.append(`selected_items[${index}][id]`, item.id);

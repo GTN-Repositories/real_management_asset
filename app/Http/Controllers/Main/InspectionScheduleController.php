@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Main;
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\Form;
+use App\Models\InspectionComment;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
 use App\Models\Unit;
@@ -152,7 +153,9 @@ class InspectionScheduleController extends Controller
                 return $item;
             });
 
-            return view('main.inspection_schedule.edit', compact('data', 'items', 'assetKanibalIds'));
+            $comments = InspectionComment::where('inspection_schedule_id', Crypt::decrypt($data->id))->get();
+
+            return view('main.inspection_schedule.edit', compact('data', 'items', 'comments', 'assetKanibalIds'));
         } catch (\Exception $e) {
             return back()->with('error', 'Error loading data: ' . $e->getMessage());
         }
@@ -164,9 +167,16 @@ class InspectionScheduleController extends Controller
             return $this->atomic(function () use ($request, $id) {
                 $schedule = InspectionSchedule::findByEncryptedId($id);
 
-                $data = $request->only(['status', 'note']);
+                $data = $request->only(['status', 'note', 'comment']);
 
                 $schedule->update($data);
+
+                if (isset($data['comment'])) {
+                    $comment = InspectionComment::create([
+                        'inspection_schedule_id' => Crypt::decrypt($schedule->id),
+                        'comment' => $data['comment'],
+                    ]);
+                }
 
                 return response()->json([
                     'status' => true,
