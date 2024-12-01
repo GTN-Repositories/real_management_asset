@@ -73,7 +73,7 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        'keyword': params.term
+                        'keyword': params.term,
                     };
                 },
                 processResults: function(data) {
@@ -84,6 +84,7 @@
                         }))
                     };
                 },
+                limit: 10,
                 cache: true
             }
         });
@@ -97,7 +98,7 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        'keyword': params.term,
                     };
                 },
                 processResults: function(data) {
@@ -110,6 +111,7 @@
                         }))
                     };
                 },
+                limit: 10,
                 cache: true
             }
         });

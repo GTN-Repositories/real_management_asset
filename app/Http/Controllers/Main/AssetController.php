@@ -121,20 +121,25 @@ class AssetController extends Controller
             'created_at',
         ];
 
-        $keyword = $request->search['value'] ?? "";
+        $keyword = $request->keyword ?? "";
         $category = $request->category;
         $assets_location = $request->assets_location;
         $manager = $request->manager;
+        $limit = $request->limit ?? 10;
 
         $data = Asset::orderBy('created_at', 'asc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
-                    foreach ($columns as $column) {
-                        $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
-                    }
+                    $query->where(function ($q) use ($keyword, $columns) {
+                        foreach ($columns as $column) {
+                            $q->orWhere($column, 'LIKE', '%' . $keyword . '%');
+                        }
+                    });
                 }
-            });
+            })
+            ->limit(10)
+            ->get();
 
         if ($category) {
             $data->where('category', $category);
