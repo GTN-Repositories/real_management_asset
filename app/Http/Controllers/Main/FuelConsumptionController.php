@@ -107,7 +107,7 @@ class FuelConsumptionController extends Controller
             'hours',
         ];
 
-        $keyword = $request->search['value'] ?? "";
+        $keyword = $request->keyword ?? "";
         // $project_id = $this->projectId();
 
         $data = FuelConsumption::orderBy('created_at', 'asc')
@@ -119,7 +119,8 @@ class FuelConsumptionController extends Controller
                         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
                     }
                 }
-            });
+            })
+            ->get();
 
         if (session('selected_project_id')) {
             $data->whereHas('management_project', function ($q) {

@@ -120,7 +120,7 @@ class IpbController extends Controller
             'location',
         ];
 
-        $keyword = $request->search['value'] ?? "";
+        $keyword = $request->keyword ?? "";
 
         $data = Ipb::orderBy('created_at', 'asc')
             ->select($columns)
@@ -130,7 +130,7 @@ class IpbController extends Controller
                         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
                     }
                 }
-            });
+            })->get();
 
         if (session('selected_project_id')) {
             $data->whereHas('management_project', function ($q) {
