@@ -55,7 +55,7 @@ class AssetController extends Controller
                 return $data->image ? '<img src="' . asset('storage/' . $data->image) . '" alt="Image" width="50" height="50"/>' : "-";
             })
             ->addColumn('nameWithNumber', function ($data) {
-                return $data->name . " - " . $data->asset_number ?? "-";
+                return $data->license_plate . " - " . $data->name . " - " . $data->asset_number ?? "-";
             })
             ->addColumn('name', function ($data) {
                 return $data->name ?? "-";
@@ -117,6 +117,7 @@ class AssetController extends Controller
             'category',
             'cost',
             'purchase_date',
+            'license_plate',
             'created_at',
         ];
 
