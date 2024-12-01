@@ -31,17 +31,18 @@
 
     <div class="col-12" id="selectAsset">
         <label for="asset_id" class="form-label">Plat Nomor</label>
-        <select id="asset_id" class="form-select form-select-lg" name="asset_id" disabled>
+        <select id="asset_id" class="form-select" name="asset_id" disabled>
             @if ($data->asset)
-                <option value="{{ encrypt($data->asset_id) }}" selected>{{ $data->asset->name . ' - ' . $data->asset->asset_number }}</option>
+                <option value="{{ encrypt($data->asset_id) }}" selected>
+                    {{ $data->asset->license_plate . ' - ' . $data->asset->name . ' - ' . $data->asset->asset_number }}
+                </option>
             @endif
         </select>
     </div>
 
     <div class="col-12 col-md-12">
         <label class="form-label" for="alias">Catatan</label>
-        <textarea name="note" id="note" cols="30" rows="6" class="form-control" placeholder="Deskripsi"
-            readonly>{{ old('note', $data->note) }}</textarea>
+        {{ strip_tags($data->note) }}
     </div>
 
     <div class="col-12 col-md-12">
@@ -96,7 +97,7 @@
 
     <div class="col-12 col-md-12">
         <label class="form-label" for="alias">Komentar</label>
-        <textarea name="comment" id="editor" cols="30" rows="10" class="form-control"
+        <textarea name="comment" id="comment" cols="30" rows="10" class="form-control"
             placeholder="Masukkan Komentar"></textarea>
     </div>
 
@@ -117,24 +118,13 @@
 
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-2">Simpan</button>
-        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close"
-            onclick="window.location.reload();">Cancel</button>
+        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
     </div>
 </form>
 
 @include('components.select2_js')
 <script>
-    CKEDITOR.replace('editor', {
-        language: 'id', // Indonesian language
-        height: 300,
-        toolbar: [
-            ['Bold', 'Italic', 'Underline'],
-            ['NumberedList', 'BulletedList'],
-            ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
-            ['Link', 'Unlink'],
-            ['Undo', 'Redo']
-        ]
-    });
+    CKEDITOR.replace('comment');
 </script>
 <script type="text/javascript">
     let selectedItems = [
@@ -151,7 +141,7 @@
                 stock: {{ $existingItemStocks[Crypt::decrypt($item->id)] ?? 0 }},
                 kanibalStock: {{ $existingKanibalStocks[Crypt::decrypt($item->id)] ?? 0 }},
                 assetKanibalId: {{ $existingAssetKanibalIds[Crypt::decrypt($item->id)] ?? null }},
-                assetKanibalName: "{{ $existingAssetKanibalIds[Crypt::decrypt($item->id)] ? \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->name . ' - ' . \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->asset_number : '-' }}",
+                assetKanibalName: "{{ isset($existingAssetKanibalIds[Crypt::decrypt($item->id)]) ? \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->license_plate . ' - ' . \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->name . ' - ' . \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->asset_number : '-' }}",
             },
         @endforeach
     ];
@@ -218,10 +208,12 @@
     document.getElementById('formUpdate').addEventListener('submit', function(event) {
         event.preventDefault();
 
+        for (let instance in CKEDITOR.instances) {
+            CKEDITOR.instances[instance].updateElement();
+        }
+
         const form = event.target;
         const formData = new FormData(form);
-
-        CKEDITOR.instances.editor.updateElement();
 
         selectedItems.forEach((item, index) => {
             formData.append(`selected_items[${index}][id]`, item.id);

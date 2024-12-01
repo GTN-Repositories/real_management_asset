@@ -3,14 +3,9 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
-use App\Models\Asset;
-use App\Models\Form;
 use App\Models\InspectionComment;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
-use App\Models\Unit;
-use Carbon\Carbon;
-use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
@@ -167,8 +162,7 @@ class InspectionScheduleController extends Controller
             return $this->atomic(function () use ($request, $id) {
                 $schedule = InspectionSchedule::findByEncryptedId($id);
 
-                $data = $request->only(['status', 'note', 'comment']);
-
+                $data = $request->only(['status', 'comment']);
                 $schedule->update($data);
 
                 if (isset($data['comment'])) {

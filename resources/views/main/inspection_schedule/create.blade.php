@@ -35,7 +35,7 @@
 
     <div class="col-12 col-md-12">
         <label class="form-label" for="alias">Catatan</label>
-        <textarea name="note" id="editor" cols="30" rows="10" class="form-control"
+        <textarea name="note" id="note" cols="30" rows="10" class="form-control"
             placeholder="Masukkan Deskripsi"></textarea>
     </div>
 
@@ -60,22 +60,34 @@
 
 @include('components.select2_js')
 <script>
-    CKEDITOR.replace('editor', {
-        language: 'id', // Indonesian language
-        height: 300,
-        toolbar: [
-            ['Bold', 'Italic', 'Underline'],
-            ['NumberedList', 'BulletedList'],
-            ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
-            ['Link', 'Unlink'],
-            ['Undo', 'Redo']
-        ]
-    });
+    CKEDITOR.replace('note');
 </script>
 <script type="text/javascript">
-    let selectedItems = [];
-
     $(document).ready(function() {
+        $('#asset_id').select2({
+            dropdownParent: $('#selectAsset'),
+            placeholder: 'Pilih Asset',
+            ajax: {
+                url: "{{ route('asset.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        'keyword': params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.data.map(item => ({
+                            text: item.nameWithNumber,
+                            id: item.relationId
+                        }))
+                    };
+                },
+                cache: true
+            }
+        });
+
         $('#item_id').select2({
             dropdownParent: $('#selectItem'),
             placeholder: 'Pilih Sparepart',
@@ -101,7 +113,10 @@
                 cache: true
             }
         });
+    });
 
+    $(document).ready(function() {
+        let selectedItems = [];
         $('#item_id').on('change', function() {
             const itemId = $(this).val();
             const selectedOption = $(this).select2('data')[0];
@@ -247,35 +262,12 @@
         });
     });
 
-    $(document).ready(function() {
-        $('#asset_id').select2({
-            dropdownParent: $('#selectAsset'),
-            placeholder: 'Pilih Asset',
-            ajax: {
-                url: "{{ route('asset.data') }}",
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        keyword: params.term
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.data.map(item => ({
-                            text: item.nameWithNumber,
-                            id: item.relationId
-                        }))
-                    };
-                },
-                cache: true
-            }
-        });
-    });
     document.getElementById('formCreate').addEventListener('submit', function(event) {
         event.preventDefault();
 
-        CKEDITOR.instances.editor.updateElement();
+        for (let instance in CKEDITOR.instances) {
+            CKEDITOR.instances[instance].updateElement();
+        }
 
         const form = event.target;
         const formData = new FormData(form);
