@@ -69,6 +69,7 @@
                         results: apiResults
                     };
                 },
+                limit: 10,
                 cache: true
             }
         });
