@@ -14,8 +14,8 @@
         </select>
     </div>
     <div class="col-12 col-md-6" id="driverRelation">
-        <label class="form-label" for="user_id">Pengguna<span class="text-danger">*</span></label>
-        <select id="user_id" name="user_id" class="select2 form-select select2-primary"data-allow-clear="true"
+        <label class="form-label" for="employee_id">Pengguna<span class="text-danger">*</span></label>
+        <select id="employee_id" name="employee_id" class="select2 form-select select2-primary"data-allow-clear="true"
             required>
         </select>
     </div>
@@ -120,11 +120,11 @@
             });
         }
 
-        $('#user_id').select2({
+        $('#employee_id').select2({
             dropdownParent: $('#driverRelation'),
-            placeholder: 'Pilih penerima',
+            placeholder: 'Pilih karyawan',
             ajax: {
-                url: "{{ route('user.data') }}",
+                url: "{{ route('employee.data') }}",
                 dataType: 'json',
                 delay: 250,
                 data: function(params) {
@@ -135,12 +135,12 @@
                 processResults: function(data) {
                     apiResults = data.data
                         .filter(function(item) {
-                            return item.idRelationAll !== null;
+                            return item.relationId !== null;
                         })
                         .map(function(item) {
                             return {
                                 text: item.name,
-                                id: item.idRelationAll,
+                                id: item.relationId,
                             };
                         });
 

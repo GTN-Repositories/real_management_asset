@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\FuelConsumption;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use PhpParser\Node\Stmt\TryCatch;
 
 class FuelConsumptionController extends Controller
 {
@@ -144,10 +145,11 @@ class FuelConsumptionController extends Controller
 
         try {
             return $this->atomic(function () use ($data) {
-                $data['price'] = str_replace('.', '', $data['price']);
-                $data['loadsheet'] = str_replace('.', '', $data['loadsheet']);
-                $data['liter'] = str_replace('.', '', $data['liter']);
-                $data['hours'] = str_replace('.', '', $data['hours']);
+                $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
+                $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
+                $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
+                $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
+                $data['lasted_km_asset'] = isset($data['lasted_km_asset']) && $data['lasted_km_asset'] != '-' ? str_replace('.', '', $data['lasted_km_asset']) : null;
 
                 $data["asset_id"] = crypt::decrypt($data["asset_id"]);
                 $data["management_project_id"] = crypt::decrypt($data["management_project_id"]);
@@ -184,6 +186,7 @@ class FuelConsumptionController extends Controller
 
         $decryptedId = Crypt::decrypt($id);
         $data = FuelConsumption::findOrFail($decryptedId);
+        $data->assets = $data->getAssetsAttribute();
 
         return view('main.fuel_consumtion.edit', compact('data'));
     }
@@ -195,21 +198,30 @@ class FuelConsumptionController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->all();
-
         try {
             return $this->atomic(function () use ($data, $id) {
-                $data['price'] = str_replace('.', '', $data['price']);
-                $data['loadsheet'] = str_replace('.', '', $data['loadsheet']);
-                $data['liter'] = str_replace('.', '', $data['liter']);
+                $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
+                $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
+                $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
+                $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
+                $data['lasted_km_asset'] = isset($data['lasted_km_asset']) && $data['lasted_km_asset'] != '-' ? str_replace('.', '', $data['lasted_km_asset']) : null;
+
                 try {
                     $data["management_project_id"] = Crypt::decrypt($data["management_project_id"]);
-                    $data["asset_id"] = crypt::decrypt($data["asset_id"]);
-                    $data["user_id"] = crypt::decrypt($data["user_id"]);
                 } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
                     $data["management_project_id"] = $data["management_project_id"];
-                    $data["asset_id"] = $data["asset_id"];
-                    $data["user_id"] = crypt::decrypt($data["user_id"]);
                 }
+                try {
+                    $data["asset_id"] = crypt::decrypt($data["asset_id"]);
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                    $data["asset_id"] = $data["asset_id"];
+                }
+                try {
+                    $data["user_id"] = crypt::decrypt($data["user_id"]);
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                    $data["user_id"] = $data["user_id"];
+                }
+
                 $data = FuelConsumption::findByEncryptedId($id)->update($data);
 
                 return response()->json([

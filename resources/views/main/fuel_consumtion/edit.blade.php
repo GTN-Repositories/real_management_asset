@@ -57,6 +57,11 @@
         <input type="text" id="hours" name="hours" class="form-control" placeholder="Masukkan jam kerja"
             required value="{{ $data->hours }}" />
     </div>
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="lasted_km_asset">KM Terakhir Asset<span class="text-danger">*</span></label>
+        <input type="text" id="lasted_km_asset" name="lasted_km_asset" class="form-control"
+            placeholder="Masukkan km terakhir asset" required value="{{ $data->lasted_km_asset }}" />
+    </div>
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
         <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
@@ -71,8 +76,6 @@
 <script>
     var management_project_id = '{{ $data->management_project_id }}';
     var management_project_name = '{{ $data->management_project->name }}';
-    var asset_id = '{{ $data->asset_id }}';
-    var asset_name = "{{ $data->asset->name . ' - ' . $data->asset->asset_number }}";
     var user_id = '{{ $data->user_id }}';
     var user_name = '{{ $data->employee->name }}';
 
@@ -127,37 +130,47 @@
 
             $('#asset_id').empty().trigger('change');
             if (projectId) {
-                const encryptedProjectId = await encryptData(projectId);
-
-                if (encryptedProjectId) {
-                    $.ajax({
-                        url: "{{ route('management-project.by_project') }}",
-                        dataType: 'json',
-                        delay: 250,
-                        data: {
-                            projectId: encryptedProjectId
-                        },
-                        success: function(data) {
-                            const uniqueAssets = Object.entries(data).reduce((unique, [
-                                assetId, assetName
-                            ]) => {
-                                if (!unique.some((i) => i.id === assetId)) {
-                                    unique.push({
-                                        id: assetId,
-                                        text: assetName
-                                    });
-                                }
-                                return unique;
-                            }, []);
+                $.ajax({
+                    url: "{{ route('management-project.by_project') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: {
+                        projectId: projectId
+                    },
+                    success: function(data) {
+                        if (data && typeof data === 'object' && Object.keys(data)
+                            .length) {
+                            var assetOptions = Object.entries(data).map(function([id,
+                                name
+                            ]) {
+                                return {
+                                    id: id,
+                                    text: name
+                                };
+                            });
 
                             $('#asset_id').select2({
                                 dropdownParent: $('#assetRelation'),
-                                data: uniqueAssets,
+                                data: assetOptions,
                                 allowClear: true
-                            }).val(asset_id).trigger('change');
+                            }).trigger('change');
+                        } else {
+                            $('#asset_id').select2({
+                                dropdownParent: $('#assetRelation'),
+                                data: [],
+                                allowClear: true
+                            }).trigger('change');
                         }
-                    });
-                }
+                    },
+                    error: function(xhr) {
+                        console.error('Error fetching assets:', xhr);
+                        $('#asset_id').select2({
+                            dropdownParent: $('#assetRelation'),
+                            data: [],
+                            allowClear: true
+                        }).trigger('change');
+                    }
+                });
             }
         });
 
@@ -166,8 +179,14 @@
             $('#management_project_id').append(projectOption).trigger('change');
         }
 
+        var asset_id = '{{ $data->asset_id }}';
+        var asset_name = '{{ $data->asset->name }}';
+        var asset_number = '{{ $data->asset->asset_number }}';
+        var asset_license_plate = '{{ $data->asset->license_plate }}';
+
         if (asset_id) {
-            var assetOption = new Option(asset_name, asset_id, true, true);
+            var assetOption = new Option(`${asset_license_plate} - ${asset_name} - ${asset_number}`, asset_id,
+                true, true);
             $('#asset_id').append(assetOption).trigger('change');
         }
 
@@ -209,9 +228,16 @@
         $('#user_id').append(option).trigger('change');
     }
 
-    $(document).on('input', '#price, #loadsheet, #liter, #hours', function() {
-        value = formatCurrency($(this).val());
-        $(this).val(value);
+    $(document).ready(function() {
+        $('#price, #loadsheet, #liter, #hours, #lasted_km_asset').each(function() {
+            const value = $(this).val();
+            $(this).val(formatCurrency(value));
+        });
+    });
+
+    $(document).on('input', '#price, #loadsheet, #liter, #hours, #lasted_km_asset', function() {
+        const value = $(this).val();
+        $(this).val(formatCurrency(value));
     });
 
     function formatCurrency(angka, prefix) {

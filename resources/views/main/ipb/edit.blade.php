@@ -15,8 +15,8 @@
             data-allow-clear="true" required></select>
     </div>
     <div class="col-12 col-md-6" id="driverRelation">
-        <label class="form-label" for="user_id">Pengguna<span class="text-danger">*</span></label>
-        <select id="user_id" name="user_id" class="select2 form-select select2-primary" data-allow-clear="true"
+        <label class="form-label" for="employee_id">Karyawan<span class="text-danger">*</span></label>
+        <select id="employee_id" name="employee_id" class="select2 form-select select2-primary" data-allow-clear="true"
             required></select>
     </div>
     <div class="col-12 col-md-6">
@@ -55,10 +55,8 @@
 
 <script>
     $(document).ready(function() {
-        const managementProjectId = '{{ $data->management_project_id }}';
-        const managementProjectName = '{{ $data->management_project->name }}';
-        const userId = '{{ $data->user_id }}';
-        const userName = '{{ $data->user->name }}';
+        var managementProjectId = '{{ $data->management_project_id }}';
+        var managementProjectName = '{{ $data->management_project->name }}';
 
         $('#management_project_id').select2({
             dropdownParent: $('#managementRelation'),
@@ -73,7 +71,7 @@
                     };
                 },
                 processResults: function(data) {
-                    const results = data.data.map(item => ({
+                    var results = data.data.map(item => ({
                         text: item.name,
                         id: item.managementRelationId
                     }));
@@ -90,11 +88,11 @@
             $('#management_project_id').append(projectOption).trigger('change');
         }
 
-        $('#user_id').select2({
+        $('#employee_id').select2({
             dropdownParent: $('#driverRelation'),
-            placeholder: 'Pilih pengguna',
+            placeholder: 'Pilih karyawan',
             ajax: {
-                url: "{{ route('user.data') }}",
+                url: "{{ route('employee.data') }}",
                 dataType: 'json',
                 delay: 250,
                 data: function(params) {
@@ -103,9 +101,9 @@
                     };
                 },
                 processResults: function(data) {
-                    const results = data.data.map(item => ({
+                    var results = data.data.map(item => ({
                         text: item.name,
-                        id: item.idRelationAll
+                        id: item.relationId
                     }));
                     return {
                         results
@@ -115,18 +113,20 @@
             }
         });
 
+        let userId = '{{ $data->employee_id ?? '' }}';
+        let userName = '{{ $data->employee->name ?? '' }}';
         if (userId) {
-            const userOption = new Option(userName, userId, true, true);
-            $('#user_id').append(userOption).trigger('change');
+            let userOption = new Option(userName, userId, true, true);
+            $('#employee_id').append(userOption).trigger('change');
         }
 
-        const today = new Date();
-        const formattedDate = today.toISOString().split('T')[0];
+        var today = new Date();
+        var formattedDate = today.toISOString().split('T')[0];
         $('#date').val(formattedDate);
 
         $('#management_project_id, #date').on('change', function() {
-            const projectId = $('#management_project_id').val();
-            const date = $('#date').val();
+            var projectId = $('#management_project_id').val();
+            var date = $('#date').val();
 
             if (projectId && date) {
                 fetchTotalLiter(projectId, date);
@@ -144,7 +144,7 @@
                 },
                 success: function(response) {
                     if (response.total_liter !== undefined) {
-                        const formattedValue = formatCurrency(response.total_liter);
+                        var formattedValue = formatCurrency(response.total_liter);
                         $('#usage_liter').prop('readonly', false).val(formattedValue).prop(
                             'readonly', true);
                     } else {
@@ -161,28 +161,16 @@
             });
         }
 
-        formatExistingInputs();
-
-        function formatExistingInputs() {
-            const issuedLiterValue = $('#issued_liter').val();
-            $('#issued_liter').val(formatCurrency(issuedLiterValue));
-
-            const usageLiterValue = $('#usage_liter').val();
-            $('#usage_liter').val(formatCurrency(usageLiterValue));
-
-            const unitPriceValue = $('#unit_price').val();
-            $('#unit_price').val(formatCurrency(unitPriceValue));
-
-            const priceValue = $('#price').val();
-            $('#price').val(formatCurrency(priceValue));
-
-            const literValue = $('#liter').val();
-            $('#liter').val(formatCurrency(literValue));
-        }
+        $(document).ready(function() {
+            $('#issued_liter, #usage_liter, #unit_price, #price, #liter').each(function() {
+                var value = $(this).val();
+                $(this).val(formatCurrency(value));
+            });
+        });
 
         $(document).on('input', '#issued_liter, #usage_liter, #unit_price, #price, #liter', function() {
-            const value = formatCurrency($(this).val());
-            $(this).val(value);
+            var value = $(this).val();
+            $(this).val(formatCurrency(value));
         });
 
         function formatCurrency(angka, prefix) {
@@ -191,7 +179,7 @@
             }
 
             angka = angka.toString();
-            const splitDecimal = angka.split('.');
+            var splitDecimal = angka.split('.');
             let number_string = angka.replace(/[^,\d]/g, '').toString(),
                 split = number_string.split(','),
                 sisa = split[0].length % 3,
@@ -199,7 +187,7 @@
                 ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
             if (ribuan) {
-                const separator = sisa ? '.' : '';
+                var separator = sisa ? '.' : '';
                 rupiah += separator + ribuan.join('.');
             }
 

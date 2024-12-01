@@ -32,6 +32,10 @@ class Ipb extends Model
     {
         return $this->belongsTo(ManagementProject::class, 'management_project_id', 'id');
     }
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'employee_id', 'id');
+    }
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');

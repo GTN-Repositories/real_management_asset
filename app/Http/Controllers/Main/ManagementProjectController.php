@@ -108,7 +108,11 @@ class ManagementProjectController extends Controller
 
     public function getAssetsByProject(Request $request)
     {
-        $projectId = Crypt::decrypt($request->projectId);
+        try {
+            $projectId = Crypt::decrypt($request->projectId);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            $projectId = $request->projectId;
+        }
 
         $project = ManagementProject::find($projectId);
 
@@ -122,7 +126,7 @@ class ManagementProjectController extends Controller
         }
 
         $assets = Asset::whereIn('id', $assetIds)->get()->mapWithKeys(function ($asset) {
-            return [$asset->id => $asset->name . ' - ' . $asset->asset_number];
+            return [$asset->id => $asset->license_plate . ' - ' . $asset->name . ' - ' . $asset->asset_number];
         })->toArray();
 
         return response()->json($assets);
@@ -187,7 +191,7 @@ class ManagementProjectController extends Controller
         } else {
             $data['asset'] = '';
         }
-        
+
         $petty_cash = PettyCash::where('project_id', Crypt::decrypt($data->id))->get();
 
         return view('main.management_project.detail', compact('data', 'petty_cash'));
@@ -345,7 +349,7 @@ class ManagementProjectController extends Controller
                 $data['status'] = $data['status'];
 
                 $create = PettyCash::findByEncryptedId($id);
-                
+
 
                 if ($data['status'] == 2 && ($create->status == 1 || $create->status == 3)) {
                     $project = ManagementProject::find($create->project_id);
