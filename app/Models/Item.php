@@ -17,7 +17,7 @@ class Item extends Model
     public static function findByEncryptedId($encryptedId)
     {
         $decryptedId = Crypt::decrypt($encryptedId);
-        
+
         return self::findOrFail($decryptedId);
     }
 
@@ -25,7 +25,7 @@ class Item extends Model
     {
         return $this->belongsTo(CategoryItem::class, 'category_id', 'id');
     }
-    
+
     public function detailPartInspections()
     {
         return $this->hasMany(DetailPartInspection::class);

@@ -19,8 +19,8 @@
             required>
         </select>
     </div>
-    <div class="col-12 col-md-6" id="driverRelation">
-        <label class="form-label" for="user_id">Nama Driver<span class="text-danger">*</span></label>
+    <div class="col-12 col-md-6" id="karyawanRelation">
+        <label class="form-label" for="user_id">Nama Karyawan<span class="text-danger">*</span></label>
         <select id="user_id" name="user_id" class="select2 form-select select2-primary"data-allow-clear="true"
             required>
         </select>
@@ -32,17 +32,32 @@
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="loadsheet">Loadsheet<span class="text-danger">*</span></label>
-        <input type="number" min="1" id="loadsheet" name="loadsheet" class="form-control"
-            placeholder="Masukkan loadsheet" required />
+        <input type="text" id="loadsheet" name="loadsheet" class="form-control" placeholder="Masukkan loadsheet"
+            required />
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="liter">Liter<span class="text-danger">*</span></label>
-        <input type="number" min="1" id="liter" name="liter" class="form-control"
-            placeholder="Masukkan liter" required />
+        <input type="text" id="liter" name="liter" class="form-control" placeholder="Masukkan liter"
+            required />
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="price">Harga/Liter<span class="text-danger">*</span></label>
         <input type="text" id="price" name="price" class="form-control" placeholder="Masukkan harga"
+            required />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="category">Kategori<span class="text-danger">*</span></label>
+        <input type="text" id="category" name="category" class="form-control" placeholder="Masukkan kategori"
+            required />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="hours">Jam Kerja<span class="text-danger">*</span></label>
+        <input type="text" id="hours" name="hours" class="form-control" placeholder="Masukkan jam kerja"
+            required />
+    </div>
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="lasted_km_asset">KM Terakhir Asset<span class="text-danger">*</span></label>
+        <input type="text" id="lasted_km_asset" name="lasted_km_asset" class="form-control" placeholder="Masukkan km terakhir asset"
             required />
     </div>
     <div class="col-12 text-center">
@@ -69,16 +84,10 @@
                     };
                 },
                 processResults: function(data) {
-                    apiResults = data.data.reduce((unique, item) => {
-                        if (!unique.some((i) => i.text === item.name)) {
-                            unique.push({
-                                text: item.name,
-                                id: item.managementRelationId,
-                            });
-                        }
-                        return unique;
-                    }, []);
-
+                    let apiResults = data.data.map(item => ({
+                        text: item.name,
+                        id: item.managementRelationId,
+                    }));
                     return {
                         results: apiResults
                     };
@@ -86,43 +95,60 @@
                 cache: true
             }
         }).on('change', function() {
-            var projectName = $('#management_project_id option:selected').text();
             var projectId = $(this).val();
 
             $('#asset_id').empty().trigger('change');
-            if (projectName) {
+            if (projectId) {
                 $.ajax({
                     url: "{{ route('management-project.by_project') }}",
                     dataType: 'json',
                     delay: 250,
                     data: {
-                        projectName: projectName
+                        projectId: projectId
                     },
                     success: function(data) {
-                        var assetOptions = Object.entries(data).map(function([assetId,
-                            assetName
-                        ]) {
-                            return {
-                                id: assetId,
-                                text: assetName
-                            };
-                        });
+                        if (data && typeof data === 'object' && Object.keys(data).length) {
+                            var assetOptions = Object.entries(data).map(function([id,
+                                name
+                            ]) {
+                                return {
+                                    id: id,
+                                    text: name
+                                };
+                            });
 
+                            $('#asset_id').select2({
+                                dropdownParent: $('#assetRelation'),
+                                data: assetOptions,
+                                allowClear: true
+                            }).trigger('change');
+                        } else {
+                            $('#asset_id').select2({
+                                dropdownParent: $('#assetRelation'),
+                                data: [],
+                                allowClear: true
+                            }).trigger('change');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error fetching assets:', xhr);
                         $('#asset_id').select2({
                             dropdownParent: $('#assetRelation'),
-                            data: assetOptions,
+                            data: [],
                             allowClear: true
-                        });
+                        }).trigger('change');
                     }
                 });
             }
         });
 
+
+
         $('#user_id').select2({
-            dropdownParent: $('#driverRelation'),
-            placeholder: 'Pilih penerima',
+            dropdownParent: $('#karyawanRelation'),
+            placeholder: 'Pilih karyawan',
             ajax: {
-                url: "{{ route('user.data') }}",
+                url: "{{ route('employee.data') }}",
                 dataType: 'json',
                 delay: 250,
                 data: function(params) {
@@ -133,12 +159,12 @@
                 processResults: function(data) {
                     apiResults = data.data
                         .filter(function(item) {
-                            return item.idRelation !== null;
+                            return item.relationId !== null;
                         })
                         .map(function(item) {
                             return {
                                 text: item.name,
-                                id: item.idRelation,
+                                id: item.relationId,
                             };
                         });
 
@@ -151,7 +177,7 @@
         });
     })
 
-    $(document).on('input', '#price, #loadsheet, #liter', function() {
+    $(document).on('input', '#price, #loadsheet, #liter, #hours, #lasted_km_asset', function() {
         value = formatCurrency($(this).val());
         $(this).val(value);
     });

@@ -42,6 +42,17 @@
             </div>
         </div>
 
+        {{-- chart manpower --}}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Manpower Data Over Time</h5>
+            </div>
+            <div class="card-body">
+                <div id="hours-chart"></div> <!-- Chart Div -->
+            </div>
+        </div>
+
+
         <!-- Product List Table -->
         <div class="card">
             <div class="card-header">
@@ -52,13 +63,14 @@
                     <thead class="border-top">
                         <tr>
                             <th>#</th>
-                            <th>tanggal</th>
-                            <th>nama project</th>
-                            <th>nama aset</th>
-                            <th>loadsheet</th>
-                            <th>banyak penggunaan</th>
-                            <th>harga/liter</th>
-                            <th>total</th>
+                            <th>Management Project</th>
+                            <th>Unit</th>
+                            <th>Tanggal</th>
+                            <th>Total Hari</th>
+                            <th>Pemakaian Solar</th>
+                            <th>Total Loadsheet</th>
+                            <th>Liter/Trip</th>
+                            <th>Rata-rata/Hari</th>
                         </tr>
                     </thead>
                 </table>
@@ -72,18 +84,19 @@
         $(document).ready(function() {
             init_table();
             init_chart(); // Initialize chart on page load
+            init_hours_chart(); // Initialize chart on page load
 
-            // Event listeners for filters
             $('.dropdown-item').on('click', function(e) {
                 e.preventDefault();
-                $('.dropdown-item').removeClass('active'); // Hapus class active dari item lain
-                $(this).addClass('active'); // Tambah class active ke item yang dipilih
-
+                $('.dropdown-item').removeClass('active');
+                $(this).addClass('active');
                 const filterType = $(this).text().trim();
                 const filterBtn = $('.btn.btn-outline-primary.dropdown-toggle');
                 filterBtn.text(filterType);
+
                 reloadTableWithFilters(null, null, filterType);
                 reloadChartWithFilters(null, null, filterType);
+                reloadHoursChartWithFilters(null, null, filterType);
             });
 
             $('#date-range-picker').daterangepicker({
@@ -97,8 +110,10 @@
                 const startDate = picker.startDate.format('YYYY-MM-DD');
                 const endDate = picker.endDate.format('YYYY-MM-DD');
                 $(this).val(startDate + ' - ' + endDate);
+
                 reloadTableWithFilters(startDate, endDate);
                 reloadChartWithFilters(startDate, endDate);
+                reloadHoursChartWithFilters(startDate, endDate);
             });
 
             $('#date-range-picker').on('cancel.daterangepicker', function() {
@@ -122,8 +137,13 @@
             init_chart(startDate, endDate, predefinedFilter);
         }
 
+        function reloadHoursChartWithFilters(startDate = '', endDate = '', predefinedFilter = '') {
+            if (hoursChart) hoursChart.destroy();
+            init_hours_chart(startDate, endDate, predefinedFilter);
+        }
 
-        function init_table(startDate = '', endDate = '', predefinedFilter = '') {
+
+        function init_table(startDate = '', endDate = '', predefinedFilter = '', keyword = '') {
             $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -132,9 +152,10 @@
                     type: "GET",
                     url: "{{ route('report-fuel.data') }}",
                     data: {
-                        startDate: startDate,
-                        endDate: endDate,
-                        predefinedFilter: predefinedFilter
+                        'keyword': keyword,
+                        'startDate': startDate,
+                        'endDate': endDate,
+                        'predefinedFilter': predefinedFilter
                     }
                 },
                 columns: [{
@@ -142,10 +163,6 @@
                         name: 'DT_RowIndex',
                         orderable: false,
                         searchable: false
-                    },
-                    {
-                        data: 'date',
-                        name: 'date'
                     },
                     {
                         data: 'management_project_id',
@@ -156,21 +173,29 @@
                         name: 'asset_id'
                     },
                     {
-                        data: 'loadsheet',
-                        name: 'loadsheet'
+                        data: 'date',
+                        name: 'date'
+                    },
+                    {
+                        data: 'day_total',
+                        name: 'day_total'
                     },
                     {
                         data: 'liter',
                         name: 'liter'
                     },
                     {
-                        data: 'price',
-                        name: 'price'
+                        data: 'loadsheet',
+                        name: 'loadsheet'
                     },
                     {
-                        data: 'total',
-                        name: 'total'
-                    }
+                        data: 'liter_trip',
+                        name: 'liter_trip'
+                    },
+                    {
+                        data: 'avarage_day',
+                        name: 'avarage_day'
+                    },
                 ]
             });
         }
@@ -267,6 +292,87 @@
             });
         }
 
+        let hoursChart;
+
+        function init_hours_chart(startDate = '', endDate = '', predefinedFilter = '') {
+            $.ajax({
+                url: "{{ route('report-fuel.hours-data') }}",
+                method: 'GET',
+                data: {
+                    startDate: startDate,
+                    endDate: endDate,
+                    predefinedFilter: predefinedFilter
+                },
+                success: function(response) {
+                    var options = {
+                        series: [{
+                            name: 'Hours',
+                            data: response.hours
+                        }],
+                        chart: {
+                            type: 'bar',
+                            height: 350,
+                            toolbar: {
+                                show: true
+                            }
+                        },
+                        plotOptions: {
+                            bar: {
+                                horizontal: false // Set to false for vertical bar chart
+                            }
+                        },
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function(value) {
+                                return value.toFixed(1) + ' hrs';
+                            }
+                        },
+                        xaxis: {
+                            categories: response.dates,
+                            title: {
+                                text: 'Dates'
+                            },
+                            labels: {
+                                rotate: -45,
+                                rotateAlways: true
+                            }
+                        },
+                        yaxis: {
+                            title: {
+                                text: 'Hours'
+                            }
+                        },
+                        tooltip: {
+                            y: {
+                                formatter: function(value) {
+                                    return value.toFixed(1) + " hrs";
+                                }
+                            }
+                        },
+                        title: {
+                            text: 'Manpower Over Time',
+                            align: 'left'
+                        },
+                        grid: {
+                            row: {
+                                colors: ['#f3f3f3', 'transparent'],
+                                opacity: 0.5
+                            }
+                        }
+                    };
+
+                    hoursChart = new ApexCharts(document.querySelector("#hours-chart"),
+                        options);
+                    hoursChart.render();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching hours data:', error);
+                    document.querySelector("#hours-chart").innerHTML =
+                        '<div class="alert alert-danger">Failed to load hours chart data. Please try again later.</div>';
+                }
+            });
+        }
+
         function exportPDF() {
             const startDate = $('#date-range-picker').data('daterangepicker')?.startDate.format('YYYY-MM-DD') || '';
             const endDate = $('#date-range-picker').data('daterangepicker')?.endDate.format('YYYY-MM-DD') || '';
@@ -316,15 +422,67 @@
         }
 
         function exportExcel() {
-            const startDate = $('#date-range-picker').data('daterangepicker')?.startDate.format('YYYY-MM-DD') || '';
-            const endDate = $('#date-range-picker').data('daterangepicker')?.endDate.format('YYYY-MM-DD') || '';
+            const startDate = $('#date-range-picker').data('daterangepicker')?.startDate?.format('YYYY-MM-DD');
+            const endDate = $('#date-range-picker').data('daterangepicker')?.endDate?.format('YYYY-MM-DD');
             const predefinedFilter = $('.dropdown-item.active').text().trim() || '';
 
-            const exportUrl = "{{ route('report-fuel.export-excel') }}" +
-                `?startDate=${startDate}&endDate=${endDate}&predefinedFilter=${predefinedFilter}`;
-
-            window.location.href = exportUrl;
+            if (startDate && endDate) {
+                $.ajax({
+                    url: "{{ route('report-fuel.export-excel') }}",
+                    type: 'GET',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        startDate: startDate,
+                        endDate: endDate,
+                        predefinedFilter: predefinedFilter
+                    },
+                    xhrFields: {
+                        responseType: 'blob'
+                    },
+                    success: function(response) {
+                        const blob = new Blob([response], {
+                            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        });
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'FuelConsumptionReport.xlsx';
+                        link.click();
+                    },
+                    error: function() {
+                        Swal.fire('Error!',
+                            'An error occurred while exporting the report. Please try again later.',
+                            'error');
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: "{{ route('report-fuel.export-excel') }}",
+                    type: 'GET',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        startDate: moment().startOf('month').format('YYYY-MM-DD'),
+                        endDate: moment().endOf('month').format('YYYY-MM-DD'),
+                        predefinedFilter: predefinedFilter
+                    },
+                    xhrFields: {
+                        responseType: 'blob'
+                    },
+                    success: function(response) {
+                        const blob = new Blob([response], {
+                            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        });
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'FuelConsumptionReport.xlsx';
+                        link.click();
+                    },
+                    error: function() {
+                        Swal.fire('Error!',
+                            'An error occurred while exporting the report. Please try again later.',
+                            'error');
+                    }
+                });
+            }
         }
-    </script>
     </script>
 @endpush

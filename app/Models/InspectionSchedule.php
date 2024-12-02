@@ -17,7 +17,7 @@ class InspectionSchedule extends Model
     public static function findByEncryptedId($encryptedId)
     {
         $decryptedId = Crypt::decrypt($encryptedId);
-        
+
         return self::findOrFail($decryptedId);
     }
 
@@ -25,8 +25,12 @@ class InspectionSchedule extends Model
     {
         return $this->belongsTo(Asset::class, 'asset_id', 'id');
     }
-    public function questions()
+    public function assetKanibal()
     {
-        return $this->hasMany(InspectionQuestion::class, 'inspection_schedule_id', 'id');
+        return $this->belongsTo(Asset::class, 'asset_kanibal_id', 'id');
+    }
+    public function comment()
+    {
+        return $this->hasMany(InspectionComment::class, 'inspection_schedule_id', 'id');
     }
 }

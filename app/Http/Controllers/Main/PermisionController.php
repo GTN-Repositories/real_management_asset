@@ -55,8 +55,12 @@ class PermisionController extends Controller implements HasMiddleware
             ->addColumn('action', function ($data) {
                 $encryptedId = Crypt::encrypt($data->id);
                 $btn = '<div class="d-flex">';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" data-id="' . $encryptedId . '" onclick="editData(this)"><i class="ti ti-pencil"></i></a>';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" data-id="' . $encryptedId . '" onclick="deleteData(this)"><i class="ti ti-trash"></i></a>';
+                if (auth()->user()->hasPermissionTo('permission-edit')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" data-id="' . $encryptedId . '" onclick="editData(this)"><i class="ti ti-pencil"></i></a>';
+                }
+                if (auth()->user()->hasPermissionTo('permission-delete')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" data-id="' . $encryptedId . '" onclick="deleteData(this)"><i class="ti ti-trash"></i></a>';
+                }
                 $btn .= '</div>';
 
                 return $btn;
@@ -100,12 +104,16 @@ class PermisionController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
-        $data = $request->all();
+        $validated = $request->validate([
+            'name' => 'required|string|unique:permissions,name',
+        ]);
 
+        $data = $request->all();
 
         try {
             return $this->atomic(function () use ($data) {
                 $data['user_id'] = Auth::user()->id;
+                $data['guard_name'] = 'web';
                 Permission::create($data);
                 return response()->json([
                     'status' => true,
@@ -115,7 +123,7 @@ class PermisionController extends Controller implements HasMiddleware
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => 'Data Gagal di Tambahkan!',
+                'message' => 'Data Gagal di Tambahkan! ' . $th->getMessage(),
             ]);
         }
     }

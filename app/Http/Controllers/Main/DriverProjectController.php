@@ -7,10 +7,10 @@ use App\Models\Asset;
 use App\Models\ManagementProject;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DriverProjectController extends Controller
 {
-    //
     public function index()
     {
         return view('main.driver.index');
@@ -18,26 +18,59 @@ class DriverProjectController extends Controller
 
     public function data()
     {
-        $data = ManagementProject::select('name', 'asset_id')
+        // Get user roles
+        $userRoles = auth()->user()->roles->pluck('name')->toArray();
+
+        // Get regular projects
+        $projects = ManagementProject::select('id', 'name', 'asset_id')
             ->orderBy('created_at', 'asc')
             ->get()
-            ->groupBy('name')
-            ->map(function ($group) {
+            ->map(function ($project) {
+                $assetIds = $project->asset_id;
                 return [
-                    'name' => $group->first()->name,
-                    'assets' => Asset::whereIn('id', $group->pluck('asset_id'))->get(),
+                    'id' => $project->id,
+                    'name' => $project->name,
+                    'assets' => Asset::whereIn('id', $assetIds)->get(),
                 ];
-            })
-            ->values();
+            });
 
-        return response()->json($data);
+        // Only add All Projects card if user is superAdmin
+        if (in_array('superAdmin', $userRoles)) {
+            $allAssets = Asset::select('id', 'name')->take(5)->get();
+            $allProjectsCard = [
+                'id' => 'all',
+                'name' => 'All Projects',
+                'assets' => $allAssets
+            ];
+
+            // Add All Projects card at the beginning
+            $projects = collect([$allProjectsCard])->concat($projects);
+        }
+
+        return response()->json($projects);
     }
 
     public function selectProject(Request $request)
     {
-        $managerName = $request->input('manager_name'); // Ambil manager name dari request
-        session(['selected_manager_name' => $managerName]); // Simpan manager name ke session
+        $projectId = $request->input('project_id');
 
-        return response()->json(['status' => 'success', 'message' => 'Project selected successfully!']);
+        if ($projectId === 'all') {
+            // Verify user is superAdmin before allowing 'all' selection
+            if (in_array('superAdmin', auth()->user()->roles->pluck('name')->toArray())) {
+                session()->forget('selected_project_id');
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access'
+                ], 403);
+            }
+        } else {
+            session(['selected_project_id' => $projectId]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Project selected successfully!'
+        ]);
     }
 }

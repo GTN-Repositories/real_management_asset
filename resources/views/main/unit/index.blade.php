@@ -57,9 +57,14 @@
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button>
                     <!-- Tombol Tambah -->
-                    <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                        <i class="fas fa-plus"></i> Tambah
+                    <button type="button" class="btn btn-success btn-sm d-flex align-items-center" onclick="importExcel()">
+                        <i class="fas fa-file-excel me-2"></i> Import Excel
                     </button>
+                    @if (auth()->user()->hasPermissionTo('asset-create'))
+                        <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
+                            <i class="fas fa-plus"></i> Tambah
+                        </button>
+                    @endif
                 </div>
             </div>
             <div class="card-datatable table-responsive">
@@ -307,6 +312,21 @@
                 });
         }
 
+        function importExcel() {
+            $.ajax({
+                    url: "{{ route('asset.import.form') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+                });
+        }
+
         function editData(id) {
 
             $.ajax({
@@ -317,6 +337,20 @@
                     $('#content-modal-ce').html(data);
 
                     $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
+                });
+        }
+
+        function detailData(id) {
+
+            $.ajax({
+                    url: "{{ route('asset.show', ':id') }}".replace(':id', id),
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    window.location.href = "{{ route('asset.show', ':id') }}".replace(':id', id);
                 })
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');

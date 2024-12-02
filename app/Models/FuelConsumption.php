@@ -11,6 +11,7 @@ class FuelConsumption extends Model
 {
     //
     protected $guarded = ['id'];
+    protected $table = 'fuel_consumptions';
 
     public function getIdAttribute()
     {
@@ -29,6 +30,11 @@ class FuelConsumption extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
+    public function getAssetsAttribute()
+    {
+        return Asset::where('id', $this->asset_id)->first();
+    }
+
     public function management_project(): BelongsTo
     {
         return $this->belongsTo(ManagementProject::class, 'management_project_id', 'id');
@@ -39,8 +45,8 @@ class FuelConsumption extends Model
         return $this->belongsTo(Asset::class, 'asset_id', 'id');
     }
 
-    public function user(): BelongsTo
+    public function employee(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(Employee::class, 'user_id', 'id');
     }
 }

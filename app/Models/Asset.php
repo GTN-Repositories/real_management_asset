@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Crypt;
 
@@ -23,6 +24,11 @@ class Asset extends Model
         return self::findOrFail($decryptedId);
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'pic', 'id');
+    }
+
     /**
      * Get all of the management_project for the Asset
      *
@@ -34,6 +40,11 @@ class Asset extends Model
         return $this->hasMany(ManagementProject::class, 'asset_id', 'id');
     }
 
+    public function fuel_consumptions(): HasMany
+    {
+        return $this->hasMany(FuelConsumption::class, 'asset_id', 'id');
+    }
+
     public static function getStatusTypes()
     {
         return [
@@ -41,5 +52,20 @@ class Asset extends Model
             'maintenance' => ['OnHold', 'Finish', 'Scheduled', 'InProgress'],
             'condition' => ['Damaged', 'Fair', 'NeedsRepair', 'Good']
         ];
+    }
+
+    public function asset_category(): BelongsTo
+    {
+        return $this->belongsTo(AssetCategory::class, 'category', 'id');
+    }
+
+    public function asset_manager(): BelongsTo
+    {
+        return $this->belongsTo(AssetManager::class, 'manager', 'id');
+    }
+
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class, 'assets_location', 'id');
     }
 }

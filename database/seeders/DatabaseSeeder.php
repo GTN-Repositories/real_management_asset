@@ -20,25 +20,37 @@ class DatabaseSeeder extends Seeder
         $this->call(UnitSeeder::class);
         $this->call(MenuPermissionSeeder::class);
 
-        // $permissions = [
-        //     'role create',
-        //     'role read',
-        //     'role update',
-        //     'role delete',
-        //     'permission create',
-        //     'permission read',
-        //     'permission update',
-        //     'permission delete',
-        //     'user create',
-        //     'user read',
-        //     'user update',
-        //     'user delete',
-        //     'report read',
-        // ];
+        $permissions = [
+            'role-create',
+            'role-edit',
+            'role-delete',
+            'permission-create',
+            'permission-edit',
+            'permission-delete',
+            'user-create',
+            'user-edit',
+            'user-delete',
+            'menu-create',
+            'menu-edit',
+            'menu-delete',
+            'asset-create',
+            'asset-edit',
+            'asset-delete',
+            'asset-detail',
+            'management-create',
+            'management-edit',
+            'management-delete',
+            'fuel-create',
+            'fuel-edit',
+            'fuel-delete',
+            'monitoring-create',
+            'monitoring-edit',
+            'monitoring-delete',
+        ];
 
-        // foreach ($permissions as $permission) {
-        //     Permission::create(['name' => $permission]);
-        // }
+        foreach ($permissions as $permission) {
+            Permission::create(['name' => $permission]);
+        }
 
         Role::create([
             'name' => 'superAdmin',
@@ -64,5 +76,7 @@ class DatabaseSeeder extends Seeder
 
         $admin->assignRole('superAdmin');
         $driver->assignRole('driver');
+
+        $admin->givePermissionTo(Permission::all());
     }
 }

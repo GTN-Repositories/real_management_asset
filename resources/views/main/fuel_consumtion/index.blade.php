@@ -37,6 +37,7 @@
                             <th>Loadsheet</th>
                             <th>Banyak Penggunaan</th>
                             <th>Harga/Liter</th>
+                            <th>Kategori</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -146,6 +147,10 @@
                     {
                         data: 'price',
                         name: 'price'
+                    },
+                    {
+                        data: 'category',
+                        name: 'category'
                     },
                     {
                         data: 'action',

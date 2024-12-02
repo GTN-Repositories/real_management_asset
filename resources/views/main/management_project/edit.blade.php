@@ -8,18 +8,37 @@
     @csrf
     @method('put')
 
-    <div class="col-12 col-md-12">
-        <label class="form-label" for="name">nama manajemen<span class="text-danger">*</span></label>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="name">Nama Management Project<span class="text-danger">*</span></label>
         <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name" required
             value="{{ $data->name }}" />
     </div>
-    <div class="col-12 col-md-12" id="relationId">
-        <label class="form-label" for="asset_id">nama aset<span class="text-danger">*</span></label>
-        <select id="asset_id" name="asset_id" class="select2 form-select " data-allow-clear="true" required>
-            <option value="{{ $data->asset->id }}" selected>{{ $data->asset->name }}</option>
-        </select>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="value_project">Value Project<span class="text-danger">*</span></label>
+        <input type="text" id="value_project" name="value_project" class="form-control"
+            placeholder="Masukkan value project" required value="{{ $data->value_project }}" />
     </div>
-    <div class="col-12 col-md-12">
+    <div class="col-12 col-md-12" id="relationId">
+        <label class="form-label" for="asset_id">Nama Asset<span class="text-danger">*</span></label>
+        <div class="select2-primary">
+            <div class="position-relative">
+                <select id="asset_id" name="asset_id[]" class="select2 form-select" multiple required>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-12" id="employeeId">
+        <label for="employee_id" class="form-label">Karyawan<span class="text-danger">*</span></label>
+        <div class="select2-primary">
+            <div class="position-relative">
+                <select id="employee_id" name="employee_id[]" class="select2 form-select" multiple required>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
         <label for="date-range-picker" class="form-label">Periode Waktu</label>
         <div class="input-group" id="date-range-picker">
             <input type="date" id="start_date" name="start_date" class="form-control" placeholder="Start Date"
@@ -29,7 +48,7 @@
                 value="{{ $data->end_date }}" required>
         </div>
     </div>
-    <div class="col-12 col-md-12">
+    <div class="col-12 col-md-6">
         <label class="form-label" for="calculation_method">Metode Kalkulasi</label>
         <select name="calculation_method" id="calculation_method" class="form-select select2">
             <option value="">Pilih</option>
@@ -60,6 +79,34 @@
                     };
                 },
                 processResults: function(data) {
+                    var apiResults = data.data.map(function(item) {
+                        return {
+                            text: item.nameWithNumber,
+                            id: item.relationId,
+                        };
+                    });
+                    return {
+                        results: apiResults
+                    };
+                },
+                limit: 10,
+                cache: true
+            }
+        });
+
+        $('#employee_id').select2({
+            dropdownParent: $('#employeeId'),
+            placeholder: 'Pilih karyawan',
+            ajax: {
+                url: "{{ route('employee.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function(data) {
                     apiResults = data.data.map(function(item) {
                         return {
                             text: item.name,
@@ -71,10 +118,79 @@
                         results: apiResults
                     };
                 },
+                limit: 10,
                 cache: true
             }
         });
+
+        var asset_ids = {!! json_encode($data->asset_id ?? []) !!};
+        var asset_names = {!! json_encode($data->assets->pluck('name') ?? []) !!};
+        var asset_numbers = {!! json_encode($data->assets->pluck('asset_number') ?? []) !!};
+
+        if (asset_ids && asset_names && asset_numbers) {
+            asset_ids.forEach(function(id, index) {
+                var option = new Option(`${asset_names[index]} - ${asset_numbers[index]}`, id, true,
+                    true);
+                $('#asset_id').append(option);
+            });
+            $('#asset_id').trigger('change');
+        }
+
+        var employee_ids = {!! json_encode($data->employee_id ?? []) !!};
+        var employee_names = {!! json_encode($data->employees->pluck('name') ?? []) !!};
+
+        employee_ids = Array.isArray(employee_ids) ? employee_ids : [];
+        employee_names = Array.isArray(employee_names) ? employee_names : [];
+
+        if (employee_ids.length > 0 && employee_names.length > 0) {
+            employee_ids.forEach(function(id, index) {
+                var name = employee_names[index] || 'Undefined';
+                var option = new Option(name, id, true, true);
+                $('#employee_id').append(option);
+            });
+            $('#employee_id').trigger('change');
+        } else {
+            $('#employee_id').empty();
+            $('#employee_id').trigger('change');
+        }
+
+
     });
+
+    $(document).ready(function() {
+        $('#value_project').each(function() {
+            const value = $(this).val();
+            $(this).val(formatCurrency(value));
+        });
+    });
+
+    $(document).on('input', '#value_project', function() {
+        const value = $(this).val();
+        $(this).val(formatCurrency(value));
+    });
+
+    function formatCurrency(angka, prefix) {
+        if (!angka) {
+            return (prefix || '') + '-';
+        }
+
+        angka = angka.toString();
+        const splitDecimal = angka.split('.');
+        let number_string = angka.replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        // tambahkan titik jika yang di input sudah menjadi angka ribuan
+        if (ribuan) {
+            const separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+        return prefix === undefined ? rupiah : rupiah ? (prefix || '') + rupiah : '';
+    }
 </script>
 <script>
     document.getElementById('formEdit').addEventListener('submit', function(event) {

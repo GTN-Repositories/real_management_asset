@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\FuelConsumption;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use PhpParser\Node\Stmt\TryCatch;
 
 class FuelConsumptionController extends Controller
 {
@@ -45,10 +46,10 @@ class FuelConsumptionController extends Controller
                 return $data->management_project->name ?? null;
             })
             ->addColumn('asset_id', function ($data) {
-                return $data->asset->name ?? null;
+                return $data->asset->name . ' - ' . $data->asset->asset_number ?? null;
             })
             ->addColumn('user_id', function ($data) {
-                return $data->user->name ?? null;
+                return $data->employee->name ?? null;
             })
             ->addColumn('date', function ($data) {
                 return $data->date ?? null;
@@ -62,16 +63,30 @@ class FuelConsumptionController extends Controller
             ->addColumn('price', function ($data) {
                 return 'Rp. ' . number_format($data->price, 0, ',', '.') ?? null;
             })
+            ->addColumn('category', function ($data) {
+                return $data->category ?? null;
+            })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                if (auth()->user()->hasPermissionTo('fuel-edit')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                }
+                if (auth()->user()->hasPermissionTo('fuel-delete')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                }
                 $btn .= '</div>';
 
                 return $btn;
             })
             ->addColumn('literDashboard', function ($data) {
-                return $data->liter ?? null;
+                $liter = $data->liter ?? null;
+                if (session('selected_project_id')) {
+                    $selectedProjectId = Crypt::decrypt(session('selected_project_id'));
+                    if ($data->management_project_id == $selectedProjectId) {
+                        return $liter;
+                    }
+                }
+                return $liter;
             })
             ->escapeColumns([])
             ->make(true);
@@ -88,9 +103,11 @@ class FuelConsumptionController extends Controller
             'loadsheet',
             'liter',
             'price',
+            'category',
+            'hours',
         ];
 
-        $keyword = $request->search['value'] ?? "";
+        $keyword = $request->keyword ?? "";
         // $project_id = $this->projectId();
 
         $data = FuelConsumption::orderBy('created_at', 'asc')
@@ -102,7 +119,14 @@ class FuelConsumptionController extends Controller
                         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
                     }
                 }
+            })
+            ->get();
+
+        if (session('selected_project_id')) {
+            $data->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
             });
+        }
 
         return $data;
     }
@@ -122,10 +146,15 @@ class FuelConsumptionController extends Controller
 
         try {
             return $this->atomic(function () use ($data) {
-                $data['price'] = str_replace('.', '', $data['price']);
-                $data['loadsheet'] = str_replace('.', '', $data['loadsheet']);
-                $data['liter'] = str_replace('.', '', $data['liter']);
+                $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
+                $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
+                $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
+                $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
+                $data['lasted_km_asset'] = isset($data['lasted_km_asset']) && $data['lasted_km_asset'] != '-' ? str_replace('.', '', $data['lasted_km_asset']) : null;
+
+                $data["asset_id"] = crypt::decrypt($data["asset_id"]);
                 $data["management_project_id"] = crypt::decrypt($data["management_project_id"]);
+                $data["user_id"] = crypt::decrypt($data["user_id"]);
                 $data = FuelConsumption::create($data);
 
                 return response()->json([
@@ -153,9 +182,12 @@ class FuelConsumptionController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit(string $id)
     {
-        $data = FuelConsumption::findByEncryptedId($id);
+
+        $decryptedId = Crypt::decrypt($id);
+        $data = FuelConsumption::findOrFail($decryptedId);
+        $data->assets = $data->getAssetsAttribute();
 
         return view('main.fuel_consumtion.edit', compact('data'));
     }
@@ -167,10 +199,30 @@ class FuelConsumptionController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->all();
-
         try {
             return $this->atomic(function () use ($data, $id) {
-                $data["management_project_id"] = crypt::decrypt($data["management_project_id"]);
+                $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
+                $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
+                $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
+                $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
+                $data['lasted_km_asset'] = isset($data['lasted_km_asset']) && $data['lasted_km_asset'] != '-' ? str_replace('.', '', $data['lasted_km_asset']) : null;
+
+                try {
+                    $data["management_project_id"] = Crypt::decrypt($data["management_project_id"]);
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                    $data["management_project_id"] = $data["management_project_id"];
+                }
+                try {
+                    $data["asset_id"] = crypt::decrypt($data["asset_id"]);
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                    $data["asset_id"] = $data["asset_id"];
+                }
+                try {
+                    $data["user_id"] = crypt::decrypt($data["user_id"]);
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                    $data["user_id"] = $data["user_id"];
+                }
+
                 $data = FuelConsumption::findByEncryptedId($id)->update($data);
 
                 return response()->json([

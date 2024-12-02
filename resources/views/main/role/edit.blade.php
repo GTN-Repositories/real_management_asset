@@ -20,11 +20,11 @@
                 <tbody>
                     <tr>
                         <td>
-                            <div class="d-flex flex-wrap">
-                                @foreach ($permissions as $permission)
-                                    <div class="form-check me-3 me-lg-5">
-                                        <input class="form-check-input" name="permissions[]" value="{{ Crypt::encrypt($permission->id) }}" type="checkbox" id="permission{{ Crypt::encrypt($permission->id) }}" {{ in_array($permission->id, $rolePermissions) ? 'checked' : '' }} />
-                                        <label class="form-check-label" for="permission{{ Crypt::encrypt($permission->id) }}"> {{ $permission->name }} </label>
+                            <div class="d-flex flex-wrap align-items-center">
+                                @foreach ($permissions as $data)
+                                    <div class="form-check me-4 mb-2">
+                                        <input class="form-check-input" name="permissions[]" value="{{ Crypt::encrypt($data->id) }}" type="checkbox" id="permission{{ $data->id }}" {{ in_array($data->id, $rolePermissions) ? 'checked' : '' }} />
+                                        <label class="form-check-label" for="permission{{ $data->id }}"> {{ $data->name }} </label>
                                     </div>
                                 @endforeach
                             </div>

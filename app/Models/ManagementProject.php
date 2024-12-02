@@ -23,13 +23,34 @@ class ManagementProject extends Model
         return self::findOrFail($decryptedId);
     }
 
-    /**
-     * Get the user that owns the ManagementProject
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function asset(): BelongsTo
     {
         return $this->belongsTo(Asset::class, 'asset_id', 'id');
+    }
+
+    public function getAssetsAttribute()
+    {
+        return Asset::whereIn('id', $this->asset_id)->get();
+    }
+
+    protected $casts = [
+        'asset_id' => 'array',
+    ];
+
+    public function monitorings()
+    {
+        return $this->hasManyThrough(
+            Monitoring::class,
+            Asset::class,
+            'id', // Foreign key on assets table
+            'asset_id', // Foreign key on monitorings table
+            'asset_id', // Local key on management_projects table
+            'id' // Local key on assets table
+        );
+    }
+
+    public function pettyCash()
+    {
+        return $this->hasMany(PettyCash::class);
     }
 }

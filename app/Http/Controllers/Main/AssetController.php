@@ -4,11 +4,20 @@ namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
+use App\Models\AssetNote;
+use App\Models\LogActivity;
+use App\Models\ManagementProject;
+use App\Models\StatusAsset;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class AssetController extends Controller
 {
@@ -43,39 +52,49 @@ class AssetController extends Controller
                 return $data->id ?? null;
             })
             ->addColumn('image', function ($data) {
-                return $data->image ? '<img src="' . asset('storage/' . $data->image) . '" alt="Image" width="50" height="50"/>' : "kosong";
+                return $data->image ? '<img src="' . asset('storage/' . $data->image) . '" alt="Image" width="50" height="50"/>' : "-";
+            })
+            ->addColumn('nameWithNumber', function ($data) {
+                return $data->license_plate . " - " . $data->name . " - " . $data->asset_number ?? "-";
             })
             ->addColumn('name', function ($data) {
-                return $data->name ?? "kosong";
+                return $data->name ?? "-";
             })
             ->addColumn('serial_number', function ($data) {
-                return $data->serial_number ?? "kosong";
+                return $data->serial_number ?? "-";
             })
             ->addColumn('model_number', function ($data) {
-                return $data->model_number ?? "kosong";
+                return $data->model_number ?? "-";
             })
             ->addColumn('manager', function ($data) {
-                return $data->manager ?? "kosong";
+                return $data->manager ?? "-";
             })
             ->addColumn('category', function ($data) {
-                return $data->category ?? "kosong";
+                return $data->asset_category->name ?? "-";
             })
             ->addColumn('assets_location', function ($data) {
-                return $data->assets_location ?? "kosong";
+                return $data->location->name ?? "-";
             })
             ->addColumn('cost', function ($data) {
-                return $data->cost ?? "kosong";
+                return $data->cost ?? "-";
             })
             ->addColumn('purchase_date', function ($data) {
-                return $data->purchase_date ?? "kosong";
+                return $data->purchase_date ?? "-";
             })
             ->addColumn('created_at', function ($data) {
-                return $data->created_at ?? "kosong";
+                return $data->created_at ?? "-";
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                if (auth()->user()->hasPermissionTo('asset-detail')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-info btn-sm me-1" title="Detail Data" onclick="detailData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
+                }
+                if (auth()->user()->hasPermissionTo('asset-edit')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                }
+                if (auth()->user()->hasPermissionTo('asset-delete')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                }
                 $btn .= '</div>';
 
                 return $btn;
@@ -88,6 +107,7 @@ class AssetController extends Controller
     {
         $columns = [
             'id',
+            'asset_number',
             'image',
             'name',
             'serial_number',
@@ -97,23 +117,29 @@ class AssetController extends Controller
             'category',
             'cost',
             'purchase_date',
+            'license_plate',
             'created_at',
         ];
 
-        $keyword = $request->search['value'] ?? "";
+        $keyword = $request->keyword ?? "";
         $category = $request->category;
         $assets_location = $request->assets_location;
         $manager = $request->manager;
+        $limit = $request->limit ?? 10;
 
         $data = Asset::orderBy('created_at', 'asc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
-                    foreach ($columns as $column) {
-                        $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
-                    }
+                    $query->where(function ($q) use ($keyword, $columns) {
+                        foreach ($columns as $column) {
+                            $q->orWhere($column, 'LIKE', '%' . $keyword . '%');
+                        }
+                    });
                 }
-            });
+            })
+            ->limit(10)
+            ->get();
 
         if ($category) {
             $data->where('category', $category);
@@ -125,6 +151,15 @@ class AssetController extends Controller
             $data->where('manager', $manager);
         }
 
+        if (session('selected_project_id')) {
+            $managementProject = ManagementProject::find(Crypt::decrypt(session('selected_project_id')));
+
+            if ($managementProject) {
+                $assetIds = $managementProject->asset_id;
+                $data->whereIn('id', $assetIds);
+            }
+        }
+
         return $data;
     }
 
@@ -132,34 +167,43 @@ class AssetController extends Controller
     {
         try {
             // Get base query
-            $query = Asset::query();
+            $baseQuery = Asset::query();
 
-            // Get operational status counts
-            $operationalStatus = $query->select(
+            // Add project filter
+            if (session('selected_project_id')) {
+                $managementProject = ManagementProject::find(Crypt::decrypt(session('selected_project_id')));
+
+                if ($managementProject) {
+                    $assetIds = $managementProject->asset_id;
+                    $baseQuery->whereIn('id', $assetIds);
+                }
+            }
+
+            // Clone queries for each count to avoid interference
+            $operationalStatus = (clone $baseQuery)->select(
                 DB::raw('COUNT(CASE WHEN status = "Idle" THEN 1 END) as idle'),
                 DB::raw('COUNT(CASE WHEN status = "StandBy" THEN 1 END) as standby'),
                 DB::raw('COUNT(CASE WHEN status = "UnderMaintenance" THEN 1 END) as underMaintenance'),
                 DB::raw('COUNT(CASE WHEN status = "Active" THEN 1 END) as active')
             )->first();
 
-            // Get maintenance status counts
-            $maintenanceStatus = $query->select(
+            $maintenanceStatus = (clone $baseQuery)->select(
                 DB::raw('COUNT(CASE WHEN status = "OnHold" THEN 1 END) as onHold'),
                 DB::raw('COUNT(CASE WHEN status = "Finish" THEN 1 END) as finish'),
                 DB::raw('COUNT(CASE WHEN status = "Scheduled" THEN 1 END) as scheduled'),
                 DB::raw('COUNT(CASE WHEN status = "InProgress" THEN 1 END) as inProgress')
             )->first();
 
-            // Get asset condition status counts
-            $assetStatus = $query->select(
+            $assetStatus = (clone $baseQuery)->select(
                 DB::raw('COUNT(CASE WHEN status = "Damaged" THEN 1 END) as damaged'),
                 DB::raw('COUNT(CASE WHEN status = "Fair" THEN 1 END) as fair'),
                 DB::raw('COUNT(CASE WHEN status = "NeedsRepair" THEN 1 END) as needsRepair'),
                 DB::raw('COUNT(CASE WHEN status = "Good" THEN 1 END) as good')
             )->first();
 
-            // Calculate percentages and totals
-            $totalAssets = $query->count();
+            $totalAssets = $baseQuery->count();
+
+            // Rest of the response building code remains the same...
 
             $response = [
                 // Operational Status
@@ -214,13 +258,265 @@ class AssetController extends Controller
         }
     }
 
-    /**
-     * Helper method to calculate percentage safely
-     */
-    private function calculatePercentage($value, $total)
+    public function getAppreciationData(Request $request)
     {
-        if ($total <= 0) return 0;
-        return round(($value / $total) * 100, 1);
+        $assetId = $request->query('asset_id');
+
+        $assetsQuery = Asset::select('purchase_date', 'cost', 'appreciation_rate', 'appreciation_period');
+
+        if ($assetId) {
+            $assetsQuery->where('id', $assetId);
+        }
+
+        $assets = $assetsQuery->get();
+
+        $chartData = [];
+        foreach ($assets as $asset) {
+            $purchaseDate = \Carbon\Carbon::parse($asset->purchase_date);
+            $data = [];
+            $cost = $asset->cost;
+
+            $rate = $asset->appreciation_rate;
+            $period = $asset->appreciation_period;
+
+            if ($rate !== null && $period !== null && $cost > 0) {
+                for ($i = 0; $i <= $period; $i++) {
+                    $value = $cost * pow(1 + ($rate / 100), $i);
+
+                    if (is_finite($value)) {
+                        $data[] = [
+                            'date' => $purchaseDate->copy()->addMonths($i)->format('Y-m-d'),
+                            'value' => $value
+                        ];
+                    }
+                }
+            }
+
+            $chartData[] = [
+                'label' => 'Asset on ' . $asset->purchase_date,
+                'data' => $data
+            ];
+        }
+
+        return response()->json($chartData);
+    }
+
+    public function getDepreciationData(Request $request)
+    {
+        $assetId = $request->query('asset_id');
+
+        $assetsQuery = Asset::select('purchase_date', 'cost', 'residual_value', 'depreciation', 'depreciation_method');
+
+        if ($assetId) {
+            $assetsQuery->where('id', $assetId);
+        }
+
+        $assets = $assetsQuery->get();
+
+        $chartData = [];
+        foreach ($assets as $asset) {
+            $purchaseDate = \Carbon\Carbon::parse($asset->purchase_date);
+            $cost = $asset->cost;
+            $residualValue = $asset->residual_value;
+            $depreciationMonths = $asset->depreciation;
+            $method = $asset->depreciation_method;
+            $data = [];
+
+            if ($depreciationMonths > 0 && $cost > $residualValue) {
+                if ($method === 'Penyusutan Garis Lurus') {
+                    $monthlyDepreciation = ($cost - $residualValue) / $depreciationMonths;
+                    for ($i = 0; $i <= $depreciationMonths; $i++) {
+                        $depreciatedValue = $cost - ($monthlyDepreciation * $i);
+                        $data[] = [
+                            'date' => $purchaseDate->copy()->addMonths($i)->format('Y-m-d'),
+                            'value' => max($depreciatedValue, $residualValue)
+                        ];
+                    }
+                } elseif ($method === 'Penyusutan Saldo Menurun') {
+                    $rate = 1 - pow($residualValue / $cost, 1 / $depreciationMonths);
+                    for ($i = 0; $i <= $depreciationMonths; $i++) {
+                        $depreciatedValue = $cost * pow(1 - $rate, $i);
+                        $data[] = [
+                            'date' => $purchaseDate->copy()->addMonths($i)->format('Y-m-d'),
+                            'value' => max($depreciatedValue, $residualValue)
+                        ];
+                    }
+                }
+            }
+
+            $chartData[] = [
+                'label' => 'Asset on ' . $asset->purchase_date,
+                'data' => $data
+            ];
+        }
+
+        return response()->json($chartData);
+    }
+
+    public function importForm()
+    {
+        return view('main.unit.import');
+    }
+    protected $statusMapping = [
+        'aktif' => 'Active',
+        'tidak aktif' => 'Idle',
+        'siaga' => 'StandBy',
+        'selesai' => 'Finish',
+        'rusak' => 'Damaged',
+        'cukup' => 'Fair',
+        'perawatan' => 'UnderMaintenance',
+        'dijadwalkan' => 'Scheduled',
+        'proses' => 'InProgress',
+        'butuh perbaikan' => 'NeedsRepair',
+        'baik' => 'Good',
+        'ditahan' => 'OnHold'
+    ];
+
+    protected function mapStatus($status)
+    {
+        return $this->statusMapping[strtolower($status)] ?? 'Idle';
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            if (!$request->hasFile('excel_file')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No file uploaded!'
+                ], 400);
+            }
+
+            $file = $request->file('excel_file');
+            $spreadsheet = IOFactory::load($file->getPathname());
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $rows = $worksheet->toArray();
+            $startRow = 4;
+            $failed = [];
+            $success = 0;
+
+            $headers = array_slice($rows[$startRow - 1], 1);
+
+            for ($i = $startRow; $i < count($rows); $i++) {
+                $row = array_slice($rows[$i], 1);
+
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+
+                $data = [
+                    'asset_number' => $row[1],
+                    'category' => $row[2],
+                    'name' => $row[3],
+                    'unit' => $row[4],
+                    'type' => $row[5],
+                    'license_plate' => $row[6],
+                    'classification' => $row[7],
+                    'chassis_number' => $row[8],
+                    'machine_number' => $row[9],
+                    'nik' => $row[10],
+                    'color' => $row[11],
+                    'manager' => $row[12],
+                    'assets_location' => $row[31],
+                    'image' => $row[32],
+                    'status' => $this->mapStatus($row[33]),
+                ];
+
+                try {
+                    DB::beginTransaction();
+
+                    Asset::create($data);
+
+                    DB::commit();
+                    $success++;
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    $failed[] = [
+                        'row' => $i + 1,
+                        'errors' => [$e->getMessage()],
+                        'data' => $data
+                    ];
+                }
+            }
+
+            $message = "Import completed. Successfully imported $success records.";
+            if (count($failed) > 0) {
+                $message .= " Failed to import " . count($failed) . " records.";
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => $message,
+                'failed_rows' => $failed,
+                'success_count' => $success
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error processing file: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function generateTemplate()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header sesuai format yang diminta
+        $headers = [
+            'No',
+            'No Aset',
+            'Kategori',
+            'Merek',
+            'Unit',
+            'Type',
+            'No Polisi',
+            'Klasifikasi',
+            'No Rangka',
+            'No Mesin',
+            'NIK',
+            'Warna',
+            'Pemilik'
+        ];
+
+        $additionalHeaders = [
+            'Project',
+            'Lokasi',
+            'PIC',
+            'Status'
+        ];
+
+        // Menulis header di B4 hingga O4
+        foreach ($headers as $index => $header) {
+            $sheet->setCellValueByColumnAndRow($index + 2, 4, $header); // Kolom B adalah index 2
+        }
+
+        // Menulis header tambahan dari AG4 hingga AJ4
+        foreach ($additionalHeaders as $index => $header) {
+            $sheet->setCellValueByColumnAndRow($index + 32, 4, $header); // Kolom AG adalah index 33
+        }
+
+        // Menyembunyikan kolom P hingga AF
+        for ($col = 15; $col <= 31; $col++) { // Kolom P = 16, AF = 32
+            $sheet->getColumnDimensionByColumn($col)->setVisible(false);
+        }
+
+        // Menyimpan template ke dalam file Excel
+        $writer = new Xlsx($spreadsheet);
+        $filePath = storage_path('app/public/asset_import_template.xlsx');
+        $writer->save($filePath);
+
+        return response()->download($filePath, 'asset_import_template.xlsx');
+    }
+
+
+    public function updateFiles(Request $request)
+    {
+        $data = Asset::findByEncryptedId($request->id);
+        $data->kategori = $request->kategori;
+        return view('main.unit.update-files', compact('data'));
     }
 
 
@@ -235,12 +531,28 @@ class AssetController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-
         try {
             return $this->atomic(function () use ($data) {
+                $lastAsset = Asset::latest('id')->first();
+                $lastNumber = $lastAsset ? intval(str_replace('ast-', '', $lastAsset->asset_number)) : 0;
+
+                if (isset($data['assets_location'])) {
+                    $data['assets_location'] = Crypt::decrypt($data['assets_location']);
+                }
+                if (isset($data['manager'])) {
+                    $data['manager'] = Crypt::decrypt($data['manager']);
+                }
+                if (isset($data['category'])) {
+                    $data['category'] = Crypt::decrypt($data['category']);
+                }
+
+                $data['status'] = "Idle";
+                $data['asset_number'] = 'ast-' . ($lastNumber + 1);
+
                 if (isset($data['image'])) {
                     $data['image'] = $data['image']->store('assets', 'public');
                 }
+
                 $data = Asset::create($data);
 
                 return response()->json([
@@ -256,14 +568,76 @@ class AssetController extends Controller
         }
     }
 
+    public function note(Request $request, $id)
+    {
+        $data = $request->all();
+
+        try {
+            return $this->atomic(function () use ($data, $id) {
+                $data['asset_id'] = Crypt::decrypt($id);
+
+                AssetNote::create($data);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil ditambahkan!',
+                ]);
+            });
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data gagal ditambahkan! ' . $th->getMessage(),
+            ]);
+        }
+    }
 
     /**
      * Display the specified resource.
      */
+
     public function show(string $id)
     {
-        //
+        $asset = Asset::findByEncryptedId($id);
+        $decryptedId = Crypt::decrypt($asset->id);
+
+        $projects = ManagementProject::whereJsonContains('asset_id', $decryptedId)->get();
+        $notes = AssetNote::where('asset_id', $decryptedId)->get();
+        $logs = LogActivity::where('asset_id', $decryptedId)->get();
+
+        $path = public_path('storage/qr_codes/');
+
+        $encryptedId = Crypt::encrypt($decryptedId);
+        $qrCodeFile = $path . $encryptedId . '.png';
+
+        if (!file_exists($qrCodeFile)) {
+            $qrCode = new QrCode(route('asset.show', $asset->id));
+            $writer = new PngWriter();
+
+            if (!file_exists($path)) {
+                mkdir($path, 0777, true);
+            }
+
+            $result = $writer->write($qrCode);
+            $result->saveToFile($qrCodeFile);
+        }
+
+        return view('main.unit.show', compact('asset', 'projects', 'notes', 'logs', 'encryptedId'));
     }
+
+    public function download(string $encryptedId)
+    {
+        $decryptedId = Crypt::decrypt($encryptedId);
+
+        $path = public_path('storage/qr_codes/' . $encryptedId . '.png');
+
+        if (file_exists($path)) {
+            return response()->download($path);
+        }
+
+        return redirect()->back()->with('error', 'File not found.');
+    }
+
+
 
     /**
      * Show the form for editing the specified resource.
@@ -286,6 +660,7 @@ class AssetController extends Controller
         try {
             return $this->atomic(function () use ($data, $id) {
                 $asset = Asset::findByEncryptedId($id);
+                $statusBefore = $asset->status;
                 if (!isset($data['image']) || !$data['image']) {
                     $data['image'] = $asset->image;
                 } else {
@@ -296,7 +671,38 @@ class AssetController extends Controller
                         $data['image'] = $data['image']->store('assets', 'public');
                     }
                 }
+
+                if (!isset($data['stnk']) || !$data['stnk']) {
+                    $data['stnk'] = $asset->stnk;
+                } else {
+                    if ($asset->stnk && Storage::disk('public')->exists($asset->stnk)) {
+                        Storage::disk('public')->delete($asset->stnk);
+                        $data['stnk'] = $data['stnk']->store('assets', 'public');
+                    } else {
+                        $data['stnk'] = $data['stnk']->store('assets', 'public');
+                    }
+                }
+
+                if (!isset($data['asuransi']) || !$data['asuransi']) {
+                    $data['asuransi'] = $asset->asuransi;
+                } else {
+                    if ($asset->asuransi && Storage::disk('public')->exists($asset->asuransi)) {
+                        Storage::disk('public')->delete($asset->asuransi);
+                        $data['asuransi'] = $data['asuransi']->store('assets', 'public');
+                    } else {
+                        $data['asuransi'] = $data['asuransi']->store('assets', 'public');
+                    }
+                }
+
                 $data = $asset->update($data);
+
+                if ($statusBefore !== $asset->status) {
+                    StatusAsset::create([
+                        'asset_id' => Crypt::decrypt($asset->id),
+                        'status_before' => $statusBefore,
+                        'status_after' => $asset->status,
+                    ]);
+                }
 
                 return response()->json([
                     'status' => true,
