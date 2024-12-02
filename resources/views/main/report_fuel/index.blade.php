@@ -65,8 +65,7 @@
                             <th>#</th>
                             <th>Management Project</th>
                             <th>Unit</th>
-                            <th>Tanggal Awal</th>
-                            <th>Tanggal Akhir</th>
+                            <th>Tanggal</th>
                             <th>Total Hari</th>
                             <th>Pemakaian Solar</th>
                             <th>Total Loadsheet</th>
@@ -173,12 +172,8 @@
                         name: 'asset_id'
                     },
                     {
-                        data: 'start_date',
-                        name: 'start_date'
-                    },
-                    {
-                        data: 'end_date',
-                        name: 'end_date'
+                        data: 'date',
+                        name: 'date'
                     },
                     {
                         data: 'day_total',
