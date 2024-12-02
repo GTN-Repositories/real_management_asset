@@ -3,7 +3,8 @@
     <h3 class="mb-2">Tambah Barang</h3>
     <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
-<form method="POST" class="row g-3" id="fromEdit" action="{{ route('item.update', $data->id) }}" enctype="multipart/form-data">
+<form method="POST" class="row g-3" id="fromEdit" action="{{ route('item.update', $data->id) }}"
+    enctype="multipart/form-data">
     @csrf
     @method('PUT')
     <div class="col-8 col-md-2">
@@ -46,6 +47,12 @@
     </div>
 
     <div class="col-12 col-md-6">
+        <label class="form-label">Harga</label>
+        <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0" placeholder="Harga"
+            required value="{{ $data->price }}" />
+    </div>
+
+    <div class="col-12 col-md-6">
         <label for="exampleFormControlSelect1" class="form-label">Status</label>
         <select class="form-select" id="exampleFormControlSelect1" name="status" aria-label="Select Status">
             <option selected value="">None</option>
@@ -54,16 +61,16 @@
         </select>
     </div>
 
-    <div class="col-12 col-md-6 mb-4" id="select2relation">
+    <div class="col-12 col-md-6 mb-4" id="categoryRelation">
         <label for="select2Basic" class="form-label">Kategori</label>
-        <select id="select2Basic" class="select2 form-select form-select-lg" name="category_id" data-allow-clear="true">
-            <option></option>
+        <select id="category_id" class="select2 form-select form-select-lg" name="category_id" data-allow-clear="true">
         </select>
     </div>
 
     <div class="col-12 col-md-6">
         <label class="form-label">Warna</label>
-        <input type="color" name="color" value="{{ $data->color }}" class="form-control mb-lg-0" placeholder="Warna" required />
+        <input type="color" name="color" value="{{ $data->color }}" class="form-control mb-lg-0"
+            placeholder="Warna" required />
     </div>
 
     <div class="col-12 text-center">
@@ -114,18 +121,38 @@
 
     // Select2
     $(document).ready(function() {
-        var relationData = @json($relation);
-        $('#select2Basic').select2({
-            dropdownParent: $('#select2relation'),
-            placeholder: 'Pilih Kategori',
-            data: relationData.map(function(relation) {
-                return {
-                    id: relation.id,
-                    text: relation.name
-                };
-            })
+        $('#category_id').select2({
+            dropdownParent: $('#categoryRelation'),
+            placeholder: 'Pilih kategori',
+            ajax: {
+                url: "{{ route('category-item.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function(data) {
+                    var results = data.data.map(item => ({
+                        text: item.name,
+                        id: item.category_id
+                    }));
+                    return {
+                        results
+                    };
+                },
+                cache: true
+            }
         });
     });
+
+    let categoryId = '{{ $data->category_id ?? '' }}';
+    let categoryName = '{{ $data->category->name ?? '' }}';
+    if (categoryId) {
+        let categoryOption = new Option(categoryName, categoryId, true, true);
+        $('#category_id').append(categoryOption).trigger('change');
+    }
 
     // image
     document.getElementById('image').addEventListener('change', function(event) {
@@ -142,6 +169,41 @@
                 "https://ca.shop.runningroom.com/media/catalog/product/placeholder/default/placeholder-image-square.jpg";
         }
     });
+
+    $(document).ready(function() {
+        $('#price').each(function() {
+            const value = $(this).val();
+            $(this).val(formatCurrency(value));
+        });
+    });
+
+    $(document).on('input', '#price', function() {
+        const value = $(this).val();
+        $(this).val(formatCurrency(value));
+    });
+
+    function formatCurrency(angka, prefix) {
+        if (!angka) {
+            return (prefix || '') + '-';
+        }
+
+        angka = angka.toString();
+        const splitDecimal = angka.split('.');
+        let number_string = angka.replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        // tambahkan titik jika yang di input sudah menjadi angka ribuan
+        if (ribuan) {
+            const separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+        return prefix === undefined ? rupiah : rupiah ? (prefix || '') + rupiah : '';
+    }
 </script>
 <script>
     document.getElementById('fromEdit').addEventListener('submit', function(event) {

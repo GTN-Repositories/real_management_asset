@@ -36,6 +36,9 @@ class CategoryItemController extends Controller
 
                 return $checkbox;
             })
+            ->addColumn('category_id', function ($data) {
+                return $data->id ?? null;
+            })
             ->addColumn('name', function ($data) {
                 return $data->name ?? null;
             })
@@ -66,7 +69,7 @@ class CategoryItemController extends Controller
             'created_at',
         ];
 
-        $keyword = $request->search['value'];
+        $keyword = $request->keyword ?? '';
 
         $data = CategoryItem::orderBy('created_at', 'asc')
             ->select($columns)

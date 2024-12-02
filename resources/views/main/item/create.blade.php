@@ -45,6 +45,11 @@
     </div>
 
     <div class="col-12 col-md-6">
+        <label class="form-label">Harga</label>
+        <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0" placeholder="Harga" required />
+    </div>
+
+    <div class="col-12 col-md-6">
         <label for="exampleFormControlSelect1" class="form-label">Status</label>
         <select class="form-select" id="exampleFormControlSelect1" name="status" aria-label="Select Status">
             <option selected value="">None</option>
@@ -141,6 +146,34 @@
                 "https://ca.shop.runningroom.com/media/catalog/product/placeholder/default/placeholder-image-square.jpg";
         }
     });
+
+    $(document).on('input', '#price', function() {
+        value = formatCurrency($(this).val());
+        $(this).val(value);
+    });
+
+    function formatCurrency(angka, prefix) {
+        if (!angka) {
+            return (prefix || '') + '-';
+        }
+
+        angka = angka.toString();
+        const splitDecimal = angka.split('.');
+        let number_string = angka.replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        // tambahkan titik jika yang di input sudah menjadi angka ribuan
+        if (ribuan) {
+            const separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+        return prefix === undefined ? rupiah : rupiah ? (prefix || '') + rupiah : '';
+    }
 </script>
 <script>
     document.getElementById('formCreate').addEventListener('submit', function(event) {

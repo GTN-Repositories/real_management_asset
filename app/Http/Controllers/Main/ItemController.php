@@ -139,6 +139,8 @@ class ItemController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $request) {
+                $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
+
                 $imageName = null;
                 if ($request->hasFile('image')) {
                     $image = $request->file('image');
@@ -202,6 +204,8 @@ class ItemController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id, $request) {
+                $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
+
                 $item = Item::findByEncryptedId($id);
                 if ($request->hasFile('image')) {
                     if ($item && $item->image) {
@@ -222,12 +226,6 @@ class ItemController extends Controller
                 if (isset($data['category_id'])) {
                     $categoryIdEncrypted = Crypt::decrypt($data['category_id']);
                     $data['category_id'] = $categoryIdEncrypted;
-                }
-
-                if ($data['metode'] == 'increase') {
-                    $data['stock'] = $item->stock + $data['stock'];
-                } else {
-                    $data['stock'] = $item->stock - $data['stock'];
                 }
 
                 $item->update($data);

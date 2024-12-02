@@ -22,35 +22,39 @@
                 <thead class="border-top">
                     <tr>
                         <th>Code</th>
-                        <td>{{ $data->code ?? null }}</td>
+                        <td>{{ $data->code ?? '-' }}</td>
                     </tr>
                     <tr>
                         <th>Nama Item</th>
-                        <td>{{ $data->name ?? null }}</td>
+                        <td>{{ $data->name ?? '-' }}</td>
                     </tr>
                     <tr>
-                        <th>Size</th>
-                        <td>{{ $data->size ?? null }}</td>
+                        <th>Ukuran</th>
+                        <td>{{ $data->size ?? '-' }}</td>
                     </tr>
                     <tr>
                         <th>Brand</th>
-                        <td>{{ $data->brand ?? null }}</td>
+                        <td>{{ $data->brand ?? '-' }}</td>
                     </tr>
                     <tr>
                         <th>Status</th>
-                        <td>{{ $data->status ?? null }}</td>
+                        <td>{{ $data->status ?? '-' }}</td>
                     </tr>
                     <tr>
                         <th>Part</th>
-                        <td>{{ $data->part ?? null }}</td>
+                        <td>{{ $data->part ?? '-' }}</td>
                     </tr>
                     <tr>
-                        <th>Color</th>
-                        <td>{{ $data->color ?? null }}</td>
+                        <th>Warna</th>
+                        <td>{{ $data->color ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Harga</th>
+                        <td>{{ number_format($data->price, 0, ',', '.') ?? '-' }}</td>
                     </tr>
                     <tr>
                         <th>Category</th>
-                        <td>{{ $data->category->name ?? null }}</td>
+                        <td>{{ $data->category->name ?? '-' }}</td>
                     </tr>
                 </thead>
             </table>
@@ -58,7 +62,7 @@
 
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">History Stock {{ $data->name ?? null }}</h5>
+                <h5 class="card-title mb-0">History Stock {{ $data->name ?? '-' }}</h5>
                 <div class="d-flex justify-content-end gap-2">
 
                 </div>
