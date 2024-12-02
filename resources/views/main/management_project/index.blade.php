@@ -113,7 +113,7 @@
 
             $('#date-range-picker').on('cancel.daterangepicker', function() {
                 $(this).val('');
-                reloadTableWithFilters(); // Reload without date range
+                reloadTableWithFilters();
             });
 
         });
@@ -133,17 +133,14 @@
             var table = $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
-                columnDefs: [{
-                    target: 0,
-                    visible: true,
-                    searchable: false
-                }, ],
-
+                destroy: true,
                 ajax: {
                     type: "GET",
                     url: "{{ route('management-project.data') }}",
                     data: {
-                        'keyword': keyword
+                        'keyword': keyword,
+                        'startDate': startDate,
+                        'endDate': endDate,
                     }
                 },
                 columns: [{

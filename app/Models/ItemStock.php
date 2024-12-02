@@ -5,8 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
 
-class Item extends Model
+class ItemStock extends Model
 {
+    //
     protected $guarded = ['id'];
 
     public function getIdAttribute()
@@ -21,13 +22,13 @@ class Item extends Model
         return self::findOrFail($decryptedId);
     }
 
-    public function category()
+    public function createdBy()
     {
-        return $this->belongsTo(CategoryItem::class, 'category_id', 'id');
+        return $this->belongsTo(User::class, 'request_by', 'id');
     }
 
-    public function detailPartInspections()
+    public function approvedBy()
     {
-        return $this->hasMany(DetailPartInspection::class);
+        return $this->belongsTo(User::class, 'aproved_by', 'id');
     }
 }

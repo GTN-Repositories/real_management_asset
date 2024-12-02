@@ -104,7 +104,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/supplier/destroy-all', [SupplierController::class, 'destroyAll'])->name('supplier.destroyAll');
     Route::resource('supplier', SupplierController::class);
 
-    Route::get('/item/stock/{id}', [ItemController::class, 'editStock'])->name('item.stock');
+    Route::put('/item/approveStock/{id}', [ItemController::class, 'approveStock'])->name('item.approveStock');
+    Route::get('/item/stock', [ItemController::class, 'editStock'])->name('item.stock');
+    Route::post('/item/stock/create', [ItemController::class, 'createStock'])->name('item.stock.create');
     Route::get('/item/data', [ItemController::class, 'data'])->name('item.data');
     Route::delete('/item/destroy-all', [ItemController::class, 'destroyAll'])->name('item.destroyAll');
     Route::resource('item', ItemController::class);
