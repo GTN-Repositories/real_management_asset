@@ -191,22 +191,29 @@ class ReportFuelController extends Controller implements HasMiddleware
             ->orderBy('date', 'asc');
 
         if ($request->filled('startDate') && $request->filled('endDate')) {
-            $query->whereBetween('date', [$request->startDate, $request->endDate]);
+            $query->whereBetween('date', [
+                Carbon::parse($request->startDate)->startOfDay(),
+                Carbon::parse($request->endDate)->endOfDay()
+            ]);
         }
 
+        // Apply predefined filter if provided
         if ($request->filled('predefinedFilter')) {
             switch ($request->predefinedFilter) {
                 case 'hari ini':
                     $query->whereDate('date', Carbon::today());
                     break;
                 case 'minggu ini':
-                    $query->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                    $query->whereBetween('date', [
+                        Carbon::now()->startOfWeek(),
+                        Carbon::now()->endOfWeek()
+                    ]);
                     break;
                 case 'bulan ini':
-                    $query->whereMonth('date', Carbon::now()->month);
+                    $query->whereRaw('MONTH(date) = MONTH(NOW()) AND YEAR(date) = YEAR(NOW())');
                     break;
                 case 'bulan kemarin':
-                    $query->whereMonth('date', Carbon::now()->subMonth()->month);
+                    $query->whereRaw('MONTH(date) = MONTH(NOW()) - 1 AND YEAR(date) = YEAR(NOW())');
                     break;
                 case 'tahun ini':
                     $query->whereYear('date', Carbon::now()->year);
@@ -244,6 +251,7 @@ class ReportFuelController extends Controller implements HasMiddleware
         return $pdf->download('FuelConsumptionReport.pdf');
     }
 
+
     public function exportExcel(Request $request)
     {
         $query = $this->getFilteredDataQuery($request);
@@ -256,9 +264,6 @@ class ReportFuelController extends Controller implements HasMiddleware
     }
 
 
-    /**
-     * Returns a query with the applied filters for consistency across exports.
-     */
     private function getFilteredDataQuery(Request $request)
     {
         $query = FuelConsumption::orderBy('date', 'asc');
@@ -271,6 +276,11 @@ class ReportFuelController extends Controller implements HasMiddleware
                     return $query->whereBetween('date', [
                         Carbon::now()->startOfWeek(),
                         Carbon::now()->endOfWeek()
+                    ]);
+                case 'bulan ini':
+                    return $query->whereBetween('date', [
+                        Carbon::now()->startOfMonth(),
+                        Carbon::now()->endOfMonth()
                     ]);
                 case 'bulan kemarin':
                     return $query->whereBetween('date', [
@@ -287,20 +297,24 @@ class ReportFuelController extends Controller implements HasMiddleware
                         Carbon::now()->subYear()->startOfYear(),
                         Carbon::now()->subYear()->endOfYear()
                     ]);
-                default:
-                    return $query->whereBetween('date', [
-                        Carbon::now()->startOfMonth(),
-                        Carbon::now()->endOfMonth()
-                    ]);
             }
         }
 
         if ($request->filled('startDate') && $request->filled('endDate')) {
-            $query->whereBetween('date', [
-                Carbon::parse($request->startDate)->startOfDay(),
-                Carbon::parse($request->endDate)->endOfDay()
+            $startDate = Carbon::parse($request->startDate);
+            $endDate = Carbon::parse($request->endDate);
+
+            if ($startDate->isSameDay($endDate)) {
+                return $query->whereBetween('date', [
+                    Carbon::now()->startOfMonth(),
+                    Carbon::now()->endOfMonth()
+                ]);
+            }
+
+            return $query->whereBetween('date', [
+                $startDate->startOfDay(),
+                $endDate->endOfDay()
             ]);
-            return $query;
         }
 
         return $query->whereBetween('date', [

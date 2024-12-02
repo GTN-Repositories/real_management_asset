@@ -138,6 +138,7 @@
         }
 
         function reloadHoursChartWithFilters(startDate = '', endDate = '', predefinedFilter = '') {
+            if (hoursChart) hoursChart.destroy();
             init_hours_chart(startDate, endDate, predefinedFilter);
         }
 
@@ -291,6 +292,8 @@
             });
         }
 
+        let hoursChart;
+
         function init_hours_chart(startDate = '', endDate = '', predefinedFilter = '') {
             $.ajax({
                 url: "{{ route('report-fuel.hours-data') }}",
@@ -328,6 +331,10 @@
                             categories: response.dates,
                             title: {
                                 text: 'Dates'
+                            },
+                            labels: {
+                                rotate: -45,
+                                rotateAlways: true
                             }
                         },
                         yaxis: {
@@ -354,7 +361,8 @@
                         }
                     };
 
-                    const hoursChart = new ApexCharts(document.querySelector("#hours-chart"), options);
+                    hoursChart = new ApexCharts(document.querySelector("#hours-chart"),
+                        options);
                     hoursChart.render();
                 },
                 error: function(xhr, status, error) {
@@ -414,14 +422,67 @@
         }
 
         function exportExcel() {
-            const startDate = $('#date-range-picker').data('daterangepicker')?.startDate.format('YYYY-MM-DD') || '';
-            const endDate = $('#date-range-picker').data('daterangepicker')?.endDate.format('YYYY-MM-DD') || '';
+            const startDate = $('#date-range-picker').data('daterangepicker')?.startDate?.format('YYYY-MM-DD');
+            const endDate = $('#date-range-picker').data('daterangepicker')?.endDate?.format('YYYY-MM-DD');
             const predefinedFilter = $('.dropdown-item.active').text().trim() || '';
 
-            const exportUrl = "{{ route('report-fuel.export-excel') }}" +
-                `?startDate=${startDate}&endDate=${endDate}&predefinedFilter=${predefinedFilter}`;
-
-            window.location.href = exportUrl;
+            if (startDate && endDate) {
+                $.ajax({
+                    url: "{{ route('report-fuel.export-excel') }}",
+                    type: 'GET',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        startDate: startDate,
+                        endDate: endDate,
+                        predefinedFilter: predefinedFilter
+                    },
+                    xhrFields: {
+                        responseType: 'blob'
+                    },
+                    success: function(response) {
+                        const blob = new Blob([response], {
+                            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        });
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'FuelConsumptionReport.xlsx';
+                        link.click();
+                    },
+                    error: function() {
+                        Swal.fire('Error!',
+                            'An error occurred while exporting the report. Please try again later.',
+                            'error');
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: "{{ route('report-fuel.export-excel') }}",
+                    type: 'GET',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        startDate: moment().startOf('month').format('YYYY-MM-DD'),
+                        endDate: moment().endOf('month').format('YYYY-MM-DD'),
+                        predefinedFilter: predefinedFilter
+                    },
+                    xhrFields: {
+                        responseType: 'blob'
+                    },
+                    success: function(response) {
+                        const blob = new Blob([response], {
+                            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        });
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'FuelConsumptionReport.xlsx';
+                        link.click();
+                    },
+                    error: function() {
+                        Swal.fire('Error!',
+                            'An error occurred while exporting the report. Please try again later.',
+                            'error');
+                    }
+                });
+            }
         }
     </script>
 @endpush
