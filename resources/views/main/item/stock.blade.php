@@ -1,12 +1,18 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Edit Stock</h3>
+    <h3 class="mb-2">Request Stock</h3>
     <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
-<form method="POST" class="row g-3" id="fromEdit" action="{{ route('item.update', $data->id) }}"
+<form method="POST" class="row g-3" id="formCreate" action="{{ route('item.stock.create') }}"
     enctype="multipart/form-data">
     @csrf
-    @method('PUT')
+
+    <div class="col-12 col-md-12" id="itemRelation">
+        <label for="item_id" class="form-label">Sparepart</label>
+        <select name="item_id" id="item_id" class="form-select select2">
+        </select>
+    </div>
+
     <div class="col-12 col-md-12">
         <label class="form-label">stock</label>
         <input type="text" name="stock" class="form-control mb-3 mb-lg-0" placeholder="stock" required />
@@ -29,8 +35,69 @@
 </form>
 
 @include('components.select2_js')
+
 <script>
-    document.getElementById('fromEdit').addEventListener('submit', function(event) {
+    $(document).ready(function() {
+        $('#item_id').select2({
+            dropdownParent: $('#itemRelation'),
+            placeholder: 'Pilih sparepart',
+            ajax: {
+                url: "{{ route('item.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function(data) {
+                    apiResults = data.data
+                        .map(function(item) {
+                            return {
+                                text: item.name,
+                                id: item.item_id,
+                            };
+                        });
+
+                    return {
+                        results: apiResults
+                    };
+                },
+                cache: true
+            }
+        });
+    });
+
+    $(document).on('input', '#stock', function() {
+        value = formatCurrency($(this).val());
+        $(this).val(value);
+    });
+
+    function formatCurrency(angka, prefix) {
+        if (!angka) {
+            return (prefix || '') + '-';
+        }
+
+        angka = angka.toString();
+        const splitDecimal = angka.split('.');
+        let number_string = angka.replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        // tambahkan titik jika yang di input sudah menjadi angka ribuan
+        if (ribuan) {
+            const separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+        return prefix === undefined ? rupiah : rupiah ? (prefix || '') + rupiah : '';
+    }
+</script>
+<script>
+    document.getElementById('formCreate').addEventListener('submit', function(event) {
         event.preventDefault();
 
         const form = event.target;

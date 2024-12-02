@@ -7,6 +7,7 @@ use App\Models\Asset;
 use App\Models\Employee;
 use App\Models\ManagementProject;
 use App\Models\PettyCash;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -91,7 +92,9 @@ class ManagementProjectController extends Controller
             'calculation_method',
         ];
 
-        $keyword = $request->search['value'] ?? "";
+        $keyword = $request->keyword ?? "";
+        $startDate = $request->startDate ?? null;
+        $endDate = $request->endDate ?? null;
 
         $data = ManagementProject::orderBy('created_at', 'asc')
             ->select($columns)
@@ -101,11 +104,15 @@ class ManagementProjectController extends Controller
                         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
                     }
                 }
-            });
+            })
+            ->when($startDate, function ($query, $startDate) {
+                return $query->whereDate('start_date', '>=', Carbon::parse($startDate));
+            })
+            ->when($endDate, function ($query, $endDate) {
+                return $query->whereDate('end_date', '<=', Carbon::parse($endDate));
+            })
+            ->get();
 
-        if ($request->filled('startDate') && $request->filled('endDate')) {
-            $data->whereBetween('date', [$request->startDate, $request->endDate]);
-        }
         return $data;
     }
 
