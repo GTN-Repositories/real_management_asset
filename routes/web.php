@@ -144,6 +144,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/report-fuel/export-excel', [ReportFuelController::class, 'exportExcel'])->name('report-fuel.export-excel');
     Route::post('report-fuel/export-pdf', [ReportFuelController::class, 'exportPDF'])->name('report-fuel.export-pdf');
     Route::get('/report-fuel/chart', [ReportFuelController::class, 'getChartData'])->name('report-fuel.chart');
+    Route::get('/report-fuel/hours-data', [ReportFuelController::class, 'getHoursData'])->name('report-fuel.hours-data');
     Route::get('/report-fuel/data', [ReportFuelController::class, 'data'])->name('report-fuel.data');
     Route::resource('report-fuel', ReportFuelController::class);
 

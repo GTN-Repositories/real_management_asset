@@ -82,21 +82,21 @@ class ReportFuelController extends Controller implements HasMiddleware
             'price'
         ];
 
-        $query = FuelConsumption::orderBy('created_at', 'asc')
+        $query = FuelConsumption::orderBy('date', 'asc')
             ->select($columns);
-
-        if ($request->filled('search.value')) {
-            $query->where(function ($q) use ($request, $columns) {
-                $keyword = $request->search['value'];
-                foreach ($columns as $column) {
-                    $q->orWhere($column, 'LIKE', "%$keyword%");
-                }
-            });
-        }
+        $keyword = $request->keyword ?? '';
+        $query->where(function ($q) use ($columns, $keyword) {
+            foreach ($columns as $column) {
+                $q->orWhere($column, 'LIKE', "%$keyword%");
+            }
+        });
 
         // Apply date range filter
         if ($request->filled('startDate') && $request->filled('endDate')) {
-            $query->whereBetween('date', [$request->startDate, $request->endDate]);
+            $query->whereBetween('date', [
+                Carbon::parse($request->startDate)->startOfDay(),
+                Carbon::parse($request->endDate)->endOfDay()
+            ]);
         }
 
         // Apply predefined filters
@@ -109,10 +109,12 @@ class ReportFuelController extends Controller implements HasMiddleware
                     $query->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
                     break;
                 case 'bulan ini':
-                    $query->whereMonth('date', Carbon::now()->month);
+                    $query->whereMonth('date', Carbon::now()->month)
+                        ->whereYear('date', Carbon::now()->year);
                     break;
                 case 'bulan kemarin':
-                    $query->whereMonth('date', Carbon::now()->subMonth()->month);
+                    $query->whereMonth('date', Carbon::now()->subMonth()->month)
+                        ->whereYear('date', Carbon::now()->subMonth()->year);
                     break;
                 case 'tahun ini':
                     $query->whereYear('date', Carbon::now()->year);
@@ -123,15 +125,8 @@ class ReportFuelController extends Controller implements HasMiddleware
             }
         }
 
-        if (session('selected_project_id')) {
-            $query->whereHas('management_project', function ($q) {
-                $q->where('id', Crypt::decrypt(session('selected_project_id')));
-            });
-        }
-
         return $query;
     }
-
 
     public function getChartData(Request $request)
     {
@@ -185,6 +180,54 @@ class ReportFuelController extends Controller implements HasMiddleware
         ]);
     }
 
+    public function getHoursData(Request $request)
+    {
+        $query = FuelConsumption::selectRaw('DATE(date) as date, SUM(hours) as total_hours')
+            ->groupBy('date')
+            ->orderBy('date', 'asc');
+
+        if ($request->filled('startDate') && $request->filled('endDate')) {
+            $query->whereBetween('date', [$request->startDate, $request->endDate]);
+        }
+
+        if ($request->filled('predefinedFilter')) {
+            switch ($request->predefinedFilter) {
+                case 'hari ini':
+                    $query->whereDate('date', Carbon::today());
+                    break;
+                case 'minggu ini':
+                    $query->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                    break;
+                case 'bulan ini':
+                    $query->whereMonth('date', Carbon::now()->month);
+                    break;
+                case 'bulan kemarin':
+                    $query->whereMonth('date', Carbon::now()->subMonth()->month);
+                    break;
+                case 'tahun ini':
+                    $query->whereYear('date', Carbon::now()->year);
+                    break;
+                case 'tahun kemarin':
+                    $query->whereYear('date', Carbon::now()->subYear()->year);
+                    break;
+            }
+        }
+
+        if (session('selected_project_id')) {
+            $query->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
+
+        $hoursData = $query->get();
+
+        return response()->json([
+            'dates' => $hoursData->pluck('date')->toArray(),
+            'hours' => $hoursData->pluck('total_hours')->toArray(),
+        ]);
+    }
+
+
     public function exportPdf(Request $request)
     {
         $query = $this->getFilteredDataQuery($request);
@@ -225,11 +268,6 @@ class ReportFuelController extends Controller implements HasMiddleware
                         Carbon::now()->startOfWeek(),
                         Carbon::now()->endOfWeek()
                     ]);
-                case 'bulan ini':
-                    return $query->whereBetween('date', [
-                        Carbon::now()->startOfMonth(),
-                        Carbon::now()->endOfMonth()
-                    ]);
                 case 'bulan kemarin':
                     return $query->whereBetween('date', [
                         Carbon::now()->subMonth()->startOfMonth(),
@@ -246,7 +284,10 @@ class ReportFuelController extends Controller implements HasMiddleware
                         Carbon::now()->subYear()->endOfYear()
                     ]);
                 default:
-                    return $query;
+                    return $query->whereBetween('date', [
+                        Carbon::now()->startOfMonth(),
+                        Carbon::now()->endOfMonth()
+                    ]);
             }
         }
 
@@ -258,6 +299,9 @@ class ReportFuelController extends Controller implements HasMiddleware
             return $query;
         }
 
-        return $query;
+        return $query->whereBetween('date', [
+            Carbon::now()->startOfMonth(),
+            Carbon::now()->endOfMonth()
+        ]);
     }
 }

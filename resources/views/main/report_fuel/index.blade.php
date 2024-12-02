@@ -42,6 +42,17 @@
             </div>
         </div>
 
+        {{-- chart manpower --}}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Manpower Data Over Time</h5>
+            </div>
+            <div class="card-body">
+                <div id="hours-chart"></div> <!-- Chart Div -->
+            </div>
+        </div>
+
+
         <!-- Product List Table -->
         <div class="card">
             <div class="card-header">
@@ -74,18 +85,19 @@
         $(document).ready(function() {
             init_table();
             init_chart(); // Initialize chart on page load
+            init_hours_chart(); // Initialize chart on page load
 
-            // Event listeners for filters
             $('.dropdown-item').on('click', function(e) {
                 e.preventDefault();
-                $('.dropdown-item').removeClass('active'); // Hapus class active dari item lain
-                $(this).addClass('active'); // Tambah class active ke item yang dipilih
-
+                $('.dropdown-item').removeClass('active');
+                $(this).addClass('active');
                 const filterType = $(this).text().trim();
                 const filterBtn = $('.btn.btn-outline-primary.dropdown-toggle');
                 filterBtn.text(filterType);
+
                 reloadTableWithFilters(null, null, filterType);
                 reloadChartWithFilters(null, null, filterType);
+                reloadHoursChartWithFilters(null, null, filterType);
             });
 
             $('#date-range-picker').daterangepicker({
@@ -99,8 +111,10 @@
                 const startDate = picker.startDate.format('YYYY-MM-DD');
                 const endDate = picker.endDate.format('YYYY-MM-DD');
                 $(this).val(startDate + ' - ' + endDate);
+
                 reloadTableWithFilters(startDate, endDate);
                 reloadChartWithFilters(startDate, endDate);
+                reloadHoursChartWithFilters(startDate, endDate);
             });
 
             $('#date-range-picker').on('cancel.daterangepicker', function() {
@@ -124,8 +138,12 @@
             init_chart(startDate, endDate, predefinedFilter);
         }
 
+        function reloadHoursChartWithFilters(startDate = '', endDate = '', predefinedFilter = '') {
+            init_hours_chart(startDate, endDate, predefinedFilter);
+        }
 
-        function init_table(startDate = '', endDate = '', predefinedFilter = '') {
+
+        function init_table(startDate = '', endDate = '', predefinedFilter = '', keyword = '') {
             $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -134,9 +152,10 @@
                     type: "GET",
                     url: "{{ route('report-fuel.data') }}",
                     data: {
-                        startDate: startDate,
-                        endDate: endDate,
-                        predefinedFilter: predefinedFilter
+                        'keyword': keyword,
+                        'startDate': startDate,
+                        'endDate': endDate,
+                        'predefinedFilter': predefinedFilter
                     }
                 },
                 columns: [{
@@ -277,6 +296,80 @@
             });
         }
 
+        function init_hours_chart(startDate = '', endDate = '', predefinedFilter = '') {
+            $.ajax({
+                url: "{{ route('report-fuel.hours-data') }}",
+                method: 'GET',
+                data: {
+                    startDate: startDate,
+                    endDate: endDate,
+                    predefinedFilter: predefinedFilter
+                },
+                success: function(response) {
+                    var options = {
+                        series: [{
+                            name: 'Hours',
+                            data: response.hours
+                        }],
+                        chart: {
+                            type: 'bar',
+                            height: 350,
+                            toolbar: {
+                                show: true
+                            }
+                        },
+                        plotOptions: {
+                            bar: {
+                                horizontal: false // Set to false for vertical bar chart
+                            }
+                        },
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function(value) {
+                                return value.toFixed(1) + ' hrs';
+                            }
+                        },
+                        xaxis: {
+                            categories: response.dates,
+                            title: {
+                                text: 'Dates'
+                            }
+                        },
+                        yaxis: {
+                            title: {
+                                text: 'Hours'
+                            }
+                        },
+                        tooltip: {
+                            y: {
+                                formatter: function(value) {
+                                    return value.toFixed(1) + " hrs";
+                                }
+                            }
+                        },
+                        title: {
+                            text: 'Manpower Over Time',
+                            align: 'left'
+                        },
+                        grid: {
+                            row: {
+                                colors: ['#f3f3f3', 'transparent'],
+                                opacity: 0.5
+                            }
+                        }
+                    };
+
+                    const hoursChart = new ApexCharts(document.querySelector("#hours-chart"), options);
+                    hoursChart.render();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching hours data:', error);
+                    document.querySelector("#hours-chart").innerHTML =
+                        '<div class="alert alert-danger">Failed to load hours chart data. Please try again later.</div>';
+                }
+            });
+        }
+
         function exportPDF() {
             const startDate = $('#date-range-picker').data('daterangepicker')?.startDate.format('YYYY-MM-DD') || '';
             const endDate = $('#date-range-picker').data('daterangepicker')?.endDate.format('YYYY-MM-DD') || '';
@@ -335,6 +428,5 @@
 
             window.location.href = exportUrl;
         }
-    </script>
     </script>
 @endpush
