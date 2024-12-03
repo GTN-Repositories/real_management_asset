@@ -40,8 +40,9 @@
 
     <div class="col-12 col-md-12">
         <label class="form-label" for="alias">Catatan</label>
-        <textarea name="note" id="note" cols="30" rows="6" class="form-control" placeholder="Deskripsi"
-            readonly>{{ old('note', $data->note) }}</textarea>
+        <div>
+            {!! $data->note !!}
+        </div>
     </div>
 
     <div class="col-12 col-md-12">
