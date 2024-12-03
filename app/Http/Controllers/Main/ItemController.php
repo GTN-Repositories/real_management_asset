@@ -105,6 +105,7 @@ class ItemController extends Controller
             'brand',
             'color',
             'stock',
+            'oum_id',
             'created_at',
         ];
 
@@ -152,6 +153,9 @@ class ItemController extends Controller
                 $siteIdEncrypted = Crypt::decrypt($data['category_id']);
 
                 $data['category_id'] = $siteIdEncrypted;
+
+                $data['oum_id'] = Crypt::decrypt($data['oum_id']);
+
                 $data = Item::create($data);
 
                 return response()->json([
@@ -224,8 +228,17 @@ class ItemController extends Controller
 
 
                 if (isset($data['category_id'])) {
-                    $categoryIdEncrypted = Crypt::decrypt($data['category_id']);
-                    $data['category_id'] = $categoryIdEncrypted;
+                    try {
+                        $data['category_id'] = Crypt::decrypt($data['category_id']);
+                    } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                        $data['category_id'] = $data['category_id'];
+                    }
+                }
+
+                try {
+                    $data['oum_id'] = Crypt::decrypt($data['oum_id']);
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                    $data['oum_id'] = $data['oum_id'];
                 }
 
                 $item->update($data);

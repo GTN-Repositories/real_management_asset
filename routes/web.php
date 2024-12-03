@@ -22,6 +22,7 @@ use App\Http\Controllers\Main\ManagementProjectController;
 use App\Http\Controllers\Main\ManagerController;
 use App\Http\Controllers\Main\MenuController;
 use App\Http\Controllers\Main\MonitoringController;
+use App\Http\Controllers\Main\OumController;
 use App\Http\Controllers\Main\PermisionController;
 use App\Http\Controllers\Main\ReportFuelController;
 use App\Http\Controllers\Main\RoleController;
@@ -163,6 +164,8 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/employee/data', [EmployeeController::class, 'data'])->name('employee.data');
     Route::delete('/employee/destroy-all', [EmployeeController::class, 'destroyAll'])->name('employee.destroyAll');
     Route::resource('employee', EmployeeController::class);
+
+    Route::get('/oum/data', [OumController::class, 'data'])->name('oum.data');
 
     Route::get('/job-title/data', [JobTitleController::class, 'data'])->name('job-title.data');
 
