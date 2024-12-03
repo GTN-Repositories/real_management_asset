@@ -42,7 +42,9 @@
 
     <div class="col-12 col-md-12">
         <label class="form-label" for="alias">Catatan</label>
-        {{ strip_tags($data->note) }}
+        <div>
+            {!! $data->note !!}
+        </div>
     </div>
 
     <div class="col-12 col-md-12">
