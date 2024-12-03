@@ -67,6 +67,12 @@
         </select>
     </div>
 
+    <div class="col-12 col-md-6 mb-4" id="oumRelation">
+        <label for="oum_id" class="form-label">Oum Tipe</label>
+        <select id="oum_id" class="select2 form-select form-select-lg" name="oum_id" data-allow-clear="true">
+        </select>
+    </div>
+
     <div class="col-12 col-md-6">
         <label class="form-label">Warna</label>
         <input type="color" name="color" value="{{ $data->color }}" class="form-control mb-lg-0"
@@ -145,14 +151,47 @@
                 cache: true
             }
         });
+
+        $('#oum_id').select2({
+            dropdownParent: $('#oumRelation'),
+            placeholder: 'Pilih oum tipe',
+            ajax: {
+                url: "{{ route('oum.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function(data) {
+                    var results = data.data.map(item => ({
+                        text: item.name,
+                        id: item.id
+                    }));
+                    return {
+                        results
+                    };
+                },
+                cache: true
+            }
+        });
+
+        let categoryId = '{{ $data->category_id ?? '' }}';
+        let categoryName = '{{ $data->category->name ?? '' }}';
+        if (categoryId) {
+            let categoryOption = new Option(categoryName, categoryId, true, true);
+            $('#category_id').append(categoryOption).trigger('change');
+        }
+
+        let oumId = '{{ $data->oum_id ?? '' }}';
+        let oumName = '{{ $data->oum->name ?? '' }}';
+        if (oumId) {
+            let oumOption = new Option(oumName, oumId, true, true);
+            $('#oum_id').append(oumOption).trigger('change');
+        }
     });
 
-    let categoryId = '{{ $data->category_id ?? '' }}';
-    let categoryName = '{{ $data->category->name ?? '' }}';
-    if (categoryId) {
-        let categoryOption = new Option(categoryName, categoryId, true, true);
-        $('#category_id').append(categoryOption).trigger('change');
-    }
 
     // image
     document.getElementById('image').addEventListener('change', function(event) {

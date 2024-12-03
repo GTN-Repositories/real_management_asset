@@ -41,6 +41,10 @@
                         <td>{{ $data->status ?? '-' }}</td>
                     </tr>
                     <tr>
+                        <th>Oum Tipe</th>
+                        <td>{{ $data->oum->name ?? '-' }}</td>
+                    </tr>
+                    <tr>
                         <th>Part</th>
                         <td>{{ $data->part ?? '-' }}</td>
                     </tr>
