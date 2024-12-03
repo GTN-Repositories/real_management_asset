@@ -55,6 +55,11 @@
         <input type="text" id="hours" name="hours" class="form-control" placeholder="Masukkan jam kerja"
             required />
     </div>
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="lasted_km_asset">KM Terakhir Asset<span class="text-danger">*</span></label>
+        <input type="text" id="lasted_km_asset" name="lasted_km_asset" class="form-control" placeholder="Masukkan km terakhir asset"
+            required />
+    </div>
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
         <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
@@ -172,7 +177,7 @@
         });
     })
 
-    $(document).on('input', '#price, #loadsheet, #liter, #hours', function() {
+    $(document).on('input', '#price, #loadsheet, #liter, #hours, #lasted_km_asset', function() {
         value = formatCurrency($(this).val());
         $(this).val(value);
     });

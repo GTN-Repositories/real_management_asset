@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\FuelConsumption;
 use App\Models\Ipb;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
 class IpbController extends Controller
@@ -71,6 +72,9 @@ class IpbController extends Controller
             ->addColumn('user_id', function ($data) {
                 return $data->user->name ?? null;
             })
+            ->addColumn('employee_id', function ($data) {
+                return $data->employee->name ?? null;
+            })
             ->addColumn('location', function ($data) {
                 return $data->location ?? null;
             })
@@ -106,6 +110,7 @@ class IpbController extends Controller
             'id',
             'date',
             'management_project_id',
+            'employee_id',
             'issued_liter',
             'usage_liter',
             'balance',
@@ -115,7 +120,7 @@ class IpbController extends Controller
             'location',
         ];
 
-        $keyword = $request->search['value'] ?? "";
+        $keyword = $request->keyword ?? "";
 
         $data = Ipb::orderBy('created_at', 'asc')
             ->select($columns)
@@ -125,12 +130,16 @@ class IpbController extends Controller
                         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
                     }
                 }
-            });
+            })->get();
 
         if (session('selected_project_id')) {
             $data->whereHas('management_project', function ($q) {
                 $q->where('id', Crypt::decrypt(session('selected_project_id')));
             });
+        }
+
+        if ($request->filled('startDate') && $request->filled('endDate')) {
+            $data->whereBetween('date', [$request->startDate, $request->endDate]);
         }
 
         return $data;
@@ -164,10 +173,13 @@ class IpbController extends Controller
         $data = $request->all();
         try {
             return $this->atomic(function () use ($data) {
-                $data["management_project_id"] = crypt::decrypt($data["management_project_id"]);
-                $data['issued_liter'] = str_replace('.', '', $data['issued_liter']);
-                $data['usage_liter'] = str_replace('.', '', $data['usage_liter']);
-                $data['unit_price'] = str_replace('.', '', $data['unit_price']);
+                $data["management_project_id"] = Crypt::decrypt($data["management_project_id"]);
+                $data["employee_id"] = Crypt::decrypt($data["employee_id"]);
+                $data["user_id"] = Auth::user()->id;
+
+                $data['issued_liter'] = isset($data['issued_liter']) && $data['issued_liter'] != '-' ? str_replace('.', '', $data['issued_liter']) : null;
+                $data['usage_liter'] = isset($data['usage_liter']) && $data['usage_liter'] != '-' ? str_replace('.', '', $data['usage_liter']) : null;
+                $data['unit_price'] = isset($data['unit_price']) && $data['unit_price'] != '-' ? str_replace('.', '', $data['unit_price']) : null;
 
                 $lastBalance = Ipb::where('management_project_id', $data["management_project_id"])
                     ->orderBy('id', 'desc')
@@ -233,9 +245,15 @@ class IpbController extends Controller
                     $data["management_project_id"] = $data["management_project_id"];
                 }
 
-                $data['issued_liter'] = str_replace('.', '', $data['issued_liter']);
-                $data['usage_liter'] = str_replace('.', '', $data['usage_liter']);
-                $data['unit_price'] = str_replace('.', '', $data['unit_price']);
+                try {
+                    $data["employee_id"] = Crypt::decrypt($data["employee_id"]);
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                    $data["employee_id"] = $data["employee_id"];
+                }
+
+                $data['issued_liter'] = isset($data['issued_liter']) && $data['issued_liter'] != '-' ? str_replace('.', '', $data['issued_liter']) : null;
+                $data['usage_liter'] = isset($data['usage_liter']) && $data['usage_liter'] != '-' ? str_replace('.', '', $data['usage_liter']) : null;
+                $data['unit_price'] = isset($data['unit_price']) && $data['unit_price'] != '-' ? str_replace('.', '', $data['unit_price']) : null;
 
                 $record = Ipb::findByEncryptedId($id);
                 if (!$record) {

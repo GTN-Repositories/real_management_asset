@@ -30,6 +30,11 @@ class FuelConsumption extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
+    public function getAssetsAttribute()
+    {
+        return Asset::where('id', $this->asset_id)->first();
+    }
+
     public function management_project(): BelongsTo
     {
         return $this->belongsTo(ManagementProject::class, 'management_project_id', 'id');

@@ -104,7 +104,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/supplier/destroy-all', [SupplierController::class, 'destroyAll'])->name('supplier.destroyAll');
     Route::resource('supplier', SupplierController::class);
 
-    Route::get('/item/stock/{id}', [ItemController::class, 'editStock'])->name('item.stock');
+    Route::put('/item/approveStock/{id}', [ItemController::class, 'approveStock'])->name('item.approveStock');
+    Route::get('/item/stock', [ItemController::class, 'editStock'])->name('item.stock');
+    Route::post('/item/stock/create', [ItemController::class, 'createStock'])->name('item.stock.create');
     Route::get('/item/data', [ItemController::class, 'data'])->name('item.data');
     Route::delete('/item/destroy-all', [ItemController::class, 'destroyAll'])->name('item.destroyAll');
     Route::resource('item', ItemController::class);
@@ -144,6 +146,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/report-fuel/export-excel', [ReportFuelController::class, 'exportExcel'])->name('report-fuel.export-excel');
     Route::post('report-fuel/export-pdf', [ReportFuelController::class, 'exportPDF'])->name('report-fuel.export-pdf');
     Route::get('/report-fuel/chart', [ReportFuelController::class, 'getChartData'])->name('report-fuel.chart');
+    Route::get('/report-fuel/hours-data', [ReportFuelController::class, 'getHoursData'])->name('report-fuel.hours-data');
     Route::get('/report-fuel/data', [ReportFuelController::class, 'data'])->name('report-fuel.data');
     Route::resource('report-fuel', ReportFuelController::class);
 
