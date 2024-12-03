@@ -268,7 +268,7 @@
                         tooltip: {
                             y: {
                                 formatter: function(value) {
-                                    return value.toFixed(1) + " liters";
+                                    return value != null ? value.toFixed(1) + " liters" : "";
                                 }
                             }
                         },
