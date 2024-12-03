@@ -324,7 +324,7 @@
                         dataLabels: {
                             enabled: true,
                             formatter: function(value) {
-                                return value.toFixed(1) + ' hrs';
+                                return value != null ? value.toFixed(1) + ' hrs' : '';
                             }
                         },
                         xaxis: {
@@ -345,7 +345,7 @@
                         tooltip: {
                             y: {
                                 formatter: function(value) {
-                                    return value.toFixed(1) + " hrs";
+                                    return value != null ? value.toFixed(1) + ' hrs' : '';
                                 }
                             }
                         },
