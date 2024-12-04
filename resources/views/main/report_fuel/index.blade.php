@@ -120,6 +120,7 @@
                 $(this).val('');
                 reloadTableWithFilters(); // Reload without date range
                 reloadChartWithFilters(); // Reload chart without date range
+                reloadHoursChartWithFilters(); // Reload chart without date range
             });
         });
 

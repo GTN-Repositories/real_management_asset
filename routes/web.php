@@ -16,6 +16,7 @@ use App\Http\Controllers\Main\InspectionScheduleController;
 use App\Http\Controllers\Main\IpbController;
 use App\Http\Controllers\Main\ItemController;
 use App\Http\Controllers\Main\JobTitleController;
+use App\Http\Controllers\Main\LoadsheetController;
 use App\Http\Controllers\Main\LocationController;
 use App\Http\Controllers\Main\LogActivityController;
 use App\Http\Controllers\Main\ManagementProjectController;
@@ -25,8 +26,10 @@ use App\Http\Controllers\Main\MonitoringController;
 use App\Http\Controllers\Main\OumController;
 use App\Http\Controllers\Main\PermisionController;
 use App\Http\Controllers\Main\ReportFuelController;
+use App\Http\Controllers\Main\ReportSparepartController;
 use App\Http\Controllers\Main\RoleController;
 use App\Http\Controllers\Main\SiteController;
+use App\Http\Controllers\Main\SoilTypeController;
 use App\Http\Controllers\Main\StatusAssetController;
 use App\Http\Controllers\Main\SupplierController;
 use App\Http\Controllers\Main\UserController;
@@ -34,6 +37,7 @@ use App\Http\Controllers\Main\WerehouseController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use SebastianBergmann\CodeCoverage\Report\Xml\Report;
 
 Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(function () {
 
@@ -165,7 +169,16 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/employee/destroy-all', [EmployeeController::class, 'destroyAll'])->name('employee.destroyAll');
     Route::resource('employee', EmployeeController::class);
 
+    Route::get('/loadsheet/data', [LoadsheetController::class, 'data'])->name('loadsheet.data');
+    Route::delete('/loadsheet/destroy-all', [LoadsheetController::class, 'destroyAll'])->name('loadsheet.destroyAll');
+    Route::resource('loadsheet', LoadsheetController::class);
+
+    Route::get('/soil-type/data', [SoilTypeController::class, 'data'])->name('soil-type.data');
+
     Route::get('/oum/data', [OumController::class, 'data'])->name('oum.data');
+
+    Route::get('/report-sparepart/data', [ReportSparepartController::class, 'data'])->name('report-sparepart.data');
+    Route::resource('report-sparepart', ReportSparepartController::class);
 
     Route::get('/job-title/data', [JobTitleController::class, 'data'])->name('job-title.data');
 
