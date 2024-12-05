@@ -52,7 +52,8 @@
                     </td>
 
                     <td style="text-align: center;" colspan="2">
-                        {{ number_format($fuel->liter / max($fuel->loadsheet, 1), 2) }}</td>
+                        {{ number_format($fuel->liter /max($fuel->loadsheetsManagement()->where('asset_id', $fuel->asset_id)->sum('loadsheet'),1),2) }}
+                    </td>
                     <td style="text-align: center;" colspan="2">
                         {{ number_format($fuel->liter / max(\Carbon\Carbon::parse($fuel->management_project->start_date)->diffInDays(\Carbon\Carbon::parse($fuel->management_project->end_date)), 1), 2) }}
                     </td>
