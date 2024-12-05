@@ -23,6 +23,17 @@
             <input type="date" id="stnk_date" name="stnk_date" class="form-control"
                 placeholder="Masukkan stnk_date" />
         </div>
+    @elseif ($data->kategori == 'tax')
+        <div class="col-12 col-md-12 mb-3">
+            <label class="form-label" for="file_tax">Gambar</label>
+            <input type="file" id="file_tax" name="file_tax" class="form-control" />
+        </div>
+        <div class="col-12 col-md-12">
+            <label class="form-label" for="date_tax">Tanggal Bayar Pajak<span
+                    class="text-danger">*</span></label>
+            <input type="date" id="date_tax" name="date_tax" class="form-control"
+                placeholder="Masukkan date_tax" />
+        </div>
     @else
         <div class="col-12 col-md-12 mb-3">
             <label class="form-label" for="asuransi">Gambar</label>

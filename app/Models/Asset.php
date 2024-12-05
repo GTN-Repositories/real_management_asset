@@ -68,4 +68,9 @@ class Asset extends Model
     {
         return $this->belongsTo(Location::class, 'assets_location', 'id');
     }
+
+    public function pics(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'pic', 'id');
+    }
 }
