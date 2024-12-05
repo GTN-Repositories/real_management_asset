@@ -68,7 +68,6 @@
                             <th>Tanggal</th>
                             <th>Total Hari</th>
                             <th>Pemakaian Solar</th>
-                            <th>Total Loadsheet</th>
                             <th>Liter/Trip</th>
                             <th>Rata-rata/Hari</th>
                         </tr>
@@ -184,10 +183,6 @@
                     {
                         data: 'liter',
                         name: 'liter'
-                    },
-                    {
-                        data: 'loadsheet',
-                        name: 'loadsheet'
                     },
                     {
                         data: 'liter_trip',

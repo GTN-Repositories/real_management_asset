@@ -21,12 +21,12 @@ return new class extends Migration
             $table->string('type')->nullable();
             $table->text('location')->nullable();
             $table->unsignedBigInteger('soil_type_id')->index()->nullable();
-            $table->integer('bpit')->nullable();
+            $table->string('bpit')->nullable();
             $table->integer('kilometer')->nullable();
             $table->integer('loadsheet')->nullable();
             $table->integer('perload')->nullable();
             $table->integer('lose_factor')->nullable();
-            $table->string('cubication')->nullable();
+            $table->integer('cubication')->nullable();
             $table->integer('price')->nullable();
             $table->string('billing_status')->nullable();
             $table->string('remarks')->nullable();

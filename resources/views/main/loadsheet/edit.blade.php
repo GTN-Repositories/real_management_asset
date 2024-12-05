@@ -90,28 +90,13 @@
                             <input type="text" id="perload" name="perload" class="form-control"
                                 value="{{ $data->perload }}" />
                         </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label" for="lose_factor">Faktor Kehilangan <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" id="lose_factor" name="lose_factor" class="form-control"
-                                value="{{ $data->lose_factor }}" />
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label" for="cubication">Kubikasi <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" id="cubication" name="cubication" class="form-control"
-                                value="{{ $data->cubication }}" />
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label" for="price">Harga <span class="text-danger">*</span></label>
-                            <input type="text" id="price" name="price" class="form-control"
-                                value="{{ $data->price }}" />
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label" for="billing_status">Status Penagihan <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" id="billing_status" name="billing_status" class="form-control"
-                             />
+                        <div class="col-12 col-md-12">
+                            <label class="form-label" for="billing_status">Status Penagihan</label>
+                            <select name="billing_status" id="billing_status" class="select2 form-select">
+                                <option value="Sudah Ditagih" @if ($data->billing_status == 'Sudah Ditagih') selected @endif>Sudah
+                                    Ditagih</option>
+                                <option value="Belum" @if ($data->billing_status == 'Belum') selected @endif>Belum</option>
+                            </select>
                         </div>
                         <div class="col-12 col-md-12">
                             <label class="form-label" for="remarks">Catatan <span
@@ -295,8 +280,8 @@
             }
         });
 
-        var soil_type_id = '{{ $data->soil_type_id ?? "" }}';
-        var soil_type_name = '{{ $data->soilType->name ?? "" }}';
+        var soil_type_id = '{{ $data->soil_type_id ?? '' }}';
+        var soil_type_name = '{{ $data->soilType->name ?? '' }}';
 
         if (soil_type_id) {
             var soilTypeOption = new Option(soil_type_name, soil_type_id, true, true);
@@ -305,13 +290,13 @@
     })
 
     $(document).ready(function() {
-        $('#hours, #bpit, #kilometer, #loadsheet, #perload, #lose_factor, #price').each(function() {
+        $('#hours, #kilometer, #loadsheet, #perload, #lose_factor, #price').each(function() {
             const value = $(this).val();
             $(this).val(formatCurrency(value));
         });
     });
 
-    $(document).on('input', '#hours, #bpit, #kilometer, #loadsheet, #perload, #lose_factor, #price', function() {
+    $(document).on('input', '#hours, #kilometer, #loadsheet, #perload, #lose_factor, #price', function() {
         const value = $(this).val();
         $(this).val(formatCurrency(value));
     });

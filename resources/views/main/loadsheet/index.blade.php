@@ -30,15 +30,19 @@
                                     <input class="form-check-input" type="checkbox" id="checkAll" />
                                 </div>
                             </th>
-                            <th>Management Project ID</th>
-                            <th>Asset ID</th>
-                            <th>Employee ID</th>
-                            <th>Soil Type ID</th>
+                            <th>Management</th>
+                            <th>Asset</th>
                             <th>Date</th>
-                            <th>Hours</th>
-                            <th>Type</th>
                             <th>Location</th>
+                            <th>Soil Type</th>
+                            <th>BPIT</th>
+                            <th>Kilometer</th>
                             <th>Loadsheet</th>
+                            <th>Per Load</th>
+                            <th>Cubication</th>
+                            <th>Price</th>
+                            <th>Billing Status</th>
+                            <th>Remarks</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -130,32 +134,48 @@
                         name: 'asset_id'
                     },
                     {
-                        data: 'employee_id',
-                        name: 'employee_id'
-                    },
-                    {
-                        data: 'soil_type_id',
-                        name: 'soil_type_id'
-                    },
-                    {
                         data: 'date',
                         name: 'date'
-                    },
-                    {
-                        data: 'hours',
-                        name: 'hours'
-                    },
-                    {
-                        data: 'type',
-                        name: 'type'
                     },
                     {
                         data: 'location',
                         name: 'location'
                     },
                     {
+                        data: 'soil_type_id',
+                        name: 'soil_type_id'
+                    },
+                    {
+                        data: 'bpit',
+                        name: 'bpit'
+                    },
+                    {
+                        data: 'kilometer',
+                        name: 'kilometer'
+                    },
+                    {
                         data: 'loadsheet',
                         name: 'loadsheet'
+                    },
+                    {
+                        data: 'perload',
+                        name: 'perload'
+                    },
+                    {
+                        data: 'cubication',
+                        name: 'cubication'
+                    },
+                    {
+                        data: 'price',
+                        name: 'price'
+                    },
+                    {
+                        data: 'billing_status',
+                        name: 'billing_status'
+                    },
+                    {
+                        data: 'remarks',
+                        name: 'remarks'
                     },
                     {
                         data: 'action',

@@ -43,7 +43,7 @@ class ReportFuelController extends Controller implements HasMiddleware
                 return $data->management_project->name ?? null;
             })
             ->addColumn('asset_id', function ($data) {
-                return $data->asset->name ?? null;
+                return $data->asset->license_plate . ' - ' . $data->asset->name . ' - ' . $data->asset->asset_number ?? null;
             })
             ->addColumn('date', function ($data) {
                 return \Carbon\Carbon::parse($data->date)->format('d-M-y') ?? null;
@@ -53,9 +53,6 @@ class ReportFuelController extends Controller implements HasMiddleware
             })
             ->addColumn('liter', function ($data) {
                 return number_format($data->liter, 0, ',', '.') ?? null;
-            })
-            ->addColumn('loadsheet', function ($data) {
-                return number_format($data->loadsheet, 0, ',', '.') ?? null;
             })
             ->addColumn('liter_trip', function ($data) {
                 return number_format($data->liter / max($data->loadsheet, 1), 2) ?? null;
@@ -74,7 +71,6 @@ class ReportFuelController extends Controller implements HasMiddleware
             'management_project_id',
             'asset_id',
             'date',
-            'loadsheet',
             'liter',
             'price'
         ];

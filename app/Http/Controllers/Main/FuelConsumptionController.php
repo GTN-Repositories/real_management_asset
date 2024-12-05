@@ -46,16 +46,13 @@ class FuelConsumptionController extends Controller
                 return $data->management_project->name ?? null;
             })
             ->addColumn('asset_id', function ($data) {
-                return $data->asset->name . ' - ' . $data->asset->asset_number ?? null;
+                return $data->asset->license_plate . ' - ' . $data->asset->name . ' - ' . $data->asset->asset_number ?? null;
             })
             ->addColumn('user_id', function ($data) {
                 return $data->employee->name ?? null;
             })
             ->addColumn('date', function ($data) {
                 return $data->date ?? null;
-            })
-            ->addColumn('loadsheet', function ($data) {
-                return number_format($data->loadsheet, 0, ',', '.') ?? null;
             })
             ->addColumn('liter', function ($data) {
                 return number_format($data->liter, 0, ',', '.') . ' liter' ?? null;
@@ -100,7 +97,6 @@ class FuelConsumptionController extends Controller
             'asset_id',
             'user_id',
             'date',
-            'loadsheet',
             'liter',
             'price',
             'category',
@@ -147,9 +143,9 @@ class FuelConsumptionController extends Controller
         try {
             return $this->atomic(function () use ($data) {
                 $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
-                $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
+                // $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
                 $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
-                $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
+                // $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
                 $data['lasted_km_asset'] = isset($data['lasted_km_asset']) && $data['lasted_km_asset'] != '-' ? str_replace('.', '', $data['lasted_km_asset']) : null;
 
                 $data["asset_id"] = crypt::decrypt($data["asset_id"]);
@@ -202,9 +198,9 @@ class FuelConsumptionController extends Controller
         try {
             return $this->atomic(function () use ($data, $id) {
                 $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
-                $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
+                // $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
                 $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
-                $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
+                // $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
                 $data['lasted_km_asset'] = isset($data['lasted_km_asset']) && $data['lasted_km_asset'] != '-' ? str_replace('.', '', $data['lasted_km_asset']) : null;
 
                 try {

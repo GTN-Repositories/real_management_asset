@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('soil_type', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->integer('value');
-            $table->timestamps();
+        Schema::table('fuel_consumptions', function (Blueprint $table) {
+            $table->string('loadsheet')->nullable()->change();
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('soil_type');
+        Schema::table('fuel_consumptions', function (Blueprint $table) {
+            $table->string('loadsheet')->nullable()->change();
+        });
     }
 };

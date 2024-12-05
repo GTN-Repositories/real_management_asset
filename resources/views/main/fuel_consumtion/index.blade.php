@@ -34,7 +34,6 @@
                             <th>Nama Aset</th>
                             <th>Pengemudi</th>
                             <th>Tanggal</th>
-                            <th>Loadsheet</th>
                             <th>Banyak Penggunaan</th>
                             <th>Harga/Liter</th>
                             <th>Kategori</th>
@@ -135,10 +134,6 @@
                     {
                         data: 'date',
                         name: 'date'
-                    },
-                    {
-                        data: 'loadsheet',
-                        name: 'loadsheet'
                     },
                     {
                         data: 'liter',
