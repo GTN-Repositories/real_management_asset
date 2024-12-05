@@ -145,7 +145,7 @@ class FuelConsumptionController extends Controller
                 $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
                 // $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
                 $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
-                // $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
+                $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
                 $data['lasted_km_asset'] = isset($data['lasted_km_asset']) && $data['lasted_km_asset'] != '-' ? str_replace('.', '', $data['lasted_km_asset']) : null;
 
                 $data["asset_id"] = crypt::decrypt($data["asset_id"]);
@@ -200,7 +200,7 @@ class FuelConsumptionController extends Controller
                 $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
                 // $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
                 $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
-                // $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
+                $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
                 $data['lasted_km_asset'] = isset($data['lasted_km_asset']) && $data['lasted_km_asset'] != '-' ? str_replace('.', '', $data['lasted_km_asset']) : null;
 
                 try {
