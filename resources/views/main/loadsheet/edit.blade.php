@@ -90,7 +90,12 @@
                             <input type="text" id="perload" name="perload" class="form-control"
                                 value="{{ $data->perload }}" />
                         </div>
-                        <div class="col-12 col-md-12">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="lose_factor">Lose Factor <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="lose_factor" name="lose_factor" class="form-control" value="{{ $data->lose_factor }}" />
+                        </div>
+                        <div class="col-12 col-md-6">
                             <label class="form-label" for="billing_status">Status Penagihan</label>
                             <select name="billing_status" id="billing_status" class="select2 form-select">
                                 <option value="Sudah Ditagih" @if ($data->billing_status == 'Sudah Ditagih') selected @endif>Sudah
@@ -290,15 +295,22 @@
     })
 
     $(document).ready(function() {
-        $('#hours, #kilometer, #loadsheet, #perload, #lose_factor, #price').each(function() {
+        $('#hours, #kilometer, #loadsheet, #perload, #price').each(function() {
             const value = $(this).val();
             $(this).val(formatCurrency(value));
         });
+
+        $('#lose_factor').val($('#lose_factor').val().replace('.', ','));
     });
 
-    $(document).on('input', '#hours, #kilometer, #loadsheet, #perload, #lose_factor, #price', function() {
+    $(document).on('input', '#hours, #kilometer, #loadsheet, #perload, #price', function() {
         const value = $(this).val();
         $(this).val(formatCurrency(value));
+    });
+
+    $(document).on('input', '#lose_factor', function() {
+        const value = $(this).val();
+        $(this).val(formatCurrencyLoseFactor(value));
     });
 
     function formatCurrency(angka, prefix) {
@@ -321,6 +333,30 @@
         }
 
         rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+        return prefix === undefined ? rupiah : rupiah ? (prefix || '') + rupiah : '';
+    }
+
+    function formatCurrencyLoseFactor(angka, prefix) {
+        if (!angka) {
+            return (prefix || '') + '-';
+        }
+
+        angka = angka.toString();
+        const splitDecimal = angka.split('.');
+        let text_string = angka.replace(/[^,\d]/g, '').toString(),
+            split = text_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        // tambahkan titik jika yang di input sudah menjadi angka ribuan
+        if (ribuan) {
+            const separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+        rupiah = rupiah.replace('.', ',');
         return prefix === undefined ? rupiah : rupiah ? (prefix || '') + rupiah : '';
     }
 </script>
