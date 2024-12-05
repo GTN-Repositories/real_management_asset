@@ -120,6 +120,12 @@ class LoadsheetController extends Controller
                 }
             });
 
+        if (session('selected_project_id')) {
+            $data->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
+
         return $data;
     }
 
