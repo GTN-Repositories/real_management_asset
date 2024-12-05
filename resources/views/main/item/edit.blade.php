@@ -61,7 +61,7 @@
         </select>
     </div>
 
-    <div class="col-12 col-md-6 mb-4" id="categoryRelation">
+    <div class="col-12 col-md-6" id="categoryRelation">
         <label for="select2Basic" class="form-label">Kategori</label>
         <select id="category_id" class="select2 form-select form-select-lg" name="category_id" data-allow-clear="true">
         </select>
@@ -73,11 +73,11 @@
         </select>
     </div>
 
-    <div class="col-12 col-md-6">
+    {{-- <div class="col-12 col-md-6">
         <label class="form-label">Warna</label>
         <input type="color" name="color" value="{{ $data->color }}" class="form-control mb-lg-0"
             placeholder="Warna" required />
-    </div>
+    </div> --}}
 
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>

@@ -50,6 +50,9 @@ class ReportLoadsheetController extends Controller
             ->addColumn('perload', function ($data) {
                 return $data->perload ? number_format($data->perload, 0, ',', '.') : '-';
             })
+            ->addColumn('lose_factor', function ($data) {
+                return $data->lose_factor ?? '-';
+            })
             ->addColumn('cubication', function ($data) {
                 return $data->cubication ? number_format($data->cubication, 0, ',', '.') : '-';
             })
@@ -83,6 +86,7 @@ class ReportLoadsheetController extends Controller
             'price',
             'billing_status',
             'remarks',
+            'lose_factor',
         ];
 
         $keyword = $request->keyword ?? "";
@@ -97,42 +101,42 @@ class ReportLoadsheetController extends Controller
                 }
             });
 
-        // if (session('selected_project_id')) {
-        //     $data->whereHas('management_project', function ($q) {
-        //         $q->where('id', Crypt::decrypt(session('selected_project_id')));
-        //     });
-        // }
+        if (session('selected_project_id')) {
+            $data->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
 
-        // if ($request->filled('startDate') && $request->filled('endDate')) {
-        //     $data->whereBetween('created_at', [
-        //         Carbon::parse($request->startDate)->startOfDay(),
-        //         Carbon::parse($request->endDate)->endOfDay()
-        //     ]);
-        // }
+        if ($request->filled('startDate') && $request->filled('endDate')) {
+            $data->whereBetween('date', [
+                $request->startDate,
+                $request->endDate
+            ]);
+        }
 
-        // // Apply predefined filters
-        // if ($request->filled('predefinedFilter')) {
-        //     switch ($request->predefinedFilter) {
-        //         case 'hari ini':
-        //             $data->whereDate('date', Carbon::today());
-        //             break;
-        //         case 'minggu ini':
-        //             $data->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-        //             break;
-        //         case 'bulan ini':
-        //             $data->whereRaw('MONTH(date) = MONTH(NOW()) AND YEAR(date) = YEAR(NOW())');
-        //             break;
-        //         case 'bulan kemarin':
-        //             $data->whereRaw('MONTH(date) = MONTH(NOW()) - 1 AND YEAR(date) = YEAR(NOW())');
-        //             break;
-        //         case 'tahun ini':
-        //             $data->whereYear('date', Carbon::now()->year);
-        //             break;
-        //         case 'tahun kemarin':
-        //             $data->whereYear('date', Carbon::now()->subYear()->year);
-        //             break;
-        //     }
-        // }
+        // Apply predefined filters
+        if ($request->filled('predefinedFilter')) {
+            switch ($request->predefinedFilter) {
+                case 'hari ini':
+                    $data->whereDate('date', Carbon::today());
+                    break;
+                case 'minggu ini':
+                    $data->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                    break;
+                case 'bulan ini':
+                    $data->whereRaw('MONTH(date) = MONTH(NOW()) AND YEAR(date) = YEAR(NOW())');
+                    break;
+                case 'bulan kemarin':
+                    $data->whereRaw('MONTH(date) = MONTH(NOW()) - 1 AND YEAR(date) = YEAR(NOW())');
+                    break;
+                case 'tahun ini':
+                    $data->whereYear('date', Carbon::now()->year);
+                    break;
+                case 'tahun kemarin':
+                    $data->whereYear('date', Carbon::now()->subYear()->year);
+                    break;
+            }
+        }
 
         return $data;
     }

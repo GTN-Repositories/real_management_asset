@@ -75,7 +75,8 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        keyword: params.term,
+                        limit: 10
                     };
                 },
                 processResults: function(data) {
@@ -89,7 +90,6 @@
                         results: apiResults
                     };
                 },
-                limit: 10,
                 cache: true
             }
         });
@@ -103,13 +103,14 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        keyword: params.term,
+                        limit: 10
                     };
                 },
                 processResults: function(data) {
                     apiResults = data.data.map(function(item) {
                         return {
-                            text: item.name,
+                            text: item.nameTitle,
                             id: item.relationId,
                         };
                     });
@@ -118,18 +119,20 @@
                         results: apiResults
                     };
                 },
-                limit: 10,
                 cache: true
             }
         });
 
         var asset_ids = {!! json_encode($data->asset_id ?? []) !!};
+        var asset_id = {!! json_encode($data->assets->pluck('id')->map(fn($id) => Crypt::decrypt($id)) ?? []) !!};
         var asset_names = {!! json_encode($data->assets->pluck('name') ?? []) !!};
         var asset_numbers = {!! json_encode($data->assets->pluck('asset_number') ?? []) !!};
 
         if (asset_ids && asset_names && asset_numbers) {
             asset_ids.forEach(function(id, index) {
-                var option = new Option(`${asset_names[index]} - ${asset_numbers[index]}`, id, true,
+                var option = new Option(
+                    `${asset_id[index]} - ${asset_names[index]} - ${asset_numbers[index]}`, id,
+                    true,
                     true);
                 $('#asset_id').append(option);
             });
@@ -138,13 +141,17 @@
 
         var employee_ids = {!! json_encode($data->employee_id ?? []) !!};
         var employee_names = {!! json_encode($data->employees->pluck('name') ?? []) !!};
+        var job_title_names = {!! json_encode($data->employees->map(function($employee) {
+            return $employee->jobTitle ? $employee->jobTitle->name : null;
+        })->toArray() ?? []) !!};
 
         employee_ids = Array.isArray(employee_ids) ? employee_ids : [];
         employee_names = Array.isArray(employee_names) ? employee_names : [];
+        job_title_names = Array.isArray(job_title_names) ? job_title_names : [];
 
-        if (employee_ids.length > 0 && employee_names.length > 0) {
+        if (employee_ids.length > 0 && employee_names.length > 0 && job_title_names.length > 0) {
             employee_ids.forEach(function(id, index) {
-                var name = employee_names[index] || 'Undefined';
+                var name = `${employee_names[index]} - ${job_title_names[index] || 'Undefined'}`;
                 var option = new Option(name, id, true, true);
                 $('#employee_id').append(option);
             });
