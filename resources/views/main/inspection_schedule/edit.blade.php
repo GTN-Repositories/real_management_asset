@@ -112,7 +112,17 @@
         <tbody>
             @foreach ($comments as $comment)
                 <tr>
-                    <td>{{ strip_tags($comment->comment) }}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span class="me-2">{{ $comment->user->name ?? 'anonymous' }}</span>
+                            <span class="text-muted">
+                                {{ $comment->time_note ? \Carbon\Carbon::parse($comment->time_note)->locale('id')->translatedFormat('d F Y H:i') : '-' }}
+                            </span>
+                        </div>
+                        <div class="mt-1">
+                            {{ strip_tags($comment->comment) }}
+                        </div>
+                    </td>
                 </tr>
             @endforeach
         </tbody>
@@ -120,7 +130,8 @@
 
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-2">Simpan</button>
-        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
+            aria-label="Close">Cancel</button>
     </div>
 </form>
 
@@ -259,7 +270,6 @@
                         text: data.message
                     }).then(() => {
                         $("#modal-ce").modal("hide");
-                        location.reload();
                     });
                 }
             })

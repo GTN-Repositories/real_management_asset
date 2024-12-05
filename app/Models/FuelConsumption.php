@@ -49,4 +49,14 @@ class FuelConsumption extends Model
     {
         return $this->belongsTo(Employee::class, 'user_id', 'id');
     }
+
+    public function loadsheets()
+    {
+        return $this->hasMany(Loadsheet::class, 'asset_id', 'asset_id');
+    }
+
+    public function loadsheetsManagement()
+    {
+        return $this->hasMany(Loadsheet::class, 'management_project_id', 'management_project_id');
+    }
 }

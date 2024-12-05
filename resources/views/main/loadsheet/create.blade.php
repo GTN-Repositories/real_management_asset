@@ -84,26 +84,12 @@
                                     class="text-danger">*</span></label>
                             <input type="text" id="perload" name="perload" class="form-control" />
                         </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label" for="lose_factor">Faktor Kehilangan <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" id="lose_factor" name="lose_factor" class="form-control"
-                             />
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label" for="cubication">Kubikasi <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" id="cubication" name="cubication" class="form-control" />
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label" for="price">Harga <span class="text-danger">*</span></label>
-                            <input type="text" id="price" name="price" class="form-control" />
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label" for="billing_status">Status Penagihan <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" id="billing_status" name="billing_status" class="form-control"
-                             />
+                        <div class="col-12 col-md-12">
+                            <label class="form-label" for="billing_status">Status Penagihan</label>
+                            <select name="billing_status" id="billing_status" class="select2 form-select">
+                                <option value="Sudah Ditagih">Sudah Ditagih</option>
+                                <option value="Belum">Belum</option>
+                            </select>
                         </div>
                         <div class="col-12 col-md-12">
                             <label class="form-label" for="remarks">Catatan <span
@@ -255,7 +241,7 @@
         });
     });
 
-    $(document).on('input', '#hours, #bpit, #kilometer, #loadsheet, #perload, #lose_factor, #price', function() {
+    $(document).on('input', '#hours, #kilometer, #loadsheet, #perload, #lose_factor, #price', function() {
         value = formatCurrency($(this).val());
         $(this).val(value);
     });

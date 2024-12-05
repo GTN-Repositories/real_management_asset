@@ -30,11 +30,11 @@
         <input type="date" id="date" name="date" class="form-control" placeholder="Masukkan tanggal"
             value="{{ date('Y-m-d') }}" required />
     </div>
-    <div class="col-12 col-md-6">
+    {{-- <div class="col-12 col-md-6">
         <label class="form-label" for="loadsheet">Loadsheet<span class="text-danger">*</span></label>
         <input type="text" id="loadsheet" name="loadsheet" class="form-control" placeholder="Masukkan loadsheet"
             required />
-    </div>
+    </div> --}}
     <div class="col-12 col-md-6">
         <label class="form-label" for="liter">Liter<span class="text-danger">*</span></label>
         <input type="text" id="liter" name="liter" class="form-control" placeholder="Masukkan liter"
@@ -50,11 +50,11 @@
         <input type="text" id="category" name="category" class="form-control" placeholder="Masukkan kategori"
             required />
     </div>
-    <div class="col-12 col-md-6">
+    {{-- <div class="col-12 col-md-6">
         <label class="form-label" for="hours">Jam Kerja<span class="text-danger">*</span></label>
         <input type="text" id="hours" name="hours" class="form-control" placeholder="Masukkan jam kerja"
             required />
-    </div>
+    </div> --}}
     <div class="col-12 col-md-12">
         <label class="form-label" for="lasted_km_asset">KM Terakhir Asset<span class="text-danger">*</span></label>
         <input type="text" id="lasted_km_asset" name="lasted_km_asset" class="form-control" placeholder="Masukkan km terakhir asset"

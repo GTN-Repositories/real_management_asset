@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('soil_type', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->integer('value');
-            $table->timestamps();
+        Schema::table('inspection_comments', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id')->index()->nullable();
+            $table->timestamp('time_note')->nullable();
         });
     }
 
@@ -24,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('soil_type');
+        Schema::table('inspection_schedules', function (Blueprint $table) {
+            $table->dropColumn(['user_id', 'time_note']);
+        });
     }
 };

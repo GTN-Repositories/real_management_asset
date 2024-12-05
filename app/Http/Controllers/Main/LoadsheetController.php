@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
 use App\Models\Loadsheet;
+use App\Models\SoilType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
@@ -38,31 +39,43 @@ class LoadsheetController extends Controller
                 return $checkbox;
             })
             ->addColumn('management_project_id', function ($data) {
-                return $data->management_project_id ?? null;
+                return $data->management_project->name ?? '-';
             })
             ->addColumn('asset_id', function ($data) {
-                return $data->asset_id ?? null;
-            })
-            ->addColumn('employee_id', function ($data) {
-                return $data->employee_id ?? null;
-            })
-            ->addColumn('soil_type_id', function ($data) {
-                return $data->soil_type_id ?? null;
+                return ($data->asset->name ?? '') . ' ' . ($data->asset->license_plate ?? '') ?? '-';
             })
             ->addColumn('date', function ($data) {
-                return $data->date ?? null;
-            })
-            ->addColumn('hours', function ($data) {
-                return $data->hours ?? null;
-            })
-            ->addColumn('type', function ($data) {
-                return $data->type ?? null;
+                return $data->date ?? '-';
             })
             ->addColumn('location', function ($data) {
-                return $data->location ?? null;
+                return $data->location ?? '-';
+            })
+            ->addColumn('soil_type_id', function ($data) {
+                return $data->soilType->name ?? '-';
+            })
+            ->addColumn('bpit', function ($data) {
+                return $data->bpit ?? '-';
+            })
+            ->addColumn('kilometer', function ($data) {
+                return $data->kilometer ? number_format($data->kilometer, 0, ',', '.') : '-';
             })
             ->addColumn('loadsheet', function ($data) {
-                return $data->loadsheet ?? null;
+                return $data->loadsheet ? number_format($data->loadsheet, 0, ',', '.') : '-';
+            })
+            ->addColumn('perload', function ($data) {
+                return $data->perload ? number_format($data->perload, 0, ',', '.') : '-';
+            })
+            ->addColumn('cubication', function ($data) {
+                return $data->cubication ? number_format($data->cubication, 0, ',', '.') : '-';
+            })
+            ->addColumn('price', function ($data) {
+                return $data->price ? number_format($data->price, 0, ',', '.') : '-';
+            })
+            ->addColumn('billing_status', function ($data) {
+                return $data->billing_status ?? '-';
+            })
+            ->addColumn('remarks', function ($data) {
+                return $data->remarks ?? '-';
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
@@ -82,16 +95,20 @@ class LoadsheetController extends Controller
             'id',
             'management_project_id',
             'asset_id',
-            'employee_id',
-            'soil_type_id',
             'date',
-            'hours',
-            'type',
             'location',
+            'soil_type_id',
+            'bpit',
+            'kilometer',
             'loadsheet',
+            'perload',
+            'cubication',
+            'price',
+            'billing_status',
+            'remarks',
         ];
 
-        $keyword = $request->search['value'];
+        $keyword = $request->keyword ?? '';
 
         $data = Loadsheet::orderBy('created_at', 'asc')
             ->select($columns)
@@ -127,12 +144,15 @@ class LoadsheetController extends Controller
                 $data['soil_type_id'] = isset($data['soil_type_id']) ? Crypt::decrypt($data['soil_type_id']) : null;
 
                 $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
-                $data['bpit'] = isset($data['bpit']) && $data['bpit'] != '-' ? str_replace('.', '', $data['bpit']) : null;
                 $data['kilometer'] = isset($data['kilometer']) && $data['kilometer'] != '-' ? str_replace('.', '', $data['kilometer']) : null;
                 $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
                 $data['perload'] = isset($data['perload']) && $data['perload'] != '-' ? str_replace('.', '', $data['perload']) : null;
-                $data['lose_factor'] = isset($data['lose_factor']) && $data['lose_factor'] != '-' ? str_replace('.', '', $data['lose_factor']) : null;
-                $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
+
+                $data['lose_factor'] = 0.7;
+                $data['cubication'] = ($data['loadsheet'] * $data['perload']) * $data['lose_factor'];
+
+                $soilType = SoilType::find($data['soil_type_id']);
+                $data['price'] = (int)($data['cubication'] * $soilType->value);
 
                 $data = Loadsheet::create($data);
 
@@ -204,12 +224,16 @@ class LoadsheetController extends Controller
                 }
 
                 $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
-                $data['bpit'] = isset($data['bpit']) && $data['bpit'] != '-' ? str_replace('.', '', $data['bpit']) : null;
                 $data['kilometer'] = isset($data['kilometer']) && $data['kilometer'] != '-' ? str_replace('.', '', $data['kilometer']) : null;
                 $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
                 $data['perload'] = isset($data['perload']) && $data['perload'] != '-' ? str_replace('.', '', $data['perload']) : null;
-                $data['lose_factor'] = isset($data['lose_factor']) && $data['lose_factor'] != '-' ? str_replace('.', '', $data['lose_factor']) : null;
                 $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
+
+                $data['lose_factor'] = 0.7;
+                $data['cubication'] = ($data['loadsheet'] * $data['perload']) * $data['lose_factor'];
+
+                $soilType = SoilType::find($data['soil_type_id']);
+                $data['price'] = (int)($data['cubication'] * $soilType->value);
 
                 $data = Loadsheet::findByEncryptedId($id)->update($data);
 

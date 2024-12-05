@@ -16,7 +16,8 @@
             <tr>
                 <th style="text-align: center;" rowspan="2" colspan="2">No.</th>
                 <th style="text-align: center;" rowspan="2" colspan="2">Management Project</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">Unit</th>
+                <th style="text-align: center;" rowspan="2" colspan="2">SN</th>
+                <th style="text-align: center;" rowspan="2" colspan="4">Unit</th>
                 <th style="text-align: center;" colspan="4">Periode</th>
                 <th style="text-align: center;" rowspan="2" colspan="2">Total Hari</th>
                 <th style="text-align: center;" rowspan="2" colspan="2">Pemakaian Solar</th>
@@ -34,7 +35,10 @@
                 <tr>
                     <td style="text-align: center;" colspan="2">{{ $index + 1 }}</td>
                     <td style="text-align: center;" colspan="2">{{ $fuel->management_project->name ?? 'N/A' }}</td>
-                    <td style="text-align: center;" colspan="2">{{ $fuel->asset->name ?? 'N/A' }}</td>
+                    <td style="text-align: center;" colspan="2">{{ $fuel->asset->serial_number ?? 'N/A' }}</td>
+                    <td style="text-align: center;" colspan="4">
+                        {{ $fuel->asset->license_plate . ' - ' . $fuel->asset->name . ' - ' . $fuel->asset->asset_number ?? 'N/A' }}
+                    </td>
                     <td style="text-align: center;" colspan="2">
                         {{ \Carbon\Carbon::parse($fuel->management_project->start_date)->format('d-M-y') }}</td>
                     <td style="text-align: center;" colspan="2">
@@ -43,7 +47,10 @@
                         {{ \Carbon\Carbon::parse($fuel->management_project->start_date)->diffInDays(\Carbon\Carbon::parse($fuel->management_project->end_date)) }}
                     </td>
                     <td style="text-align: center;" colspan="2">{{ $fuel->liter }}</td>
-                    <td style="text-align: center;" colspan="2">{{ $fuel->loadsheet }}</td>
+                    <td style="text-align: center;" colspan="2">
+                        {{ $fuel->loadsheetsManagement()->where('asset_id', $fuel->asset_id)->sum('loadsheet') }}
+                    </td>
+
                     <td style="text-align: center;" colspan="2">
                         {{ number_format($fuel->liter / max($fuel->loadsheet, 1), 2) }}</td>
                     <td style="text-align: center;" colspan="2">

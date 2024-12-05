@@ -21,4 +21,8 @@ class InspectionComment extends Model
 
         return self::findOrFail($decryptedId);
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

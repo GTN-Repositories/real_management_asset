@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\InspectionComment;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
 class InspectionScheduleController extends Controller
@@ -169,6 +171,8 @@ class InspectionScheduleController extends Controller
                     $comment = InspectionComment::create([
                         'inspection_schedule_id' => Crypt::decrypt($schedule->id),
                         'comment' => $data['comment'],
+                        'user_id' => Auth::user()->id,
+                        'time_note' => Carbon::now(),
                     ]);
                 }
 
