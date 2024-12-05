@@ -70,7 +70,8 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        keyword: params.term,
+                        limit: 10
                     };
                 },
                 processResults: function(data) {
@@ -85,7 +86,6 @@
                         results: apiResults
                     };
                 },
-                limit: 10,
                 cache: true
             }
         });
@@ -99,13 +99,14 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        keyword: params.term,
+                        limit: 10
                     };
                 },
                 processResults: function(data) {
                     apiResults = data.data.map(function(item) {
                         return {
-                            text: item.name,
+                            text: item.nameTitle,
                             id: item.relationId,
                         };
                     });
@@ -114,7 +115,6 @@
                         results: apiResults
                     };
                 },
-                limit: 10,
                 cache: true
             }
         });

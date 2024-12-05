@@ -25,21 +25,21 @@ class Loadsheet extends Model
 
     public function management_project()
     {
-        return $this->belongsTo(ManagementProject::class, 'management_project_id');
+        return $this->belongsTo(ManagementProject::class, 'management_project_id', 'id');
     }
 
     public function asset()
     {
-        return $this->belongsTo(Asset::class, 'asset_id');
+        return $this->belongsTo(Asset::class, 'asset_id', 'id');
     }
 
     public function employee()
     {
-        return $this->belongsTo(Employee::class, 'employee_id');
+        return $this->belongsTo(Employee::class, 'employee_id', 'id');
     }
 
     public function soilType()
     {
-        return $this->belongsTo(SoilType::class, 'soil_type_id');
+        return $this->belongsTo(SoilType::class, 'soil_type_id', 'id');
     }
 }

@@ -55,7 +55,7 @@ class AssetController extends Controller
                 return $data->image ? '<img src="' . asset('storage/' . $data->image) . '" alt="Image" width="50" height="50"/>' : "-";
             })
             ->addColumn('nameWithNumber', function ($data) {
-                return $data->license_plate . " - " . $data->name . " - " . $data->asset_number ?? "-";
+                return Crypt::decrypt($data->id) . '-' . $data->name . " - " . $data->license_plate ?? "-";
             })
             ->addColumn('name', function ($data) {
                 return $data->name ?? "-";
@@ -126,6 +126,8 @@ class AssetController extends Controller
         $assets_location = $request->assets_location;
         $manager = $request->manager;
 
+        $limit = $request->limit ?? '';
+
         $data = Asset::orderBy('created_at', 'asc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
@@ -137,6 +139,7 @@ class AssetController extends Controller
                     });
                 }
             })
+            ->limit($limit)
             ->get();
 
         if ($category) {

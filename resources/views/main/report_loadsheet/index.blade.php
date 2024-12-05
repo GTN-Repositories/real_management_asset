@@ -36,13 +36,20 @@
                     <thead class="border-top">
                         <tr>
                             <th>#</th>
-                            <th>Tanggal</th>
-                            <th>Nama Project</th>
-                            <th>Nama Aset</th>
-                            <th>Nama Sparepart</th>
-                            <th>Jumlah</th>
-                            <th>Harga</th>
-                            <th>Total</th>
+                            <th>Management</th>
+                            <th>Asset</th>
+                            <th>Date</th>
+                            <th>Location</th>
+                            <th>Soil Type</th>
+                            <th>BPIT</th>
+                            <th>Kilometer</th>
+                            <th>Loadsheet</th>
+                            <th>Per Load</th>
+                            <th>Factor Lose</th>
+                            <th>Cubication</th>
+                            <th>Price</th>
+                            <th>Billing Status</th>
+                            <th>Remarks</th>
                         </tr>
                     </thead>
                 </table>
@@ -98,19 +105,23 @@
         }
 
 
-        function init_table(startDate = '', endDate = '', predefinedFilter = '', keyword = '') {
-            $('#data-table').DataTable({
+        function init_table(keyword = '', startDate = '', endDate = '', predefinedFilter = '') {
+            var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+            var table = $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
-                destroy: true,
+                columnDefs: [{
+                    target: 0,
+                    visible: true,
+                    searchable: false
+                }, ],
+
                 ajax: {
                     type: "GET",
-                    url: "{{ route('report-sparepart.data') }}",
+                    url: "{{ route('report-loadsheet.data') }}",
                     data: {
-                        'keyword': keyword,
-                        'startDate': startDate,
-                        'endDate': endDate,
-                        'predefinedFilter': predefinedFilter
+                        'keyword': keyword
                     }
                 },
                 columns: [{
@@ -154,6 +165,10 @@
                     {
                         data: 'perload',
                         name: 'perload'
+                    },
+                    {
+                        data: 'lose_factor',
+                        name: 'lose_factor'
                     },
                     {
                         data: 'cubication',

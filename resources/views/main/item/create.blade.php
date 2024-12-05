@@ -59,17 +59,17 @@
         </select>
     </div>
 
-    <div class="col-12 col-md-6 mb-4" id="select2relation">
+    <div class="col-12 col-md-6" id="select2relation">
         <label for="select2Basic" class="form-label">Kategori</label>
         <select id="select2Basic" class="select2 form-select form-select-lg" name="category_id" data-allow-clear="true">
             <option></option>
         </select>
     </div>
-
+{{--
     <div class="col-12 col-md-6">
         <label class="form-label">Warna</label>
         <input type="color" name="color" class="form-control mb-lg-0" placeholder="Warna" required />
-    </div>
+    </div> --}}
 
     <div class="col-12 col-md-6" id="oumRelation">
         <label for="oum_id" class="form-label">Oum Tipe<span class="text-danger">*</span></label>
