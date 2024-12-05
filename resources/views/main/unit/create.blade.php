@@ -14,25 +14,22 @@
         <label class="form-label" for="name">Nama Asset<span class="text-danger">*</span></label>
         <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name" required />
     </div>
-    <div class="col-12 col-md-6" id="userRelation">
-        <label class="form-label" for="pic">pic<span class="text-danger">*</span></label>
-        <select id="pic" name="pic" class="select2 form-select select2-primary"data-allow-clear="true"
-            required>
-        </select>
-    </div>
     <div class="col-12 col-md-6" id="categoryParent">
         <label class="form-label" for="category">Kategori</label>
         <select id="category_id" name="category" class="select2 form-select select2-primary"data-allow-clear="true">
         </select>
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="cost">Biaya Pembelian</label>
-        <input type="number" min="1" id="cost" name="cost" class="form-control"
-            placeholder="Masukkan cost" />
+        <label class="form-label" for="brand">Brand</label>
+        <input type="text" id="brand" name="brand" class="form-control" placeholder="Masukkan brand" />
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="unit">Unit</label>
         <input type="text" id="unit" name="unit" class="form-control" placeholder="Masukkan unit" />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="type">Type</label>
+        <input type="text" id="type" name="type" class="form-control" placeholder="Masukkan type" />
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="license_plate">Nomor Polisi</label>
@@ -45,21 +42,39 @@
             placeholder="Masukkan classification" />
     </div>
     <div class="col-12 col-md-6">
+        <label class="form-label" for="chassis_number">Nomor Rangka</label>
+        <input type="text" id="chassis_number" name="chassis_number" class="form-control"
+            placeholder="Masukkan chassis_number" />
+    </div>
+    <div class="col-12 col-md-6">
         <label class="form-label" for="machine_number">Nomor Mesin</label>
         <input type="text" id="machine_number" name="machine_number" class="form-control"
             placeholder="Masukkan nomor mesin" />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="color">Warna</label>
-        <input type="text" id="color" name="color" class="form-control" placeholder="Masukkan warna" />
-    </div>
-    <div class="col-12 col-md-6">
         <label class="form-label" for="nik">Nik</label>
         <input type="text" id="nik" name="nik" class="form-control" placeholder="Masukkan nik" />
     </div>
-    <div class="col-12 col-md-12">
-        <label class="form-label" for="description">Keterangan</label>
-        <textarea name="description" id="description" class="form-control" cols="30" rows="5"></textarea>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="color">Warna</label>
+        <input type="text" id="color" name="color" class="form-control" placeholder="Masukkan warna" />
+    </div>
+    <div class="col-12 col-md-6" id="managerParent">
+        <label class="form-label" for="manager">Pemilik</label>
+        <select id="manager_id" name="manager" class="select2 form-select select2-primary"data-allow-clear="true">
+        </select>
+    </div>
+    <div class="col-12 col-md-6" id="assets_locationParent">
+        <label class="form-label" for="assets_location">Lokasi</label>
+        <select id="assets_location_id" name="assets_location"
+            class="select2 form-select select2-primary"data-allow-clear="true">
+        </select>
+    </div>
+    <div class="col-12 col-md-6" id="userRelation">
+        <label class="form-label" for="pic">pic<span class="text-danger">*</span></label>
+        <select id="pic" name="pic" class="select2 form-select select2-primary"data-allow-clear="true"
+            required>
+        </select>
     </div>
     <div class="col-12">
         <hr class="my-4">
@@ -78,6 +93,43 @@
                     style="">
                     <div class="accordion-body row">
                         <div class="col-12 col-md-6">
+                            <label class="form-label" for="purchase_date">Tanggal Pembelian</label>
+                            <input type="date" id="purchase_date" name="purchase_date" class="form-control"
+                                placeholder="Masukkan purchase_date" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="type_purchase">Type Purchase</label>
+                            <select name="type_purchase" id="type_purchase" class="select2 form-select">
+                                <option value="">Pilih Tipe Pembelian</option>
+                                <option value="buy">Buy</option>
+                                <option value="rent">Rent</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="cost">Biaya</label>
+                            <input type="number" min="1" id="cost" name="cost" class="form-control"
+                                placeholder="Masukkan cost" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="contract_period">Contract Period</label>
+                            <input type="number" min="1" id="contract_period" name="contract_period"
+                                class="form-control" placeholder="Masukkan contract_period" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="file_reminder">Upload File Reminder</label>
+                            <input type="file" id="file_reminder" name="file_reminder" class="form-control"
+                                placeholder="Masukkan file_reminder" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="date_reminder">Tanggal Reminder</label>
+                            <input type="date" id="date_reminder" name="date_reminder" class="form-control"
+                                placeholder="Masukkan date_reminder" />
+                        </div>
+                        <div class="col-12 col-md-12">
+                            <label class="form-label" for="description">Keterangan</label>
+                            <textarea name="description" id="description" class="form-control" cols="30" rows="5"></textarea>
+                        </div>
+                        <div class="col-12 col-md-6">
                             <label class="form-label" for="serial_number">Nomor Seri</label>
                             <input type="text" id="serial_number" name="serial_number" class="form-control"
                                 placeholder="Masukkan serial_number" />
@@ -87,21 +139,61 @@
                             <input type="text" id="model_number" name="model_number" class="form-control"
                                 placeholder="Masukkan model_number" />
                         </div>
-                        <div class="col-12 col-md-12">
+                        <div class="col-12 col-md-12 mb-3">
                             <label class="form-label" for="warranty_period">Waktu Garansi</label>
                             <input type="number" min="1" id="warranty_period" name="warranty_period"
                                 class="form-control" placeholder="Masukkan warranty_period" />
                         </div>
-                        <div class="col-12 col-md-6" id="assets_locationParent">
-                            <label class="form-label" for="assets_location">Lokasi</label>
-                            <select id="assets_location_id" name="assets_location"
-                                class="select2 form-select select2-primary"data-allow-clear="true">
-                            </select>
+                        {{-- assurance --}}
+                        <hr>
+                        <h5>Informasi Assurance</h5>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="no_policy">Nomor Policy</label>
+                            <input type="text" id="no_policy" name="no_policy" class="form-control"
+                                placeholder="Masukkan no_policy" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="purchase_date">Tanggal Pembelian</label>
-                            <input type="date" id="purchase_date" name="purchase_date" class="form-control"
-                                placeholder="Masukkan purchase_date" />
+                            <label class="form-label" for="insurance_name">Nama Asuransi</label>
+                            <input type="text" id="insurance_name" name="insurance_name" class="form-control"
+                                placeholder="Masukkan insurance_name" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="insurance_cost">Biaya Asuransi</label>
+                            <input type="text" id="insurance_cost" name="insurance_cost" class="form-control"
+                                placeholder="Masukkan insurance_cost" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="asuransi_date">Tanggal Asuransi</label>
+                            <input type="date" id="asuransi_date" name="asuransi_date" class="form-control"
+                            placeholder="Masukkan asuransi" />
+                        </div>
+                        <div class="col-12 col-md-12 mb-3">
+                            <label class="form-label" for="asuransi">Upload File Asuransi</label>
+                            <input type="file" id="asuransi" name="asuransi" class="form-control"
+                                placeholder="Masukkan asuransi" />
+                        </div>
+                        {{-- tax --}}
+                        <hr>
+                        <h5>Informasi Tax</h5>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="tax_cost">Biaya Pajak</label>
+                            <input type="text" id="tax_cost" name="tax_cost" class="form-control"
+                                placeholder="Masukkan tax_cost" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="tax_period">Waktu Pajak</label>
+                            <input type="number" min="1" id="tax_period" name="tax_period"
+                                class="form-control" placeholder="Masukkan tax_period" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="date_tax">Tanggal Pengingat Pajak</label>
+                            <input type="date" id="date_tax" name="date_tax" class="form-control"
+                                placeholder="Masukkan date_tax" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="file_tax">Upload File Pajak</label>
+                            <input type="file" id="file_tax" name="file_tax" class="form-control"
+                                placeholder="Masukkan file_tax" />
                         </div>
                     </div>
                 </div>
@@ -110,28 +202,28 @@
                 <h2 class="accordion-header" id="headingTwo">
                     <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
                         data-bs-target="#accordionTwo" aria-expanded="false" aria-controls="accordionTwo">
-                        Informasi Penyusutan Asset
+                        Informasi Depreciation Asset
                     </button>
                 </h2>
                 <div id="accordionTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
                     data-bs-parent="#accordionExample">
                     <div class="accordion-body row">
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="depreciation">Penyusutan</label>
+                            <label class="form-label" for="depreciation">Month</label>
                             <input type="number" min="1" id="depreciation" name="depreciation"
                                 class="form-control" placeholder="Masukkan depreciation" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="depreciation_percentage">Presentase Penyusutan</label>
+                            <label class="form-label" for="depreciation_percentage">Presentase Depreciation</label>
                             <input type="text" id="depreciation_percentage" name="depreciation_percentage"
                                 class="form-control" placeholder="Masukkan depreciation_percentage" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="depreciation_method">Metode Penyusutan</label>
+                            <label class="form-label" for="depreciation_method">Metode Depreciation</label>
                             <select name="depreciation_method" id="depreciation_method" class="select2 form-select">
-                                <option value="">Pilih</option>
-                                <option value="Penyusutan Saldo Menurun">Penyusutan Saldo Menurun</option>
-                                <option value="Penyusutan Garis Lurus">Penyusutan Garis Lurus</option>
+                                <option value="">Pilih Metode</option>
+                                <option value="Resuding Balance Depreciation">Resuding Balance Depreciation</option>
+                                <option value="Straight-Line Deprecitaion">Straight-Line Deprecitaion</option>
                             </select>
                         </div>
                         <div class="col-12 col-md-6">
@@ -146,19 +238,19 @@
                 <h2 class="accordion-header" id="headingThree">
                     <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
                         data-bs-target="#accordionThree" aria-expanded="false" aria-controls="accordionThree">
-                        Informasi Apresiasi Asset
+                        Informasi Appreciation Asset
                     </button>
                 </h2>
                 <div id="accordionThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
                     data-bs-parent="#accordionExample">
                     <div class="accordion-body row">
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="appreciation_rate">Tingkat Apresiasi</label>
+                            <label class="form-label" for="appreciation_rate">Appreciation Rate</label>
                             <input type="number" min="1" id="appreciation_rate" name="appreciation_rate"
                                 class="form-control" placeholder="Masukkan appreciation_rate" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="appreciation_period">Periode Apresiasi</label>
+                            <label class="form-label" for="appreciation_period">Periode Appreciation</label>
                             <input type="number" min="1" id="appreciation_period" name="appreciation_period"
                                 class="form-control" placeholder="Masukkan appreciation_period" />
                         </div>
@@ -210,6 +302,32 @@
             placeholder: 'Pilih Kategori',
             ajax: {
                 url: "{{ route('category.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.data.map(function(item) {
+                            return {
+                                text: item.name,
+                                id: item.id
+                            };
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $('#manager_id').select2({
+            dropdownParent: $('#managerParent'),
+            placeholder: 'Pilih pemilik',
+            ajax: {
+                url: "{{ route('manager.data') }}",
                 dataType: 'json',
                 delay: 250,
                 data: function(params) {

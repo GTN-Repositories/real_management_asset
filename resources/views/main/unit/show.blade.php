@@ -324,6 +324,18 @@
                                     </button>
                                 </td>
                             </tr>
+                            <tr>
+                                <td>gambar pajak</td>
+                                <td><img src="{{ asset('storage/' . $asset->file_tax) }}" alt="gambar asuransi"
+                                        width="50"></td>
+                                <td>{{ $asset->date_tax }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary btn-sm"
+                                        onclick="createFile('tax')">
+                                        <i class="fas fa-pencil me-2"></i> Edit
+                                    </button>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
