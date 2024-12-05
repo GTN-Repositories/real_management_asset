@@ -74,6 +74,7 @@
                 data: function(params) {
                     return {
                         'keyword': params.term,
+                        'limit': 10,
                     };
                 },
                 processResults: function(data) {
@@ -84,7 +85,6 @@
                         }))
                     };
                 },
-                limit: 10,
                 cache: true
             }
         });
@@ -99,6 +99,7 @@
                 data: function(params) {
                     return {
                         'keyword': params.term,
+                        'limit': 10,
                     };
                 },
                 processResults: function(data) {
@@ -111,14 +112,13 @@
                         }))
                     };
                 },
-                limit: 10,
                 cache: true
             }
         });
     });
 
+    let selectedItems = [];
     $(document).ready(function() {
-        let selectedItems = [];
         $('#item_id').on('change', function() {
             const itemId = $(this).val();
             const selectedOption = $(this).select2('data')[0];
@@ -188,7 +188,8 @@
                         delay: 250,
                         data: function(params) {
                             return {
-                                keyword: params.term
+                                keyword: params.term,
+                                limit: 10
                             };
                         },
                         processResults: function(data) {
