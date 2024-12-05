@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('loadsheets', function (Blueprint $table) {
-            $table->string('bpit')->change();
+            $table->string('bpit')->nullable()->change();
         });
     }
 
