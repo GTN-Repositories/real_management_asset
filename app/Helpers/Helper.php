@@ -27,4 +27,31 @@ class Helper
             return 'Reject';
         }
     }
+
+    public static function bulan()
+    {
+        $data = [
+            '01' => 'Januari',
+            '02' => 'Februari',
+            '03' => 'Maret',
+            '04' => 'April',
+            '05' => 'Mei',
+            '06' => 'Juni',
+            '07' => 'Juli',
+            '08' => 'Agustus',
+            '09' => 'September',
+            '10' => 'Oktober',
+            '11' => 'November',
+            '12' => 'Desember',
+        ];
+
+        return $data;
+    }
+    public static function tahun()
+    {
+        // 10 TAHUN KEBELAKANG COLLECT TO ARRAY
+        $data = collect(range(date('Y'), date('Y') - 10))->toArray();
+
+        return $data;
+    }
 }
