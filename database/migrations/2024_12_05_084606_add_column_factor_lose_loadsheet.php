@@ -17,7 +17,6 @@ return new class extends Migration
 
         Schema::table('dev_real.loadsheets', function (Blueprint $table) {
             $table->string('bpit')->nullable();
-            $table->float('factor_lose')->default(0.75);
         });
     }
 

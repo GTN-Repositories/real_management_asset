@@ -140,7 +140,7 @@ class ManagementProjectController extends Controller
         }
 
         $assets = Asset::whereIn('id', $assetIds)->get()->mapWithKeys(function ($asset) {
-            return [$asset->id => $asset->license_plate . ' - ' . $asset->name . ' - ' . $asset->asset_number];
+            return [$asset->id => Crypt::decrypt($asset->id) . ' - ' . $asset->name . ' - ' . $asset->asset_number];
         })->toArray();
 
         return response()->json($assets);
