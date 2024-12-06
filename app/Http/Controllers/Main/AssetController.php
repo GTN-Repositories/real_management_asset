@@ -49,7 +49,7 @@ class AssetController extends Controller
                 return $checkbox;
             })
             ->addColumn('relationId', function ($data) {
-                return $data->id ?? null;
+                return Crypt::decrypt($data->id) ?? null;
             })
             ->addColumn('image', function ($data) {
                 return $data->image ? '<img src="' . asset('storage/' . $data->image) . '" alt="Image" width="50" height="50"/>' : "-";
@@ -57,32 +57,47 @@ class AssetController extends Controller
             ->addColumn('nameWithNumber', function ($data) {
                 return Crypt::decrypt($data->id) . '-' . $data->name . " - " . $data->license_plate ?? "-";
             })
-            ->addColumn('name', function ($data) {
-                return $data->name ?? "-";
-            })
-            ->addColumn('serial_number', function ($data) {
-                return $data->serial_number ?? "-";
-            })
-            ->addColumn('model_number', function ($data) {
-                return $data->model_number ?? "-";
-            })
-            ->addColumn('manager', function ($data) {
-                return $data->manager ?? "-";
-            })
             ->addColumn('category', function ($data) {
-                return $data->asset_category->name ?? "-";
+                return $data->category;
+            })
+            ->addColumn('name', function ($data) {
+                return $data->name;
+            })
+            ->addColumn('unit', function ($data) {
+                return $data->unit;
+            })
+            ->addColumn('type', function ($data) {
+                return $data->type;
+            })
+            ->addColumn('license_plate', function ($data) {
+                return $data->license_plate;
+            })
+            ->addColumn('classification', function ($data) {
+                return $data->classification;
+            })
+            ->addColumn('chassis_number', function ($data) {
+                return $data->chassis_number;
+            })
+            ->addColumn('machine_number', function ($data) {
+                return $data->machine_number;
+            })
+            ->addColumn('nik', function ($data) {
+                return $data->nik;
+            })
+            ->addColumn('color', function ($data) {
+                return $data->color;
+            })
+            ->addColumn('owner', function ($data) {
+                return $data->owner;
             })
             ->addColumn('assets_location', function ($data) {
-                return $data->location->name ?? "-";
+                return $data->assets_location;
             })
-            ->addColumn('cost', function ($data) {
-                return $data->cost ?? "-";
+            ->addColumn('pic', function ($data) {
+                return $data->pics->name ?? $data->pic;
             })
-            ->addColumn('purchase_date', function ($data) {
-                return $data->purchase_date ?? "-";
-            })
-            ->addColumn('created_at', function ($data) {
-                return $data->created_at ?? "-";
+            ->addColumn('status', function ($data) {
+                return $data->status;
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
@@ -110,18 +125,23 @@ class AssetController extends Controller
             'asset_number',
             'image',
             'name',
-            'serial_number',
-            'model_number',
-            'manager',
-            'assets_location',
             'category',
-            'cost',
-            'purchase_date',
+            'unit',
+            'type',
             'license_plate',
+            'classification',
+            'chassis_number',
+            'machine_number',
+            'nik',
+            'color',
+            'owner',
+            'assets_location',
+            'pic',
+            'status',
             'created_at',
         ];
 
-        $keyword = $request->keyword ?? "";
+        $keyword = $request->search['value'] ?? '';
         $category = $request->category;
         $assets_location = $request->assets_location;
         $manager = $request->manager;
@@ -138,9 +158,7 @@ class AssetController extends Controller
                         }
                     });
                 }
-            })
-            ->limit($limit)
-            ->get();
+            });
 
         if ($category) {
             $data->where('category', $category);
@@ -181,14 +199,17 @@ class AssetController extends Controller
                 $lastAsset = Asset::latest('id')->first();
                 $lastNumber = $lastAsset ? intval(str_replace('ast-', '', $lastAsset->asset_number)) : 0;
 
-                if (isset($data['assets_location'])) {
-                    $data['assets_location'] = Crypt::decrypt($data['assets_location']);
-                }
-                if (isset($data['manager'])) {
-                    $data['manager'] = Crypt::decrypt($data['manager']);
-                }
-                if (isset($data['category'])) {
-                    $data['category'] = Crypt::decrypt($data['category']);
+                // if (isset($data['assets_location'])) {
+                //     $data['assets_location'] = Crypt::decrypt($data['assets_location']);
+                // }
+                // if (isset($data['manager'])) {
+                //     $data['manager'] = Crypt::decrypt($data['manager']);
+                // }
+                // if (isset($data['category'])) {
+                //     $data['category'] = Crypt::decrypt($data['category']);
+                // }
+                if (isset($data['pic'])) {
+                    $data['pic'] = Crypt::decrypt($data['pic']);
                 }
 
                 $data['status'] = "Idle";
@@ -215,6 +236,7 @@ class AssetController extends Controller
                 ]);
             });
         } catch (\Throwable $th) {
+            dd($th);
             return response()->json([
                 'status' => false,
                 'message' => 'Data gagal ditambahkan! ' . $th->getMessage(),
@@ -322,6 +344,10 @@ class AssetController extends Controller
                     }
                 }
 
+                // if (isset($data['pic'])) {
+                //     $data['pic'] = Crypt::decrypt($data['pic']);
+                // }
+
                 $data = $asset->update($data);
 
                 if ($statusBefore !== $asset->status) {
@@ -338,6 +364,7 @@ class AssetController extends Controller
                 ]);
             });
         } catch (\Throwable $th) {
+            dd($th);
             return response()->json([
                 'status' => false,
                 'message' => 'Data gagal diperbarui! ' . $th->getMessage(),

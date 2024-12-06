@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('dev_real.loadsheets', function (Blueprint $table) {
-            $table->dropColumn('bpit');
-        });
-
-        Schema::table('dev_real.loadsheets', function (Blueprint $table) {
-            $table->string('bpit')->nullable();
+        Schema::table('assets', function (Blueprint $table) {
+            $table->date('appreciation_period')->nullable()->change();
         });
     }
 

@@ -203,7 +203,7 @@
                     apiResults = data.data
                         .map(function(item) {
                             return {
-                                text: item.name,
+                                text: item.name + ' ' + item.nameTitle,
                                 id: item.relationId,
                             };
                         });
@@ -246,7 +246,7 @@
         });
     });
 
-    $(document).on('input', '#hours, #kilometer, #loadsheet, #perload, #lose_factor, #price', function() {
+    $(document).on('input', '#hours, #kilometer, #loadsheet, #perload, #price', function() {
         value = formatCurrency($(this).val());
         $(this).val(value);
     });

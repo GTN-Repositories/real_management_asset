@@ -11,18 +11,17 @@
         <input type="file" id="image" name="image" class="form-control" />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="name">Nama Asset<span class="text-danger">*</span></label>
+        <label class="form-label" for="name">Merek<span class="text-danger">*</span></label>
         <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan name" required />
     </div>
     <div class="col-12 col-md-6" id="categoryParent">
         <label class="form-label" for="category">Kategori</label>
-        <select id="category_id" name="category" class="select2 form-select select2-primary"data-allow-clear="true">
-        </select>
+        <input type="text" id="category" name="category" class="form-control" placeholder="Masukkan Kategori" required />
     </div>
-    <div class="col-12 col-md-6">
+    {{-- <div class="col-12 col-md-6">
         <label class="form-label" for="brand">Brand</label>
         <input type="text" id="brand" name="brand" class="form-control" placeholder="Masukkan brand" />
-    </div>
+    </div> --}}
     <div class="col-12 col-md-6">
         <label class="form-label" for="unit">Unit</label>
         <input type="text" id="unit" name="unit" class="form-control" placeholder="Masukkan unit" />
@@ -52,7 +51,7 @@
             placeholder="Masukkan nomor mesin" />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="nik">Nik</label>
+        <label class="form-label" for="nik">NIK</label>
         <input type="text" id="nik" name="nik" class="form-control" placeholder="Masukkan nik" />
     </div>
     <div class="col-12 col-md-6">
@@ -60,22 +59,31 @@
         <input type="text" id="color" name="color" class="form-control" placeholder="Masukkan warna" />
     </div>
     <div class="col-12 col-md-6" id="managerParent">
-        <label class="form-label" for="manager">Pemilik</label>
-        <select id="manager_id" name="manager" class="select2 form-select select2-primary"data-allow-clear="true">
-        </select>
+        <label class="form-label" for="owner">Pemilik</label>
+        <input type="text" id="owner" name="owner" class="form-control" placeholder="Masukkan Pemilik" />
+        {{-- <select id="manager_id" name="manager" class="select2 form-select select2-primary"data-allow-clear="true">
+        </select> --}}
     </div>
-    <div class="col-12 col-md-6" id="assets_locationParent">
-        <label class="form-label" for="assets_location">Lokasi</label>
-        <select id="assets_location_id" name="assets_location"
-            class="select2 form-select select2-primary"data-allow-clear="true">
-        </select>
-    </div>
-    <div class="col-12 col-md-6" id="userRelation">
-        <label class="form-label" for="pic">pic<span class="text-danger">*</span></label>
+    <div class="col-12 col-md-6" id="picRelation">
+        <label class="form-label" for="pic">PIC<span class="text-danger">*</span></label>
         <select id="pic" name="pic" class="select2 form-select select2-primary"data-allow-clear="true"
             required>
         </select>
     </div>
+    <div class="col-12 col-md-12" id="assets_locationParent">
+        <label class="form-label" for="assets_location">Lokasi</label>
+        <input type="text" id="assets_location" name="assets_location" class="form-control" placeholder="Masukkan Lokasi" />
+        {{-- <select id="assets_location_id" name="assets_location"
+            class="select2 form-select select2-primary"data-allow-clear="true">
+        </select> --}}
+    </div>
+    {{-- <div class="col-12 col-md-6" id="userRelation">
+        <label class="form-label" for="pic">pic<span class="text-danger">*</span></label>
+        <select id="pic" name="pic" class="select2 form-select select2-primary"data-allow-clear="true"
+            required>
+        </select>
+    </div> --}}
+    
     <div class="col-12">
         <hr class="my-4">
     </div>
@@ -112,7 +120,7 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="contract_period">Contract Period</label>
-                            <input type="number" min="1" id="contract_period" name="contract_period"
+                            <input type="date" id="contract_period" name="contract_period"
                                 class="form-control" placeholder="Masukkan contract_period" />
                         </div>
                         <div class="col-12 col-md-6">
@@ -129,7 +137,7 @@
                             <label class="form-label" for="description">Keterangan</label>
                             <textarea name="description" id="description" class="form-control" cols="30" rows="5"></textarea>
                         </div>
-                        <div class="col-12 col-md-6">
+                        {{-- <div class="col-12 col-md-6">
                             <label class="form-label" for="serial_number">Nomor Seri</label>
                             <input type="text" id="serial_number" name="serial_number" class="form-control"
                                 placeholder="Masukkan serial_number" />
@@ -143,10 +151,10 @@
                             <label class="form-label" for="warranty_period">Waktu Garansi</label>
                             <input type="number" min="1" id="warranty_period" name="warranty_period"
                                 class="form-control" placeholder="Masukkan warranty_period" />
-                        </div>
-                        {{-- assurance --}}
+                        </div> --}}
+                        {{-- Insurance --}}
                         <hr>
-                        <h5>Informasi Assurance</h5>
+                        <h5>Informasi Insurance</h5>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="no_policy">Nomor Policy</label>
                             <input type="text" id="no_policy" name="no_policy" class="form-control"
@@ -182,7 +190,7 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="tax_period">Waktu Pajak</label>
-                            <input type="number" min="1" id="tax_period" name="tax_period"
+                            <input type="date" id="tax_period" name="tax_period"
                                 class="form-control" placeholder="Masukkan tax_period" />
                         </div>
                         <div class="col-12 col-md-6">
@@ -209,13 +217,17 @@
                     data-bs-parent="#accordionExample">
                     <div class="accordion-body row">
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="depreciation">Month</label>
-                            <input type="number" min="1" id="depreciation" name="depreciation"
-                                class="form-control" placeholder="Masukkan depreciation" />
+                            <label class="form-label" for="depreciation">Bulan</label>
+                            <select id="depreciation" name="depreciation" class="form-control"aria-label="Pilih Bulan">
+                                <option value="" selected>Pilih Bulan</option>
+                                @foreach (\App\Helpers\Helper::bulan() as $key => $bln)
+                                    <option value="{{ $key }}" {{ now()->month == $key ? 'selected' : '' }}> {{ $bln }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="depreciation_percentage">Presentase Depreciation</label>
-                            <input type="text" id="depreciation_percentage" name="depreciation_percentage"
+                            <input type="number" id="depreciation_percentage" name="depreciation_percentage"
                                 class="form-control" placeholder="Masukkan depreciation_percentage" />
                         </div>
                         <div class="col-12 col-md-6">
@@ -251,7 +263,7 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="appreciation_period">Periode Appreciation</label>
-                            <input type="number" min="1" id="appreciation_period" name="appreciation_period"
+                            <input type="date" id="appreciation_period" name="appreciation_period"
                                 class="form-control" placeholder="Masukkan appreciation_period" />
                         </div>
                     </div>
@@ -261,26 +273,35 @@
                 <h2 class="accordion-header" id="headingThree">
                     <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
                         data-bs-target="#accordionFour" aria-expanded="false" aria-controls="accordionFour">
-                        Informasi Pemasok Asset
+                        Informasi Supplier Asset
                     </button>
                 </h2>
                 <div id="accordionFour" class="accordion-collapse collapse" aria-labelledby="headingThree"
                     data-bs-parent="#accordionExample">
                     <div class="accordion-body row">
-                        <div class="col-12 col-md-12">
-                            <label class="form-label" for="supplier_name">Nama Pemasok</label>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="supplier_name">Nama Supplier</label>
                             <input type="text" id="supplier_name" name="supplier_name" class="form-control"
                                 placeholder="Masukkan supplier_name" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="supplier_phone_number">Nomor Telepon Pemasok</label>
+                            <label class="form-label" for="supplier_phone_number">Nomor Telepon Supplier</label>
                             <input type="text" id="supplier_phone_number" name="supplier_phone_number"
                                 class="form-control" placeholder="Masukkan supplier_phone_number" />
                         </div>
+                        <div class="col-12 col-md-12">
+                            <label class="form-label" for="supplier_address">Alamat Supplier</label>
+                            <textarea id="supplier_address" name="supplier_address" class="form-control" cols="30" rows="5"></textarea>
+                        </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="supplier_address">Alamat Pemasok</label>
-                            <input type="text" id="supplier_address" name="supplier_address" class="form-control"
-                                placeholder="Masukkan supplier_address" />
+                            <label class="form-label" for="supplier_pic_name">Nama PIC Supplier</label>
+                            <input type="text" id="supplier_pic_name" name="supplier_pic_name" class="form-control"
+                                placeholder="Masukkan supplier_name" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="supplier_pic_phone">Nomor PIC Telepon Supplier</label>
+                            <input type="text" id="supplier_pic_phone" name="supplier_pic_phone"
+                                class="form-control" placeholder="Masukkan supplier_phone_number" />
                         </div>
                     </div>
                 </div>
@@ -375,11 +396,42 @@
             }
         });
 
+        // $('#pic').select2({
+        //     dropdownParent: $('#userRelation'),
+        //     placeholder: 'Pilih PIC',
+        //     ajax: {
+        //         url: "{{ route('user.data') }}",
+        //         dataType: 'json',
+        //         delay: 250,
+        //         data: function(params) {
+        //             return {
+        //                 keyword: params.term
+        //             };
+        //         },
+        //         processResults: function(data) {
+        //             apiResults = data.data
+        //                 .filter(function(item) {
+        //                     return item.idRelationAll !== null;
+        //                 })
+        //                 .map(function(item) {
+        //                     return {
+        //                         text: item.name,
+        //                         id: item.idRelationAll,
+        //                     };
+        //                 });
+
+        //             return {
+        //                 results: apiResults
+        //             };
+        //         },
+        //         cache: true
+        //     }
+        // });
         $('#pic').select2({
-            dropdownParent: $('#userRelation'),
+            dropdownParent: $('#picRelation'),
             placeholder: 'Pilih PIC',
             ajax: {
-                url: "{{ route('user.data') }}",
+                url: "{{ route('employee.data') }}",
                 dataType: 'json',
                 delay: 250,
                 data: function(params) {
@@ -390,12 +442,12 @@
                 processResults: function(data) {
                     apiResults = data.data
                         .filter(function(item) {
-                            return item.idRelationAll !== null;
+                            return item.relationId !== null;
                         })
                         .map(function(item) {
                             return {
-                                text: item.name,
-                                id: item.idRelationAll,
+                                text: item.name+' ('+item.nameTitle+')',
+                                id: item.relationId,
                             };
                         });
 

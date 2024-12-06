@@ -56,8 +56,8 @@ class LoadsheetController extends Controller
             ->addColumn('bpit', function ($data) {
                 return $data->bpit ?? '-';
             })
-            ->addColumn('factor_lose', function ($data) {
-                return $data->factor_lose ?? '-';
+            ->addColumn('lose_factor', function ($data) {
+                return $data->lose_factor ?? '-';
             })
             ->addColumn('kilometer', function ($data) {
                 return $data->kilometer ? number_format($data->kilometer, 0, ',', '.') : '-';
@@ -109,7 +109,7 @@ class LoadsheetController extends Controller
             'price',
             'billing_status',
             'remarks',
-            'factor_lose',
+            'lose_factor',
         ];
 
         $keyword = $request->keyword ?? '';

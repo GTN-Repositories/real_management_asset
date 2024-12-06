@@ -164,6 +164,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::resource('report-asset', AssetReportController::class);
 
     Route::get('/report-loadsheet/data', [ReportLoadsheetController::class, 'data'])->name('report-loadsheet.data');
+    Route::get('/report-loadsheet/export-excel', [ReportLoadsheetController::class, 'exportExcel'])->name('report-loadsheet.export-excel');
     Route::resource('report-loadsheet', ReportLoadsheetController::class);
 
     Route::get('/monitoring/data', [MonitoringController::class, 'data'])->name('monitoring.data');

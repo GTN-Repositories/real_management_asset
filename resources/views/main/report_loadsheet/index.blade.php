@@ -24,6 +24,9 @@
                 <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
                 <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
             </div>
+            <button onclick="exportExcel()" class="btn btn-success">
+                <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+            </button>
         </div>
 
         <!-- Product List Table -->
@@ -188,6 +191,70 @@
                     },
                 ]
             });
+        }
+
+        function exportExcel() {
+            const startDate = $('#date-range-picker').data('daterangepicker')?.startDate?.format('YYYY-MM-DD');
+            const endDate = $('#date-range-picker').data('daterangepicker')?.endDate?.format('YYYY-MM-DD');
+            const predefinedFilter = $('.dropdown-item.active').text().trim() || '';
+
+            if (startDate && endDate) {
+                $.ajax({
+                    url: "{{ route('report-loadsheet.export-excel') }}",
+                    type: 'GET',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        startDate: startDate,
+                        endDate: endDate,   
+                        predefinedFilter: predefinedFilter
+                    },
+                    xhrFields: {
+                        responseType: 'blob'
+                    },
+                    success: function(response) {
+                        const blob = new Blob([response], {
+                            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        });
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'Loadsheet.xlsx';
+                        link.click();
+                    },
+                    error: function() {
+                        Swal.fire('Error!',
+                            'An error occurred while exporting the report. Please try again later.',
+                            'error');
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: "{{ route('report-loadsheet.export-excel') }}",
+                    type: 'GET',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        startDate: moment().startOf('month').format('YYYY-MM-DD'),
+                        endDate: moment().endOf('month').format('YYYY-MM-DD'),
+                        predefinedFilter: predefinedFilter
+                    },
+                    xhrFields: {
+                        responseType: 'blob'
+                    },
+                    success: function(response) {
+                        const blob = new Blob([response], {
+                            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        });
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'Loadsheet.xlsx';
+                        link.click();
+                    },
+                    error: function() {
+                        Swal.fire('Error!',
+                            'An error occurred while exporting the report. Please try again later.',
+                            'error');
+                    }
+                });
+            }
         }
     </script>
 @endpush

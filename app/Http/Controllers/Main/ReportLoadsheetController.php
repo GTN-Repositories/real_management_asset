@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\ReportLoadsheetExport;
 use App\Http\Controllers\Controller;
 use App\Models\Loadsheet;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportLoadsheetController extends Controller
 {
@@ -139,5 +141,64 @@ class ReportLoadsheetController extends Controller
         }
 
         return $data;
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $query = $this->getFilteredDataQuery($request);
+        $data = $query->get();
+
+        $name = 'Loadsheet';
+        $start_date = $request->startDate ?? now()->startOfMonth();
+        $end_date = $request->endDate ?? now()->endOfMonth();
+        $name .= '_' . $start_date . '_to_' . $end_date;
+
+        return Excel::download(new ReportLoadsheetExport($data), $name . '.xlsx');
+    }
+
+    private function getFilteredDataQuery(Request $request)
+    {
+        $query = Loadsheet::orderBy('id', 'asc');
+
+        $start_date = $request->startDate ?? now()->startOfMonth();
+        $end_date = $request->endDate ?? now()->endOfMonth();
+        
+        if ($request->filled('predefinedFilter')) {
+            switch ($request->predefinedFilter) {
+                case 'hari ini':
+                    return $query->whereDate('date', Carbon::today());
+                case 'minggu ini':
+                    return $query->whereBetween('date', [
+                        Carbon::now()->startOfWeek(),
+                        Carbon::now()->endOfWeek()
+                    ]);
+                case 'bulan ini':
+                    return $query->whereBetween('date', [
+                        Carbon::now()->startOfMonth(),
+                        Carbon::now()->endOfMonth()
+                    ]);
+                case 'bulan kemarin':
+                    return $query->whereBetween('date', [
+                        Carbon::now()->subMonth()->startOfMonth(),
+                        Carbon::now()->subMonth()->endOfMonth()
+                    ]);
+                case 'tahun ini':
+                    return $query->whereBetween('date', [
+                        Carbon::now()->startOfYear(),
+                        Carbon::now()->endOfYear()
+                    ]);
+                case 'tahun kemarin':
+                    return $query->whereBetween('date', [
+                        Carbon::now()->subYear()->startOfYear(),
+                        Carbon::now()->subYear()->endOfYear()
+                    ]);
+                default:
+                    return $query;
+            }
+        }
+
+        $query->whereBetween('date', [$start_date, $end_date]);
+
+        return $query;
     }
 }
