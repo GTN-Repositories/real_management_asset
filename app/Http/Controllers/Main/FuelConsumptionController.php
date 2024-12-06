@@ -115,8 +115,7 @@ class FuelConsumptionController extends Controller
                         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
                     }
                 }
-            })
-            ->get();
+            });
 
         if (session('selected_project_id')) {
             $data->whereHas('management_project', function ($q) {
