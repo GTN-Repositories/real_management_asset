@@ -39,6 +39,7 @@
                             <th>Kilometer</th>
                             <th>Loadsheet</th>
                             <th>Per Load</th>
+                            <th>Factor Lose</th>
                             <th>Cubication</th>
                             <th>Price</th>
                             <th>Billing Status</th>
@@ -160,6 +161,10 @@
                     {
                         data: 'perload',
                         name: 'perload'
+                    },
+                    {
+                        data: 'factor_lose',
+                        name: 'factor_lose'
                     },
                     {
                         data: 'cubication',
