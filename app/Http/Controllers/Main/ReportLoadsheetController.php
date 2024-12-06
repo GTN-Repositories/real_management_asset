@@ -162,7 +162,7 @@ class ReportLoadsheetController extends Controller
 
         $start_date = $request->startDate ?? now()->startOfMonth();
         $end_date = $request->endDate ?? now()->endOfMonth();
-        
+
         if ($request->filled('predefinedFilter')) {
             switch ($request->predefinedFilter) {
                 case 'hari ini':
