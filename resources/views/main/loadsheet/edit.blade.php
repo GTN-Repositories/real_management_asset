@@ -93,7 +93,7 @@
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="lose_factor">Lose Factor <span
                                     class="text-danger">*</span></label>
-                            <input type="text" id="lose_factor" name="lose_factor" class="form-control" value="{{ $data->lose_factor }}" />
+                            <input type="number" id="lose_factor" name="lose_factor" class="form-control" value="{{ $data->lose_factor }}" step="0.01"/>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="billing_status">Status Penagihan</label>
@@ -300,7 +300,7 @@
             $(this).val(formatCurrency(value));
         });
 
-        $('#lose_factor').val($('#lose_factor').val().replace('.', ','));
+        // $('#lose_factor').val($('#lose_factor').val().replace('.', ','));
     });
 
     $(document).on('input', '#hours, #kilometer, #loadsheet, #perload, #price', function() {
@@ -308,10 +308,10 @@
         $(this).val(formatCurrency(value));
     });
 
-    $(document).on('input', '#lose_factor', function() {
-        const value = $(this).val();
-        $(this).val(formatCurrencyLoseFactor(value));
-    });
+    // $(document).on('input', '#lose_factor', function() {
+    //     const value = $(this).val();
+    //     $(this).val(formatCurrencyLoseFactor(value));
+    // });
 
     function formatCurrency(angka, prefix) {
         if (!angka) {

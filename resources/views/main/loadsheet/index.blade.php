@@ -163,8 +163,8 @@
                         name: 'perload'
                     },
                     {
-                        data: 'factor_lose',
-                        name: 'factor_lose'
+                        data: 'lose_factor',
+                        name: 'lose_factor'
                     },
                     {
                         data: 'cubication',

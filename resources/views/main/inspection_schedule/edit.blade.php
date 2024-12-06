@@ -12,13 +12,13 @@
     <div class="col-12 col-md-12">
         <label class="form-label">Judul Maintenance</label>
         <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" value="{{ old('name', $data->name) }}" required readonly />
+            placeholder="Masukan Nama Item" value="{{ old('name', $data->name) }}" required disabled />
     </div>
 
     <div class="col-12 col-md-6">
         <label class="form-label">Tanggal</label>
         <input type="date" name="date" id="date" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Tanggal" value="{{ old('date', $data->date) }}" required readonly />
+            placeholder="Masukan Tanggal" value="{{ old('date', $data->date) }}" required disabled />
     </div>
 
     <div class="col-12 col-md-6">
@@ -57,11 +57,11 @@
         </select>
     </div>
 
-    <div class="col-12 col-md-12" id="selectItem">
+    {{-- <div class="col-12 col-md-12" id="selectItem">
         <label for="item_id" class="form-label">Sparepart</label>
-        <select id="item_id" class="form-select form-select-lg" name="item_id" disabled>
+        <select id="item_id" class="form-select form-select-lg" name="item_id">
         </select>
-    </div>
+    </div> --}}
 
     <div class="col-12 mt-3" id="selectedItemsContainer">
         <label class="form-label">Item yang Dipilih:</label>
@@ -76,17 +76,19 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($items as $item)
+                @foreach ($items as $key => $item)
                     <tr>
                         <td>{{ $item->code }}</td>
                         <td>{{ $item->name }}</td>
                         <td>
-                            <input type="number" class="form-control item-stock" data-item-id="{{ $item->id }}"
-                                value="{{ $item->stock_in_schedule }}" readonly>
+                            {{-- <input type="number" class="form-control item-stock" data-item-id="{{ $item->id }}"
+                                value="{{ $item->stock_in_schedule }}" readonly> --}}
+                                {{ $item->stock_in_schedule }}
                         </td>
                         <td>
-                            <input type="number" class="form-control kanibal-stock" data-item-id="{{ $item->id }}"
-                                value="{{ $item->kanibal_stock_in_schedule }}" readonly>
+                            {{-- <input type="number" class="form-control kanibal-stock" data-item-id="{{ $item->id }}"
+                                value="" readonly> --}}
+                            {{ $item->kanibal_stock_in_schedule }}
                         </td>
                         <td>
                             {{ $assetKanibalIds[$item->id] ?? '-' }}
@@ -216,8 +218,7 @@
             }
         });
     });
-</script>
-<script>
+
     document.getElementById('formUpdate').addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -230,8 +231,13 @@
 
         selectedItems.forEach((item, index) => {
             formData.append(`selected_items[${index}][id]`, item.id);
-            formData.append(`selected_items[${index}][stock]`, item.stock);
-            formData.append(`selected_items[${index}][kanibal_stock]`, item.kanibalStock);
+            const assetKanibalId = $(`#asset_kanibal_id_${item.id}`).val();
+            formData.append(`selected_items[${index}][asset_kanibal_id]`, assetKanibalId);
+            if (item.jenisMetode === 'stock') {
+                formData.append(`selected_items[${index}][item_stock]`, item.stock);
+            } else if (item.jenisMetode === 'kanibal') {
+                formData.append(`selected_items[${index}][kanibal_stock]`, item.kanibalStock);
+            }
         });
 
         const url = form.action;
@@ -270,6 +276,8 @@
                         text: data.message
                     }).then(() => {
                         $("#modal-ce").modal("hide");
+                        // REDIRECT TO ROUTE INDEX
+                        window.location.href = "{{ route('inspection-schedule.index') }}";
                     });
                 }
             })
