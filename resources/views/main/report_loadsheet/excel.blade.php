@@ -1,58 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fuel Consumption Report</title>
-</head>
-
-<body>
-    <h1>Fuel Consumption Report</h1>
-
-    <!-- Table Data -->
-    <table>
-        <thead>
+<table>
+    <thead>
+        <tr>
+            <th style="text-align: center;">No</th>
+            <th style="text-align: center;">Management</th>
+            <th style="text-align: center;">Asset</th>
+            <th style="text-align: center;">Date</th>
+            <th style="text-align: center;">Location</th>
+            <th style="text-align: center;">Soil Type</th>
+            <th style="text-align: center;">BPIT</th>
+            <th style="text-align: center;">Kilometer</th>
+            <th style="text-align: center;">Loadsheet</th>
+            <th style="text-align: center;">Per Load</th>
+            <th style="text-align: center;">Factor Lose</th>
+            <th style="text-align: center;">Cubication</th>
+            <th style="text-align: center;">Price</th>
+            <th style="text-align: center;">Billing Status</th>
+            <th style="text-align: center;">Remarks</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($data as $item)
             <tr>
-                <th style="text-align: center;" rowspan="2" colspan="2">No.</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">Management Project</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">Unit</th>
-                <th style="text-align: center;" colspan="4">Periode</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">Total Hari</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">Pemakaian Solar</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">Total Loadsheet</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">Liter/Trip</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">Rata-rata/Hari</th>
+                <td>{{ $loop->iteration }}</td>
+                <td>{{ $item->management_project_id }}</td>
+                <td>{{ $item->asset_id }}</td>
+                <td>{{ $item->date }}</td>
+                <td>{{ $item->location }}</td>
+                <td>{{ $item->soil_type_id }}</td>
+                <td>{{ $item->bpit }}</td>
+                <td>{{ $item->kilometer }}</td>
+                <td>{{ $item->loadsheet }}</td>
+                <td>{{ $item->perload }}</td>
+                <td>{{ $item->lose_factor }}</td>
+                <td>{{ $item->cubication }}</td>
+                <td>{{ $item->price }}</td>
+                <td>{{ $item->billing_status }}</td>
+                <td>{{ $item->remarks }}</td>
             </tr>
-            <tr>
-                <th style="text-align: center;" colspan="2">Awal</th>
-                <th style="text-align: center;" colspan="2">Akhir</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($fuelConsumptions as $index => $fuel)
-                <tr>
-                    <td style="text-align: center;" colspan="2">{{ $index + 1 }}</td>
-                    <td style="text-align: center;" colspan="2">{{ $fuel->management_project->name ?? 'N/A' }}</td>
-                    <td style="text-align: center;" colspan="2">{{ $fuel->asset->name ?? 'N/A' }}</td>
-                    <td style="text-align: center;" colspan="2">
-                        {{ \Carbon\Carbon::parse($fuel->management_project->start_date)->format('d-M-y') }}</td>
-                    <td style="text-align: center;" colspan="2">
-                        {{ \Carbon\Carbon::parse($fuel->management_project->end_date)->format('d-M-y') }}</td>
-                    <td style="text-align: center;" colspan="2">
-                        {{ \Carbon\Carbon::parse($fuel->management_project->start_date)->diffInDays(\Carbon\Carbon::parse($fuel->management_project->end_date)) }}
-                    </td>
-                    <td style="text-align: center;" colspan="2">{{ $fuel->liter }}</td>
-                    <td style="text-align: center;" colspan="2">{{ $fuel->loadsheet }}</td>
-                    <td style="text-align: center;" colspan="2">
-                        {{ number_format($fuel->liter / max($fuel->loadsheet, 1), 2) }}</td>
-                    <td style="text-align: center;" colspan="2">
-                        {{ number_format($fuel->liter / max(\Carbon\Carbon::parse($fuel->management_project->start_date)->diffInDays(\Carbon\Carbon::parse($fuel->management_project->end_date)), 1), 2) }}
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-</body>
-
-</html>
+        @endforeach
+    </tbody>
+</table>
