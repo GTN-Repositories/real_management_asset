@@ -71,7 +71,11 @@ class InspectionScheduleController extends Controller
         $data = $request->all();
         try {
             return $this->atomic(function () use ($data, $request) {
-                $asset_id = Crypt::decrypt($data['asset_id']);
+                try{
+                    $asset_id = Crypt::decrypt($data['asset_id']);
+                }catch(\Illuminate\Contracts\Encryption\DecryptException $e){
+                    $asset_id = $data['asset_id'];
+                }
 
                 $decryptedItemIds = [];
                 $itemStocks = [];
