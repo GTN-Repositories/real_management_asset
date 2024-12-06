@@ -29,6 +29,10 @@
             <option value="Tonase">Tonase</option>
         </select>
     </div>
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="location">Lokasi Project<span class="text-danger">*</span></label>
+        <textarea name="location" id="location" cols="30" rows="5" class="form-control"></textarea>
+    </div>
     <div class="col-12 col-md-12" id="relationId">
         <label for="asset_id" class="form-label">Asset<span class="text-danger">*</span></label>
         <div class="select2-primary">

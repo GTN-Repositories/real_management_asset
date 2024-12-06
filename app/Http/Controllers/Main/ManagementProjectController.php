@@ -47,6 +47,9 @@ class ManagementProjectController extends Controller
             ->addColumn('name', function ($data) {
                 return $data->name ?? null;
             })
+            ->addColumn('value_project', function ($data) {
+                return number_format($data->value_project) ?? null;
+            })
             ->addColumn('asset_id', function ($data) {
                 if (is_array($data->asset_id) && count($data->asset_id) > 0) {
                     $assetNames = Asset::whereIn('id', $data->asset_id)->pluck('name')->toArray();
@@ -90,6 +93,7 @@ class ManagementProjectController extends Controller
             'start_date',
             'end_date',
             'calculation_method',
+            'value_project',
         ];
 
         $keyword = $request->keyword ?? "";
@@ -181,6 +185,7 @@ class ManagementProjectController extends Controller
                     'end_date' => $end_date,
                     'calculation_method' => $data['calculation_method'],
                     'value_project' => $data['value_project'],
+                    'location' => $data['location'],
                 ];
 
                 ManagementProject::create($projectData);
@@ -251,7 +256,11 @@ class ManagementProjectController extends Controller
         try {
             return $this->atomic(function () use ($data, $id) {
                 $data['value_project'] = isset($data['value_project']) && $data['value_project'] != '-' ? str_replace('.', '', $data['value_project']) : null;
+                $dateRangeInput = $data['date_range'];
+                [$startDate, $endDate] = explode(' - ', $dateRangeInput);
 
+                $start_date = Carbon::parse(trim($startDate));
+                $end_date = Carbon::parse(trim($endDate));
                 $decryptedAssetIds = [];
 
                 foreach ($data['asset_id'] as $assetId) {
@@ -283,10 +292,11 @@ class ManagementProjectController extends Controller
                     'name' => $data['name'],
                     'asset_id' => $decryptedAssetIds,
                     'employee_id' => $decryptedEmployeeIds,
-                    'start_date' => $data['start_date'],
-                    'end_date' => $data['end_date'],
+                    'start_date' => $start_date,
+                    'end_date' => $end_date,
                     'calculation_method' => $data['calculation_method'],
                     'value_project' => $data['value_project'],
+                    'location' => $data['location'],
                 ];
                 $project->update($projectData);
 

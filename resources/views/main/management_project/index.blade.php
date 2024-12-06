@@ -44,6 +44,7 @@
                             <th>nama asset</th>
                             <th>tanggal awal</th>
                             <th>tanggal akhir</th>
+                            <th>Nilai Project</th>
                             <th>metode</th>
                             <th>Aksi</th>
                         </tr>
@@ -164,6 +165,10 @@
                     {
                         data: 'end_date',
                         name: 'end_date'
+                    },
+                    {
+                        data: 'value_project',
+                        name: 'value_project'
                     },
                     {
                         data: 'calculation_method',

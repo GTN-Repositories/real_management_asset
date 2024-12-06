@@ -159,7 +159,7 @@ class LoadsheetController extends Controller
 
                 $data['lose_factor'] = (float)str_replace(',', '.', $data['lose_factor']);
                 $data['cubication'] = ($data['loadsheet'] * $data['perload']) * $data['lose_factor'];
-                $data['cubication'] = ($data['loadsheet'] * $data['perload']) * $data['factor_lose'];
+                // $data['cubication'] = ($data['loadsheet'] * $data['perload']) * $data['factor_lose'];
 
                 $soilType = SoilType::find($data['soil_type_id']);
                 $data['price'] = (int)($data['cubication'] * $soilType->value);
