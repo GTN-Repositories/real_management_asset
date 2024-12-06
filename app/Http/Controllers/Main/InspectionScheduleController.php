@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Models\Asset;
 use App\Models\InspectionComment;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
@@ -141,7 +142,7 @@ class InspectionScheduleController extends Controller
             $itemIds = json_decode($data->item_id, true) ?? [];
             $itemStocks = json_decode($data->item_stock, true) ?? [];
             $kanibalStocks = json_decode($data->kanibal_stock, true) ?? [];
-            $assetKanibalIds = json_decode($data->asset_kanibal_id, true) ?? [];
+            $assetKanibalIds = $data->asset_kanibal_id;
 
             $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemStocks, $kanibalStocks) {
                 $itemId = (string) $item->id;
@@ -149,6 +150,11 @@ class InspectionScheduleController extends Controller
                 $item->kanibal_stock_in_schedule = isset($kanibalStocks[$itemId]) ? $kanibalStocks[$itemId] : 0;
                 return $item;
             });
+
+            // foreach ($assetKanibalIds as $key => $value) {
+            //     $asset = Asset::find($value['id']);
+            //     $value['name'] = $asset->id . ' - ' . $asset->name . ' - ' . $asset->asset_number;
+            // }
 
             $comments = InspectionComment::where('inspection_schedule_id', Crypt::decrypt($data->id))->get();
 
@@ -176,10 +182,12 @@ class InspectionScheduleController extends Controller
                     ]);
                 }
 
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Status berhasil diperbarui!',
-                ]);
+                // return response()->json([
+                //     'status' => true,
+                //     'message' => 'Status berhasil diperbarui!',
+                // ]);
+
+                return redirect()->back()->with('success', 'Status berhasil diperbarui!');
             });
         } catch (\Throwable $th) {
             return response()->json([
