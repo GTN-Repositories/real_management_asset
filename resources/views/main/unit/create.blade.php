@@ -273,26 +273,35 @@
                 <h2 class="accordion-header" id="headingThree">
                     <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
                         data-bs-target="#accordionFour" aria-expanded="false" aria-controls="accordionFour">
-                        Informasi Pemasok Asset
+                        Informasi Supplier Asset
                     </button>
                 </h2>
                 <div id="accordionFour" class="accordion-collapse collapse" aria-labelledby="headingThree"
                     data-bs-parent="#accordionExample">
                     <div class="accordion-body row">
-                        <div class="col-12 col-md-12">
-                            <label class="form-label" for="supplier_name">Nama Pemasok</label>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="supplier_name">Nama Supplier</label>
                             <input type="text" id="supplier_name" name="supplier_name" class="form-control"
                                 placeholder="Masukkan supplier_name" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="supplier_phone_number">Nomor Telepon Pemasok</label>
+                            <label class="form-label" for="supplier_phone_number">Nomor Telepon Supplier</label>
                             <input type="text" id="supplier_phone_number" name="supplier_phone_number"
                                 class="form-control" placeholder="Masukkan supplier_phone_number" />
                         </div>
+                        <div class="col-12 col-md-12">
+                            <label class="form-label" for="supplier_address">Alamat Supplier</label>
+                            <textarea id="supplier_address" name="supplier_address" class="form-control" cols="30" rows="5"></textarea>
+                        </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="supplier_address">Alamat Pemasok</label>
-                            <input type="text" id="supplier_address" name="supplier_address" class="form-control"
-                                placeholder="Masukkan supplier_address" />
+                            <label class="form-label" for="supplier_pic_name">Nama PIC Supplier</label>
+                            <input type="text" id="supplier_pic_name" name="supplier_pic_name" class="form-control"
+                                placeholder="Masukkan supplier_name" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="supplier_pic_phone">Nomor PIC Telepon Supplier</label>
+                            <input type="text" id="supplier_pic_phone" name="supplier_pic_phone"
+                                class="form-control" placeholder="Masukkan supplier_phone_number" />
                         </div>
                     </div>
                 </div>
