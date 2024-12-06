@@ -26,6 +26,7 @@ use App\Http\Controllers\Main\MonitoringController;
 use App\Http\Controllers\Main\OumController;
 use App\Http\Controllers\Main\PermisionController;
 use App\Http\Controllers\Main\ReportFuelController;
+use App\Http\Controllers\Main\ReportLoadsheetController;
 use App\Http\Controllers\Main\ReportSparepartController;
 use App\Http\Controllers\Main\RoleController;
 use App\Http\Controllers\Main\SiteController;
@@ -152,6 +153,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::post('report-fuel/export-pdf', [ReportFuelController::class, 'exportPDF'])->name('report-fuel.export-pdf');
     Route::get('/report-fuel/chart', [ReportFuelController::class, 'getChartData'])->name('report-fuel.chart');
     Route::get('/report-fuel/hours-data', [ReportFuelController::class, 'getHoursData'])->name('report-fuel.hours-data');
+    Route::get('/report-fuel/expanse-fuel', [ReportFuelController::class, 'getChartExpanseFuel'])->name('report-fuel.expanse-fuel');
     Route::get('/report-fuel/data', [ReportFuelController::class, 'data'])->name('report-fuel.data');
     Route::resource('report-fuel', ReportFuelController::class);
 
@@ -160,6 +162,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/report-asset/chart', [AssetReportController::class, 'getChartData'])->name('report-asset.chart');
     Route::get('/report-asset/data', [AssetReportController::class, 'data'])->name('report-asset.data');
     Route::resource('report-asset', AssetReportController::class);
+
+    Route::get('/report-loadsheet/data', [ReportLoadsheetController::class, 'data'])->name('report-loadsheet.data');
+    Route::resource('report-loadsheet', ReportLoadsheetController::class);
 
     Route::get('/monitoring/data', [MonitoringController::class, 'data'])->name('monitoring.data');
     Route::delete('/monitoring/destroy-all', [MonitoringController::class, 'destroyAll'])->name('monitoring.destroyAll');

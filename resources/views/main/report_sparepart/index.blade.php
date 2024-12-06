@@ -40,7 +40,7 @@
         <!-- Product List Table -->
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Fuel Consumption</h5>
+                <h5 class="card-title mb-0">Sparepart</h5>
             </div>
             <div class="card-datatable table-responsive">
                 <table class="datatables table" id="data-table">

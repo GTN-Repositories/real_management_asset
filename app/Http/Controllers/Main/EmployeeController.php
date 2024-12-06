@@ -43,6 +43,9 @@ class EmployeeController extends Controller
             ->addColumn('name', function ($data) {
                 return $data->name ?? null;
             })
+            ->addColumn('nameTitle', function ($data) {
+                return $data->name . '-' . $data->jobTitle->name ?? null;
+            })
             ->addColumn('job_title', function ($data) {
                 return $data->jobTitle->name ?? null;
             })
@@ -67,18 +70,18 @@ class EmployeeController extends Controller
         ];
 
         $keyword = $request->search['value'] ?? "";
-        // $project_id = $this->projectId();
 
+        $limit = $request->limit ?? '';
         $data = Employee::orderBy('created_at', 'asc')
             ->select($columns)
-            // ->whereIn($project_id)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
                     foreach ($columns as $column) {
                         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
                     }
                 }
-            });
+            })
+            ->limit($limit);
 
         return $data;
     }

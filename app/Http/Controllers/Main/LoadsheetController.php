@@ -124,6 +124,12 @@ class LoadsheetController extends Controller
                 }
             });
 
+        if (session('selected_project_id')) {
+            $data->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
+
         return $data;
     }
 
@@ -139,7 +145,6 @@ class LoadsheetController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-
         try {
             return $this->atomic(function () use ($data) {
                 $data['management_project_id'] = Crypt::decrypt($data['management_project_id']);
@@ -152,6 +157,8 @@ class LoadsheetController extends Controller
                 $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
                 $data['perload'] = isset($data['perload']) && $data['perload'] != '-' ? str_replace('.', '', $data['perload']) : null;
 
+                $data['lose_factor'] = (float)str_replace(',', '.', $data['lose_factor']);
+                $data['cubication'] = ($data['loadsheet'] * $data['perload']) * $data['lose_factor'];
                 $data['cubication'] = ($data['loadsheet'] * $data['perload']) * $data['factor_lose'];
 
                 $soilType = SoilType::find($data['soil_type_id']);
@@ -232,7 +239,7 @@ class LoadsheetController extends Controller
                 $data['perload'] = isset($data['perload']) && $data['perload'] != '-' ? str_replace('.', '', $data['perload']) : null;
                 $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
 
-                $data['lose_factor'] = 0.7;
+                $data['lose_factor'] = (float)str_replace(',', '.', $data['lose_factor']);
                 $data['cubication'] = ($data['loadsheet'] * $data['perload']) * $data['lose_factor'];
 
                 $soilType = SoilType::find($data['soil_type_id']);

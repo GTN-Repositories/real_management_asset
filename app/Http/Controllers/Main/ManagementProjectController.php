@@ -232,8 +232,11 @@ class ManagementProjectController extends Controller
             ? json_decode($data->employee_id, true)
             : ($data->employee_id ?? []);
 
-        $data->employees = Employee::whereIn('id', $data->employee_id)->get();
-
+        $data->employees = Employee::whereIn('id', $data->employee_id)
+            ->get()
+            ->each(function ($employee) {
+                $employee->job_title = $employee->jobTitle->name;
+            });
         return view('main.management_project.edit', compact('data'));
     }
 

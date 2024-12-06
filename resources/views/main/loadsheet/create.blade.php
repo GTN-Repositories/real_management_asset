@@ -85,11 +85,11 @@
                             <input type="text" id="perload" name="perload" class="form-control" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="factor_lose">Factor Lose <span
+                            <label class="form-label" for="lose_factor">Lose Factor <span
                                     class="text-danger">*</span></label>
-                            <input type="text" id="factor_lose" name="factor_lose" class="form-control" value="0.75"/>
+                            <input type="text" id="lose_factor" name="lose_factor" class="form-control" value="0.75"/>
                         </div>
-                        <div class="col-6 col-md-6">
+                        <div class="col-12 col-md-6">
                             <label class="form-label" for="billing_status">Status Penagihan</label>
                             <select name="billing_status" id="billing_status" class="select2 form-select">
                                 <option value="Belum">Belum Ditagih</option>

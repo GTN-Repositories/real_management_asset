@@ -46,7 +46,7 @@
                             <th>Status</th>
                             <th>Ukuran</th>
                             <th>Merek</th>
-                            <th>Warna</th>
+                            {{-- <th>Warna</th> --}}
                             <th>Stock</th>
                             <th>Dibuat Pada</th>
                             <th>Aksi</th>
@@ -161,10 +161,6 @@
                     {
                         data: 'brand',
                         name: 'brand'
-                    },
-                    {
-                        data: 'color',
-                        name: 'color'
                     },
                     {
                         data: 'stock',
