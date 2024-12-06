@@ -38,7 +38,7 @@
                         </select>
                     </div>
                     <div class="col-12 col-md-4">
-                        <label class="form-label" for="manager">Manajer</label>
+                        <label class="form-label" for="manager">PIC</label>
                         <select id="manager" name="manager" class="select2 form-select " data-allow-clear="true" required>
                             <option value="">Pilih</option>
                             <option value="lenz creative">lenz creative</option>

@@ -51,7 +51,7 @@
                     style="">
                     <div class="accordion-body row">
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="type">Jenis <span class="text-danger">*</span></label>
+                            <label class="form-label" for="type">Jenis Pekerjaan <span class="text-danger">*</span></label>
                             <input type="text" id="type" name="type" class="form-control" />
                         </div>
                         <div class="col-12 col-md-6" id="soilTypeRelation">
@@ -70,7 +70,7 @@
                             <input type="text" id="bpit" name="bpit" class="form-control" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="kilometer">Kilometer <span
+                            <label class="form-label" for="kilometer">Jarak (KM) <span
                                     class="text-danger">*</span></label>
                             <input type="text" id="kilometer" name="kilometer" class="form-control" />
                         </div>
@@ -84,15 +84,20 @@
                                     class="text-danger">*</span></label>
                             <input type="text" id="perload" name="perload" class="form-control" />
                         </div>
-                        <div class="col-12 col-md-12">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="factor_lose">Factor Lose <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="factor_lose" name="factor_lose" class="form-control" value="0.75"/>
+                        </div>
+                        <div class="col-6 col-md-6">
                             <label class="form-label" for="billing_status">Status Penagihan</label>
                             <select name="billing_status" id="billing_status" class="select2 form-select">
+                                <option value="Belum">Belum Ditagih</option>
                                 <option value="Sudah Ditagih">Sudah Ditagih</option>
-                                <option value="Belum">Belum</option>
                             </select>
                         </div>
                         <div class="col-12 col-md-12">
-                            <label class="form-label" for="remarks">Catatan <span
+                            <label class="form-label" for="remarks">Remarks <span
                                     class="text-danger">*</span></label>
                             <textarea id="remarks" name="remarks" class="form-control"></textarea>
                         </div>
