@@ -76,16 +76,22 @@
                                     <input class="form-check-input" type="checkbox" id="checkAll" />
                                 </div>
                             </th>
-                            <th>gambar aset</th>
-                            <th>nama aset</th>
-                            <th>nomor seri</th>
-                            <th>nomor model</th>
-                            <th>manajer aset</th>
-                            <th>lokasi aset</th>
-                            <th>kategori aset</th>
-                            <th>biaya pembelian</th>
-                            <th>tanggal pembelian</th>
-                            <th>dibuat pada</th>
+                            <th>Gambar</th>
+                            <th>ID</th>
+                            <th>Kategori</th>
+                            <th>Merek</th>
+                            <th>Unit</th>
+                            <th>Tipe</th>
+                            <th>Nopol</th>
+                            <th>Classification</th>
+                            <th>No Rangka</th>
+                            <th>No Mesin</th>
+                            <th>NIK</th>
+                            <th>Warna</th>
+                            <th>Pemilik</th>
+                            <th>Location</th>
+                            <th>PIC</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -175,7 +181,8 @@
                         'manager': manager
                     }
                 },
-                columns: [{
+                columns: [
+                    {
                         data: 'id',
                         name: 'id',
                         orderable: false,
@@ -186,40 +193,64 @@
                         name: 'image'
                     },
                     {
-                        data: 'name',
-                        name: 'name'
-                    },
-                    {
-                        data: 'serial_number',
-                        name: 'serial_number'
-                    },
-                    {
-                        data: 'model_number',
-                        name: 'model_number'
-                    },
-                    {
-                        data: 'manager',
-                        name: 'manager'
-                    },
-                    {
-                        data: 'assets_location',
-                        name: 'assets_location'
+                        data: 'relationId',
+                        name: 'relationId'
                     },
                     {
                         data: 'category',
                         name: 'category'
                     },
                     {
-                        data: 'cost',
-                        name: 'cost'
+                        data: 'name',
+                        name: 'name'
                     },
                     {
-                        data: 'purchase_date',
-                        name: 'purchase_date'
+                        data: 'unit',
+                        name: 'unit'
                     },
                     {
-                        data: 'created_at',
-                        name: 'created_at'
+                        data: 'type',
+                        name: 'type'
+                    },
+                    {
+                        data: 'license_plate',
+                        name: 'license_plate'
+                    },
+                    {
+                        data: 'classification',
+                        name: 'classification'
+                    },
+                    {
+                        data: 'chassis_number',
+                        name: 'chassis_number'
+                    },
+                    {
+                        data: 'machine_number',
+                        name: 'machine_number'
+                    },
+                    {
+                        data: 'nik',
+                        name: 'nik'
+                    },
+                    {
+                        data: 'color',
+                        name: 'color'
+                    },
+                    {
+                        data: 'owner',
+                        name: 'owner'
+                    },
+                    {
+                        data: 'assets_location',
+                        name: 'assets_location'
+                    },
+                    {
+                        data: 'pic',
+                        name: 'pic'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
                     },
                     {
                         data: 'action',
