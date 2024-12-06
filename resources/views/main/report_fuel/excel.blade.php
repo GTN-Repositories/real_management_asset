@@ -31,31 +31,38 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($fuelConsumptions as $index => $fuel)
-                <tr>
-                    <td style="text-align: center;" colspan="2">{{ $index + 1 }}</td>
-                    <td style="text-align: center;" colspan="2">{{ $fuel->management_project->name ?? 'N/A' }}</td>
-                    <td style="text-align: center;" colspan="2">{{ $fuel->asset->serial_number ?? 'N/A' }}</td>
-                    <td style="text-align: center;" colspan="4">
-                        {{ $fuel->asset->license_plate . ' - ' . $fuel->asset->name . ' - ' . $fuel->asset->asset_number ?? 'N/A' }}
-                    </td>
-                    <td style="text-align: center;" colspan="2">
-                        {{ \Carbon\Carbon::parse($fuel->management_project->start_date)->format('d-M-y') }}</td>
-                    <td style="text-align: center;" colspan="2">
-                        {{ \Carbon\Carbon::parse($fuel->management_project->end_date)->format('d-M-y') }}</td>
-                    <td style="text-align: center;" colspan="2">
-                        {{ \Carbon\Carbon::parse($fuel->management_project->start_date)->diffInDays(\Carbon\Carbon::parse($fuel->management_project->end_date)) }}
-                    </td>
-                    <td style="text-align: center;" colspan="2">{{ $fuel->liter }}</td>
-                    <td style="text-align: center;" colspan="2">
-                        {{ $fuel->loadsheetsManagement()->where('asset_id', $fuel->asset_id)->sum('loadsheet') }}
-                    </td>
+            @php
+                $groupedFuelConsumptions = $fuelConsumptions->groupBy('asset_id');
+            @endphp
 
-                    <td style="text-align: center;" colspan="2">
-                        {{ number_format($fuel->liter /max($fuel->loadsheetsManagement()->where('asset_id', $fuel->asset_id)->sum('loadsheet'),1),2) }}
+            @foreach ($groupedFuelConsumptions as $assetId => $group)
+                @php
+                    $firstFuel = $group->first();
+                    $totalLiter = $group->sum('liter');
+                    $totalLoadsheet = $group->sum(function($fuel) {
+                        return $fuel->loadsheetsManagement()->where('asset_id', $fuel->asset_id)->sum('loadsheet');
+                    });
+                    $days = \Carbon\Carbon::parse($firstFuel->management_project->start_date)->diffInDays(\Carbon\Carbon::parse($firstFuel->management_project->end_date));
+                @endphp
+                <tr>
+                    <td style="text-align: center;" colspan="2">{{ $loop->iteration }}</td>
+                    <td style="text-align: center;" colspan="2">{{ $firstFuel->management_project->name ?? 'N/A' }}</td>
+                    <td style="text-align: center;" colspan="2">{{ $firstFuel->asset->serial_number ?? 'N/A' }}</td>
+                    <td style="text-align: center;" colspan="4">
+                        {{ $firstFuel->asset->license_plate . ' - ' . $firstFuel->asset->name . ' - ' . $firstFuel->asset->asset_number ?? 'N/A' }}
                     </td>
                     <td style="text-align: center;" colspan="2">
-                        {{ number_format($fuel->liter / max(\Carbon\Carbon::parse($fuel->management_project->start_date)->diffInDays(\Carbon\Carbon::parse($fuel->management_project->end_date)), 1), 2) }}
+                        {{ \Carbon\Carbon::parse($firstFuel->management_project->start_date)->format('d-M-y') }}</td>
+                    <td style="text-align: center;" colspan="2">
+                        {{ \Carbon\Carbon::parse($firstFuel->management_project->end_date)->format('d-M-y') }}</td>
+                    <td style="text-align: center;" colspan="2">{{ $days }}</td>
+                    <td style="text-align: center;" colspan="2">{{ $totalLiter }}</td>
+                    <td style="text-align: center;" colspan="2">{{ $totalLoadsheet }}</td>
+                    <td style="text-align: center;" colspan="2">
+                        {{ number_format($totalLiter / max($totalLoadsheet, 1), 2) }}
+                    </td>
+                    <td style="text-align: center;" colspan="2">
+                        {{ number_format($totalLiter / max($days, 1), 2) }}
                     </td>
                 </tr>
             @endforeach
