@@ -344,9 +344,9 @@ class AssetController extends Controller
                     }
                 }
 
-                if (isset($data['pic'])) {
-                    $data['pic'] = Crypt::decrypt($data['pic']);
-                }
+                // if (isset($data['pic'])) {
+                //     $data['pic'] = Crypt::decrypt($data['pic']);
+                // }
 
                 $data = $asset->update($data);
 
@@ -364,6 +364,7 @@ class AssetController extends Controller
                 ]);
             });
         } catch (\Throwable $th) {
+            dd($th);
             return response()->json([
                 'status' => false,
                 'message' => 'Data gagal diperbarui! ' . $th->getMessage(),
