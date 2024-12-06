@@ -91,7 +91,7 @@
                             {{ $item->kanibal_stock_in_schedule }}
                         </td>
                         <td>
-                            {{ $assetKanibalIds[$item->id] ?? '-' }}
+                            {{ $item->assetKanibalName ?? '-' }}
                         </td>
                     </tr>
                 @endforeach
@@ -118,7 +118,7 @@
                         <div class="d-flex align-items-center">
                             <span class="me-2">{{ $comment->user->name ?? 'anonymous' }}</span>
                             <span class="text-muted">
-                                {{ $comment->time_note ? \Carbon\Carbon::parse($comment->time_note)->locale('id')->translatedFormat('d F Y H:i') : '-' }}
+                                {{ $comment->time_note? \Carbon\Carbon::parse($comment->time_note)->locale('id')->translatedFormat('d F Y H:i'): '-' }}
                             </span>
                         </div>
                         <div class="mt-1">
@@ -142,57 +142,6 @@
     CKEDITOR.replace('comment');
 </script>
 <script type="text/javascript">
-    let selectedItems = [
-        @php
-            $existingItemStocks = json_decode($data->item_stock ?? '{}', true) ?? [];
-            $existingKanibalStocks = json_decode($data->kanibal_stock ?? '{}', true) ?? [];
-            $existingAssetKanibalIds = json_decode($data->asset_kanibal_id ?? '{}', true) ?? [];
-        @endphp
-        @foreach ($items as $item)
-            {
-                id: "{{ $item->id }}",
-                name: "{{ $item->name }}",
-                code: "{{ $item->code }}",
-                stock: {{ $existingItemStocks[Crypt::decrypt($item->id)] ?? 0 }},
-                kanibalStock: {{ $existingKanibalStocks[Crypt::decrypt($item->id)] ?? 0 }},
-                assetKanibalId: {{ $existingAssetKanibalIds[Crypt::decrypt($item->id)] ?? null }},
-                assetKanibalName: "{{ isset($existingAssetKanibalIds[Crypt::decrypt($item->id)]) ? \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->license_plate . ' - ' . \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->name . ' - ' . \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->asset_number : '-' }}",
-            },
-        @endforeach
-    ];
-
-    $(document).ready(function() {
-        function updateSelectedItemsTable() {
-            const tableBody = $('#selectedItemsTable tbody');
-            tableBody.empty();
-
-            selectedItems.forEach(function(item) {
-                tableBody.append(
-                    `<tr>
-                <td>${item.code}</td>
-                <td>${item.name}</td>
-                <td>
-                    <input type="number" class="form-control item-stock"
-                        data-item-id="${item.id}"
-                        value="${item.stock}" readonly>
-                </td>
-                <td>
-                    <input type="number" class="form-control kanibal-stock"
-                        data-item-id="${item.id}"
-                        value="${item.kanibalStock}" readonly>
-                </td>
-                <td>
-                    ${item.assetKanibalName}
-                </td>
-            </tr>`
-                );
-            });
-        }
-
-        updateSelectedItemsTable();
-    })
-
-
     $(document).ready(function() {
         $('#asset_id').select2({
             dropdownParent: $('#selectAsset'),

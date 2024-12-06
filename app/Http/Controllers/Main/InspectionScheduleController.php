@@ -139,15 +139,32 @@ class InspectionScheduleController extends Controller
         try {
             $data = InspectionSchedule::findByEncryptedId($id);
 
-            $itemIds = json_decode($data->item_id, true) ?? [];
-            $itemStocks = json_decode($data->item_stock, true) ?? [];
-            $kanibalStocks = json_decode($data->kanibal_stock, true) ?? [];
-            $assetKanibalIds = $data->asset_kanibal_id;
+            $itemIds = is_array(json_decode($data->item_id, true))
+                ? json_decode($data->item_id, true)
+                : [];
 
-            $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemStocks, $kanibalStocks) {
-                $itemId = (string) $item->id;
-                $item->stock_in_schedule = isset($itemStocks[$itemId]) ? $itemStocks[$itemId] : 1;
-                $item->kanibal_stock_in_schedule = isset($kanibalStocks[$itemId]) ? $kanibalStocks[$itemId] : 0;
+            $itemStocks = is_array(json_decode($data->item_stock, true))
+                ? json_decode($data->item_stock, true)
+                : [];
+
+            $kanibalStocks = is_array(json_decode($data->kanibal_stock, true))
+                ? json_decode($data->kanibal_stock, true)
+                : [];
+
+            $assetKanibalIds = is_array(json_decode($data->asset_kanibal_id, true))
+                ? json_decode($data->asset_kanibal_id, true)
+                : [];
+
+            $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemStocks, $kanibalStocks, $assetKanibalIds) {
+                $itemId = (string) Crypt::decrypt($item->id);
+
+                $asset_id = $assetKanibalIds[$itemId] ?? 0;
+                $item->stock_in_schedule = $itemStocks[$itemId] ?? 0;
+                $item->kanibal_stock_in_schedule = $kanibalStocks[$itemId] ?? 0;
+                $item->assetKanibalName = isset($assetKanibalIds[$itemId])
+                    ?  $asset_id . ' - ' . Asset::find($assetKanibalIds[$itemId] ?? 0)->name . ' - ' . Asset::find($assetKanibalIds[$itemId] ?? 0)->license_plate
+                    : '-';
+
                 return $item;
             });
 
