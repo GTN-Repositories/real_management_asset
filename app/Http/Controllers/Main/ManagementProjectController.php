@@ -100,7 +100,7 @@ class ManagementProjectController extends Controller
         $startDate = $request->startDate ?? null;
         $endDate = $request->endDate ?? null;
 
-        $data = ManagementProject::orderBy('created_at', 'asc')
+        $data = ManagementProject::orderBy('created_at', 'desc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
@@ -108,14 +108,25 @@ class ManagementProjectController extends Controller
                         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
                     }
                 }
-            })
-            ->when($startDate, function ($query, $startDate) {
-                return $query->whereDate('start_date', '>=', Carbon::parse($startDate));
-            })
-            ->when($endDate, function ($query, $endDate) {
-                return $query->whereDate('end_date', '<=', Carbon::parse($endDate));
-            })
-            ->get();
+            });
+
+        if ($startDate && $endDate) {
+            $data->where(function ($q) use ($startDate, $endDate) {
+                $q->where(function ($subQ) use ($startDate, $endDate) {
+                    // Record yang mulai dalam rentang filter
+                    $subQ->whereDate('start_date', '>=', $startDate)
+                        ->whereDate('start_date', '<=', $endDate);
+                })->orWhere(function ($subQ) use ($startDate, $endDate) {
+                    // Record yang berakhir dalam rentang filter
+                    $subQ->whereDate('end_date', '>=', $startDate)
+                        ->whereDate('end_date', '<=', $endDate);
+                })->orWhere(function ($subQ) use ($startDate, $endDate) {
+                    // Record yang melingkupi rentang filter
+                    $subQ->whereDate('start_date', '<=', $startDate)
+                        ->whereDate('end_date', '>=', $endDate);
+                });
+            });
+        }
 
         return $data;
     }

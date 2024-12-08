@@ -8,7 +8,7 @@
 
         <!-- Card Border Shadow -->
         <div class="row">
-            <div class="col-sm-6 col-lg-3 mb-4">
+            <div class="col-sm-6 col-lg-4 mb-4">
                 <div class="card card-border-shadow-primary">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2 pb-1">
@@ -19,61 +19,95 @@
                         </div>
                         <p class="mb-1">Total Asset</p>
                         <p class="mb-0">
-                            <span class="fw-medium me-1">+18.2%</span>
-                            <small class="text-muted">than last week</small>
+                            {{-- <span class="fw-medium me-1">+18.2%</span>
+                            <small class="text-muted">than last week</small> --}}
                         </p>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-3 mb-4">
+            <div class="col-sm-6 col-lg-4 mb-4">
                 <div class="card card-border-shadow-warning">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2 pb-1">
                             <div class="avatar me-2">
-                                <span class="avatar-initial rounded bg-label-warning"><i
-                                        class="ti ti-alert-triangle ti-md"></i></span>
+                                <span class="avatar-initial rounded bg-label-primary"><i
+                                        class="ti ti-gas-station ti-md"></i></span>
                             </div>
                             <h4 class="ms-1 mb-0" id="total-fuel">Loading...</h4>
                         </div>
                         <p class="mb-1">Fuel Consumption</p>
                         <p class="mb-0">
-                            <span class="fw-medium me-1">-8.7%</span>
-                            <small class="text-muted">than last week</small>
+                            {{-- <span class="fw-medium me-1">-8.7%</span>
+                            <small class="text-muted">than last week</small> --}}
                         </p>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-3 mb-4">
+            <div class="col-sm-6 col-lg-4 mb-4">
                 <div class="card card-border-shadow-danger">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2 pb-1">
                             <div class="avatar me-2">
-                                <span class="avatar-initial rounded bg-label-danger"><i
+                                <span class="avatar-initial rounded bg-label-primary"><i
                                         class="ti ti-git-fork ti-md"></i></span>
                             </div>
-                            <h4 class="ms-1 mb-0">27</h4>
+                            <h4 class="ms-1 mb-0">on progress</h4>
                         </div>
                         <p class="mb-1">Productivity</p>
                         <p class="mb-0">
-                            <span class="fw-medium me-1">+4.3%</span>
-                            <small class="text-muted">than last week</small>
+                            {{-- <span class="fw-medium me-1">+4.3%</span>
+                            <small class="text-muted">than last week</small> --}}
                         </p>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-3 mb-4">
+            <div class="col-sm-6 col-lg-4 mb-4">
                 <div class="card card-border-shadow-info">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2 pb-1">
                             <div class="avatar me-2">
-                                <span class="avatar-initial rounded bg-label-info"><i class="ti ti-clock ti-md"></i></span>
+                                <span class="avatar-initial rounded bg-label-primary"><i class="ti ti-wallet ti-md"></i></span>
                             </div>
-                            <h4 class="ms-1 mb-0">13</h4>
+                            <h4 class="ms-1 mb-0">on progress</h4>
                         </div>
                         <p class="mb-1">Asset Value</p>
                         <p class="mb-0">
-                            <span class="fw-medium me-1">-2.5%</span>
-                            <small class="text-muted">than last week</small>
+                            {{-- <span class="fw-medium me-1">-2.5%</span> --}}
+                            {{-- <small class="text-muted">than last week</small> --}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4 mb-4">
+                <div class="card card-border-shadow-info">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2 pb-1">
+                            <div class="avatar me-2">
+                                <span class="avatar-initial rounded bg-label-primary"><i class="ti ti-file-text ti-md"></i></span>
+                            </div>
+                            <h4 class="ms-1 mb-0" id="total-loadsheet">Loading...</h4>
+                        </div>
+                        <p class="mb-1">Total Loadsheet</p>
+                        <p class="mb-0">
+                            {{-- <span class="fw-medium me-1">-2.5%</span> --}}
+                            {{-- <small class="text-muted">than last week</small> --}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4 mb-4">
+                <div class="card card-border-shadow-info">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2 pb-1">
+                            <div class="avatar me-2">
+                                <span class="avatar-initial rounded bg-label-primary"><i class="ti ti-info-circle ti-md"></i></span>
+                            </div>
+                            <h4 class="ms-1 mb-0">on progress</h4>
+                        </div>
+                        <p class="mb-1">Open Issue</p>
+                        <p class="mb-0">
+                            {{-- <span class="fw-medium me-1">-2.5%</span> --}}
+                            {{-- <small class="text-muted">than last week</small> --}}
                         </p>
                     </div>
                 </div>
@@ -166,13 +200,26 @@
                     console.error('Error fetching data:', error);
                 }
             });
+            $.ajax({
+                url: "{{ route('loadsheet.data') }}",
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    let loadsheetDashboard = response.data.map(item => item.loadsheetDashboard);
+                    let totalLoadsheet = loadsheetDashboard.length ? loadsheetDashboard.reduce((total, num) =>
+                        total + num) : 0;
+                    $('#total-loadsheet').text(totalLoadsheet ? totalLoadsheet + ' liter' : 0 + ' liter');
+                },
+                error: function(xhr, status, error) {
+                    $('#total-loadsheet').text('Error');
+                    console.error('Error fetching data:', error);
+                }
+            });
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Fetch data and initialize charts
             fetchStatusData();
 
-            // Configure download buttons
             setupDownloadButtons();
         });
 
@@ -344,7 +391,6 @@
         }
 
         function showErrorMessage(message) {
-            // Add your error handling logic here
             console.error(message);
         }
     </script>

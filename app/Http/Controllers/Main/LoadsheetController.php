@@ -39,7 +39,7 @@ class LoadsheetController extends Controller
                 return $checkbox;
             })
             ->addColumn('management_project_id', function ($data) {
-                return $data->management_project_id . ' - '. $data->management_project->name ?? '-';
+                return $data->management_project_id . ' - ' . $data->management_project->name ?? '-';
             })
             ->addColumn('asset_id', function ($data) {
                 return ($data->asset_id ?? '') . ' - ' . ($data->asset->name ?? '');
@@ -87,6 +87,16 @@ class LoadsheetController extends Controller
                 $btn .= '</div>';
 
                 return $btn;
+            })
+            ->addColumn('loadsheetDashboard', function ($data) {
+                $loadsheet = $data->loadsheet ?? null;
+                if (session('selected_project_id')) {
+                    $selectedProjectId = Crypt::decrypt(session('selected_project_id'));
+                    if ($data->management_project_id == $selectedProjectId) {
+                        return $loadsheet;
+                    }
+                }
+                return $loadsheet;
             })
             ->escapeColumns([])
             ->make(true);

@@ -184,6 +184,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/oum/data', [OumController::class, 'data'])->name('oum.data');
 
     Route::get('/report-sparepart/data', [ReportSparepartController::class, 'data'])->name('report-sparepart.data');
+    Route::get('/report-sparepart/data-inspection', [ReportSparepartController::class, 'getInspectionData'])->name('report-sparepart.data-inspection');
     Route::resource('report-sparepart', ReportSparepartController::class);
 
     Route::get('/job-title/data', [JobTitleController::class, 'data'])->name('job-title.data');
