@@ -33,28 +33,34 @@
         <tbody>
             @php
                 $groupedFuelConsumptions = $fuelConsumptions->groupBy('asset_id');
+                $startDate = \Carbon\Carbon::parse($startDate);
+                $endDate = \Carbon\Carbon::parse($endDate);
             @endphp
 
             @foreach ($groupedFuelConsumptions as $assetId => $group)
                 @php
                     $firstFuel = $group->first();
-                    $totalLiter = $group->sum('liter');
-                    $totalLoadsheet = $group->sum(function($fuel) {
-                        return $fuel->loadsheetsManagement()->where('asset_id', $fuel->asset_id)->sum('loadsheet');
+                    $totalLiter = $group->whereBetween('date', [$startDate, $endDate])->sum('liter');
+                    $totalLoadsheet = $group->whereBetween('date', [$startDate, $endDate])->sum(function ($fuel) {
+                        return $fuel
+                            ->loadsheetsManagement()
+                            ->where('asset_id', $fuel->asset_id)
+                            ->sum('loadsheet');
                     });
-                    $days = \Carbon\Carbon::parse($firstFuel->management_project->start_date)->diffInDays(\Carbon\Carbon::parse($firstFuel->management_project->end_date));
+                    $days = $startDate->diffInDays($endDate);
                 @endphp
                 <tr>
                     <td style="text-align: center;" colspan="2">{{ $loop->iteration }}</td>
-                    <td style="text-align: center;" colspan="2">{{ $firstFuel->management_project->name ?? 'N/A' }}</td>
+                    <td style="text-align: center;" colspan="2">{{ $firstFuel->management_project->name ?? 'N/A' }}
+                    </td>
                     <td style="text-align: center;" colspan="2">{{ $firstFuel->asset->serial_number ?? 'N/A' }}</td>
                     <td style="text-align: center;" colspan="4">
                         {{ $firstFuel->asset->license_plate . ' - ' . $firstFuel->asset->name . ' - ' . $firstFuel->asset->asset_number ?? 'N/A' }}
                     </td>
                     <td style="text-align: center;" colspan="2">
-                        {{ \Carbon\Carbon::parse($firstFuel->management_project->start_date)->format('d-M-y') }}</td>
+                        {{ $startDate->format('d-M-y') }}</td>
                     <td style="text-align: center;" colspan="2">
-                        {{ \Carbon\Carbon::parse($firstFuel->management_project->end_date)->format('d-M-y') }}</td>
+                        {{ $endDate->format('d-M-y') }}</td>
                     <td style="text-align: center;" colspan="2">{{ $days }}</td>
                     <td style="text-align: center;" colspan="2">{{ $totalLiter }}</td>
                     <td style="text-align: center;" colspan="2">{{ $totalLoadsheet }}</td>

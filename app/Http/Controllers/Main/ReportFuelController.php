@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\MonthlyReportExport;
 use App\Exports\MultiSheetExport;
 use App\Exports\ReportFuelExport;
 use App\Http\Controllers\Controller;
@@ -249,7 +250,13 @@ class ReportFuelController extends Controller implements HasMiddleware
         $name = 'FuelConsumptionReport';
         $name .= '_' . $request->startDate . '_to_' . $request->endDate;
 
-        return Excel::download(new MultiSheetExport($data), $name . '.xlsx');
+        return Excel::download(new MultiSheetExport($data, $request), $name . '.xlsx');
+    }
+
+    public function exportExcelMonthly(Request $request)
+    {
+        $name = 'LoadsheetReport_' . Carbon::now()->format('M_Y');
+        return Excel::download(new MonthlyReportExport($request), $name . '.xlsx');
     }
 
 
