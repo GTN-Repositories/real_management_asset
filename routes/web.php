@@ -80,6 +80,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/asset/download/{encryptedId}', [AssetController::class, 'download'])->name('asset.download');
     Route::get('/asset/download-template', [AssetController::class, 'generateTemplate'])->name('asset.downloadTemplate');
     Route::get('/asset/import', [AssetController::class, 'importForm'])->name('asset.import.form');
+    Route::get('/asset/export', [AssetController::class, 'exportExcel'])->name('asset.export.excel');
     Route::post('/asset/import', [AssetController::class, 'import'])->name('asset.import');
     Route::get('/asset/update-files', [AssetController::class, 'updateFiles'])->name('asset.updateFiles');
     Route::post('/asset/note/{id}', [AssetController::class, 'note'])->name('asset.note');

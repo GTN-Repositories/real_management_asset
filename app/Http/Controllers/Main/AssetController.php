@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\AssetExport;
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\AssetNote;
 use App\Models\LogActivity;
 use App\Models\ManagementProject;
 use App\Models\StatusAsset;
+use Carbon\Carbon;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Exception;
@@ -15,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -821,5 +824,15 @@ class AssetController extends Controller
         }
 
         return redirect()->back()->with('error', 'File not found.');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $data = Asset::all();
+
+        $name = 'AssetReport';
+        $name .= '_' . $request->startDate . '_to_' . $request->endDate;
+
+        return Excel::download(new AssetExport($data), $name . '.xlsx');
     }
 }
