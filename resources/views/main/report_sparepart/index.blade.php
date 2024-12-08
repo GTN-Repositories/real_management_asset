@@ -26,13 +26,13 @@
             </div>
         </div>
 
-        {{-- chart manpower --}}
+        {{-- chart stock category --}}
         <div class="card mb-4">
             <div class="card-header">
-                <h5 class="card-title mb-0">Manpower Data Over Time</h5>
+                <h5 class="card-title mb-0">Item Stock by Category</h5>
             </div>
             <div class="card-body">
-                <div id="hours-chart"></div> <!-- Chart Div -->
+                <div id="stock-category-chart"></div>
             </div>
         </div>
 
@@ -67,7 +67,7 @@
     <script type="text/javascript">
         $(document).ready(function() {
             init_table();
-            init_hours_chart();
+            init_stock_category_chart();
 
             $('.dropdown-item').on('click', function(e) {
                 e.preventDefault();
@@ -78,7 +78,7 @@
                 filterBtn.text(filterType);
 
                 reloadTableWithFilters(null, null, filterType);
-                reloadHoursChartWithFilters(null, null, filterType);
+                reloadSparepartChart(null, null, filterType);
             });
 
             $('#date-range-picker').daterangepicker({
@@ -94,13 +94,13 @@
                 $(this).val(startDate + ' - ' + endDate);
 
                 reloadTableWithFilters(startDate, endDate);
-                reloadHoursChartWithFilters(startDate, endDate);
+                reloadSparepartChart(startDate, endDate);
             });
 
             $('#date-range-picker').on('cancel.daterangepicker', function() {
                 $(this).val('');
                 reloadTableWithFilters(); // Reload without date range
-                reloadHoursChartWithFilters();
+                reloadSparepartChart();
             });
         });
 
@@ -113,9 +113,9 @@
             init_table(startDate, endDate, predefinedFilter);
         }
 
-        function reloadHoursChartWithFilters(startDate = '', endDate = '', predefinedFilter = '') {
-            if (hoursChart) hoursChart.destroy();
-            init_hours_chart(startDate, endDate, predefinedFilter);
+        function reloadSparepartChart(startDate = '', endDate = '', predefinedFilter = '') {
+            if (stockCategoryChart) stockCategoryChart.destroy();
+            init_stock_category_chart(startDate, endDate, predefinedFilter);
         }
 
 
@@ -176,23 +176,20 @@
             });
         }
 
-        let hoursChart;
+        let stockCategoryChart;
 
-        function init_hours_chart(startDate = '', endDate = '', predefinedFilter = '') {
+        function init_stock_category_chart(predefinedFilter = '', startDate = '', endDate = '') {
             $.ajax({
-                url: "{{ route('report-fuel.hours-data') }}",
+                url: "{{ route('report-sparepart.data-inspection') }}",
                 method: 'GET',
                 data: {
-                    startDate: startDate,
-                    endDate: endDate,
-                    predefinedFilter: predefinedFilter
+                    'start_date': startDate,
+                    'end_date': endDate,
+                    'predefinedFilter': predefinedFilter
                 },
                 success: function(response) {
                     var options = {
-                        series: [{
-                            name: 'Hours',
-                            data: response.hours
-                        }],
+                        series: response.series, // Data for categories
                         chart: {
                             type: 'bar',
                             height: 350,
@@ -202,57 +199,52 @@
                         },
                         plotOptions: {
                             bar: {
-                                horizontal: false // Set to false for vertical bar chart
-                            }
+                                horizontal: false,
+                                dataLabels: {
+                                    position: 'top',
+                                },
+                            },
                         },
                         dataLabels: {
                             enabled: true,
-                            formatter: function(value) {
-                                return value != null ? value.toFixed(1) + ' hrs' : '';
-                            }
                         },
                         xaxis: {
-                            categories: response.dates,
+                            categories: response.months, // Months data
                             title: {
-                                text: 'Dates'
-                            },
-                            labels: {
-                                rotate: -45,
-                                rotateAlways: true
+                                text: 'Months'
                             }
                         },
                         yaxis: {
                             title: {
-                                text: 'Hours'
+                                text: 'Stock Count'
                             }
                         },
                         tooltip: {
                             y: {
                                 formatter: function(value) {
-                                    return value != null ? value.toFixed(1) + ' hrs' : '';
+                                    return value != null ? value + ' units' : '';
                                 }
                             }
                         },
                         title: {
-                            text: 'Manpower Over Time',
-                            align: 'left'
+                            text: 'Monthly Stock by Category',
+                            align: 'center'
                         },
-                        grid: {
-                            row: {
-                                colors: ['#f3f3f3', 'transparent'],
-                                opacity: 0.5
-                            }
-                        }
+                        legend: {
+                            position: 'top'
+                        },
                     };
 
-                    hoursChart = new ApexCharts(document.querySelector("#hours-chart"),
-                        options);
-                    hoursChart.render();
+                    var stockCategoryChart = new ApexCharts(
+                        document.querySelector("#stock-category-chart"),
+                        options
+                    );
+                    stockCategoryChart.render();
                 },
                 error: function(xhr, status, error) {
-                    console.error('Error fetching hours data:', error);
-                    document.querySelector("#hours-chart").innerHTML =
-                        '<div class="alert alert-danger">Failed to load hours chart data. Please try again later.</div>';
+                    console.error('Error fetching stock category data:', error);
+                    document.querySelector("#stock-category-chart").innerHTML =
+                        '<div class="alert alert-danger">Failed to load stock category chart data. Please try again later.</div>';
                 }
             });
         }
