@@ -9,7 +9,7 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithDrawings;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
-class ReportAssetExport implements FromView, WithDrawings
+class AssetExport implements FromView, WithDrawings
 {
     protected $data;
 
@@ -25,7 +25,7 @@ class ReportAssetExport implements FromView, WithDrawings
             return $asset;
         });
 
-        return view('main.report_asset.excel', [
+        return view('main.unit.excel', [
             'assets' => $assets,
         ]);
     }
@@ -39,9 +39,14 @@ class ReportAssetExport implements FromView, WithDrawings
                 $drawing = new Drawing();
                 $drawing->setName('Asset Image');
                 $drawing->setDescription('Image of asset');
-                $drawing->setPath(storage_path('app/public/' . $asset->image));
+                $path = storage_path('app/public/' . $asset->image);
+                if (file_exists($path)) {
+                    $drawing->setPath($path);
+                } else {
+                    continue;
+                }
                 $drawing->setHeight(20);
-                $drawing->setCoordinates('AE' . ($index + 3));
+                $drawing->setCoordinates('C' . ($index + 3));
                 $drawings[] = $drawing;
             }
         }
