@@ -71,6 +71,6 @@ class Asset extends Model
 
     public function pics(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'pic', 'id');
+        return $this->belongsTo(Employee::class, 'pic', 'id');
     }
 }
