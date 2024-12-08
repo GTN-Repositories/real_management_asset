@@ -9,39 +9,20 @@
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-12 col-md-4">
+                    <div class="col-12 col-md-4" id="categoryParent">
                         <label class="form-label" for="category">Kategori</label>
-                        <select name="category" id="category" class="select2 form-select " data-allow-clear="true" required>
-                            <option value="">Pilih</option>
-                            <option value="Technology">Technology</option>
-                            <option value="Construction">Construction</option>
-                            <option value="Medical Assets">Medical Assets</option>
-                            <option value="Education">Education</option>
-                            <option value="Lisences">Lisences</option>
-                            <option value="Real Estate">Real Estate</option>
-                            <option value="Legal Claims">Legal Claims</option>
+                        <select name="category" id="category_id" class="select2 form-select " data-allow-clear="true"
+                            required>
                         </select>
                     </div>
-                    <div class="col-12 col-md-4">
+                    <div class="col-12 col-md-4" id="assets_locationParent">
                         <label class="form-label" for="assets_location">Lokasi Aset</label>
-                        <select name="assets_location" id="assets_location" class="form-select select2">
-                            <option value="">Pilih</option>
-                            <option value="Jatim">Jatim</option>
-                            <option value="Jateng">Jateng</option>
-                            <option value="Jabar">Jabar</option>
-                            <option value="Kaltim">Kaltim</option>
-                            <option value="Kalteng">Kalteng</option>
-                            <option value="Kalsel">Kalsel</option>
-                            <option value="Bali">Bali</option>
-                            <option value="DKI">DKI</option>
-                            <option value="Aceh">Aceh</option>
+                        <select name="assets_location" id="assets_location_id" class="form-select select2">
                         </select>
                     </div>
-                    <div class="col-12 col-md-4">
-                        <label class="form-label" for="manager">PIC</label>
-                        <select id="manager" name="manager" class="select2 form-select " data-allow-clear="true" required>
-                            <option value="">Pilih</option>
-                            <option value="lenz creative">lenz creative</option>
+                    <div class="col-12 col-md-4" id="picParent">
+                        <label class="form-label" for="pic">PIC</label>
+                        <select id="pic_id" name="pic" class="select2 form-select " data-allow-clear="true" required>
                         </select>
                     </div>
                 </div>
@@ -112,11 +93,106 @@
 @endsection
 
 @push('js')
+    <script>
+        $(document).ready(function() {
+            $('#category_id').select2({
+                dropdownParent: $('#categoryParent'),
+                placeholder: 'Pilih Kategori',
+                ajax: {
+                    url: "{{ route('asset.data') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            keyword: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.data.reduce((unique, item) => {
+                                if (!unique.some((i) => i.text === item.category)) {
+                                    unique.push({
+                                        text: item.category,
+                                        id: item
+                                            .category
+                                    });
+                                }
+                                return unique;
+                            }, [])
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $('#assets_location_id').select2({
+                dropdownParent: $('#assets_locationParent'),
+                placeholder: 'Pilih lokasi',
+                ajax: {
+                    url: "{{ route('asset.data') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            keyword: params.term,
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.data.reduce((unique, item) => {
+                                if (!unique.some((i) => i.text === item.assets_location)) {
+                                    unique.push({
+                                        text: item.assets_location,
+                                        id: item
+                                            .assets_location // Changed from relationId to assets_location
+                                    });
+                                }
+                                return unique;
+                            }, [])
+                        }
+                    },
+                    cache: true
+                }
+            });
+
+            $('#pic_id').select2({
+                dropdownParent: $('#picParent'),
+                placeholder: 'Pilih PIC',
+                ajax: {
+                    url: "{{ route('employee.data') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            keyword: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        apiResults = data.data
+                            .filter(function(item) {
+                                return item.relationId !== null;
+                            })
+                            .map(function(item) {
+                                return {
+                                    text: item.name + ' (' + item.nameTitle + ')',
+                                    id: item.relationId,
+                                };
+                            });
+
+                        return {
+                            results: apiResults
+                        };
+                    },
+                    cache: true
+                }
+            });
+        });
+    </script>
     <script type="text/javascript">
         $(document).ready(function() {
             init_table();
 
-            $('#category, #assets_location, #manager').on('change', function() {
+            $('#category_id, #assets_location_id, #pic_id').on('change', function() {
                 init_table();
             });
 
@@ -155,9 +231,9 @@
 
         function init_table(keyword = '') {
             var csrf_token = $('meta[name="csrf-token"]').attr('content');
-            var category = $('#category').val();
-            var assets_location = $('#assets_location').val();
-            var manager = $('#manager').val();
+            var category = $('#category_id').val();
+            var assets_location = $('#assets_location_id').val();
+            var pic = $('#pic_id').val();
 
             if ($.fn.DataTable.isDataTable('#data-table')) {
                 $('#data-table').DataTable().clear().destroy();
@@ -178,11 +254,10 @@
                         'keyword': keyword,
                         'category': category,
                         'assets_location': assets_location,
-                        'manager': manager
+                        'pic': pic
                     }
                 },
-                columns: [
-                    {
+                columns: [{
                         data: 'id',
                         name: 'id',
                         orderable: false,

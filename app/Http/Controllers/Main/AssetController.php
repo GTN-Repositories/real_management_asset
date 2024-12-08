@@ -141,10 +141,8 @@ class AssetController extends Controller
             'created_at',
         ];
 
-        $keyword = $request->search['value'] ?? '';
-        $category = $request->category;
-        $assets_location = $request->assets_location;
-        $manager = $request->manager;
+        $keyword = $request->keyword ?? '';
+
 
         $limit = $request->limit ?? '';
 
@@ -160,14 +158,15 @@ class AssetController extends Controller
                 }
             });
 
-        if ($category) {
-            $data->where('category', $category);
+        if ($request->assets_location) {
+            $data->where('assets_location', 'LIKE', '%' . $request->assets_location . '%');
         }
-        if ($assets_location) {
-            $data->where('assets_location', $assets_location);
+
+        if ($request->category) {
+            $data->where('category', 'LIKE', '%' . $request->category . '%');
         }
-        if ($manager) {
-            $data->where('manager', $manager);
+        if ($request->pic) {
+            $data->where('pic', 'LIKE', '%' . Crypt::decrypt($request->pic) . '%');
         }
 
         if (session('selected_project_id')) {
@@ -344,9 +343,13 @@ class AssetController extends Controller
                     }
                 }
 
-                // if (isset($data['pic'])) {
-                //     $data['pic'] = Crypt::decrypt($data['pic']);
-                // }
+                if (isset($data['pic'])) {
+                    try {
+                        $data['pic'] = Crypt::decrypt($data['pic']);
+                    } catch (\Exception $e) {
+                        $data['pic'] = $data['pic'];
+                    }
+                }
 
                 $data = $asset->update($data);
 
