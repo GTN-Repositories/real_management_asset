@@ -66,9 +66,10 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2 pb-1">
                             <div class="avatar me-2">
-                                <span class="avatar-initial rounded bg-label-primary"><i class="ti ti-wallet ti-md"></i></span>
+                                <span class="avatar-initial rounded bg-label-primary"><i
+                                        class="ti ti-wallet ti-md"></i></span>
                             </div>
-                            <h4 class="ms-1 mb-0">on progress</h4>
+                            <h4 class="ms-1 mb-0" id="asset-value">Loading...</h4>
                         </div>
                         <p class="mb-1">Asset Value</p>
                         <p class="mb-0">
@@ -83,7 +84,8 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2 pb-1">
                             <div class="avatar me-2">
-                                <span class="avatar-initial rounded bg-label-primary"><i class="ti ti-file-text ti-md"></i></span>
+                                <span class="avatar-initial rounded bg-label-primary"><i
+                                        class="ti ti-file-text ti-md"></i></span>
                             </div>
                             <h4 class="ms-1 mb-0" id="total-loadsheet">Loading...</h4>
                         </div>
@@ -100,7 +102,8 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2 pb-1">
                             <div class="avatar me-2">
-                                <span class="avatar-initial rounded bg-label-primary"><i class="ti ti-info-circle ti-md"></i></span>
+                                <span class="avatar-initial rounded bg-label-primary"><i
+                                        class="ti ti-info-circle ti-md"></i></span>
                             </div>
                             <h4 class="ms-1 mb-0">on progress</h4>
                         </div>
@@ -116,7 +119,7 @@
         <!-- Status Donut Charts -->
         <div class="row">
             <!-- Operational Status -->
-            <div class="col-md-6 col-lg-4 mb-4">
+            <div class="col-md-6 col-lg-6 mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Operational Status</h5>
@@ -133,7 +136,7 @@
             </div>
 
             <!-- Maintenance Status -->
-            <div class="col-md-6 col-lg-4 mb-4">
+            <div class="col-md-6 col-lg-6 mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Maintenance Status</h5>
@@ -150,7 +153,7 @@
             </div>
 
             <!-- Asset Status -->
-            <div class="col-md-6 col-lg-4 mb-4">
+            <div class="col-md-6 col-lg-6 mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Asset Status</h5>
@@ -162,6 +165,17 @@
                     </div>
                     <div class="card-body">
                         <div id="assetStatusChart"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="m-0">Speedometer</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="speedometerChart"></div>
                     </div>
                 </div>
             </div>
@@ -186,6 +200,21 @@
                 }
             });
             $.ajax({
+                url: "{{ route('asset.data') }}",
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    let cost = response.data.map(item => item.cost);
+                    let totalCost = cost.length ? cost.reduce((total, num) =>
+                        total + num) : 0;
+                    $('#asset-value').text(totalCost ? totalCost : 0);
+                },
+                error: function(xhr, status, error) {
+                    $('#asset-value').text('Error');
+                    console.error('Error fetching data:', error);
+                }
+            });
+            $.ajax({
                 url: "{{ route('fuel.data') }}",
                 type: 'GET',
                 dataType: 'json',
@@ -206,9 +235,11 @@
                 dataType: 'json',
                 success: function(response) {
                     let loadsheetDashboard = response.data.map(item => item.loadsheetDashboard);
-                    let totalLoadsheet = loadsheetDashboard.length ? loadsheetDashboard.reduce((total, num) =>
+                    let totalLoadsheet = loadsheetDashboard.length ? loadsheetDashboard.reduce((total,
+                            num) =>
                         total + num) : 0;
-                    $('#total-loadsheet').text(totalLoadsheet ? totalLoadsheet + ' liter' : 0 + ' liter');
+                    $('#total-loadsheet').text(totalLoadsheet ? totalLoadsheet + ' liter' : 0 +
+                        ' liter');
                 },
                 error: function(xhr, status, error) {
                     $('#total-loadsheet').text('Error');
@@ -220,8 +251,54 @@
         document.addEventListener('DOMContentLoaded', function() {
             fetchStatusData();
 
+            renderSpeedometer();
+
             setupDownloadButtons();
         });
+
+        function renderSpeedometer() {
+            const options = {
+                chart: {
+                    type: 'radialBar',
+                    height: 350
+                },
+                series: [70], // Static value for the speedometer
+                labels: ['Performance'],
+                plotOptions: {
+                    radialBar: {
+                        startAngle: -135,
+                        endAngle: 135,
+                        track: {
+                            background: '#e7e7e7',
+                            strokeWidth: '97%',
+                            margin: 5
+                        },
+                        dataLabels: {
+                            name: {
+                                fontSize: '22px',
+                                color: '#212529'
+                            },
+                            value: {
+                                fontSize: '36px',
+                                color: '#343a40',
+                                formatter: function(val) {
+                                    return val + '%';
+                                }
+                            }
+                        }
+                    }
+                },
+                fill: {
+                    colors: ['#20E647']
+                },
+                stroke: {
+                    lineCap: 'round'
+                }
+            };
+
+            const chart = new ApexCharts(document.querySelector("#speedometerChart"), options);
+            chart.render();
+        }
 
         function fetchStatusData() {
             $.ajax({

@@ -102,6 +102,9 @@ class AssetController extends Controller
             ->addColumn('status', function ($data) {
                 return $data->status;
             })
+            ->addColumn('cost', function ($data) {
+                return $data->cost;
+            })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
                 if (auth()->user()->hasPermissionTo('asset-detail')) {
@@ -138,6 +141,7 @@ class AssetController extends Controller
             'nik',
             'color',
             'owner',
+            'cost',
             'assets_location',
             'pic',
             'status',
