@@ -51,6 +51,9 @@ class AssetController extends Controller
 
                 return $checkbox;
             })
+            ->addColumn('noDecryptId', function ($data) {
+                return $data->id ?? null;
+            })
             ->addColumn('relationId', function ($data) {
                 return Crypt::decrypt($data->id) ?? null;
             })

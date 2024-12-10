@@ -38,6 +38,7 @@
                 </option>
             @endif
         </select>
+        <input type="hidden" name="asset_id" value="{{ $data->asset_id }}">
     </div>
 
     <div class="col-12 col-md-12">
@@ -50,10 +51,10 @@
     <div class="col-12 col-md-12">
         <label for="exampleFormControlSelect1" class="form-label">Status</label>
         <select class="form-select select2" id="exampleFormControlSelect1" name="status" aria-label="Select Status">
-            <option value="scheduled" {{ $data->status == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
-            <option value="in_progress" {{ $data->status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-            <option value="on_hold" {{ $data->status == 'on_hold' ? 'selected' : '' }}>On Hold</option>
-            <option value="finish" {{ $data->status == 'finish' ? 'selected' : '' }}>Finish</option>
+            <option value="Scheduled" {{ $data->status == 'Scheduled' ? 'selected' : '' }}>Scheduled</option>
+            <option value="InProgress" {{ $data->status == 'InProgress' ? 'selected' : '' }}>In Progress</option>
+            <option value="OnHold" {{ $data->status == 'OnHold' ? 'selected' : '' }}>On Hold</option>
+            <option value="Finish" {{ $data->status == 'Finish' ? 'selected' : '' }}>Finish</option>
         </select>
     </div>
 
@@ -81,13 +82,9 @@
                         <td>{{ $item->code }}</td>
                         <td>{{ $item->name }}</td>
                         <td>
-                            {{-- <input type="number" class="form-control item-stock" data-item-id="{{ $item->id }}"
-                                value="{{ $item->stock_in_schedule }}" readonly> --}}
-                                {{ $item->stock_in_schedule }}
+                            {{ $item->stock_in_schedule }}
                         </td>
                         <td>
-                            {{-- <input type="number" class="form-control kanibal-stock" data-item-id="{{ $item->id }}"
-                                value="" readonly> --}}
                             {{ $item->kanibal_stock_in_schedule }}
                         </td>
                         <td>
@@ -142,6 +139,8 @@
     CKEDITOR.replace('comment');
 </script>
 <script type="text/javascript">
+    selectedItems = [];
+
     $(document).ready(function() {
         $('#asset_id').select2({
             dropdownParent: $('#selectAsset'),
