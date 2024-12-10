@@ -30,10 +30,40 @@
             <button onclick="exportExcel()" class="btn btn-success">
                 <i class="fa-solid fa-file-excel me-1"></i>Export Excel
             </button>
-            <button onclick="exportExcelMonth()" class="btn btn-success">
-                <i class="fa-solid fa-file-excel me-1"></i>Excel Fuel Bulan Ini
-            </button>
-
+        </div>
+        <div class="card my-3">
+            <div class="card-body d-flex justify-content-end align-items-end">
+                <div class="me-2">
+                    <label for="month" class="form-label">Bulan</label>
+                    <select id="month" class="form-select select2">
+                        <option value="">Pilih Bulan</option>
+                        <option value="01">Januari</option>
+                        <option value="02">Februari</option>
+                        <option value="03">Maret</option>
+                        <option value="04">April</option>
+                        <option value="05">Mei</option>
+                        <option value="06">Juni</option>
+                        <option value="07">Juli</option>
+                        <option value="08">Agustus</option>
+                        <option value="09">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                </div>
+                <div class="me-2">
+                    <label for="year" class="form-label">Tahun</label>
+                    <select id="year" class="form-select select2">
+                        <option value="">Pilih Tahun</option>
+                        @for ($i = date('Y'); $i >= 1985; $i--)
+                            <option value="{{ $i }}">{{ $i }}</option>
+                        @endfor
+                    </select>
+                </div>
+                <button onclick="exportExcelMonth()" class="btn btn-success">
+                    <i class="fa-solid fa-file-excel me-1"></i>Excel Fuel Monthly
+                </button>
+            </div>
         </div>
         <!-- Chart Container -->
         {{-- <div class="card mb-4">
@@ -530,67 +560,40 @@
         }
 
         function exportExcelMonth() {
-            const startDate = $('#date-range-picker').data('daterangepicker')?.startDate?.format('YYYY-MM-DD');
-            const endDate = $('#date-range-picker').data('daterangepicker')?.endDate?.format('YYYY-MM-DD');
-            const predefinedFilter = $('.dropdown-item.active').text().trim() || '';
+            const month = $('#month').val();
+            const year = $('#year').val();
 
-            if (startDate && endDate) {
-                $.ajax({
-                    url: "{{ route('report-fuel.export-excel-month') }}",
-                    type: 'GET',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        startDate: startDate,
-                        endDate: endDate,
-                        predefinedFilter: predefinedFilter
-                    },
-                    xhrFields: {
-                        responseType: 'blob'
-                    },
-                    success: function(response) {
-                        const blob = new Blob([response], {
-                            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                        });
-                        const link = document.createElement('a');
-                        link.href = window.URL.createObjectURL(blob);
-                        link.download = 'FuelConsumptionReport.xlsx';
-                        link.click();
-                    },
-                    error: function() {
-                        Swal.fire('Error!',
-                            'An error occurred while exporting the report. Please try again later.',
-                            'error');
-                    }
-                });
-            } else {
-                $.ajax({
-                    url: "{{ route('report-fuel.export-excel-month') }}",
-                    type: 'GET',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        startDate: moment().startOf('month').format('YYYY-MM-DD'),
-                        endDate: moment().endOf('month').format('YYYY-MM-DD'),
-                        predefinedFilter: predefinedFilter
-                    },
-                    xhrFields: {
-                        responseType: 'blob'
-                    },
-                    success: function(response) {
-                        const blob = new Blob([response], {
-                            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                        });
-                        const link = document.createElement('a');
-                        link.href = window.URL.createObjectURL(blob);
-                        link.download = 'FuelConsumptionReport.xlsx';
-                        link.click();
-                    },
-                    error: function() {
-                        Swal.fire('Error!',
-                            'An error occurred while exporting the report. Please try again later.',
-                            'error');
-                    }
-                });
+            if (!month || !year) {
+                Swal.fire('Error!', 'Please select month and year.', 'error');
+                return;
             }
+
+            $.ajax({
+                url: "{{ route('report-fuel.export-excel-month') }}",
+                type: 'GET',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    month: month,
+                    year: year,
+                },
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function(response) {
+                    const blob = new Blob([response], {
+                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    });
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'FuelConsumptionReport.xlsx';
+                    link.click();
+                },
+                error: function() {
+                    Swal.fire('Error!',
+                        'An error occurred while exporting the report. Please try again later.',
+                        'error');
+                }
+            });
         }
     </script>
 @endpush

@@ -143,6 +143,11 @@ class ReportSparepartController extends Controller
                 Carbon::parse($request->start_date)->startOfDay(),
                 Carbon::parse($request->end_date)->endOfDay()
             ]);
+        } else {
+            $query->whereBetween('date', [
+                Carbon::now()->startOfMonth(),
+                Carbon::now()->endOfMonth()
+            ]);
         }
 
         $inspectionSchedules = $query->get();
