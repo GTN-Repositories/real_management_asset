@@ -79,6 +79,24 @@
             placeholder="Warna" required />
     </div> --}}
 
+    <div class="col-12 col-md-6">
+        <label class="form-label">No Invoice</label>
+        <input type="text" name="no_invoice" id="no_invoice" class="form-control mb-3 mb-lg-0"
+            placeholder="nomor invoice" required value="{{ $data->no_invoice }}" />
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Nama Supplier</label>
+        <input type="text" name="supplier_name" id="supplier_name" class="form-control mb-3 mb-lg-0"
+            placeholder="Nama Supplier" required value="{{ $data->supplier_name }}" />
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Alamat Supplier</label>
+        <input type="text" name="supplier_addrees" id="supplier_addrees" class="form-control mb-3 mb-lg-0"
+            placeholder="Alamat Supplier" required value="{{ $data->supplier_addrees }}" />
+    </div>
+
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
         <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
