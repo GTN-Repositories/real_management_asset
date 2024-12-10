@@ -25,6 +25,10 @@ class InspectionSchedule extends Model
     {
         return $this->belongsTo(Asset::class, 'asset_id', 'id');
     }
+    public function managementProject()
+    {
+        return $this->belongsTo(ManagementProject::class, 'management_project_id', 'id');
+    }
     public function assetKanibal()
     {
         return $this->belongsTo(Asset::class, 'asset_kanibal_id', 'id');

@@ -19,6 +19,7 @@ use App\Http\Controllers\Main\JobTitleController;
 use App\Http\Controllers\Main\LoadsheetController;
 use App\Http\Controllers\Main\LocationController;
 use App\Http\Controllers\Main\LogActivityController;
+use App\Http\Controllers\Main\MaintenanceController;
 use App\Http\Controllers\Main\ManagementProjectController;
 use App\Http\Controllers\Main\ManagerController;
 use App\Http\Controllers\Main\MenuController;
@@ -140,6 +141,10 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('quiz', function () {
         return view('main.quiz.index');
     })->name('quiz');
+
+    Route::get('/maintenance/data', [MaintenanceController::class, 'data'])->name('maintenance.data');
+    Route::delete('/maintenance/destroy-all', [MaintenanceController::class, 'destroyAll'])->name('maintenance.destroyAll');
+    Route::resource('maintenance', MaintenanceController::class);
 
     Route::get('/fuel/data', [FuelConsumptionController::class, 'data'])->name('fuel.data');
     Route::delete('/fuel/destroy-all', [FuelConsumptionController::class, 'destroyAll'])->name('fuel.destroyAll');

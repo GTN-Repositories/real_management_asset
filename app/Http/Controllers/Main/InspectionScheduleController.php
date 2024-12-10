@@ -69,12 +69,18 @@ class InspectionScheduleController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
+        // dd($data);
         try {
             return $this->atomic(function () use ($data, $request) {
-                try{
+                try {
                     $asset_id = Crypt::decrypt($data['asset_id']);
-                }catch(\Illuminate\Contracts\Encryption\DecryptException $e){
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
                     $asset_id = $data['asset_id'];
+                }
+                try {
+                    $management_project_id = Crypt::decrypt($data['management_project_id']);
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                    $management_project_id = $data['management_project_id'];
                 }
 
                 $decryptedItemIds = [];
@@ -96,7 +102,7 @@ class InspectionScheduleController extends Controller
                             }
 
                             if (isset($encryptedItemId['asset_kanibal_id'])) {
-                                $assetKanibalIds[$decryptedItemId] = Crypt::decrypt($encryptedItemId['asset_kanibal_id']);
+                                    $assetKanibalIds[$decryptedItemId] = Crypt::decrypt($encryptedItemId['asset_kanibal_id']);
                             }
                         } catch (\Exception $e) {
                             continue;
@@ -104,12 +110,20 @@ class InspectionScheduleController extends Controller
                     }
                 }
 
+                Asset::where('id', $asset_id)->update([
+                    'status' => 'UnderMaintenance'
+                ]);
+
+
                 $schedule = InspectionSchedule::create([
                     'name' => $data['name'],
                     'date' => $data['date'],
                     'type' => $data['type'],
+                    'management_project_id' => $management_project_id,
                     'asset_id' => $asset_id,
                     'note' => $data['note'],
+                    'workshop' => $data['workshop'],
+                    'mechanic_name' => $data['mechanic_name'],
                     'item_id' => json_encode($decryptedItemIds) ?? null,
                     'item_stock' => json_encode($itemStocks) ?? null,
                     'kanibal_stock' => json_encode($kanibalStocks) ?? null,
@@ -162,6 +176,7 @@ class InspectionScheduleController extends Controller
             $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemStocks, $kanibalStocks, $assetKanibalIds) {
                 $itemId = (string) Crypt::decrypt($item->id);
 
+
                 $asset_id = $assetKanibalIds[$itemId] ?? 0;
                 $item->stock_in_schedule = $itemStocks[$itemId] ?? 0;
                 $item->kanibal_stock_in_schedule = $kanibalStocks[$itemId] ?? 0;
@@ -191,8 +206,20 @@ class InspectionScheduleController extends Controller
             return $this->atomic(function () use ($request, $id) {
                 $schedule = InspectionSchedule::findByEncryptedId($id);
 
-                $data = $request->only(['status', 'comment']);
+                $data = $request->only(['status', 'comment', 'asset_id']);
+
+                try {
+                    $assst_id = Crypt::encrypt($data['asset_id']);
+                } catch (\Exception $e) {
+                    $assst_id = $data['asset_id'];
+                }
+
+                Asset::where('id', Crypt::decrypt($assst_id))->update([
+                    'status' => $data['status']
+                ]);
+
                 $schedule->update($data);
+
 
                 if (isset($data['comment'])) {
                     $comment = InspectionComment::create([
@@ -203,10 +230,10 @@ class InspectionScheduleController extends Controller
                     ]);
                 }
 
-                // return response()->json([
-                //     'status' => true,
-                //     'message' => 'Status berhasil diperbarui!',
-                // ]);
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Status berhasil diperbarui!',
+                ]);
 
                 return redirect()->back()->with('success', 'Status berhasil diperbarui!');
             });
