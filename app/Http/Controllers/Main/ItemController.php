@@ -75,6 +75,15 @@ class ItemController extends Controller
             ->addColumn('stock', function ($data) {
                 return $data->stock ?? null;
             })
+            ->addColumn('no_invoice', function ($data) {
+                return $data->no_invoice ?? null;
+            })
+            ->addColumn('supplier_addrees', function ($data) {
+                return $data->supplier_addrees ?? null;
+            })
+            ->addColumn('supplier_name', function ($data) {
+                return $data->supplier_name ?? null;
+            })
             ->addColumn('created_at', function ($data) {
                 return $data->created_at->format('d-m-Y');
             })
@@ -107,9 +116,12 @@ class ItemController extends Controller
             'stock',
             'oum_id',
             'created_at',
+            'no_invoice',
+            'supplier_name',
+            'supplier_addrees',
         ];
 
-        $keyword = $request->search['value'] ?? '';
+        $keyword = $request->keyword ?? '';
 
         $data = Item::orderBy('created_at', 'asc')
             ->select($columns)

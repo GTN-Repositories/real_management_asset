@@ -48,6 +48,9 @@
                             <th>Merek</th>
                             {{-- <th>Warna</th> --}}
                             <th>Stock</th>
+                            <th>Nomor Invoice</th>
+                            <th>Nama Supplier</th>
+                            <th>Alamat Supplier</th>
                             <th>Dibuat Pada</th>
                             <th>Aksi</th>
                         </tr>
@@ -165,6 +168,18 @@
                     {
                         data: 'stock',
                         name: 'stock'
+                    },
+                    {
+                        data: 'no_invoice',
+                        name: 'no_invoice'
+                    },
+                    {
+                        data: 'supplier_name',
+                        name: 'supplier_name'
+                    },
+                    {
+                        data: 'supplier_addrees',
+                        name: 'supplier_addrees'
                     },
                     {
                         data: 'created_at',
