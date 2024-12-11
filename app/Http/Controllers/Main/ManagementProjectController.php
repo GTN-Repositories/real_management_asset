@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Main;
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\Employee;
+use App\Models\Loadsheet;
 use App\Models\ManagementProject;
 use App\Models\PettyCash;
 use Carbon\Carbon;
@@ -442,5 +443,29 @@ class ManagementProjectController extends Controller
                 'message' => 'Data gagal ditambahkan! ' . $th->getMessage(),
             ]);
         }
+    }
+
+    public function spedometer(Request $request)
+    {
+        $managementProject = ManagementProject::findByEncryptedId($request->management_project_id);
+
+        $totalPrice = Loadsheet::where('management_project_id', Crypt::decrypt($managementProject->id))
+            ->sum('price');
+
+        $performance = ($totalPrice > 0 && $managementProject->value_project > 0) ?
+            ($totalPrice / $managementProject->value_project) * 100 : 0;
+
+        if ($performance > 100) {
+            $performance = 100;
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'totalPrice' => number_format($totalPrice, 0),
+                'maxValue' => number_format($managementProject->value_project, 0),
+                'performance' => number_format($performance, 2)
+            ]
+        ]);
     }
 }

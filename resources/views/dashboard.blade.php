@@ -18,10 +18,6 @@
                             <h4 class="ms-1 mb-0" id="total-asset">Loading...</h4>
                         </div>
                         <p class="mb-1">Total Asset</p>
-                        <p class="mb-0">
-                            {{-- <span class="fw-medium me-1">+18.2%</span>
-                            <small class="text-muted">than last week</small> --}}
-                        </p>
                     </div>
                 </div>
             </div>
@@ -36,10 +32,6 @@
                             <h4 class="ms-1 mb-0" id="total-fuel">Loading...</h4>
                         </div>
                         <p class="mb-1">Fuel Consumption</p>
-                        <p class="mb-0">
-                            {{-- <span class="fw-medium me-1">-8.7%</span>
-                            <small class="text-muted">than last week</small> --}}
-                        </p>
                     </div>
                 </div>
             </div>
@@ -54,10 +46,6 @@
                             <h4 class="ms-1 mb-0">on progress</h4>
                         </div>
                         <p class="mb-1">Productivity</p>
-                        <p class="mb-0">
-                            {{-- <span class="fw-medium me-1">+4.3%</span>
-                            <small class="text-muted">than last week</small> --}}
-                        </p>
                     </div>
                 </div>
             </div>
@@ -72,10 +60,6 @@
                             <h4 class="ms-1 mb-0" id="asset-value">Loading...</h4>
                         </div>
                         <p class="mb-1">Asset Value</p>
-                        <p class="mb-0">
-                            {{-- <span class="fw-medium me-1">-2.5%</span> --}}
-                            {{-- <small class="text-muted">than last week</small> --}}
-                        </p>
                     </div>
                 </div>
             </div>
@@ -90,10 +74,6 @@
                             <h4 class="ms-1 mb-0" id="total-loadsheet">Loading...</h4>
                         </div>
                         <p class="mb-1">Total Loadsheet</p>
-                        <p class="mb-0">
-                            {{-- <span class="fw-medium me-1">-2.5%</span> --}}
-                            {{-- <small class="text-muted">than last week</small> --}}
-                        </p>
                     </div>
                 </div>
             </div>
@@ -101,17 +81,22 @@
                 <div class="card card-border-shadow-info">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2 pb-1">
-                            <div class="avatar me-2">
-                                <span class="avatar-initial rounded bg-label-primary"><i
-                                        class="ti ti-info-circle ti-md"></i></span>
+                            <div class="d-flex gap-3">
+                                <div class="d-flex flex-column">
+                                    <h4 class="ms-1 mb-0" id="total-maintenance">Loading...</h4>
+                                    <p class="mb-0">
+                                        Open
+                                    </p>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <h4 class="ms-1 mb-0" id="total-overdue">Loading...</h4>
+                                    <p class="mb-0">
+                                        Overdue
+                                    </p>
+                                </div>
                             </div>
-                            <h4 class="ms-1 mb-0">on progress</h4>
                         </div>
                         <p class="mb-1">Open Issue</p>
-                        <p class="mb-0">
-                            {{-- <span class="fw-medium me-1">-2.5%</span> --}}
-                            {{-- <small class="text-muted">than last week</small> --}}
-                        </p>
                     </div>
                 </div>
             </div>
@@ -169,7 +154,18 @@
                 </div>
             </div>
 
-            <div class="col-md-6 col-lg-6 mb-4">
+            <div class="col-md-6 col-lg-6 mb-4 d-flex flex-column justify-content-between">
+                <div class="col-12 col-md-12" id="managementProject">
+                    <div class="select2-primary">
+                        <div class="position-relative">
+                            <select id="management_project_id" name="management_project_id" class="select2 form-select"
+                                required>
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Speedometer</h5>
@@ -215,6 +211,37 @@
                 }
             });
             $.ajax({
+                url: "{{ route('asset.data') }}",
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    let status = response.data.filter(item => item.status === 'UnderMaintenance').map(
+                        item => 1);
+                    let totalMaintenance = status.length ? status.reduce((total, num) =>
+                        total + num) : 0;
+                    $('#total-maintenance').text(totalMaintenance ? totalMaintenance : 0);
+                },
+                error: function(xhr, status, error) {
+                    $('#total-maintenance').text('Error');
+                    console.error('Error fetching data:', error);
+                }
+            });
+            $.ajax({
+                url: "{{ route('asset.data') }}",
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    let status = response.data.filter(item => item.status === 'Overdue').map(item => 1);
+                    let totalOverdue = status.length ? status.reduce((total, num) =>
+                        total + num) : 0;
+                    $('#total-overdue').text(totalOverdue ? totalOverdue : 0);
+                },
+                error: function(xhr, status, error) {
+                    $('#total-overdue').text('Error');
+                    console.error('Error fetching data:', error);
+                }
+            });
+            $.ajax({
                 url: "{{ route('fuel.data') }}",
                 type: 'GET',
                 dataType: 'json',
@@ -246,28 +273,92 @@
                     console.error('Error fetching data:', error);
                 }
             });
+            $('#management_project_id').select2({
+                dropdownParent: $('#managementProject'),
+                placeholder: 'Pilih management project',
+                ajax: {
+                    url: "{{ route('management-project.data') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            keyword: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        apiResults = data.data.map(function(item) {
+                            return {
+                                text: item.name,
+                                id: item.managementRelationId,
+                            };
+                        });
+
+                        return {
+                            results: apiResults
+                        };
+                    },
+                    limit: 10,
+                    cache: true
+                }
+            });
         });
 
         document.addEventListener('DOMContentLoaded', function() {
             fetchStatusData();
 
-            renderSpeedometer();
+            init_speedometer_chart();
 
             setupDownloadButtons();
         });
 
-        function renderSpeedometer() {
+
+        $('#management_project_id').on('change', function() {
+            const managementProjectId = $(this).val();
+            $.ajax({
+                url: "{{ route('management-project.spedometer') }}",
+                type: 'GET',
+                data: {
+                    management_project_id: managementProjectId
+                },
+                dataType: 'json',
+                success: function(response) {
+                    reloadSpeedometer(response.data);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                    showErrorMessage('Failed to load chart data');
+                }
+            });
+        });
+
+        function reloadSpeedometer(data) {
+            if (speedometerChart) speedometerChart.destroy();
+            init_speedometer_chart(data);
+        }
+
+        let speedometerChart;
+
+        function init_speedometer_chart(data) {
             const options = {
                 chart: {
                     type: 'radialBar',
-                    height: 350
+                    height: 350,
+                    sparkline: {
+                        enabled: true
+                    },
+                    animations: {
+                        enabled: false
+                    }
                 },
-                series: [70], // Static value for the speedometer
+                series: [parseFloat(data.performance)], // Ubah ke format number
                 labels: ['Performance'],
                 plotOptions: {
                     radialBar: {
                         startAngle: -135,
                         endAngle: 135,
+                        hollow: {
+                            size: '60%'
+                        },
                         track: {
                             background: '#e7e7e7',
                             strokeWidth: '97%',
@@ -282,7 +373,14 @@
                                 fontSize: '36px',
                                 color: '#343a40',
                                 formatter: function(val) {
-                                    return val + '%';
+                                    return val.toFixed(2) + '%';
+                                }
+                            },
+                            total: {
+                                show: true,
+                                label: 'Actual Sales',
+                                formatter: function(w) {
+                                    return data.totalPrice;
                                 }
                             }
                         }
@@ -293,12 +391,24 @@
                 },
                 stroke: {
                     lineCap: 'round'
+                },
+                title: {
+                    text: `Project Value: ${data.maxValue}`,
+                    align: 'right',
+                    offsetX: 10,
+                    style: {
+                        color: '#212529',
+                        fontSize: '18px'
+                    }
                 }
             };
 
-            const chart = new ApexCharts(document.querySelector("#speedometerChart"), options);
-            chart.render();
+
+            speedometerChart = new ApexCharts(document.querySelector("#speedometerChart"),
+                options);
+            speedometerChart.render();
         }
+
 
         function fetchStatusData() {
             $.ajax({
