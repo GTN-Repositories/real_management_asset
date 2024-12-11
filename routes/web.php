@@ -95,6 +95,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/management-project/by-project', [ManagementProjectController::class, 'getAssetsByProject'])->name('management-project.by_project');
     Route::get('/management-project/data', [ManagementProjectController::class, 'data'])->name('management-project.data');
     Route::get('/management-project/todoRequestPettyCash', [ManagementProjectController::class, 'todoRequestPettyCash'])->name('management-project.todoRequestPettyCash');
+    Route::get('/management-project/spedometer', [ManagementProjectController::class, 'spedometer'])->name('management-project.spedometer');
     Route::post('/management-project/requestPettyCash', [ManagementProjectController::class, 'requestPettyCash'])->name('management-project.requestPettyCash');
     Route::put('/management-project/approvePettyCash/{id}', [ManagementProjectController::class, 'approvePettyCash'])->name('management-project.approvePettyCash');
     Route::delete('/management-project/destroy-all', [ManagementProjectController::class, 'destroyAll'])->name('management-project.destroyAll');
