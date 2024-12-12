@@ -21,7 +21,8 @@
         <label class="form-label" for="category">Kategori</label>
         {{-- <select id="category_id" name="category" class="select2 form-select select2-primary"data-allow-clear="true">
         </select> --}}
-        <input type="text" id="category" name="category" value="{{ $data->category ?? '' }}" class="form-control" placeholder="Masukkan Kategori" required />
+        <input type="text" id="category" name="category" value="{{ $data->category ?? '' }}" class="form-control"
+            placeholder="Masukkan Kategori" required />
     </div>
     {{-- <div class="col-12 col-md-6">
         <label class="form-label" for="brand">Brand</label>
@@ -70,7 +71,8 @@
     </div>
     <div class="col-12 col-md-6" id="managerParent">
         <label class="form-label" for="manager">Pemilik</label>
-        <input type="text" id="owner" name="owner" value="{{ $data->owner ?? '' }}" class="form-control" placeholder="Masukkan Pemilik" />
+        <input type="text" id="owner" name="owner" value="{{ $data->owner ?? '' }}" class="form-control"
+            placeholder="Masukkan Pemilik" />
         {{-- <select id="manager_id" name="manager" class="select2 form-select select2-primary"data-allow-clear="true">
         </select> --}}
     </div>
@@ -80,14 +82,34 @@
             required>
         </select>
     </div>
-    <div class="col-12 col-md-12" id="assets_locationParent">
+    <div class="col-12 col-md-6" id="assets_locationParent">
         <label class="form-label" for="assets_location">Lokasi</label>
-        <input type="text" id="assets_location" name="assets_location" value="{{ $data->assets_location }}" class="form-control" placeholder="Masukkan Lokasi" />
+        <input type="text" id="assets_location" name="assets_location" value="{{ $data->assets_location }}"
+            class="form-control" placeholder="Masukkan Lokasi" />
         {{-- <select id="assets_location_id" name="assets_location"
             class="select2 form-select select2-primary"data-allow-clear="true">
         </select> --}}
     </div>
-    
+    <div class="col-12 col-md-6">
+        <label for="status" class="form-label">Status</label>
+        <select class="form-select select2" id="status" name="status" aria-label="Select status">
+            <option value="Idle" {{ $data->status == 'Idle' ? 'selected' : '' }}>Idle</option>
+            <option value="StandBy" {{ $data->status == 'StandBy' ? 'selected' : '' }}>Stand By</option>
+            <option value="OnHold" {{ $data->status == 'OnHold' ? 'selected' : '' }}>On Hold</option>
+            <option value="Finish" {{ $data->status == 'Finish' ? 'selected' : '' }}>Finish</option>
+            <option value="Damaged" {{ $data->status == 'Damaged' ? 'selected' : '' }}>Damaged</option>
+            <option value="Fair" {{ $data->status == 'Fair' ? 'selected' : '' }}>Fair</option>
+            <option value="UnderMaintenance" {{ $data->status == 'UnderMaintenance' ? 'selected' : '' }}>
+                Under Maintenance</option>
+            <option value="Active" {{ $data->status == 'Active' ? 'selected' : '' }}>Active</option>
+            <option value="Scheduled" {{ $data->status == 'Scheduled' ? 'selected' : '' }}>Scheduled</option>
+            <option value="InProgress" {{ $data->status == 'InProgress' ? 'selected' : '' }}>In Progress</option>
+            <option value="NeedsRepair" {{ $data->status == 'NeedsRepair' ? 'selected' : '' }}>Needs Repair</option>
+            <option value="Good" {{ $data->status == 'Good' ? 'selected' : '' }}>Good</option>
+            <option value="Overdue" {{ $data->status == 'Overdue' ? 'selected' : '' }}>Overdue</option>
+        </select>
+    </div>
+
     <div class="col-12">
         <hr class="my-4">
     </div>
@@ -124,9 +146,8 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="contract_period">Contract Period</label>
-                            <input type="date" id="contract_period" name="contract_period"
-                                class="form-control" placeholder="Masukkan contract_period"
-                                value="{{ $data->contract_period ?? '' }}" />
+                            <input type="date" id="contract_period" name="contract_period" class="form-control"
+                                placeholder="Masukkan contract_period" value="{{ $data->contract_period ?? '' }}" />
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="file_reminder">Upload File Reminder</label>
@@ -196,9 +217,8 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="tax_period">Waktu Pajak</label>
-                            <input type="date" id="tax_period" name="tax_period"
-                                class="form-control" placeholder="Masukkan tax_period"
-                                value="{{ $data->tax_period ?? '' }}" />
+                            <input type="date" id="tax_period" name="tax_period" class="form-control"
+                                placeholder="Masukkan tax_period" value="{{ $data->tax_period ?? '' }}" />
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="date_tax">Tanggal Pengingat Pajak</label>
@@ -225,10 +245,13 @@
                     <div class="accordion-body row">
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="depreciation">Bulan</label>
-                            <select id="depreciation" name="depreciation" class="form-control"aria-label="Pilih Bulan">
+                            <select id="depreciation" name="depreciation"
+                                class="form-control"aria-label="Pilih Bulan">
                                 <option value="" selected>Pilih Bulan</option>
                                 @foreach (\App\Helpers\Helper::bulan() as $key => $bln)
-                                    <option value="{{ $key }}" {{ $data->depreciation == $key ? 'selected' : '' }}> {{ $bln }}</option>
+                                    <option value="{{ $key }}"
+                                        {{ $data->depreciation == $key ? 'selected' : '' }}> {{ $bln }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -311,13 +334,15 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="supplier_pic_name">Nama PIC Supplier</label>
-                            <input type="text" id="supplier_pic_name" name="supplier_pic_name" value="{{ $data->supplier_pic_name }}" class="form-control"
+                            <input type="text" id="supplier_pic_name" name="supplier_pic_name"
+                                value="{{ $data->supplier_pic_name }}" class="form-control"
                                 placeholder="Masukkan supplier_name" />
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="supplier_pic_phone">Nomor PIC Telepon Supplier</label>
-                            <input type="text" id="supplier_pic_phone" name="supplier_pic_phone" value="{{ $data->supplier_pic_phone }}"
-                                class="form-control" placeholder="Masukkan supplier_phone_number" />
+                            <input type="text" id="supplier_pic_phone" name="supplier_pic_phone"
+                                value="{{ $data->supplier_pic_phone }}" class="form-control"
+                                placeholder="Masukkan supplier_phone_number" />
                         </div>
                     </div>
                 </div>
@@ -483,7 +508,7 @@
                         })
                         .map(function(item) {
                             return {
-                                text: item.name+' ('+item.nameTitle+')',
+                                text: item.name + ' (' + item.nameTitle + ')',
                                 id: item.relationId,
                             };
                         });
