@@ -6,6 +6,7 @@ use App\Exports\AssetExport;
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\AssetNote;
+use App\Models\CostumField;
 use App\Models\LogActivity;
 use App\Models\ManagementProject;
 use App\Models\StatusAsset;
@@ -217,6 +218,7 @@ class AssetController extends Controller
                 // if (isset($data['category'])) {
                 //     $data['category'] = Crypt::decrypt($data['category']);
                 // }
+
                 if (isset($data['pic'])) {
                     $data['pic'] = Crypt::decrypt($data['pic']);
                 }
@@ -237,7 +239,26 @@ class AssetController extends Controller
                     $data['file_tax'] = $data['file_tax']->store('assets', 'public');
                 }
 
-                $data = Asset::create($data);
+                $asset = Asset::create($data);
+
+                $customFieldNames = $data['custom_field_name'] ?? [];
+                $customFieldValues = $data['custom_field_value'] ?? [];
+                $customFieldTypes = $data['custom_field_type'] ?? [];
+
+                foreach ($customFieldNames as $index => $customFieldName) {
+                    $customFieldValue = $customFieldValues[$index] ?? null;
+                    $customFieldType = $customFieldTypes[$index] ?? null;
+
+                    if ($customFieldName !== null && $customFieldValue !== null && $customFieldType !== null) {
+                        CostumField::create([
+                            'asset_id' => Crypt::decrypt($asset->id),
+                            'nama_field' => $customFieldName,
+                            'nilai_field' => $customFieldValue,
+                            'tipe_field' => $customFieldType,
+                        ]);
+                    }
+                }
+
 
                 return response()->json([
                     'status' => true,
@@ -293,8 +314,9 @@ class AssetController extends Controller
     public function edit($id)
     {
         $data = Asset::findByEncryptedId($id);
+        $customFields = CostumField::where('asset_id', Crypt::decrypt($data->id))->get();
 
-        return view('main.unit.edit', compact('data'));
+        return view('main.unit.edit', compact('data', 'customFields'));
     }
 
 
@@ -361,7 +383,7 @@ class AssetController extends Controller
                     }
                 }
 
-                $data = $asset->update($data);
+                $result = $asset->update($data);
 
                 if ($statusBefore !== $asset->status) {
                     StatusAsset::create([
@@ -370,6 +392,39 @@ class AssetController extends Controller
                         'status_after' => $asset->status,
                     ]);
                 }
+
+                $customFieldNames = $data['custom_field_name'] ?? [];
+                $customFieldValues = $data['custom_field_value'] ?? [];
+                $customFieldTypes = $data['custom_field_type'] ?? [];
+
+                $costumFieldsBefore = CostumField::where('asset_id', Crypt::decrypt($asset->id))->get();
+                $costumFieldsBeforeIds = $costumFieldsBefore->map(function ($field) {
+                    return Crypt::decrypt($field->id);
+                })->toArray();
+                foreach ($customFieldNames as $index => $customFieldName) {
+                    $customFieldValue = $customFieldValues[$index] ?? null;
+                    $customFieldType = $customFieldTypes[$index] ?? null;
+
+                    if ($customFieldName !== null && $customFieldValue !== null && $customFieldType !== null) {
+                        if (isset($costumFieldsBeforeIds[$index])) {
+                            CostumField::where('id', $costumFieldsBeforeIds[$index])->update([
+                                'nama_field' => $customFieldName,
+                                'nilai_field' => $customFieldValue,
+                                'tipe_field' => $customFieldType,
+                            ]);
+                            unset($costumFieldsBeforeIds[$index]);
+                        } else {
+                            CostumField::create([
+                                'asset_id' => Crypt::decrypt($asset->id),
+                                'nama_field' => $customFieldName,
+                                'nilai_field' => $customFieldValue,
+                                'tipe_field' => $customFieldType,
+                            ]);
+                        }
+                    }
+                }
+
+                CostumField::whereIn('id', $costumFieldsBeforeIds)->delete();
 
                 return response()->json([
                     'status' => true,
