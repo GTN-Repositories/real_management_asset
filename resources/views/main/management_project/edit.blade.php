@@ -18,6 +18,23 @@
         <input type="text" id="value_project" name="value_project" class="form-control"
             placeholder="Masukkan value project" required value="{{ $data->value_project }}" />
     </div>
+    <div class="col-12 col-md-6">
+        <label for="date-range-pickers" class="form-label">Periode Waktu</label>
+        <input type="text" id="date-range-pickers" name="date_range" class="form-control"
+            placeholder="Select Date Range">
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="calculation_method">Metode Kalkulasi</label>
+        <select name="calculation_method" id="calculation_method" class="form-select select2">
+            <option value="">Pilih</option>
+            <option value="Kubic" @if ($data->calculation_method == 'Kubic') selected @endif>Kubic</option>
+            <option value="Tonase" @if ($data->calculation_method == 'Tonase') selected @endif>Tonase</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="location">Lokasi Project<span class="text-danger">*</span></label>
+        <textarea name="location" id="location" cols="30" rows="5" class="form-control">{{ $data->location }}</textarea>
+    </div>
     <div class="col-12 col-md-12" id="relationId">
         <label class="form-label" for="asset_id">Nama Asset<span class="text-danger">*</span></label>
         <div class="select2-primary">
@@ -38,24 +55,17 @@
             </div>
         </div>
     </div>
-    <div class="col-12 col-md-6">
-        <label for="date-range-picker" class="form-label">Periode Waktu</label>
-        <div class="input-group" id="date-range-picker">
+    {{-- <div class="col-12 col-md-6">
+        <label for="date-range-pickers" class="form-label">Periode Waktu</label>
+        <div class="input-group" id="date-range-pickers">
             <input type="date" id="start_date" name="start_date" class="form-control" placeholder="Start Date"
                 value="{{ $data->start_date }}" required>
             <span class="input-group-text">to</span>
             <input type="date" id="end_date" name="end_date" class="form-control" placeholder="End Date"
                 value="{{ $data->end_date }}" required>
         </div>
-    </div>
-    <div class="col-12 col-md-6">
-        <label class="form-label" for="calculation_method">Metode Kalkulasi</label>
-        <select name="calculation_method" id="calculation_method" class="form-select select2">
-            <option value="">Pilih</option>
-            <option value="Kubic" @if ($data->calculation_method == 'Kubic') selected @endif>Kubic</option>
-            <option value="Tonase" @if ($data->calculation_method == 'Tonase') selected @endif>Tonase</option>
-        </select>
-    </div>
+    </div> --}}
+    
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
         <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
@@ -66,6 +76,34 @@
 @include('components.select2_js')
 <script>
     $(document).ready(function() {
+        $('#date-range-pickers').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
+
+        var startDate = "{{ $data->start_date }}";
+        var endDate = "{{ $data->end_date }}";
+
+        // Menggunakan moment untuk memformat tanggal
+        var formatStartDate = moment(startDate);
+        var formatEndDate = moment(endDate);
+
+        $('#date-range-pickers').daterangepicker({
+            startDate: formatStartDate,
+            endDate: formatEndDate,
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        }, function(start, end) {
+            $('#date-range-pickers').val(start.format('MM/DD/YYYY') + ' - ' + end.format('MM/DD/YYYY'));
+        });
+
+        // Set default value pada input
+        $('#date-range-pickers').val(formatStartDate.format('MM/DD/YYYY') + ' - ' + formatEndDate.format('MM/DD/YYYY'));
+        
         $('#asset_id').select2({
             dropdownParent: $('#relationId'),
             placeholder: 'Pilih aset',
@@ -75,7 +113,8 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        keyword: params.term,
+                        limit: 10
                     };
                 },
                 processResults: function(data) {
@@ -89,7 +128,6 @@
                         results: apiResults
                     };
                 },
-                limit: 10,
                 cache: true
             }
         });
@@ -103,13 +141,14 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        keyword: params.term,
+                        limit: 10
                     };
                 },
                 processResults: function(data) {
                     apiResults = data.data.map(function(item) {
                         return {
-                            text: item.name,
+                            text: item.nameTitle,
                             id: item.relationId,
                         };
                     });
@@ -118,18 +157,20 @@
                         results: apiResults
                     };
                 },
-                limit: 10,
                 cache: true
             }
         });
 
         var asset_ids = {!! json_encode($data->asset_id ?? []) !!};
+        var asset_id = {!! json_encode($data->assets->pluck('id')->map(fn($id) => Crypt::decrypt($id)) ?? []) !!};
         var asset_names = {!! json_encode($data->assets->pluck('name') ?? []) !!};
         var asset_numbers = {!! json_encode($data->assets->pluck('asset_number') ?? []) !!};
 
         if (asset_ids && asset_names && asset_numbers) {
             asset_ids.forEach(function(id, index) {
-                var option = new Option(`${asset_names[index]} - ${asset_numbers[index]}`, id, true,
+                var option = new Option(
+                    `${asset_id[index]} - ${asset_names[index]} - ${asset_numbers[index]}`, id,
+                    true,
                     true);
                 $('#asset_id').append(option);
             });
@@ -138,13 +179,17 @@
 
         var employee_ids = {!! json_encode($data->employee_id ?? []) !!};
         var employee_names = {!! json_encode($data->employees->pluck('name') ?? []) !!};
+        var job_title_names = {!! json_encode($data->employees->map(function($employee) {
+            return $employee->jobTitle ? $employee->jobTitle->name : null;
+        })->toArray() ?? []) !!};
 
         employee_ids = Array.isArray(employee_ids) ? employee_ids : [];
         employee_names = Array.isArray(employee_names) ? employee_names : [];
+        job_title_names = Array.isArray(job_title_names) ? job_title_names : [];
 
-        if (employee_ids.length > 0 && employee_names.length > 0) {
+        if (employee_ids.length > 0 && employee_names.length > 0 && job_title_names.length > 0) {
             employee_ids.forEach(function(id, index) {
-                var name = employee_names[index] || 'Undefined';
+                var name = `${employee_names[index]} - ${job_title_names[index] || 'Undefined'}`;
                 var option = new Option(name, id, true, true);
                 $('#employee_id').append(option);
             });

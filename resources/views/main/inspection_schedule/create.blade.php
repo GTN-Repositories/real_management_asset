@@ -12,6 +12,16 @@
         <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
             placeholder="Masukan Nama Item" value="{{ old('name') }}" required />
     </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label">Nama Bengkel</label>
+        <input type="text" name="workshop" id="workshop" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Nama Bengkel" value="{{ old('workshop') }}" required />
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label">Nama Mekanik</label>
+        <input type="text" name="mechanic_name" id="mechanic_name" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Nama Mekanik" value="{{ old('mechanic_name') }}" required />
+    </div>
 
     <div class="col-12 col-md-6">
         <label class="form-label">Tanggal</label>
@@ -27,9 +37,17 @@
         </select>
     </div>
 
-    <div class="col-12" id="selectAsset">
-        <label for="asset_id" class="form-label">Plat Nomor</label>
-        <select id="asset_id" class="form-select form-select-lg" name="asset_id">
+    <div class="col-12 col-md-6" id="managementRelation">
+        <label class="form-label" for="management_project_id">Nama Management Project<span
+                class="text-danger">*</span></label>
+        <select id="management_project_id" name="management_project_id"
+            class="select2 form-select select2-primary"data-allow-clear="true" required>
+        </select>
+    </div>
+    <div class="col-12 col-md-6" id="assetRelation">
+        <label class="form-label" for="asset_id">Nama Asset<span class="text-danger">*</span></label>
+        <select id="asset_id" name="asset_id" class="select2 form-select select2-primary"data-allow-clear="true"
+            required>
         </select>
     </div>
 
@@ -64,28 +82,74 @@
 </script>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#asset_id').select2({
-            dropdownParent: $('#selectAsset'),
-            placeholder: 'Pilih Asset',
+        $('#management_project_id').select2({
+            dropdownParent: $('#managementRelation'),
+            placeholder: 'Pilih projek',
             ajax: {
-                url: "{{ route('asset.data') }}",
+                url: "{{ route('management-project.data') }}",
                 dataType: 'json',
                 delay: 250,
                 data: function(params) {
                     return {
-                        'keyword': params.term,
+                        keyword: params.term
                     };
                 },
                 processResults: function(data) {
+                    let apiResults = data.data.map(item => ({
+                        text: item.name,
+                        id: item.managementRelationId,
+                    }));
                     return {
-                        results: data.data.map(item => ({
-                            text: item.nameWithNumber,
-                            id: item.relationId
-                        }))
+                        results: apiResults
                     };
                 },
-                limit: 10,
                 cache: true
+            }
+        }).on('change', function() {
+            var projectId = $(this).val();
+
+            $('#asset_id').empty().trigger('change');
+            if (projectId) {
+                $.ajax({
+                    url: "{{ route('management-project.by_project') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: {
+                        projectId: projectId
+                    },
+                    success: function(data) {
+                        if (data && typeof data === 'object' && Object.keys(data).length) {
+                            var assetOptions = Object.entries(data).map(function([id,
+                                name
+                            ]) {
+                                return {
+                                    id: id,
+                                    text: name
+                                };
+                            });
+
+                            $('#asset_id').select2({
+                                dropdownParent: $('#assetRelation'),
+                                data: assetOptions,
+                                allowClear: true
+                            }).trigger('change');
+                        } else {
+                            $('#asset_id').select2({
+                                dropdownParent: $('#assetRelation'),
+                                data: [],
+                                allowClear: true
+                            }).trigger('change');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error fetching assets:', xhr);
+                        $('#asset_id').select2({
+                            dropdownParent: $('#assetRelation'),
+                            data: [],
+                            allowClear: true
+                        }).trigger('change');
+                    }
+                });
             }
         });
 
@@ -99,6 +163,7 @@
                 data: function(params) {
                     return {
                         'keyword': params.term,
+                        'limit': 10,
                     };
                 },
                 processResults: function(data) {
@@ -111,14 +176,13 @@
                         }))
                     };
                 },
-                limit: 10,
                 cache: true
             }
         });
     });
 
+    let selectedItems = [];
     $(document).ready(function() {
-        let selectedItems = [];
         $('#item_id').on('change', function() {
             const itemId = $(this).val();
             const selectedOption = $(this).select2('data')[0];
@@ -188,14 +252,15 @@
                         delay: 250,
                         data: function(params) {
                             return {
-                                keyword: params.term
+                                keyword: params.term,
+                                limit: 10
                             };
                         },
                         processResults: function(data) {
                             return {
                                 results: data.data.map(asset => ({
                                     text: asset.nameWithNumber,
-                                    id: asset.relationId
+                                    id: asset.noDecryptId
                                 }))
                             };
                         },

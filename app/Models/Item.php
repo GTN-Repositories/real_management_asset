@@ -26,6 +26,11 @@ class Item extends Model
         return $this->belongsTo(CategoryItem::class, 'category_id', 'id');
     }
 
+    public function oum()
+    {
+        return $this->belongsTo(Oum::class, 'oum_id', 'id');
+    }
+
     public function detailPartInspections()
     {
         return $this->hasMany(DetailPartInspection::class);

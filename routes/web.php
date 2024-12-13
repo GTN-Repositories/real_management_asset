@@ -16,16 +16,22 @@ use App\Http\Controllers\Main\InspectionScheduleController;
 use App\Http\Controllers\Main\IpbController;
 use App\Http\Controllers\Main\ItemController;
 use App\Http\Controllers\Main\JobTitleController;
+use App\Http\Controllers\Main\LoadsheetController;
 use App\Http\Controllers\Main\LocationController;
 use App\Http\Controllers\Main\LogActivityController;
+use App\Http\Controllers\Main\MaintenanceController;
 use App\Http\Controllers\Main\ManagementProjectController;
 use App\Http\Controllers\Main\ManagerController;
 use App\Http\Controllers\Main\MenuController;
 use App\Http\Controllers\Main\MonitoringController;
+use App\Http\Controllers\Main\OumController;
 use App\Http\Controllers\Main\PermisionController;
 use App\Http\Controllers\Main\ReportFuelController;
+use App\Http\Controllers\Main\ReportLoadsheetController;
+use App\Http\Controllers\Main\ReportSparepartController;
 use App\Http\Controllers\Main\RoleController;
 use App\Http\Controllers\Main\SiteController;
+use App\Http\Controllers\Main\SoilTypeController;
 use App\Http\Controllers\Main\StatusAssetController;
 use App\Http\Controllers\Main\SupplierController;
 use App\Http\Controllers\Main\UserController;
@@ -33,6 +39,7 @@ use App\Http\Controllers\Main\WerehouseController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use SebastianBergmann\CodeCoverage\Report\Xml\Report;
 
 Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(function () {
 
@@ -74,6 +81,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/asset/download/{encryptedId}', [AssetController::class, 'download'])->name('asset.download');
     Route::get('/asset/download-template', [AssetController::class, 'generateTemplate'])->name('asset.downloadTemplate');
     Route::get('/asset/import', [AssetController::class, 'importForm'])->name('asset.import.form');
+    Route::get('/asset/export', [AssetController::class, 'exportExcel'])->name('asset.export.excel');
     Route::post('/asset/import', [AssetController::class, 'import'])->name('asset.import');
     Route::get('/asset/update-files', [AssetController::class, 'updateFiles'])->name('asset.updateFiles');
     Route::post('/asset/note/{id}', [AssetController::class, 'note'])->name('asset.note');
@@ -87,6 +95,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/management-project/by-project', [ManagementProjectController::class, 'getAssetsByProject'])->name('management-project.by_project');
     Route::get('/management-project/data', [ManagementProjectController::class, 'data'])->name('management-project.data');
     Route::get('/management-project/todoRequestPettyCash', [ManagementProjectController::class, 'todoRequestPettyCash'])->name('management-project.todoRequestPettyCash');
+    Route::get('/management-project/spedometer', [ManagementProjectController::class, 'spedometer'])->name('management-project.spedometer');
     Route::post('/management-project/requestPettyCash', [ManagementProjectController::class, 'requestPettyCash'])->name('management-project.requestPettyCash');
     Route::put('/management-project/approvePettyCash/{id}', [ManagementProjectController::class, 'approvePettyCash'])->name('management-project.approvePettyCash');
     Route::delete('/management-project/destroy-all', [ManagementProjectController::class, 'destroyAll'])->name('management-project.destroyAll');
@@ -134,6 +143,10 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
         return view('main.quiz.index');
     })->name('quiz');
 
+    Route::get('/maintenance/data', [MaintenanceController::class, 'data'])->name('maintenance.data');
+    Route::delete('/maintenance/destroy-all', [MaintenanceController::class, 'destroyAll'])->name('maintenance.destroyAll');
+    Route::resource('maintenance', MaintenanceController::class);
+
     Route::get('/fuel/data', [FuelConsumptionController::class, 'data'])->name('fuel.data');
     Route::delete('/fuel/destroy-all', [FuelConsumptionController::class, 'destroyAll'])->name('fuel.destroyAll');
     Route::resource('fuel', FuelConsumptionController::class);
@@ -144,9 +157,11 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::resource('driver', DriverProjectController::class);
 
     Route::get('/report-fuel/export-excel', [ReportFuelController::class, 'exportExcel'])->name('report-fuel.export-excel');
+    Route::get('/report-fuel/export-excel-loadsheet', [ReportFuelController::class, 'exportExcelMonthly'])->name('report-fuel.export-excel-month');
     Route::post('report-fuel/export-pdf', [ReportFuelController::class, 'exportPDF'])->name('report-fuel.export-pdf');
     Route::get('/report-fuel/chart', [ReportFuelController::class, 'getChartData'])->name('report-fuel.chart');
     Route::get('/report-fuel/hours-data', [ReportFuelController::class, 'getHoursData'])->name('report-fuel.hours-data');
+    Route::get('/report-fuel/expanse-fuel', [ReportFuelController::class, 'getChartExpanseFuel'])->name('report-fuel.expanse-fuel');
     Route::get('/report-fuel/data', [ReportFuelController::class, 'data'])->name('report-fuel.data');
     Route::resource('report-fuel', ReportFuelController::class);
 
@@ -156,6 +171,10 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/report-asset/data', [AssetReportController::class, 'data'])->name('report-asset.data');
     Route::resource('report-asset', AssetReportController::class);
 
+    Route::get('/report-loadsheet/data', [ReportLoadsheetController::class, 'data'])->name('report-loadsheet.data');
+    Route::get('/report-loadsheet/export-excel', [ReportLoadsheetController::class, 'exportExcel'])->name('report-loadsheet.export-excel');
+    Route::resource('report-loadsheet', ReportLoadsheetController::class);
+
     Route::get('/monitoring/data', [MonitoringController::class, 'data'])->name('monitoring.data');
     Route::delete('/monitoring/destroy-all', [MonitoringController::class, 'destroyAll'])->name('monitoring.destroyAll');
     Route::resource('monitoring', MonitoringController::class);
@@ -163,6 +182,18 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/employee/data', [EmployeeController::class, 'data'])->name('employee.data');
     Route::delete('/employee/destroy-all', [EmployeeController::class, 'destroyAll'])->name('employee.destroyAll');
     Route::resource('employee', EmployeeController::class);
+
+    Route::get('/loadsheet/data', [LoadsheetController::class, 'data'])->name('loadsheet.data');
+    Route::delete('/loadsheet/destroy-all', [LoadsheetController::class, 'destroyAll'])->name('loadsheet.destroyAll');
+    Route::resource('loadsheet', LoadsheetController::class);
+
+    Route::get('/soil-type/data', [SoilTypeController::class, 'data'])->name('soil-type.data');
+
+    Route::get('/oum/data', [OumController::class, 'data'])->name('oum.data');
+
+    Route::get('/report-sparepart/data', [ReportSparepartController::class, 'data'])->name('report-sparepart.data');
+    Route::get('/report-sparepart/data-inspection', [ReportSparepartController::class, 'getInspectionData'])->name('report-sparepart.data-inspection');
+    Route::resource('report-sparepart', ReportSparepartController::class);
 
     Route::get('/job-title/data', [JobTitleController::class, 'data'])->name('job-title.data');
 

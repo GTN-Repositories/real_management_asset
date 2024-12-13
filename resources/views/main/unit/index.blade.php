@@ -9,39 +9,20 @@
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-12 col-md-4">
+                    <div class="col-12 col-md-4" id="categoryParent">
                         <label class="form-label" for="category">Kategori</label>
-                        <select name="category" id="category" class="select2 form-select " data-allow-clear="true" required>
-                            <option value="">Pilih</option>
-                            <option value="Technology">Technology</option>
-                            <option value="Construction">Construction</option>
-                            <option value="Medical Assets">Medical Assets</option>
-                            <option value="Education">Education</option>
-                            <option value="Lisences">Lisences</option>
-                            <option value="Real Estate">Real Estate</option>
-                            <option value="Legal Claims">Legal Claims</option>
+                        <select name="category" id="category_id" class="select2 form-select " data-allow-clear="true"
+                            required>
                         </select>
                     </div>
-                    <div class="col-12 col-md-4">
+                    <div class="col-12 col-md-4" id="assets_locationParent">
                         <label class="form-label" for="assets_location">Lokasi Aset</label>
-                        <select name="assets_location" id="assets_location" class="form-select select2">
-                            <option value="">Pilih</option>
-                            <option value="Jatim">Jatim</option>
-                            <option value="Jateng">Jateng</option>
-                            <option value="Jabar">Jabar</option>
-                            <option value="Kaltim">Kaltim</option>
-                            <option value="Kalteng">Kalteng</option>
-                            <option value="Kalsel">Kalsel</option>
-                            <option value="Bali">Bali</option>
-                            <option value="DKI">DKI</option>
-                            <option value="Aceh">Aceh</option>
+                        <select name="assets_location" id="assets_location_id" class="form-select select2">
                         </select>
                     </div>
-                    <div class="col-12 col-md-4">
-                        <label class="form-label" for="manager">Manajer</label>
-                        <select id="manager" name="manager" class="select2 form-select " data-allow-clear="true" required>
-                            <option value="">Pilih</option>
-                            <option value="lenz creative">lenz creative</option>
+                    <div class="col-12 col-md-4" id="picParent">
+                        <label class="form-label" for="pic">PIC</label>
+                        <select id="pic_id" name="pic" class="select2 form-select " data-allow-clear="true" required>
                         </select>
                     </div>
                 </div>
@@ -60,6 +41,9 @@
                     <button type="button" class="btn btn-success btn-sm d-flex align-items-center" onclick="importExcel()">
                         <i class="fas fa-file-excel me-2"></i> Import Excel
                     </button>
+                    <button onclick="exportExcel()" class="btn btn-success btn-sm">
+                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                    </button>
                     @if (auth()->user()->hasPermissionTo('asset-create'))
                         <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
                             <i class="fas fa-plus"></i> Tambah
@@ -76,16 +60,22 @@
                                     <input class="form-check-input" type="checkbox" id="checkAll" />
                                 </div>
                             </th>
-                            <th>gambar aset</th>
-                            <th>nama aset</th>
-                            <th>nomor seri</th>
-                            <th>nomor model</th>
-                            <th>manajer aset</th>
-                            <th>lokasi aset</th>
-                            <th>kategori aset</th>
-                            <th>biaya pembelian</th>
-                            <th>tanggal pembelian</th>
-                            <th>dibuat pada</th>
+                            <th>Gambar</th>
+                            <th>ID</th>
+                            <th>Kategori</th>
+                            <th>Merek</th>
+                            <th>Unit</th>
+                            <th>Tipe</th>
+                            <th>Nopol</th>
+                            <th>Classification</th>
+                            <th>No Rangka</th>
+                            <th>No Mesin</th>
+                            <th>NIK</th>
+                            <th>Warna</th>
+                            <th>Pemilik</th>
+                            <th>Location</th>
+                            <th>PIC</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -106,11 +96,106 @@
 @endsection
 
 @push('js')
+    <script>
+        $(document).ready(function() {
+            $('#category_id').select2({
+                dropdownParent: $('#categoryParent'),
+                placeholder: 'Pilih Kategori',
+                ajax: {
+                    url: "{{ route('asset.data') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            keyword: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.data.reduce((unique, item) => {
+                                if (!unique.some((i) => i.text === item.category)) {
+                                    unique.push({
+                                        text: item.category,
+                                        id: item
+                                            .category
+                                    });
+                                }
+                                return unique;
+                            }, [])
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $('#assets_location_id').select2({
+                dropdownParent: $('#assets_locationParent'),
+                placeholder: 'Pilih lokasi',
+                ajax: {
+                    url: "{{ route('asset.data') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            keyword: params.term,
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.data.reduce((unique, item) => {
+                                if (!unique.some((i) => i.text === item.assets_location)) {
+                                    unique.push({
+                                        text: item.assets_location,
+                                        id: item
+                                            .assets_location // Changed from relationId to assets_location
+                                    });
+                                }
+                                return unique;
+                            }, [])
+                        }
+                    },
+                    cache: true
+                }
+            });
+
+            $('#pic_id').select2({
+                dropdownParent: $('#picParent'),
+                placeholder: 'Pilih PIC',
+                ajax: {
+                    url: "{{ route('employee.data') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            keyword: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        apiResults = data.data
+                            .filter(function(item) {
+                                return item.relationId !== null;
+                            })
+                            .map(function(item) {
+                                return {
+                                    text: item.name + ' (' + item.nameTitle + ')',
+                                    id: item.relationId,
+                                };
+                            });
+
+                        return {
+                            results: apiResults
+                        };
+                    },
+                    cache: true
+                }
+            });
+        });
+    </script>
     <script type="text/javascript">
         $(document).ready(function() {
             init_table();
 
-            $('#category, #assets_location, #manager').on('change', function() {
+            $('#category_id, #assets_location_id, #pic_id').on('change', function() {
                 init_table();
             });
 
@@ -149,9 +234,9 @@
 
         function init_table(keyword = '') {
             var csrf_token = $('meta[name="csrf-token"]').attr('content');
-            var category = $('#category').val();
-            var assets_location = $('#assets_location').val();
-            var manager = $('#manager').val();
+            var category = $('#category_id').val();
+            var assets_location = $('#assets_location_id').val();
+            var pic = $('#pic_id').val();
 
             if ($.fn.DataTable.isDataTable('#data-table')) {
                 $('#data-table').DataTable().clear().destroy();
@@ -172,7 +257,7 @@
                         'keyword': keyword,
                         'category': category,
                         'assets_location': assets_location,
-                        'manager': manager
+                        'pic': pic
                     }
                 },
                 columns: [{
@@ -186,40 +271,64 @@
                         name: 'image'
                     },
                     {
-                        data: 'name',
-                        name: 'name'
-                    },
-                    {
-                        data: 'serial_number',
-                        name: 'serial_number'
-                    },
-                    {
-                        data: 'model_number',
-                        name: 'model_number'
-                    },
-                    {
-                        data: 'manager',
-                        name: 'manager'
-                    },
-                    {
-                        data: 'assets_location',
-                        name: 'assets_location'
+                        data: 'relationId',
+                        name: 'relationId'
                     },
                     {
                         data: 'category',
                         name: 'category'
                     },
                     {
-                        data: 'cost',
-                        name: 'cost'
+                        data: 'name',
+                        name: 'name'
                     },
                     {
-                        data: 'purchase_date',
-                        name: 'purchase_date'
+                        data: 'unit',
+                        name: 'unit'
                     },
                     {
-                        data: 'created_at',
-                        name: 'created_at'
+                        data: 'type',
+                        name: 'type'
+                    },
+                    {
+                        data: 'license_plate',
+                        name: 'license_plate'
+                    },
+                    {
+                        data: 'classification',
+                        name: 'classification'
+                    },
+                    {
+                        data: 'chassis_number',
+                        name: 'chassis_number'
+                    },
+                    {
+                        data: 'machine_number',
+                        name: 'machine_number'
+                    },
+                    {
+                        data: 'nik',
+                        name: 'nik'
+                    },
+                    {
+                        data: 'color',
+                        name: 'color'
+                    },
+                    {
+                        data: 'owner',
+                        name: 'owner'
+                    },
+                    {
+                        data: 'assets_location',
+                        name: 'assets_location'
+                    },
+                    {
+                        data: 'pic',
+                        name: 'pic'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
                     },
                     {
                         data: 'action',
@@ -355,6 +464,70 @@
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
                 });
+        }
+
+        function exportExcel() {
+            const startDate = $('#date-range-picker').data('daterangepicker')?.startDate?.format('YYYY-MM-DD');
+            const endDate = $('#date-range-picker').data('daterangepicker')?.endDate?.format('YYYY-MM-DD');
+            const predefinedFilter = $('.dropdown-item.active').text().trim() || '';
+
+            if (startDate && endDate) {
+                $.ajax({
+                    url: "{{ route('asset.export.excel') }}",
+                    type: 'GET',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        startDate: startDate,
+                        endDate: endDate,
+                        predefinedFilter: predefinedFilter
+                    },
+                    xhrFields: {
+                        responseType: 'blob'
+                    },
+                    success: function(response) {
+                        const blob = new Blob([response], {
+                            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        });
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'FuelConsumptionReport.xlsx';
+                        link.click();
+                    },
+                    error: function() {
+                        Swal.fire('Error!',
+                            'An error occurred while exporting the report. Please try again later.',
+                            'error');
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: "{{ route('asset.export.excel') }}",
+                    type: 'GET',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        startDate: moment().startOf('month').format('YYYY-MM-DD'),
+                        endDate: moment().endOf('month').format('YYYY-MM-DD'),
+                        predefinedFilter: predefinedFilter
+                    },
+                    xhrFields: {
+                        responseType: 'blob'
+                    },
+                    success: function(response) {
+                        const blob = new Blob([response], {
+                            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        });
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'FuelConsumptionReport.xlsx';
+                        link.click();
+                    },
+                    error: function() {
+                        Swal.fire('Error!',
+                            'An error occurred while exporting the report. Please try again later.',
+                            'error');
+                    }
+                });
+            }
         }
     </script>
 @endpush

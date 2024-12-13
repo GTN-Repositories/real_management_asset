@@ -75,6 +75,15 @@ class ItemController extends Controller
             ->addColumn('stock', function ($data) {
                 return $data->stock ?? null;
             })
+            ->addColumn('no_invoice', function ($data) {
+                return $data->no_invoice ?? null;
+            })
+            ->addColumn('supplier_addrees', function ($data) {
+                return $data->supplier_addrees ?? null;
+            })
+            ->addColumn('supplier_name', function ($data) {
+                return $data->supplier_name ?? null;
+            })
             ->addColumn('created_at', function ($data) {
                 return $data->created_at->format('d-m-Y');
             })
@@ -105,10 +114,14 @@ class ItemController extends Controller
             'brand',
             'color',
             'stock',
+            'oum_id',
             'created_at',
+            'no_invoice',
+            'supplier_name',
+            'supplier_addrees',
         ];
 
-        $keyword = $request->search['value'] ?? '';
+        $keyword = $request->keyword ?? '';
 
         $data = Item::orderBy('created_at', 'asc')
             ->select($columns)
@@ -152,6 +165,9 @@ class ItemController extends Controller
                 $siteIdEncrypted = Crypt::decrypt($data['category_id']);
 
                 $data['category_id'] = $siteIdEncrypted;
+
+                $data['oum_id'] = Crypt::decrypt($data['oum_id']);
+
                 $data = Item::create($data);
 
                 return response()->json([
@@ -224,8 +240,17 @@ class ItemController extends Controller
 
 
                 if (isset($data['category_id'])) {
-                    $categoryIdEncrypted = Crypt::decrypt($data['category_id']);
-                    $data['category_id'] = $categoryIdEncrypted;
+                    try {
+                        $data['category_id'] = Crypt::decrypt($data['category_id']);
+                    } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                        $data['category_id'] = $data['category_id'];
+                    }
+                }
+
+                try {
+                    $data['oum_id'] = Crypt::decrypt($data['oum_id']);
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                    $data['oum_id'] = $data['oum_id'];
                 }
 
                 $item->update($data);

@@ -3,7 +3,6 @@
 namespace App\Exports;
 
 use App\Models\ManagementProject;
-use App\Models\Asset;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Crypt;
 use Maatwebsite\Excel\Concerns\FromView;

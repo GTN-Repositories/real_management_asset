@@ -30,17 +30,50 @@
             <button onclick="exportExcel()" class="btn btn-success">
                 <i class="fa-solid fa-file-excel me-1"></i>Export Excel
             </button>
-
+        </div>
+        <div class="card my-3">
+            <div class="card-body d-flex justify-content-end align-items-end">
+                <div class="me-2">
+                    <label for="month" class="form-label">Bulan</label>
+                    <select id="month" class="form-select select2">
+                        <option value="">Pilih Bulan</option>
+                        <option value="01">Januari</option>
+                        <option value="02">Februari</option>
+                        <option value="03">Maret</option>
+                        <option value="04">April</option>
+                        <option value="05">Mei</option>
+                        <option value="06">Juni</option>
+                        <option value="07">Juli</option>
+                        <option value="08">Agustus</option>
+                        <option value="09">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                </div>
+                <div class="me-2">
+                    <label for="year" class="form-label">Tahun</label>
+                    <select id="year" class="form-select select2">
+                        <option value="">Pilih Tahun</option>
+                        @for ($i = date('Y'); $i >= 1985; $i--)
+                            <option value="{{ $i }}">{{ $i }}</option>
+                        @endfor
+                    </select>
+                </div>
+                <button onclick="exportExcelMonth()" class="btn btn-success">
+                    <i class="fa-solid fa-file-excel me-1"></i>Excel Fuel Monthly
+                </button>
+            </div>
         </div>
         <!-- Chart Container -->
-        <div class="card mb-4">
+        {{-- <div class="card mb-4">
             <div class="card-header">
                 <h5 class="card-title mb-0">Fuel Consumption Over Time</h5>
             </div>
             <div class="card-body">
                 <div id="fuel-consumption-chart"></div> <!-- Chart Div -->
             </div>
-        </div>
+        </div> --}}
 
         {{-- chart manpower --}}
         <div class="card mb-4">
@@ -52,6 +85,26 @@
             </div>
         </div>
 
+        {{-- chart expense --}}
+        <div id="dashboard-container">
+            <div id="scorecard-section" class="scorecard-container">
+                <!-- Scorecard data will be inserted here dynamically -->
+            </div>
+            <div class="card my-3">
+                <div class="card-body">
+                    <div id="liters-chart-section" class="chart-container">
+                        <!-- Liters chart will be rendered here dynamically -->
+                    </div>
+                </div>
+            </div>
+            <div class="card my-3">
+                <div class="card-body">
+                    <div id="price-chart-section" class="chart-container">
+                        <!-- Price chart will be rendered here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Product List Table -->
         <div class="card">
@@ -68,7 +121,6 @@
                             <th>Tanggal</th>
                             <th>Total Hari</th>
                             <th>Pemakaian Solar</th>
-                            <th>Total Loadsheet</th>
                             <th>Liter/Trip</th>
                             <th>Rata-rata/Hari</th>
                         </tr>
@@ -83,8 +135,8 @@
     <script type="text/javascript">
         $(document).ready(function() {
             init_table();
-            init_chart(); // Initialize chart on page load
             init_hours_chart(); // Initialize chart on page load
+            init_expanse_chart(); // Initialize chart on page load
 
             $('.dropdown-item').on('click', function(e) {
                 e.preventDefault();
@@ -95,8 +147,8 @@
                 filterBtn.text(filterType);
 
                 reloadTableWithFilters(null, null, filterType);
-                reloadChartWithFilters(null, null, filterType);
                 reloadHoursChartWithFilters(null, null, filterType);
+                reloadExpanseChartWithFilters(null, null, filterType);
             });
 
             $('#date-range-picker').daterangepicker({
@@ -112,14 +164,15 @@
                 $(this).val(startDate + ' - ' + endDate);
 
                 reloadTableWithFilters(startDate, endDate);
-                reloadChartWithFilters(startDate, endDate);
                 reloadHoursChartWithFilters(startDate, endDate);
+                reloadExpanseChartWithFilters(startDate, endDate);
             });
 
             $('#date-range-picker').on('cancel.daterangepicker', function() {
                 $(this).val('');
                 reloadTableWithFilters(); // Reload without date range
-                reloadChartWithFilters(); // Reload chart without date range
+                reloadHoursChartWithFilters(); // Reload chart without date range
+                reloadExpanseChartWithFilters(); // Reload chart without date range
             });
         });
 
@@ -132,14 +185,15 @@
             init_table(startDate, endDate, predefinedFilter);
         }
 
-        function reloadChartWithFilters(startDate = '', endDate = '', predefinedFilter = '') {
-            if (fuelConsumptionChart) fuelConsumptionChart.destroy();
-            init_chart(startDate, endDate, predefinedFilter);
-        }
-
         function reloadHoursChartWithFilters(startDate = '', endDate = '', predefinedFilter = '') {
             if (hoursChart) hoursChart.destroy();
             init_hours_chart(startDate, endDate, predefinedFilter);
+        }
+
+        function reloadExpanseChartWithFilters(startDate = '', endDate = '', predefinedFilter = '') {
+            if (litersChartSection) litersChartSection.destroy();
+            if (priceChartSection) priceChartSection.destroy();
+            init_expanse_chart(startDate, endDate, predefinedFilter);
         }
 
 
@@ -185,10 +239,6 @@
                         name: 'liter'
                     },
                     {
-                        data: 'loadsheet',
-                        name: 'loadsheet'
-                    },
-                    {
                         data: 'liter_trip',
                         name: 'liter_trip'
                     },
@@ -197,98 +247,6 @@
                         name: 'avarage_day'
                     },
                 ]
-            });
-        }
-
-        let fuelConsumptionChart;
-
-        function init_chart(startDate = '', endDate = '', predefinedFilter = '') {
-            $.ajax({
-                url: "{{ route('report-fuel.chart') }}",
-                method: 'GET',
-                data: {
-                    startDate: startDate,
-                    endDate: endDate,
-                    predefinedFilter: predefinedFilter
-                },
-                success: function(response) {
-                    var options = {
-                        series: [{
-                            name: 'Fuel Consumption (liters)',
-                            data: response.liters
-                        }],
-                        chart: {
-                            height: 350,
-                            type: 'line',
-                            zoom: {
-                                enabled: true
-                            },
-                            toolbar: {
-                                show: true
-                            },
-                            background: '#ffffff'
-                        },
-                        dataLabels: {
-                            enabled: false
-                        },
-                        stroke: {
-                            curve: 'smooth',
-                            width: 3
-                        },
-                        title: {
-                            text: 'Fuel Consumption Over Time',
-                            align: 'left'
-                        },
-                        grid: {
-                            row: {
-                                colors: ['#f3f3f3', 'transparent'],
-                                opacity: 0.5
-                            }
-                        },
-                        xaxis: {
-                            categories: response.dates,
-                            title: {
-                                text: 'Date'
-                            },
-                            labels: {
-                                rotate: -45,
-                                rotateAlways: true
-                            }
-                        },
-                        yaxis: {
-                            title: {
-                                text: 'Liters'
-                            },
-                            labels: {
-                                formatter: function(value) {
-                                    return value.toFixed(1);
-                                }
-                            }
-                        },
-                        tooltip: {
-                            y: {
-                                formatter: function(value) {
-                                    return value.toFixed(1) + " liters";
-                                }
-                            }
-                        },
-                        markers: {
-                            size: 5,
-                            hover: {
-                                size: 7
-                            }
-                        }
-                    };
-
-                    fuelConsumptionChart = new ApexCharts(document.querySelector("#fuel-consumption-chart"),
-                        options);
-                    fuelConsumptionChart.render();
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching chart data:', error);
-                    document.querySelector("#fuel-consumption-chart").innerHTML =
-                        '<div class="alert alert-danger">Failed to load chart data. Please try again later.</div>';
-                }
             });
         }
 
@@ -324,13 +282,13 @@
                         dataLabels: {
                             enabled: true,
                             formatter: function(value) {
-                                return value.toFixed(1) + ' hrs';
+                                return value != null ? value.toFixed(1) + ' hrs' : '';
                             }
                         },
                         xaxis: {
-                            categories: response.dates,
+                            categories: response.months,
                             title: {
-                                text: 'Dates'
+                                text: 'Months'
                             },
                             labels: {
                                 rotate: -45,
@@ -345,12 +303,12 @@
                         tooltip: {
                             y: {
                                 formatter: function(value) {
-                                    return value.toFixed(1) + " hrs";
+                                    return value != null ? value.toFixed(1) + ' hrs' : '';
                                 }
                             }
                         },
                         title: {
-                            text: 'Manpower Over Time',
+                            text: 'Manpower Over Time (Monthly)',
                             align: 'left'
                         },
                         grid: {
@@ -372,6 +330,122 @@
                 }
             });
         }
+
+        let litersChartSection;
+        let priceChartSection;
+
+        function init_expanse_chart(startDate = '', endDate = '', predefinedFilter = '') {
+            $.ajax({
+                url: "{{ route('report-fuel.expanse-fuel') }}",
+                method: 'GET',
+                data: {
+                    startDate: startDate,
+                    endDate: endDate,
+                    predefinedFilter: predefinedFilter
+                },
+                success: function(response) {
+                    // Render the scorecard
+                    const scorecard = `
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Avg Per Day</h5>
+                                <p class="card-text">${response.avgPerDay.toFixed(2)} Liters</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Avg Per Trip</h5>
+                                <p class="card-text">${response.avgPerTrip.toFixed(2)} Liters</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Avg Per Liter</h5>
+                                <p class="card-text">${response.avgPerLiter.toFixed(2)} Price</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Fuel Cost</h5>
+                                <p class="card-text">${response.totalFuelCost.toFixed(2)} Currency</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+
+                    document.querySelector("#scorecard-section").innerHTML = scorecard;
+
+                    // Prepare chart options for liters
+                    var litersChartOptions = {
+                        series: [{
+                            name: 'Liters',
+                            data: response.litersData
+                        }],
+                        chart: {
+                            type: 'line',
+                            height: 350,
+                            toolbar: {
+                                show: true
+                            }
+                        },
+                        xaxis: {
+                            categories: response.dates
+                        },
+                        title: {
+                            text: 'Fuel Consumption Over Time',
+                            align: 'left'
+                        }
+                    };
+
+                    // Prepare chart options for price
+                    var priceChartOptions = {
+                        series: [{
+                            name: 'Price',
+                            data: response.priceData
+                        }],
+                        chart: {
+                            type: 'line',
+                            height: 350,
+                            toolbar: {
+                                show: true
+                            }
+                        },
+                        xaxis: {
+                            categories: response.dates
+                        },
+                        title: {
+                            text: 'Fuel Price Over Time',
+                            align: 'left'
+                        }
+                    };
+
+                    // Render the charts
+                    litersChartSection = new ApexCharts(document.querySelector("#liters-chart-section"),
+                        litersChartOptions);
+                    litersChartSection.render();
+
+                    priceChartSection = new ApexCharts(document.querySelector("#price-chart-section"),
+                        priceChartOptions);
+                    priceChartSection.render();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching expanse data:', error);
+                    document.querySelector("#liters-chart-section").innerHTML =
+                        '<div class="alert alert-danger">Failed to load expanse chart data. Please try again later.</div>';
+                    document.querySelector("#price-chart-section").innerHTML =
+                        '<div class="alert alert-danger">Failed to load price chart data. Please try again later.</div>';
+                }
+            });
+        }
+
 
         function exportPDF() {
             const startDate = $('#date-range-picker').data('daterangepicker')?.startDate.format('YYYY-MM-DD') || '';
@@ -483,6 +557,43 @@
                     }
                 });
             }
+        }
+
+        function exportExcelMonth() {
+            const month = $('#month').val();
+            const year = $('#year').val();
+
+            if (!month || !year) {
+                Swal.fire('Error!', 'Please select month and year.', 'error');
+                return;
+            }
+
+            $.ajax({
+                url: "{{ route('report-fuel.export-excel-month') }}",
+                type: 'GET',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    month: month,
+                    year: year,
+                },
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function(response) {
+                    const blob = new Blob([response], {
+                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    });
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'FuelConsumptionReport.xlsx';
+                    link.click();
+                },
+                error: function() {
+                    Swal.fire('Error!',
+                        'An error occurred while exporting the report. Please try again later.',
+                        'error');
+                }
+            });
         }
     </script>
 @endpush

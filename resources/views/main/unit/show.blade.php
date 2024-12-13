@@ -16,10 +16,16 @@
                         aria-selected="true"> General
                     </button>
                 </li>
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                         data-bs-target="#navs-justified-project" aria-controls="navs-justified-project"
                         aria-selected="false">Project
+                    </button>
+                </li> --}}
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                        data-bs-target="#navs-justified-payment" aria-controls="navs-justified-payment"
+                        aria-selected="false">Payment
                     </button>
                 </li>
                 <li class="nav-item">
@@ -53,21 +59,21 @@
                     <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                         data-bs-target="#navs-justified-reminder" aria-controls="navs-justified-reminder"
                         aria-selected="false">
-                        Reminder
+                        Log History 
                     </button>
                 </li>
                 <li class="nav-item">
                     <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                         data-bs-target="#navs-justified-notes" aria-controls="navs-justified-notes" aria-selected="false">
-                        Notes
+                        Note
                     </button>
                 </li>
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                         data-bs-target="#navs-justified-audits" aria-controls="navs-justified-audits" aria-selected="false">
                         Audits
                     </button>
-                </li>
+                </li> --}}
             </ul>
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="navs-justified-general" role="tabpanel">
@@ -243,6 +249,14 @@
                                         <td>Supplier Address</td>
                                         <td>{{ $asset->supplier_address ?? '' }}</td>
                                     </tr>
+                                    <tr>
+                                        <td>Supplier PIC Name</td>
+                                        <td>{{ $asset->supplier_pic_name ?? '' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Supplier PIC Phone Number</td>
+                                        <td>{{ $asset->supplier_pic_phone ?? '' }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -263,6 +277,21 @@
                     @empty
                         data ini belum pernah memiliki project
                     @endforelse
+                </div>
+                <div class="tab-pane fade" id="navs-justified-payment" role="tabpanel">
+                    <table class="datatables table">
+                        <thead class="border-top">
+                            <tr>
+                                <th>
+                                    #
+                                </th>
+                                <th>Reminder</th>
+                                <th>Content</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                    </table>
                 </div>
                 <div class="tab-pane fade" id="navs-justified-history" role="tabpanel">
                     <table class="datatables table" id="data-table">
@@ -320,6 +349,18 @@
                                 <td>
                                     <button type="button" class="btn btn-primary btn-sm"
                                         onclick="createFile('asuransi')">
+                                        <i class="fas fa-pencil me-2"></i> Edit
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>gambar pajak</td>
+                                <td><img src="{{ asset('storage/' . $asset->file_tax) }}" alt="gambar asuransi"
+                                        width="50"></td>
+                                <td>{{ $asset->date_tax }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary btn-sm"
+                                        onclick="createFile('tax')">
                                         <i class="fas fa-pencil me-2"></i> Edit
                                     </button>
                                 </td>

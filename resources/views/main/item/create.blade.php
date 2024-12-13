@@ -46,7 +46,8 @@
 
     <div class="col-12 col-md-6">
         <label class="form-label">Harga</label>
-        <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0" placeholder="Harga" required />
+        <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0" placeholder="Harga"
+            required />
     </div>
 
     <div class="col-12 col-md-6">
@@ -58,16 +59,45 @@
         </select>
     </div>
 
-    <div class="col-12 col-md-6 mb-4" id="select2relation">
+    <div class="col-12 col-md-6" id="select2relation">
         <label for="select2Basic" class="form-label">Kategori</label>
         <select id="select2Basic" class="select2 form-select form-select-lg" name="category_id" data-allow-clear="true">
             <option></option>
         </select>
     </div>
-
+    {{--
     <div class="col-12 col-md-6">
         <label class="form-label">Warna</label>
         <input type="color" name="color" class="form-control mb-lg-0" placeholder="Warna" required />
+    </div> --}}
+
+    <div class="col-12 col-md-6" id="oumRelation">
+        <label for="oum_id" class="form-label">Oum Tipe<span class="text-danger">*</span></label>
+        <div class="select2-primary">
+            <div class="position-relative">
+                <select id="oum_id" name="oum_id" class="select2 form-select" required>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">No Invoice</label>
+        <input type="text" name="no_invoice" id="no_invoice" class="form-control mb-3 mb-lg-0"
+            placeholder="nomor invoice" required />
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Nama Supplier</label>
+        <input type="text" name="supplier_name" id="supplier_name" class="form-control mb-3 mb-lg-0"
+            placeholder="Nama Supplier" required />
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Alamat Supplier</label>
+        <input type="text" name="supplier_addrees" id="supplier_addrees" class="form-control mb-3 mb-lg-0"
+            placeholder="Alamat Supplier" required />
     </div>
 
     <div class="col-12 text-center">
@@ -128,6 +158,35 @@
                     text: relation.name
                 };
             })
+        });
+
+        $('#oum_id').select2({
+            dropdownParent: $('#oumRelation'),
+            placeholder: 'Pilih oum tipe',
+            ajax: {
+                url: "{{ route('oum.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function(data) {
+                    apiResults = data.data.map(function(item) {
+                        return {
+                            text: item.name,
+                            id: item.id,
+                        };
+                    });
+
+                    return {
+                        results: apiResults
+                    };
+                },
+                limit: 10,
+                cache: true
+            }
         });
     });
 

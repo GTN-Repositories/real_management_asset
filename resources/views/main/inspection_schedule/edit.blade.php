@@ -12,13 +12,13 @@
     <div class="col-12 col-md-12">
         <label class="form-label">Judul Maintenance</label>
         <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" value="{{ old('name', $data->name) }}" required readonly />
+            placeholder="Masukan Nama Item" value="{{ old('name', $data->name) }}" required disabled />
     </div>
 
     <div class="col-12 col-md-6">
         <label class="form-label">Tanggal</label>
         <input type="date" name="date" id="date" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Tanggal" value="{{ old('date', $data->date) }}" required readonly />
+            placeholder="Masukan Tanggal" value="{{ old('date', $data->date) }}" required disabled />
     </div>
 
     <div class="col-12 col-md-6">
@@ -38,28 +38,31 @@
                 </option>
             @endif
         </select>
+        <input type="hidden" name="asset_id" value="{{ $data->asset_id }}">
     </div>
 
     <div class="col-12 col-md-12">
         <label class="form-label" for="alias">Catatan</label>
-        {{ strip_tags($data->note) }}
+        <div>
+            {!! $data->note !!}
+        </div>
     </div>
 
     <div class="col-12 col-md-12">
         <label for="exampleFormControlSelect1" class="form-label">Status</label>
         <select class="form-select select2" id="exampleFormControlSelect1" name="status" aria-label="Select Status">
-            <option value="scheduled" {{ $data->status == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
-            <option value="in_progress" {{ $data->status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-            <option value="on_hold" {{ $data->status == 'on_hold' ? 'selected' : '' }}>On Hold</option>
-            <option value="finish" {{ $data->status == 'finish' ? 'selected' : '' }}>Finish</option>
+            <option value="Scheduled" {{ $data->status == 'Scheduled' ? 'selected' : '' }}>Scheduled</option>
+            <option value="InProgress" {{ $data->status == 'InProgress' ? 'selected' : '' }}>In Progress</option>
+            <option value="OnHold" {{ $data->status == 'OnHold' ? 'selected' : '' }}>On Hold</option>
+            <option value="Finish" {{ $data->status == 'Finish' ? 'selected' : '' }}>Finish</option>
         </select>
     </div>
 
-    <div class="col-12 col-md-12" id="selectItem">
+    {{-- <div class="col-12 col-md-12" id="selectItem">
         <label for="item_id" class="form-label">Sparepart</label>
-        <select id="item_id" class="form-select form-select-lg" name="item_id" disabled>
+        <select id="item_id" class="form-select form-select-lg" name="item_id">
         </select>
-    </div>
+    </div> --}}
 
     <div class="col-12 mt-3" id="selectedItemsContainer">
         <label class="form-label">Item yang Dipilih:</label>
@@ -74,20 +77,18 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($items as $item)
+                @foreach ($items as $key => $item)
                     <tr>
                         <td>{{ $item->code }}</td>
                         <td>{{ $item->name }}</td>
                         <td>
-                            <input type="number" class="form-control item-stock" data-item-id="{{ $item->id }}"
-                                value="{{ $item->stock_in_schedule }}" readonly>
+                            {{ $item->stock_in_schedule }}
                         </td>
                         <td>
-                            <input type="number" class="form-control kanibal-stock" data-item-id="{{ $item->id }}"
-                                value="{{ $item->kanibal_stock_in_schedule }}" readonly>
+                            {{ $item->kanibal_stock_in_schedule }}
                         </td>
                         <td>
-                            {{ $assetKanibalIds[$item->id] ?? '-' }}
+                            {{ $item->assetKanibalName ?? '-' }}
                         </td>
                     </tr>
                 @endforeach
@@ -110,7 +111,17 @@
         <tbody>
             @foreach ($comments as $comment)
                 <tr>
-                    <td>{{ strip_tags($comment->comment) }}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span class="me-2">{{ $comment->user->name ?? 'anonymous' }}</span>
+                            <span class="text-muted">
+                                {{ $comment->time_note? \Carbon\Carbon::parse($comment->time_note)->locale('id')->translatedFormat('d F Y H:i'): '-' }}
+                            </span>
+                        </div>
+                        <div class="mt-1">
+                            {{ strip_tags($comment->comment) }}
+                        </div>
+                    </td>
                 </tr>
             @endforeach
         </tbody>
@@ -118,7 +129,8 @@
 
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-2">Simpan</button>
-        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
+            aria-label="Close">Cancel</button>
     </div>
 </form>
 
@@ -127,56 +139,7 @@
     CKEDITOR.replace('comment');
 </script>
 <script type="text/javascript">
-    let selectedItems = [
-        @php
-            $existingItemStocks = json_decode($data->item_stock ?? '{}', true) ?? [];
-            $existingKanibalStocks = json_decode($data->kanibal_stock ?? '{}', true) ?? [];
-            $existingAssetKanibalIds = json_decode($data->asset_kanibal_id ?? '{}', true) ?? [];
-        @endphp
-        @foreach ($items as $item)
-            {
-                id: "{{ $item->id }}",
-                name: "{{ $item->name }}",
-                code: "{{ $item->code }}",
-                stock: {{ $existingItemStocks[Crypt::decrypt($item->id)] ?? 0 }},
-                kanibalStock: {{ $existingKanibalStocks[Crypt::decrypt($item->id)] ?? 0 }},
-                assetKanibalId: {{ $existingAssetKanibalIds[Crypt::decrypt($item->id)] ?? null }},
-                assetKanibalName: "{{ isset($existingAssetKanibalIds[Crypt::decrypt($item->id)]) ? \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->license_plate . ' - ' . \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->name . ' - ' . \App\Models\Asset::find($existingAssetKanibalIds[Crypt::decrypt($item->id)])->asset_number : '-' }}",
-            },
-        @endforeach
-    ];
-
-    $(document).ready(function() {
-        function updateSelectedItemsTable() {
-            const tableBody = $('#selectedItemsTable tbody');
-            tableBody.empty();
-
-            selectedItems.forEach(function(item) {
-                tableBody.append(
-                    `<tr>
-                <td>${item.code}</td>
-                <td>${item.name}</td>
-                <td>
-                    <input type="number" class="form-control item-stock"
-                        data-item-id="${item.id}"
-                        value="${item.stock}" readonly>
-                </td>
-                <td>
-                    <input type="number" class="form-control kanibal-stock"
-                        data-item-id="${item.id}"
-                        value="${item.kanibalStock}" readonly>
-                </td>
-                <td>
-                    ${item.assetKanibalName}
-                </td>
-            </tr>`
-                );
-            });
-        }
-
-        updateSelectedItemsTable();
-    })
-
+    selectedItems = [];
 
     $(document).ready(function() {
         $('#asset_id').select2({
@@ -203,8 +166,7 @@
             }
         });
     });
-</script>
-<script>
+
     document.getElementById('formUpdate').addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -217,8 +179,13 @@
 
         selectedItems.forEach((item, index) => {
             formData.append(`selected_items[${index}][id]`, item.id);
-            formData.append(`selected_items[${index}][stock]`, item.stock);
-            formData.append(`selected_items[${index}][kanibal_stock]`, item.kanibalStock);
+            const assetKanibalId = $(`#asset_kanibal_id_${item.id}`).val();
+            formData.append(`selected_items[${index}][asset_kanibal_id]`, assetKanibalId);
+            if (item.jenisMetode === 'stock') {
+                formData.append(`selected_items[${index}][item_stock]`, item.stock);
+            } else if (item.jenisMetode === 'kanibal') {
+                formData.append(`selected_items[${index}][kanibal_stock]`, item.kanibalStock);
+            }
         });
 
         const url = form.action;
@@ -257,7 +224,8 @@
                         text: data.message
                     }).then(() => {
                         $("#modal-ce").modal("hide");
-                        location.reload();
+                        // REDIRECT TO ROUTE INDEX
+                        window.location.href = "{{ route('inspection-schedule.index') }}";
                     });
                 }
             })

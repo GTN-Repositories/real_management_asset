@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\AssetExport;
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\AssetNote;
 use App\Models\LogActivity;
 use App\Models\ManagementProject;
 use App\Models\StatusAsset;
+use Carbon\Carbon;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Exception;
@@ -15,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -48,41 +51,62 @@ class AssetController extends Controller
 
                 return $checkbox;
             })
-            ->addColumn('relationId', function ($data) {
+            ->addColumn('noDecryptId', function ($data) {
                 return $data->id ?? null;
+            })
+            ->addColumn('relationId', function ($data) {
+                return Crypt::decrypt($data->id) ?? null;
             })
             ->addColumn('image', function ($data) {
                 return $data->image ? '<img src="' . asset('storage/' . $data->image) . '" alt="Image" width="50" height="50"/>' : "-";
             })
             ->addColumn('nameWithNumber', function ($data) {
-                return $data->license_plate . " - " . $data->name . " - " . $data->asset_number ?? "-";
-            })
-            ->addColumn('name', function ($data) {
-                return $data->name ?? "-";
-            })
-            ->addColumn('serial_number', function ($data) {
-                return $data->serial_number ?? "-";
-            })
-            ->addColumn('model_number', function ($data) {
-                return $data->model_number ?? "-";
-            })
-            ->addColumn('manager', function ($data) {
-                return $data->manager ?? "-";
+                return Crypt::decrypt($data->id) . '-' . $data->name . " - " . $data->license_plate ?? "-";
             })
             ->addColumn('category', function ($data) {
-                return $data->asset_category->name ?? "-";
+                return $data->category;
+            })
+            ->addColumn('name', function ($data) {
+                return $data->name;
+            })
+            ->addColumn('unit', function ($data) {
+                return $data->unit;
+            })
+            ->addColumn('type', function ($data) {
+                return $data->type;
+            })
+            ->addColumn('license_plate', function ($data) {
+                return $data->license_plate;
+            })
+            ->addColumn('classification', function ($data) {
+                return $data->classification;
+            })
+            ->addColumn('chassis_number', function ($data) {
+                return $data->chassis_number;
+            })
+            ->addColumn('machine_number', function ($data) {
+                return $data->machine_number;
+            })
+            ->addColumn('nik', function ($data) {
+                return $data->nik;
+            })
+            ->addColumn('color', function ($data) {
+                return $data->color;
+            })
+            ->addColumn('owner', function ($data) {
+                return $data->owner;
             })
             ->addColumn('assets_location', function ($data) {
-                return $data->location->name ?? "-";
+                return $data->assets_location;
+            })
+            ->addColumn('pic', function ($data) {
+                return $data->pics->name ?? $data->pic;
+            })
+            ->addColumn('status', function ($data) {
+                return $data->status;
             })
             ->addColumn('cost', function ($data) {
-                return $data->cost ?? "-";
-            })
-            ->addColumn('purchase_date', function ($data) {
-                return $data->purchase_date ?? "-";
-            })
-            ->addColumn('created_at', function ($data) {
-                return $data->created_at ?? "-";
+                return $data->cost;
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
@@ -110,22 +134,27 @@ class AssetController extends Controller
             'asset_number',
             'image',
             'name',
-            'serial_number',
-            'model_number',
-            'manager',
-            'assets_location',
             'category',
-            'cost',
-            'purchase_date',
+            'unit',
+            'type',
             'license_plate',
+            'classification',
+            'chassis_number',
+            'machine_number',
+            'nik',
+            'color',
+            'owner',
+            'cost',
+            'assets_location',
+            'pic',
+            'status',
             'created_at',
         ];
 
-        $keyword = $request->keyword ?? "";
-        $category = $request->category;
-        $assets_location = $request->assets_location;
-        $manager = $request->manager;
-        $limit = $request->limit ?? 10;
+        $keyword = $request->keyword ?? '';
+
+
+        $limit = $request->limit ?? '';
 
         $data = Asset::orderBy('created_at', 'asc')
             ->select($columns)
@@ -137,18 +166,17 @@ class AssetController extends Controller
                         }
                     });
                 }
-            })
-            ->limit(10)
-            ->get();
+            });
 
-        if ($category) {
-            $data->where('category', $category);
+        if ($request->assets_location) {
+            $data->where('assets_location', 'LIKE', '%' . $request->assets_location . '%');
         }
-        if ($assets_location) {
-            $data->where('assets_location', $assets_location);
+
+        if ($request->category) {
+            $data->where('category', 'LIKE', '%' . $request->category . '%');
         }
-        if ($manager) {
-            $data->where('manager', $manager);
+        if ($request->pic) {
+            $data->where('pic', 'LIKE', '%' . Crypt::decrypt($request->pic) . '%');
         }
 
         if (session('selected_project_id')) {
@@ -161,6 +189,256 @@ class AssetController extends Controller
         }
 
         return $data;
+    }
+
+
+    public function create()
+    {
+        return view('main.unit.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $data = $request->all();
+        try {
+            return $this->atomic(function () use ($data) {
+                $lastAsset = Asset::latest('id')->first();
+                $lastNumber = $lastAsset ? intval(str_replace('ast-', '', $lastAsset->asset_number)) : 0;
+
+                // if (isset($data['assets_location'])) {
+                //     $data['assets_location'] = Crypt::decrypt($data['assets_location']);
+                // }
+                // if (isset($data['manager'])) {
+                //     $data['manager'] = Crypt::decrypt($data['manager']);
+                // }
+                // if (isset($data['category'])) {
+                //     $data['category'] = Crypt::decrypt($data['category']);
+                // }
+                if (isset($data['pic'])) {
+                    $data['pic'] = Crypt::decrypt($data['pic']);
+                }
+
+                $data['status'] = "Idle";
+                $data['asset_number'] = 'ast-' . ($lastNumber + 1);
+
+                if (isset($data['image'])) {
+                    $data['image'] = $data['image']->store('assets', 'public');
+                }
+                if (isset($data['file_reminder'])) {
+                    $data['file_reminder'] = $data['file_reminder']->store('assets', 'public');
+                }
+                if (isset($data['asuransi'])) {
+                    $data['asuransi'] = $data['asuransi']->store('assets', 'public');
+                }
+                if (isset($data['file_tax'])) {
+                    $data['file_tax'] = $data['file_tax']->store('assets', 'public');
+                }
+
+                $data = Asset::create($data);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil ditambahkan!',
+                ]);
+            });
+        } catch (\Throwable $th) {
+            dd($th);
+            return response()->json([
+                'status' => false,
+                'message' => 'Data gagal ditambahkan! ' . $th->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+
+    public function show(string $id)
+    {
+        $asset = Asset::findByEncryptedId($id);
+        $decryptedId = Crypt::decrypt($asset->id);
+
+        $projects = ManagementProject::whereJsonContains('asset_id', $decryptedId)->get();
+        $notes = AssetNote::where('asset_id', $decryptedId)->get();
+        $logs = LogActivity::where('asset_id', $decryptedId)->get();
+
+        $path = public_path('storage/qr_codes/');
+
+        $encryptedId = Crypt::encrypt($decryptedId);
+        $qrCodeFile = $path . $encryptedId . '.png';
+
+        if (!file_exists($qrCodeFile)) {
+            $qrCode = new QrCode(route('asset.show', $asset->id));
+            $writer = new PngWriter();
+
+            if (!file_exists($path)) {
+                mkdir($path, 0777, true);
+            }
+
+            $result = $writer->write($qrCode);
+            $result->saveToFile($qrCodeFile);
+        }
+
+        return view('main.unit.show', compact('asset', 'projects', 'notes', 'logs', 'encryptedId'));
+    }
+
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id)
+    {
+        $data = Asset::findByEncryptedId($id);
+
+        return view('main.unit.edit', compact('data'));
+    }
+
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, $id)
+    {
+        $data = $request->all();
+
+        try {
+            return $this->atomic(function () use ($data, $id) {
+                $asset = Asset::findByEncryptedId($id);
+                $statusBefore = $asset->status;
+                if (!isset($data['image']) || !$data['image']) {
+                    $data['image'] = $asset->image;
+                } else {
+                    if ($asset->image && Storage::disk('public')->exists($asset->image)) {
+                        Storage::disk('public')->delete($asset->image);
+                        $data['image'] = $data['image']->store('assets', 'public');
+                    } else {
+                        $data['image'] = $data['image']->store('assets', 'public');
+                    }
+                }
+
+                if (!isset($data['stnk']) || !$data['stnk']) {
+                    $data['stnk'] = $asset->stnk;
+                } else {
+                    if ($asset->stnk && Storage::disk('public')->exists($asset->stnk)) {
+                        Storage::disk('public')->delete($asset->stnk);
+                        $data['stnk'] = $data['stnk']->store('assets', 'public');
+                    } else {
+                        $data['stnk'] = $data['stnk']->store('assets', 'public');
+                    }
+                }
+
+                if (!isset($data['asuransi']) || !$data['asuransi']) {
+                    $data['asuransi'] = $asset->asuransi;
+                } else {
+                    if ($asset->asuransi && Storage::disk('public')->exists($asset->asuransi)) {
+                        Storage::disk('public')->delete($asset->asuransi);
+                        $data['asuransi'] = $data['asuransi']->store('assets', 'public');
+                    } else {
+                        $data['asuransi'] = $data['asuransi']->store('assets', 'public');
+                    }
+                }
+
+                if (!isset($data['file_tax']) || !$data['file_tax']) {
+                    $data['file_tax'] = $asset->file_tax;
+                } else {
+                    if ($asset->file_tax && Storage::disk('public')->exists($asset->file_tax)) {
+                        Storage::disk('public')->delete($asset->file_tax);
+                        $data['file_tax'] = $data['file_tax']->store('assets', 'public');
+                    } else {
+                        $data['file_tax'] = $data['file_tax']->store('assets', 'public');
+                    }
+                }
+
+                if (isset($data['pic'])) {
+                    try {
+                        $data['pic'] = Crypt::decrypt($data['pic']);
+                    } catch (\Exception $e) {
+                        $data['pic'] = $data['pic'];
+                    }
+                }
+
+                $data = $asset->update($data);
+
+                if ($statusBefore !== $asset->status) {
+                    StatusAsset::create([
+                        'asset_id' => Crypt::decrypt($asset->id),
+                        'status_before' => $statusBefore,
+                        'status_after' => $asset->status,
+                    ]);
+                }
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diperbarui!',
+                ]);
+            });
+        } catch (\Throwable $th) {
+            dd($th);
+            return response()->json([
+                'status' => false,
+                'message' => 'Data gagal diperbarui! ' . $th->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($id)
+    {
+        try {
+            $data = Asset::findByEncryptedId($id);
+            if ($data->image && Storage::disk('public')->exists($data->image)) {
+                Storage::disk('public')->delete($data->image);
+            }
+            $data->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data berhasil dihapus!',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data gagal dihapus! ' . $th->getMessage(),
+            ]);
+        }
+    }
+
+    public function destroyAll(Request $request)
+    {
+        try {
+            $ids = $request->ids;
+            return $this->atomic(function () use ($ids) {
+                $decryptedIds = [];
+                foreach ($ids as $encryptedId) {
+                    $decryptedIds[] = Crypt::decrypt($encryptedId);
+                }
+
+                foreach ($decryptedIds as $id) {
+                    $asset = Asset::findOrFail($id);
+                    if ($asset->image && Storage::disk('public')->exists($asset->image)) {
+                        Storage::disk('public')->delete($asset->image);
+                    }
+                }
+
+                $delete = Asset::whereIn('id', $decryptedIds)->delete();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data Berhasil Dihapus!',
+                ]);
+            });
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data Gagal Dihapus!',
+            ]);
+        }
     }
 
     public function getStatusData()
@@ -519,55 +797,6 @@ class AssetController extends Controller
         return view('main.unit.update-files', compact('data'));
     }
 
-
-    public function create()
-    {
-        return view('main.unit.create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $data = $request->all();
-        try {
-            return $this->atomic(function () use ($data) {
-                $lastAsset = Asset::latest('id')->first();
-                $lastNumber = $lastAsset ? intval(str_replace('ast-', '', $lastAsset->asset_number)) : 0;
-
-                if (isset($data['assets_location'])) {
-                    $data['assets_location'] = Crypt::decrypt($data['assets_location']);
-                }
-                if (isset($data['manager'])) {
-                    $data['manager'] = Crypt::decrypt($data['manager']);
-                }
-                if (isset($data['category'])) {
-                    $data['category'] = Crypt::decrypt($data['category']);
-                }
-
-                $data['status'] = "Idle";
-                $data['asset_number'] = 'ast-' . ($lastNumber + 1);
-
-                if (isset($data['image'])) {
-                    $data['image'] = $data['image']->store('assets', 'public');
-                }
-
-                $data = Asset::create($data);
-
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil ditambahkan!',
-                ]);
-            });
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data gagal ditambahkan! ' . $th->getMessage(),
-            ]);
-        }
-    }
-
     public function note(Request $request, $id)
     {
         $data = $request->all();
@@ -591,39 +820,6 @@ class AssetController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-
-    public function show(string $id)
-    {
-        $asset = Asset::findByEncryptedId($id);
-        $decryptedId = Crypt::decrypt($asset->id);
-
-        $projects = ManagementProject::whereJsonContains('asset_id', $decryptedId)->get();
-        $notes = AssetNote::where('asset_id', $decryptedId)->get();
-        $logs = LogActivity::where('asset_id', $decryptedId)->get();
-
-        $path = public_path('storage/qr_codes/');
-
-        $encryptedId = Crypt::encrypt($decryptedId);
-        $qrCodeFile = $path . $encryptedId . '.png';
-
-        if (!file_exists($qrCodeFile)) {
-            $qrCode = new QrCode(route('asset.show', $asset->id));
-            $writer = new PngWriter();
-
-            if (!file_exists($path)) {
-                mkdir($path, 0777, true);
-            }
-
-            $result = $writer->write($qrCode);
-            $result->saveToFile($qrCodeFile);
-        }
-
-        return view('main.unit.show', compact('asset', 'projects', 'notes', 'logs', 'encryptedId'));
-    }
-
     public function download(string $encryptedId)
     {
         $decryptedId = Crypt::decrypt($encryptedId);
@@ -637,139 +833,13 @@ class AssetController extends Controller
         return redirect()->back()->with('error', 'File not found.');
     }
 
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    public function exportExcel(Request $request)
     {
-        $data = Asset::findByEncryptedId($id);
+        $data = Asset::all();
 
-        return view('main.unit.edit', compact('data'));
-    }
+        $name = 'AssetReport';
+        $name .= '_' . $request->startDate . '_to_' . $request->endDate;
 
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-        $data = $request->all();
-
-        try {
-            return $this->atomic(function () use ($data, $id) {
-                $asset = Asset::findByEncryptedId($id);
-                $statusBefore = $asset->status;
-                if (!isset($data['image']) || !$data['image']) {
-                    $data['image'] = $asset->image;
-                } else {
-                    if ($asset->image && Storage::disk('public')->exists($asset->image)) {
-                        Storage::disk('public')->delete($asset->image);
-                        $data['image'] = $data['image']->store('assets', 'public');
-                    } else {
-                        $data['image'] = $data['image']->store('assets', 'public');
-                    }
-                }
-
-                if (!isset($data['stnk']) || !$data['stnk']) {
-                    $data['stnk'] = $asset->stnk;
-                } else {
-                    if ($asset->stnk && Storage::disk('public')->exists($asset->stnk)) {
-                        Storage::disk('public')->delete($asset->stnk);
-                        $data['stnk'] = $data['stnk']->store('assets', 'public');
-                    } else {
-                        $data['stnk'] = $data['stnk']->store('assets', 'public');
-                    }
-                }
-
-                if (!isset($data['asuransi']) || !$data['asuransi']) {
-                    $data['asuransi'] = $asset->asuransi;
-                } else {
-                    if ($asset->asuransi && Storage::disk('public')->exists($asset->asuransi)) {
-                        Storage::disk('public')->delete($asset->asuransi);
-                        $data['asuransi'] = $data['asuransi']->store('assets', 'public');
-                    } else {
-                        $data['asuransi'] = $data['asuransi']->store('assets', 'public');
-                    }
-                }
-
-                $data = $asset->update($data);
-
-                if ($statusBefore !== $asset->status) {
-                    StatusAsset::create([
-                        'asset_id' => Crypt::decrypt($asset->id),
-                        'status_before' => $statusBefore,
-                        'status_after' => $asset->status,
-                    ]);
-                }
-
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil diperbarui!',
-                ]);
-            });
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data gagal diperbarui! ' . $th->getMessage(),
-            ]);
-        }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        try {
-            $data = Asset::findByEncryptedId($id);
-            if ($data->image && Storage::disk('public')->exists($data->image)) {
-                Storage::disk('public')->delete($data->image);
-            }
-            $data->delete();
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Data berhasil dihapus!',
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data gagal dihapus! ' . $th->getMessage(),
-            ]);
-        }
-    }
-
-    public function destroyAll(Request $request)
-    {
-        try {
-            $ids = $request->ids;
-            return $this->atomic(function () use ($ids) {
-                $decryptedIds = [];
-                foreach ($ids as $encryptedId) {
-                    $decryptedIds[] = Crypt::decrypt($encryptedId);
-                }
-
-                foreach ($decryptedIds as $id) {
-                    $asset = Asset::findOrFail($id);
-                    if ($asset->image && Storage::disk('public')->exists($asset->image)) {
-                        Storage::disk('public')->delete($asset->image);
-                    }
-                }
-
-                $delete = Asset::whereIn('id', $decryptedIds)->delete();
-
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data Berhasil Dihapus!',
-                ]);
-            });
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data Gagal Dihapus!',
-            ]);
-        }
+        return Excel::download(new AssetExport($data), $name . '.xlsx');
     }
 }
