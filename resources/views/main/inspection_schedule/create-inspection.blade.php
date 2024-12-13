@@ -4,7 +4,7 @@
     <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
 
-<form method="POST" class="row g-3" id="formCreate" action="{{ route('maintenances.store') }}"
+<form method="POST" class="row g-3" id="formCreateMaintenance" action="{{ route('inspection-schedule.store') }}"
     enctype="multipart/form-data">
     @csrf
 
@@ -370,7 +370,7 @@
         });
     });
 
-    document.getElementById('formCreate').addEventListener('submit', function(event) {
+    document.getElementById('formCreateMaintenance').addEventListener('submit', function(event) {
         event.preventDefault();
 
         for (let instance in CKEDITOR.instances) {
