@@ -69,7 +69,6 @@ class InspectionScheduleController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-        // dd($data);
         try {
             return $this->atomic(function () use ($data, $request) {
                 try {

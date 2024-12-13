@@ -32,7 +32,7 @@ class CategoryController extends Controller
             'name',
         ];
 
-        $keyword = $request->keyword ?? '';
+        $keyword = $request->search['value'] ?? '';
 
         $data = AssetCategory::orderBy('id', 'desc')
             ->select($columns)

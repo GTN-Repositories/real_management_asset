@@ -69,7 +69,7 @@ class CategoryItemController extends Controller
             'created_at',
         ];
 
-        $keyword = $request->keyword ?? '';
+        $keyword = $request->search['value'] ?? '';
 
         $data = CategoryItem::orderBy('created_at', 'asc')
             ->select($columns)

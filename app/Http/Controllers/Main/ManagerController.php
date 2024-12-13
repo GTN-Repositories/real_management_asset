@@ -33,7 +33,7 @@ class ManagerController extends Controller
             'name',
         ];
 
-        $keyword = $request->keyword ?? '';
+        $keyword = $request->search['value'] ?? '';
 
         $data = AssetManager::orderBy('id', 'desc')
             ->select($columns)

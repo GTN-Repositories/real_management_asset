@@ -151,7 +151,7 @@ class AssetController extends Controller
             'created_at',
         ];
 
-        $keyword = $request->keyword ?? '';
+        $keyword = $request->search['value'] ?? '';
 
 
         $limit = $request->limit ?? '';
