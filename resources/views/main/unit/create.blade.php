@@ -16,7 +16,8 @@
     </div>
     <div class="col-12 col-md-6" id="categoryParent">
         <label class="form-label" for="category">Kategori</label>
-        <input type="text" id="category" name="category" class="form-control" placeholder="Masukkan Kategori" required />
+        <input type="text" id="category" name="category" class="form-control" placeholder="Masukkan Kategori"
+            required />
     </div>
     {{-- <div class="col-12 col-md-6">
         <label class="form-label" for="brand">Brand</label>
@@ -72,7 +73,8 @@
     </div>
     <div class="col-12 col-md-12" id="assets_locationParent">
         <label class="form-label" for="assets_location">Lokasi</label>
-        <input type="text" id="assets_location" name="assets_location" class="form-control" placeholder="Masukkan Lokasi" />
+        <input type="text" id="assets_location" name="assets_location" class="form-control"
+            placeholder="Masukkan Lokasi" />
         {{-- <select id="assets_location_id" name="assets_location"
             class="select2 form-select select2-primary"data-allow-clear="true">
         </select> --}}
@@ -120,8 +122,8 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="contract_period">Contract Period</label>
-                            <input type="date" id="contract_period" name="contract_period"
-                                class="form-control" placeholder="Masukkan contract_period" />
+                            <input type="date" id="contract_period" name="contract_period" class="form-control"
+                                placeholder="Masukkan contract_period" />
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="file_reminder">Upload File Reminder</label>
@@ -173,7 +175,7 @@
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="asuransi_date">Tanggal Asuransi</label>
                             <input type="date" id="asuransi_date" name="asuransi_date" class="form-control"
-                            placeholder="Masukkan asuransi" />
+                                placeholder="Masukkan asuransi" />
                         </div>
                         <div class="col-12 col-md-12 mb-3">
                             <label class="form-label" for="asuransi">Upload File Asuransi</label>
@@ -190,8 +192,8 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="tax_period">Waktu Pajak</label>
-                            <input type="date" id="tax_period" name="tax_period"
-                                class="form-control" placeholder="Masukkan tax_period" />
+                            <input type="date" id="tax_period" name="tax_period" class="form-control"
+                                placeholder="Masukkan tax_period" />
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="date_tax">Tanggal Pengingat Pajak</label>
@@ -218,10 +220,12 @@
                     <div class="accordion-body row">
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="depreciation">Bulan</label>
-                            <select id="depreciation" name="depreciation" class="form-control"aria-label="Pilih Bulan">
+                            <select id="depreciation" name="depreciation"
+                                class="form-control"aria-label="Pilih Bulan">
                                 <option value="" selected>Pilih Bulan</option>
                                 @foreach (\App\Helpers\Helper::bulan() as $key => $bln)
-                                    <option value="{{ $key }}" {{ now()->month == $key ? 'selected' : '' }}> {{ $bln }}</option>
+                                    <option value="{{ $key }}" {{ now()->month == $key ? 'selected' : '' }}>
+                                        {{ $bln }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -282,32 +286,66 @@
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="supplier_name">Nama Supplier</label>
                             <input type="text" id="supplier_name" name="supplier_name" class="form-control"
-                                placeholder="Masukkan supplier_name" />
+                                placeholder="Masukkan Nama Supplier" />
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="supplier_phone_number">Nomor Telepon Supplier</label>
                             <input type="text" id="supplier_phone_number" name="supplier_phone_number"
-                                class="form-control" placeholder="Masukkan supplier_phone_number" />
-                        </div>
-                        <div class="col-12 col-md-12">
-                            <label class="form-label" for="supplier_address">Alamat Supplier</label>
-                            <textarea id="supplier_address" name="supplier_address" class="form-control" cols="30" rows="5"></textarea>
+                                class="form-control" placeholder="Masukkan Nomor Telpon Supplier" />
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="supplier_pic_name">Nama PIC Supplier</label>
-                            <input type="text" id="supplier_pic_name" name="supplier_pic_name" class="form-control"
-                                placeholder="Masukkan supplier_name" />
+                            <input type="text" id="supplier_pic_name" name="supplier_pic_name"
+                                class="form-control" placeholder="Masukkan Nama PIC Supplier" />
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="supplier_pic_phone">Nomor PIC Telepon Supplier</label>
                             <input type="text" id="supplier_pic_phone" name="supplier_pic_phone"
-                                class="form-control" placeholder="Masukkan supplier_phone_number" />
+                                class="form-control" placeholder="Masukkan Nomor PIC Telepon Supplier" />
+                        </div>
+                        <div class="col-12 col-md-12">
+                            <label class="form-label" for="supplier_office_number">Nomor Kantor Supplier</label>
+                            <input type="text" id="supplier_office_number" name="supplier_office_number"
+                                class="form-control" placeholder="Masukkan Nomor Kantor Supplier" />
+                        </div>
+                        <div class="col-12 col-md-12">
+                            <label class="form-label" for="supplier_address">Alamat Supplier</label>
+                            <textarea id="supplier_address" name="supplier_address" class="form-control" cols="30" rows="5"></textarea>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <h5>Tambah Field Dinamis</h5>
+    <div class="custom-fields">
+        <div class="custom-field">
+            <div class="row">
+                <div class="col-md-4">
+                    <select name="custom_field_type[]" class="form-control" id="custom_field_type_1">
+                        <option value="">Pilih Tipe</option>
+                        <option value="text">Text</option>
+                        <option value="number">Number</option>
+                        <option value="date">Date</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="custom_field_name[]" class="form-control"
+                        placeholder="Masukkan nama field">
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" name="custom_field_value[]" class="form-control"
+                            placeholder="Masukkan nilai field" id="custom_field_value_1">
+                        <button class="btn btn-danger remove-field">Hapus</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary tambah-field">Tambah Field</button>
+
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
         <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
@@ -317,6 +355,57 @@
 
 @include('components.select2_js')
 <script>
+    $(document).ready(function() {
+        var count = 1;
+        $('.tambah-field').on('click', function() {
+            count++;
+            var html = `
+      <div class="custom-field">
+        <div class="row">
+          <div class="col-md-4">
+            <select name="custom_field_type[]" class="form-control" id="custom_field_type_${count}">
+              <option value="">Pilih Tipe</option>
+              <option value="text">Text</option>
+              <option value="number">Number</option>
+              <option value="date">Date</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <input type="text" name="custom_field_name[]" class="form-control" placeholder="Masukkan nama field">
+          </div>
+          <div class="col-md-4">
+            <div class="input-group">
+              <input type="text" name="custom_field_value[]" class="form-control" placeholder="Masukkan nilai field" id="custom_field_value_${count}">
+              <button class="btn btn-danger remove-field">Hapus</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+            $('.custom-fields').append(html);
+            ubahTipeField(count);
+        });
+
+        $(document).on('click', '.remove-field', function() {
+            $(this).parent('.input-group').parent('.col-md-4').parent('.row').parent('.custom-field')
+                .remove();
+        });
+
+        function ubahTipeField(index) {
+            $(`#custom_field_type_${index}`).on('change', function() {
+                var tipe = $(this).val();
+                if (tipe == 'text') {
+                    $(`#custom_field_value_${index}`).attr('type', 'text');
+                } else if (tipe == 'number') {
+                    $(`#custom_field_value_${index}`).attr('type', 'number');
+                } else if (tipe == 'date') {
+                    $(`#custom_field_value_${index}`).attr('type', 'date');
+                }
+            });
+        }
+        ubahTipeField(1);
+    });
+
     $('document').ready(function() {
         $('#category_id').select2({
             dropdownParent: $('#categoryParent'),
@@ -396,37 +485,6 @@
             }
         });
 
-        // $('#pic').select2({
-        //     dropdownParent: $('#userRelation'),
-        //     placeholder: 'Pilih PIC',
-        //     ajax: {
-        //         url: "{{ route('user.data') }}",
-        //         dataType: 'json',
-        //         delay: 250,
-        //         data: function(params) {
-        //             return {
-        //                 keyword: params.term
-        //             };
-        //         },
-        //         processResults: function(data) {
-        //             apiResults = data.data
-        //                 .filter(function(item) {
-        //                     return item.idRelationAll !== null;
-        //                 })
-        //                 .map(function(item) {
-        //                     return {
-        //                         text: item.name,
-        //                         id: item.idRelationAll,
-        //                     };
-        //                 });
-
-        //             return {
-        //                 results: apiResults
-        //             };
-        //         },
-        //         cache: true
-        //     }
-        // });
         $('#pic').select2({
             dropdownParent: $('#picRelation'),
             placeholder: 'Pilih PIC',
@@ -446,7 +504,7 @@
                         })
                         .map(function(item) {
                             return {
-                                text: item.name+' ('+item.nameTitle+')',
+                                text: item.name + ' (' + item.nameTitle + ')',
                                 id: item.relationId,
                             };
                         });
