@@ -121,7 +121,7 @@ class ItemController extends Controller
             'supplier_addrees',
         ];
 
-        $keyword = $request->keyword ?? '';
+        $keyword = $request->search['value'] ?? '';
 
         $data = Item::orderBy('created_at', 'asc')
             ->select($columns)

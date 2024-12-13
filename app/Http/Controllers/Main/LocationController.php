@@ -32,7 +32,7 @@ class LocationController extends Controller
             'name',
         ];
 
-        $keyword = $request->keyword ?? '';
+        $keyword = $request->search['value'] ?? '';
 
         $data = Location::orderBy('id', 'desc')
             ->select($columns)

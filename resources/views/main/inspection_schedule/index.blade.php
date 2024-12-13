@@ -124,9 +124,9 @@
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button> --}}
                     {{-- @if (auth()->user()->hasPermissionTo('asset-create')) --}}
-                    {{-- <button type="button" class="btn btn-primary btn-sm" onclick="createDataInspection()">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="createDataInspection()">
                         <i class="fas fa-plus"></i> Tambah
-                    </button> --}}
+                    </button>
                     {{-- @endif --}}
                 </div>
             </div>
@@ -143,7 +143,7 @@
                             <th>Catatan</th>
                             <th>Management Project</th>
                             <th>Asset</th>
-                            <th>Status</th>
+                            <th>Result</th>
                             <th>Tanggal</th>
                             <th>Item</th>
                             <th>Stok</th>
@@ -233,7 +233,7 @@
                 }],
                 ajax: {
                     type: "GET",
-                    url: "{{ route('maintenance.data') }}",
+                    url: "{{ route('maintenances.data') }}",
                     data: {
                         'keyword': keyword,
                     }
@@ -265,8 +265,8 @@
                         name: 'asset_id',
                     },
                     {
-                        data: 'status',
-                        name: 'status'
+                        data: 'result',
+                        name: 'result'
                     },
                     {
                         data: 'date',
@@ -311,6 +311,36 @@
 
             $.ajax({
                     url: "{{ route('inspection-schedule.edit', ':id') }}".replace(':id', id),
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
+                });
+        }
+
+        function createDataInspection() {
+            $.ajax({
+                    url: "{{ route('maintenances.create') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+                });
+        }
+
+        function editDataInspection(id) {
+            $.ajax({
+                    url: "{{ route('maintenances.edit', ':id') }}".replace(':id', id),
                     type: 'GET',
                 })
                 .done(function(data) {

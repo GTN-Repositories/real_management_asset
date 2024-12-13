@@ -122,7 +122,7 @@ class LoadsheetController extends Controller
             'lose_factor',
         ];
 
-        $keyword = $request->keyword ?? '';
+        $keyword = $request->search['value'] ?? '';
 
         $data = Loadsheet::orderBy('created_at', 'asc')
             ->select($columns)
