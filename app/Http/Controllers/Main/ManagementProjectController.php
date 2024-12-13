@@ -173,21 +173,22 @@ class ManagementProjectController extends Controller
                 $dateRangeInput = $data['date_range'];
                 [$startDate, $endDate] = explode(' - ', $dateRangeInput);
 
-                $data['value_project'] = isset($data['value_project']) && $data['value_project'] != '-' ? str_replace('.', '', $data['value_project']) : null;
+                $data['value_project'] = isset($data['value_project']) && ($data['value_project'] != '-') ? str_replace('.', '', $data['value_project']) : null;
 
                 $start_date = trim($startDate);
                 $end_date = trim($endDate);
 
                 $decryptedAssetIds = [];
                 foreach ($data['asset_id'] as $encryptedAssetId) {
-                    $decryptedAssetIds[] = Crypt::decrypt($encryptedAssetId);
+                    // $decryptedAssetIds[] = Crypt::decrypt($encryptedAssetId);
+                    $decryptedAssetIds[] = $encryptedAssetId;
                 }
 
                 $decryptedEmployeeIds = [];
                 foreach ($data['employee_id'] as $encryptedEmployeeId) {
                     $decryptedEmployeeIds[] = Crypt::decrypt($encryptedEmployeeId);
                 }
-
+                
                 $projectData = [
                     'name' => $data['name'],
                     'asset_id' => $decryptedAssetIds,
@@ -198,7 +199,7 @@ class ManagementProjectController extends Controller
                     'value_project' => $data['value_project'],
                     'location' => $data['location'],
                 ];
-
+                
                 ManagementProject::create($projectData);
                 Asset::whereIn('id', $decryptedAssetIds)->update(['status' => 'Active']);
 
@@ -208,6 +209,7 @@ class ManagementProjectController extends Controller
                 ]);
             });
         } catch (\Throwable $th) {
+            dd($th);
             return response()->json([
                 'status' => false,
                 'message' => 'Data gagal ditambahkan! ' . $th->getMessage(),
