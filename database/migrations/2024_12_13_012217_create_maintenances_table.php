@@ -14,24 +14,29 @@ return new class extends Migration
         Schema::create('maintenances', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('type');
-            $table->unsignedBigInteger('asset_id');
-            $table->unsignedBigInteger('management_project_id');
-            $table->string('note')->nullable();
-            $table->json('item_id')->nullable();
-            $table->json('asset_kanibal_id')->nullable();
-            $table->json('item_stock')->nullable();
-            $table->json('kanibal_stock')->nullable();
-            $table->date('date');
-            $table->string('result');
-            $table->unsignedBigInteger('employee_id');
-            $table->date('date_breakdown')->nullable();
+            $table->string('workshop')->nullable();
+            $table->unsignedBigInteger('inspection_schedule_id')->index();
+            $table->json('employee_id');
+            $table->integer('status')->defaut(1);
+
+            // IF ON HOLD
+            $table->string('code_delay')->nullable();
+            $table->string('delay_reason')->nullable();
+            $table->date('estimate_finish')->nullable();
+            $table->integer('delay_hours')->nullable();
+            $table->timestamp('start_maintenace')->nullable();
+            $table->timestamp('end_maintenace')->nullable();
+            $table->timestamp('deviasi')->nullable();
+
+            // IF FINISH
+            $table->timestamp('finish_at')->nullable();
             $table->string('hm')->nullable();
             $table->string('km')->nullable();
-            $table->string('detail_problem')->nullable();
-            $table->string('action')->nullable();
-            $table->string('major_minor')->nullable();
-            $table->date('date_reminder')->nullable();
+            $table->string('location')->nullable();
+            $table->text('detail_problem')->nullable();
+            $table->string('action_to_do')->nullable();
+            $table->string('urgention')->nullable();
+            
             $table->timestamps();
         });
     }

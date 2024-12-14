@@ -16,20 +16,102 @@ class InspectionScheduleController extends Controller
 {
     public function index(Request $request)
     {
-        $data = $this->data($request);
+        $data = new MaintenanceController();
+        $data = $data->data($request);
 
         return view('main.inspection_schedule.index', compact('data'));
     }
 
     public function data(Request $request)
     {
+        $data = $this->getData($request);
+
+        return datatables()
+            ->of($data)
+            ->addIndexColumn()
+            ->addColumn('name', function ($data) {
+                return $data->name ?? '-';
+            })
+            ->addColumn('id', function ($data) {
+                return $data->id;
+            })
+            ->addColumn('format_id', function ($data) {
+                return 'INS-'.Crypt::decrypt($data->id);
+            })
+            ->addColumn('type', function ($data) {
+                return $data->type ?? '-';
+            })
+            ->addColumn('note', function ($data) {
+                return $data->note ?? '-';
+            })
+            ->addColumn('managementProject', function ($data) {
+                return $data->managementProject->name ?? '-';
+            })
+            ->addColumn('asset_id', function ($data) {
+                return Crypt::decrypt($data->asset->id) . ' - ' . $data->asset->name . ' - ' . $data->asset->license_plate ?? '-';
+            })
+            ->addColumn('date', function ($data) {
+                return $data->date ?? '-';
+            })
+            ->addColumn('item_name', function ($data) {
+                $itemIds = is_array(json_decode($data->item_id, true)) ? json_decode($data->item_id, true) : [];
+                $items = Item::whereIn('id', $itemIds)->get()->pluck('name')->implode(', ');
+                return $items;
+            })
+            ->addColumn('item_stock', function ($data) {
+                $itemStocks = is_array(json_decode($data->item_stock, true)) ? json_decode($data->item_stock, true) : [];
+                return array_sum($itemStocks);
+            })
+            ->addColumn('kanibal_stock', function ($data) {
+                $kanibalStocks = is_array(json_decode($data->kanibal_stock, true)) ? json_decode($data->kanibal_stock, true) : [];
+                return array_sum($kanibalStocks);
+            })
+            ->addColumn('asset_kanibal_name', function ($data) {
+                $assetKanibalIds = is_array(json_decode($data->asset_kanibal_id, true)) ? json_decode($data->asset_kanibal_id, true) : [];
+                $items = Item::whereIn('id', array_keys($assetKanibalIds))->get()->map(function ($item) use ($assetKanibalIds) {
+                    $itemId = (string) Crypt::decrypt($item->id);
+                    $item->assetKanibalName = isset($assetKanibalIds[$itemId])
+                        ? $assetKanibalIds[$itemId] . ' - ' . Asset::find($assetKanibalIds[$itemId] ?? 0)->name . ' - ' . Asset::find($assetKanibalIds[$itemId] ?? 0)->license_plate
+                        : '-';
+                    return $item;
+                });
+                return $items->pluck('assetKanibalName')->implode(', ');
+            })
+            ->addColumn('action', function ($data) {
+                $btn = '<div class="d-flex">';
+                // if (auth()->user()->hasPermissionTo('asset-edit')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
+                // }
+                // if (auth()->user()->hasPermissionTo('asset-delete')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                // }
+                $btn .= '</div>';
+
+                return $btn;
+            })
+            ->escapeColumns([])
+            ->make(true);
+    }
+    
+    public function getData(Request $request)
+    {
         $columns = [
             'id',
             'name',
             'type',
             'asset_id',
+            'management_project_id',
             'note',
+            'item_id',
+            'asset_kanibal_id',
+            'status',
+            'item_stock',
+            'kanibal_stock',
+            'created_at',
+            'updated_at',
             'date',
+            'workshop',
+            'employee_id',
         ];
 
         $keyword = $request->search;
@@ -45,13 +127,12 @@ class InspectionScheduleController extends Controller
                     $query->where('type', $type);
                 }
 
-                if ($keyword != '') {
-                    foreach ($columns as $column) {
-                        $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
-                    }
-                }
-            })
-            ->get();
+                // if ($keyword != '') {
+                //     foreach ($columns as $column) {
+                //         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
+                //     }
+                // }
+            });
 
         foreach ($data as $key => $value) {
             $value['start'] = $value['date'] . ' 00:00:00';
@@ -109,10 +190,9 @@ class InspectionScheduleController extends Controller
                     }
                 }
 
-                Asset::where('id', $asset_id)->update([
-                    'status' => 'UnderMaintenance'
-                ]);
-
+                // Asset::where('id', $asset_id)->update([
+                //     'status' => 'UnderMaintenance'
+                // ]);
 
                 $schedule = InspectionSchedule::create([
                     'name' => $data['name'],
@@ -121,8 +201,8 @@ class InspectionScheduleController extends Controller
                     'management_project_id' => $management_project_id,
                     'asset_id' => $asset_id,
                     'note' => $data['note'],
-                    'workshop' => $data['workshop'],
-                    'mechanic_name' => $data['mechanic_name'],
+                    // 'workshop' => $data['workshop'],
+                    // 'mechanic_name' => $data['mechanic_name'],
                     'item_id' => json_encode($decryptedItemIds) ?? null,
                     'item_stock' => json_encode($itemStocks) ?? null,
                     'kanibal_stock' => json_encode($kanibalStocks) ?? null,
