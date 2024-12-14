@@ -175,6 +175,22 @@ class MaintenanceController extends Controller
                     ]);
                 }
 
+                $maintenance->code_delay = $request->get('code_delay');
+                $maintenance->delay_reason = $request->get('delay_reason');
+                $maintenance->estimate_finish = $request->get('estimate_finish');
+                $maintenance->delay_hours = $request->get('delay_hours');
+                $maintenance->start_maintenace = $request->get('start_maintenace');
+                $maintenance->end_maintenace = $request->get('end_maintenace');
+                $maintenance->deviasi = $request->get('deviasi');
+                $maintenance->finish_at = $request->get('finish_at');
+                $maintenance->hm = $request->get('hm');
+                $maintenance->km = $request->get('km');
+                $maintenance->location = $request->get('location');
+                $maintenance->detail_problem = $request->get('detail_problem');
+                $maintenance->action_to_do = $request->get('action_to_do');
+                $maintenance->urgention = $request->get('urgention');
+                $maintenance->save();
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Status berhasil diperbarui!',
