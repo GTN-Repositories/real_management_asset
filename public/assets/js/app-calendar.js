@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function () {
       eventClick: function (info) {
         console.log(info.event.id);
 
-        editData(info.event.id);
+        editDataMaintenance(info.event.id);
         // eventClick(info);
       },
       datesSet: function () {

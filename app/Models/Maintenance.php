@@ -21,4 +21,9 @@ class Maintenance extends Model
 
         return self::findOrFail($decryptedId);
     }
+
+    public function inspection_schedule()
+    {
+        return $this->belongsTo(InspectionSchedule::class, 'inspection_schedule_id', 'id');
+    }
 }
