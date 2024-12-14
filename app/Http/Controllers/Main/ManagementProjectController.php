@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\ProjectExport;
+use App\Exports\ProjectTemplateExport;
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\Employee;
@@ -12,6 +14,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ManagementProjectController extends Controller
 {
@@ -188,7 +192,7 @@ class ManagementProjectController extends Controller
                 foreach ($data['employee_id'] as $encryptedEmployeeId) {
                     $decryptedEmployeeIds[] = Crypt::decrypt($encryptedEmployeeId);
                 }
-                
+
                 $projectData = [
                     'name' => $data['name'],
                     'asset_id' => $decryptedAssetIds,
@@ -199,7 +203,7 @@ class ManagementProjectController extends Controller
                     'value_project' => $data['value_project'],
                     'location' => $data['location'],
                 ];
-                
+
                 ManagementProject::create($projectData);
                 Asset::whereIn('id', $decryptedAssetIds)->update(['status' => 'Active']);
 
@@ -469,5 +473,54 @@ class ManagementProjectController extends Controller
                 'performance' => number_format($performance, 2)
             ]
         ]);
+    }
+
+    public function excel(Request $request)
+    {
+        $data = ManagementProject::all();
+        return Excel::download(new ProjectExport($data), 'project.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        return view('main.management_project.import');
+    }
+
+    public function importExcel(Request $request)
+    {
+        $file = $request->file('file');
+        try {
+            return $this->atomic(function () use ($file) {
+                $spreadsheet = IOFactory::load($file->getPathname());
+                $worksheet = $spreadsheet->getActiveSheet();
+                $highestRow = $worksheet->getHighestRow();
+
+                for ($row = 2; $row <= $highestRow; $row++) {
+                    $data = [
+                        'name' => $worksheet->getCell("A{$row}")->getValue(),
+                        'value_project' => $worksheet->getCell("B{$row}")->getValue(),
+                        'petty_cash' => $worksheet->getCell("C{$row}")->getValue(),
+                        'status' => $worksheet->getCell("D{$row}")->getValue(),
+                    ];
+
+                    ManagementProject::create($data);
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data berhasil diimport!'
+                ]);
+            });
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengimpor data! ' . $th->getMessage(),
+            ]);
+        }
+    }
+
+    public function templateExcel()
+    {
+        return Excel::download(new ProjectTemplateExport(), 'project.xlsx');
     }
 }

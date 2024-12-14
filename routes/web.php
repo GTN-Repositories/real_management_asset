@@ -92,6 +92,10 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/asset/destroy-all', [AssetController::class, 'destroyAll'])->name('asset.destroyAll');
     Route::resource('asset', AssetController::class);
 
+    Route::get('/management-project/export-excel', [ManagementProjectController::class, 'excel'])->name('management-project.export-excel');
+    Route::get('/management-project/import-excel', [ManagementProjectController::class, 'importExcel'])->name('management-project.import-excel');
+    Route::get('/management-project/import', [ManagementProjectController::class, 'import'])->name('management-project.import');
+    Route::get('/management-project/template', [ManagementProjectController::class, 'templateExcel'])->name('management-project.template');
     Route::get('/management-project/by-project', [ManagementProjectController::class, 'getAssetsByProject'])->name('management-project.by_project');
     Route::get('/management-project/data', [ManagementProjectController::class, 'data'])->name('management-project.data');
     Route::get('/management-project/todoRequestPettyCash', [ManagementProjectController::class, 'todoRequestPettyCash'])->name('management-project.todoRequestPettyCash');
@@ -123,6 +127,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/form/data', [FormController::class, 'data'])->name('form.data');
     Route::delete('/form/destroy-all', [FormController::class, 'destroyAll'])->name('form.destroyAll');
     Route::resource('form', FormController::class);
+
 
     Route::post('/fuel-ipb/total-liter', [IpbController::class, 'getTotalLiter'])->name('fuel-ipb.total-liter');
     Route::get('/fuel-ipb/data', [IpbController::class, 'data'])->name('fuel-ipb.data');
