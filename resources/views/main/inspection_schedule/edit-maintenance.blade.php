@@ -49,8 +49,8 @@
     </div>
 
     <div class="col-12 col-md-12">
-        <label for="exampleFormControlSelect1" class="form-label">Status</label>
-        <select class="form-select select2" id="exampleFormControlSelect1" name="status" aria-label="Select Status">
+        <label for="statusMaintenance" class="form-label">Status</label>
+        <select class="form-select select2" id="statusMaintenance" name="status" aria-label="Select Status">
             <option value="Scheduled" {{ $data->status == 'Scheduled' ? 'selected' : '' }}>Scheduled</option>
             <option value="InProgress" {{ $data->status == 'InProgress' ? 'selected' : '' }}>In Progress</option>
             <option value="OnHold" {{ $data->status == 'OnHold' ? 'selected' : '' }}>On Hold</option>
@@ -58,48 +58,89 @@
         </select>
     </div>
 
-    <div class="col-12 col-md-6">
-        <label class="form-label">Tanggal Breakdown</label>
-        <input type="datetime-local" value="{{ date('Y-m-d') }}" name="date" id="date" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" />
+    <div class="col-12 col-md-6" id="code_delay_form" hidden>
+        <label class="form-label">Code Delay</label>
+        <input type="text" name="code_delay" value="{{ $maintenance->code_delay }}" id="code_delay" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Code Delay" />
     </div>
 
-    <div class="col-12 col-md-6">
-        <label class="form-label">Hm</label>
-        <input type="text" name="hm" id="hm" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" />
+    <div class="col-12 col-md-6" id="delay_reason_form" hidden>
+        <label class="form-label">Delay Reason</label>
+        <input type="text" name="delay_reason" value="{{ $maintenance->delay_reason }}" id="delay_reason" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Delay Reason" />
+    </div>
+    
+    <div class="col-12 col-md-6" id="estimate_finish_form" hidden>
+        <label class="form-label">DateTime Estimate Finish/RFU</label>
+        <input type="date" value="{{ date('Y-m-d') }}" name="estimate_finish" value="{{ $maintenance->estimate_finish }}" id="estimate_finish" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan DateTime Estimate Finish/RFU" />
     </div>
 
-    <div class="col-12 col-md-6">
-        <label class="form-label">Km</label>
-        <input type="text" name="km" id="km" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" />
+    <div class="col-12 col-md-6" id="delay_hours_form" hidden>
+        <label class="form-label">Delay (Strt-Bd) (hrs)</label>
+        <input type="number" name="delay_hours" value="{{ $maintenance->delay_hours }}" id="delay_hours" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Delay (Strt-Bd) (hrs)" />
     </div>
 
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-md-6" id="start_maintenace_form" hidden>
+        <label class="form-label">DateTime Start Maintenance</label>
+        <input type="datetime-local" name="start_maintenace" value="{{ $maintenance->start_maintenace }}" id="start_maintenace" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan DateTime Start Maintenance" />
+    </div>
+
+    <div class="col-12 col-md-6" id="end_maintenace_form" hidden>
+        <label class="form-label">DateTime Stop Maintenance</label>
+        <input type="datetime-local" name="end_maintenace" value="{{ $maintenance->end_maintenace }}" id="end_maintenace" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan DateTime Stop Maintenance" />
+    </div>
+
+    <div class="col-12 col-md-6" id="deviasi_form" hidden>
+        <label class="form-label">Deviasi</label>
+        <input type="datetime-local" name="deviasi" value="{{ $maintenance->deviasi }}" id="deviasi" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Deviasi" />
+    </div>
+
+    <div class="col-12 col-md-6" id="finish_at_form" hidden>
+        <label class="form-label">Finish / RFU</label>
+        <input type="datetime-local" name="finish_at" value="{{ $maintenance->finish_at }}" id="finish_at" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Finish / RFU" />
+    </div>
+
+    <div class="col-12 col-md-6" id="hm_form" hidden>
+        <label class="form-label">HM</label>
+        <input type="text" name="hm" value="{{ $maintenance->hm }}" id="hm" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan HM" />
+    </div>
+
+    <div class="col-12 col-md-6" id="km_form" hidden>
+        <label class="form-label">KM</label>
+        <input type="text" name="km" value="{{ $maintenance->km }}" id="km" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan KM" />
+    </div>
+
+    <div class="col-12 col-md-6" id="location_form" hidden>
+        <label class="form-label">Location</label>
+        <input type="text" name="location" value="{{ $maintenance->location }}" id="location" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Location" />
+    </div>
+
+    <div class="col-12 col-md-12" id="detail_problem_form" hidden>
         <label class="form-label">Detail Problem</label>
-        <input type="text" name="detail_problem" id="detail_problem" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" />
+        <textarea name="detail_problem" value="{{ $maintenance->detail_problem }}" id="detail_problem" class="form-control mb-3 mb-lg-0" cols="30" rows="5"></textarea>
     </div>
 
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-md-6" id="action_to_do_form" hidden>
         <label class="form-label">Action To Do</label>
-        <input type="text" name="action_to_do" id="action_to_do" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" />
+        <input type="text" name="action_to_do" value="{{ $maintenance->action_to_do }}" id="action_to_do" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Action To Do" />
     </div>
 
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-md-6" id="urgention_form" hidden>
         <label class="form-label">Urgensi</label>
-        <select name="urgention" id="urgention" class="form-select" id="urgention">
+        <select name="urgention" id="urgention" class="form-select select2">
             <option value="Major">Major</option>
             <option value="Minor">Minor</option>
         </select>
-    </div>
-
-    <div class="col-12 col-md-6">
-        <label class="form-label">Tanggal Pengingat</label>
-        <input type="date" value="{{ date('Y-m-d') }}" name="date_reminder" id="date_reminder" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" />
     </div>
 
     <div class="col-12 mt-3" id="selectedItemsContainer">
@@ -203,6 +244,8 @@
                 cache: true
             }
         });
+
+        changeStatus('{{ $data->status }}');
     });
 
     document.getElementById('formUpdate').addEventListener('submit', function(event) {
@@ -275,4 +318,62 @@
                 });
             });
     });
+
+    $(document).on('change', '#statusMaintenance', function() {
+        var status = $(this).val();
+        
+        changeStatus(status);
+    })
+
+    function changeStatus(status) {
+        if (status == 'OnHold') {
+            $('#code_delay_form').attr('hidden', false);
+            $('#delay_reason_form').attr('hidden', false);
+            $('#estimate_finish_form').attr('hidden', false);
+            $('#delay_hours_form').attr('hidden', false);
+            $('#start_maintenace_form').attr('hidden', false);
+            $('#end_maintenace_form').attr('hidden', false);
+            $('#deviasi_form').attr('hidden', false);
+
+            $('#finish_at_form').attr('hidden', true);
+            $('#hm_form').attr('hidden', true);
+            $('#km_form').attr('hidden', true);
+            $('#location_form').attr('hidden', true);
+            $('#detail_problem_form').attr('hidden', true);
+            $('#action_to_do_form').attr('hidden', true);
+            $('#urgention_form').attr('hidden', true);
+        } else if (status == 'Finish') {
+            $('#code_delay_form').attr('hidden', true);
+            $('#delay_reason_form').attr('hidden', true);
+            $('#estimate_finish_form').attr('hidden', true);
+            $('#delay_hours_form').attr('hidden', true);
+            $('#start_maintenace_form').attr('hidden', true);
+            $('#end_maintenace_form').attr('hidden', true);
+            $('#deviasi_form').attr('hidden', true);
+
+            $('#finish_at_form').attr('hidden', false);
+            $('#hm_form').attr('hidden', false);
+            $('#km_form').attr('hidden', false);
+            $('#location_form').attr('hidden', false);
+            $('#detail_problem_form').attr('hidden', false);
+            $('#action_to_do_form').attr('hidden', false);
+            $('#urgention_form').attr('hidden', false);
+        } else {
+            $('#code_delay_form').attr('hidden', true);
+            $('#delay_reason_form').attr('hidden', true);
+            $('#estimate_finish_form').attr('hidden', true);
+            $('#delay_hours_form').attr('hidden', true);
+            $('#start_maintenace_form').attr('hidden', true);
+            $('#end_maintenace_form').attr('hidden', true);
+            $('#deviasi_form').attr('hidden', true);
+
+            $('#finish_at_form').attr('hidden', true);
+            $('#hm_form').attr('hidden', true);
+            $('#km_form').attr('hidden', true);
+            $('#location_form').attr('hidden', true);
+            $('#detail_problem_form').attr('hidden', true);
+            $('#action_to_do_form').attr('hidden', true);
+            $('#urgention_form').attr('hidden', true);
+        }
+    }
 </script>
