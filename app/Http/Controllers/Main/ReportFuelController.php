@@ -76,7 +76,7 @@ class ReportFuelController extends Controller implements HasMiddleware
             'price'
         ];
 
-        $keyword = $request->keyword ?? '';
+        $keyword = $request->search['value'] ?? '';
 
         $query = FuelConsumption::orderBy('date', 'asc')
             ->select($columns)

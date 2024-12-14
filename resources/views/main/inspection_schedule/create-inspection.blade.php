@@ -1,39 +1,30 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Tambah Jadwal Maintenance</h3>
+    <h3 class="mb-2">Tambah Inspection</h3>
     <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
 
-<form method="POST" class="row g-3" id="formCreateInspection" action="{{ route('inspection-schedule.store') }}"
+<form method="POST" class="row g-3" id="formCreateMaintenance" action="{{ route('inspection-schedule.store') }}"
     enctype="multipart/form-data">
     @csrf
+
     <div class="col-12 col-md-12">
-        <label class="form-label">Judul Maintenance</label>
+        <label class="form-label">Judul Inspection</label>
         <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" value="{{ old('name') }}" required />
-    </div>
-    <div class="col-12 col-md-6">
-        <label class="form-label">Nama Bengkel</label>
-        <input type="text" name="workshop" id="workshop" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Bengkel" value="{{ old('workshop') }}" required />
-    </div>
-    <div class="col-12 col-md-6">
-        <label class="form-label">Nama Mekanik</label>
-        <input type="text" name="mechanic_name" id="mechanic_name" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Mekanik" value="{{ old('mechanic_name') }}" required />
+            placeholder="Masukan Nama Item" required />
     </div>
 
     <div class="col-12 col-md-6">
         <label class="form-label">Tanggal</label>
         <input type="date" name="date" id="date" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" value="{{ old('date', date('Y-m-d')) }}" required />
+            placeholder="Masukan Nama Item" required />
     </div>
 
     <div class="col-12 col-md-6">
         <label for="exampleFormControlSelect1" class="form-label">Jenis Maintenance</label>
         <select class="form-select" id="exampleFormControlSelect1" name="type" aria-label="Select Type">
-            <option value="p2h">P2H</option>
-            <option value="pm">PM</option>
+            <option value="day">Harian</option>
+            <option value="week">mingguan</option>
         </select>
     </div>
 
@@ -55,6 +46,56 @@
         <label class="form-label" for="alias">Catatan</label>
         <textarea name="note" id="note" cols="30" rows="10" class="form-control"
             placeholder="Masukkan Deskripsi"></textarea>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label for="exampleFormControlSelect1" class="form-label">Result</label>
+        <select class="form-select" id="exampleFormControlSelect1" name="type" aria-label="Select Type">
+            <option value="ready">Ready To Use</option>
+            <option value="breakdown">Breakdown</option>
+        </select>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Tanggal Breakdown</label>
+        <input type="date" name="date" id="date" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Nama Item" />
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Hm</label>
+        <input type="text" name="hm" id="hm" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Nama Item" />
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Km</label>
+        <input type="text" name="km" id="km" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Nama Item" />
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Detail Problem</label>
+        <input type="text" name="detail_problem" id="detail_problem" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Nama Item" />
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Action</label>
+        <input type="text" name="action" id="action" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Nama Item" />
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Major Minor</label>
+        <input type="text" name="major_minor" id="major_minor" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Nama Item" />
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Tanggal Pengingat</label>
+        <input type="date" name="date_reminder" id="date_reminder" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Nama Item" />
     </div>
 
     <div class="col-12 col-md-12" id="selectItem">
@@ -329,7 +370,7 @@
         });
     });
 
-    document.getElementById('formCreateInspection').addEventListener('submit', function(event) {
+    document.getElementById('formCreateMaintenance').addEventListener('submit', function(event) {
         event.preventDefault();
 
         for (let instance in CKEDITOR.instances) {
@@ -367,7 +408,6 @@
                     for (const [field, messages] of Object.entries(data.errors)) {
                         errorMessages += messages.join('<br>') + '<br>';
                     }
-
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
@@ -398,4 +438,7 @@
                 });
             });
     });
+
 </script>
+
+

@@ -143,9 +143,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
         return view('main.quiz.index');
     })->name('quiz');
 
-    Route::get('/maintenance/data', [MaintenanceController::class, 'data'])->name('maintenance.data');
-    Route::delete('/maintenance/destroy-all', [MaintenanceController::class, 'destroyAll'])->name('maintenance.destroyAll');
-    Route::resource('maintenance', MaintenanceController::class);
+    Route::get('/maintenances/data', [MaintenanceController::class, 'data'])->name('maintenances.data');
+    Route::delete('/maintenances/destroy-all', [MaintenanceController::class, 'destroyAll'])->name('maintenances.destroyAll');
+    Route::resource('maintenances', MaintenanceController::class);
 
     Route::get('/fuel/data', [FuelConsumptionController::class, 'data'])->name('fuel.data');
     Route::delete('/fuel/destroy-all', [FuelConsumptionController::class, 'destroyAll'])->name('fuel.destroyAll');

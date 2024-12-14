@@ -320,35 +320,77 @@
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="supplier_name">Nama Supplier</label>
                             <input type="text" id="supplier_name" name="supplier_name" class="form-control"
-                                placeholder="Masukkan supplier_name" value="{{ $data->supplier_name ?? '' }}" />
+                                placeholder="Masukkan Nama Supplier" value="{{ $data->supplier_name ?? '' }}" />
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="supplier_phone_number">Nomor Telepon Supplier</label>
                             <input type="text" id="supplier_phone_number" name="supplier_phone_number"
-                                class="form-control" placeholder="Masukkan supplier_phone_number"
+                                class="form-control" placeholder="Masukkan Nomor Telpon Supplier"
                                 value="{{ $data->supplier_phone_number ?? '' }}" />
-                        </div>
-                        <div class="col-12 col-md-12">
-                            <label class="form-label" for="supplier_address">Alamat Supplier</label>
-                            <textarea id="supplier_address" name="supplier_address" class="form-control" cols="30" rows="5">{{ $data->supplier_address ?? '' }}</textarea>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="supplier_pic_name">Nama PIC Supplier</label>
                             <input type="text" id="supplier_pic_name" name="supplier_pic_name"
-                                value="{{ $data->supplier_pic_name }}" class="form-control"
-                                placeholder="Masukkan supplier_name" />
+                                class="form-control" placeholder="Masukkan Nama PIC Supplier"
+                                value="{{ $data->supplier_pic_name ?? '' }}" />
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="supplier_pic_phone">Nomor PIC Telepon Supplier</label>
                             <input type="text" id="supplier_pic_phone" name="supplier_pic_phone"
-                                value="{{ $data->supplier_pic_phone }}" class="form-control"
-                                placeholder="Masukkan supplier_phone_number" />
+                                class="form-control" placeholder="Masukkan Nomor PIC Telepon Supplier"
+                                value="{{ $data->supplier_pic_phone ?? '' }}" />
+                        </div>
+                        <div class="col-12 col-md-12">
+                            <label class="form-label" for="supplier_office_number">Nomor Kantor Supplier</label>
+                            <input type="text" id="supplier_office_number" name="supplier_office_number"
+                                class="form-control" placeholder="Masukkan Nomor Kantor Supplier"
+                                value="{{ $data->supplier_office_number ?? '' }}" />
+                        </div>
+                        <div class="col-12 col-md-12">
+                            <label class="form-label" for="supplier_address">Alamat Supplier</label>
+                            <textarea id="supplier_address" name="supplier_address" class="form-control" cols="30" rows="5">{{ $data->supplier_address ?? '' }}</textarea>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="custom-fields">
+        @foreach ($customFields as $customField)
+            <div class="custom-field">
+                <div class="row">
+                    <div class="col-md-4">
+                        <select name="custom_field_type[]" class="form-control"
+                            id="custom_field_type_{{ $loop->index }}">
+                            <option value="">Pilih Tipe</option>
+                            <option value="text" {{ $customField->tipe_field == 'text' ? 'selected' : '' }}>Text
+                            </option>
+                            <option value="number" {{ $customField->tipe_field == 'number' ? 'selected' : '' }}>Number
+                            </option>
+                            <option value="date" {{ $customField->tipe_field == 'date' ? 'selected' : '' }}>Date
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" name="custom_field_name[]" class="form-control"
+                            placeholder="Masukkan nama field" value="{{ $customField->nama_field }}">
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input type="{{ $customField->tipe_field }}" name="custom_field_value[]" class="form-control"
+                                placeholder="Masukkan nilai field" id="custom_field_value_{{ $loop->index }}"
+                                value="{{ $customField->nilai_field }}">
+                            <button class="btn btn-danger remove-field">Hapus</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    <button type="button" class="btn btn-primary tambah-field">Tambah Field</button>
+
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
         <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
@@ -358,6 +400,64 @@
 
 @include('components.select2_js')
 <script>
+    $(document).ready(function() {
+        var count = 1;
+
+        // Panggil fungsi ubahTipeField untuk setiap field
+        $('.custom-field select[name^="custom_field_type"]').each(function() {
+            ubahTipeField(this);
+        });
+
+        // Tambah field baru
+        $('.tambah-field').on('click', function() {
+            count++;
+            var html = `<div class="custom-field">
+                <div class="row">
+                    <div class="col-md-4">
+                        <select name="custom_field_type[]" class="form-control" id="custom_field_type_${count}">
+                            <option value="">Pilih Tipe</option>
+                            <option value="text">Text</option>
+                            <option value="number">Number</option>
+                            <option value="date">Date</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" name="custom_field_name[]" class="form-control" placeholder="Masukkan nama field">
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input type="text" name="custom_field_value[]" class="form-control" placeholder="Masukkan nilai field" id="custom_field_value_${count}">
+                            <button class="btn btn-danger remove-field">Hapus</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+            $('.custom-fields').append(html);
+            ubahTipeField('#custom_field_type_' + count);
+        });
+
+        // Hapus field
+        $(document).on('click', '.remove-field', function() {
+            $(this).parent('.input-group').parent('.col-md-4').parent('.row').parent('.custom-field')
+                .remove();
+        });
+
+        function ubahTipeField(selector) {
+            $(selector).on('change', function() {
+                var tipe = $(this).val();
+                var id = $(this).attr('id').replace('custom_field_type_', 'custom_field_value_');
+                if (tipe == 'text') {
+                    $('#' + id).attr('type', 'text');
+                } else if (tipe == 'number') {
+                    $('#' + id).attr('type', 'number');
+                } else if (tipe == 'date') {
+                    $('#' + id).attr('type', 'date');
+                }
+            });
+        }
+    });
+
+
     $('document').ready(function() {
         $('#category_id').select2({
             dropdownParent: $('#categoryParent'),
