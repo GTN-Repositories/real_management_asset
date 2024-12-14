@@ -20,6 +20,12 @@
                     <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button>
+                    <button onclick="importExcel()" class="btn btn-success btn-sm">
+                        <i class="fa-solid fa-file-excel me-1"></i>Import Excel
+                    </button>
+                    <button onclick="exportExcel()" class="btn btn-success btn-sm">
+                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                    </button>
                     <!-- Tombol Tambah -->
                     @if (auth()->user()->hasPermissionTo('management-create'))
                         <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
@@ -306,6 +312,48 @@
                 })
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
+                });
+        }
+
+        function exportExcel() {
+            $.ajax({
+                url: "{{ route('management-project.export-excel') }}",
+                type: 'GET',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                },
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function(response) {
+                    const blob = new Blob([response], {
+                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    });
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'FuelConsumptionReport.xlsx';
+                    link.click();
+                },
+                error: function() {
+                    Swal.fire('Error!',
+                        'An error occurred while exporting the report. Please try again later.',
+                        'error');
+                }
+            });
+        }
+
+        function importExcel() {
+            $.ajax({
+                    url: "{{ route('management-project.import') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
                 });
         }
     </script>
