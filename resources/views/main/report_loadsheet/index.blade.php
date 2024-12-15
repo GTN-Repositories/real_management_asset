@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card mt-4">
             <div class="card-header">
                 <h5 class="card-title mb-0">Asset Loadsheet</h5>
             </div>
