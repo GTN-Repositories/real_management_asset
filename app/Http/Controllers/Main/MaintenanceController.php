@@ -76,6 +76,8 @@ class MaintenanceController extends Controller
                 }
                 $data['employee_id'] = json_encode($employee_id);
 
+                $data['status'] = 1;
+
                 Asset::where('id', $inspection_schedule->asset_id)->update([
                     'status' => 'UnderMaintenance'
                 ]);

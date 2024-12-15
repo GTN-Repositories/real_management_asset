@@ -69,7 +69,7 @@
         <input type="text" name="delay_reason" value="{{ $maintenance->delay_reason }}" id="delay_reason" class="form-control mb-3 mb-lg-0"
             placeholder="Masukan Delay Reason" />
     </div>
-    
+
     <div class="col-12 col-md-6" id="estimate_finish_form" hidden>
         <label class="form-label">DateTime Estimate Finish/RFU</label>
         <input type="date" value="{{ date('Y-m-d') }}" name="estimate_finish" value="{{ $maintenance->estimate_finish }}" id="estimate_finish" class="form-control mb-3 mb-lg-0"
@@ -321,7 +321,7 @@
 
     $(document).on('change', '#statusMaintenance', function() {
         var status = $(this).val();
-        
+
         changeStatus(status);
     })
 
