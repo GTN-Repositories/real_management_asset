@@ -33,7 +33,7 @@ class SoilTypeController extends Controller
             'name',
         ];
 
-        $keyword = $request->keyword ?? "";
+        $keyword = $request->search['value'] ?? '';
 
         $data = SoilType::orderBy('created_at', 'asc')
             ->select($columns)
