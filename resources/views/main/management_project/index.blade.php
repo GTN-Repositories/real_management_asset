@@ -16,6 +16,12 @@
             <div class="card-header">
                 <h5 class="card-title mb-0">Management Project</h5>
                 <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-success btn-sm d-flex align-items-center" onclick="importExcel()">
+                        <i class="fas fa-file-excel me-2"></i> Import Excel
+                    </button>
+                    <button onclick="exportExcel()" class="btn btn-success btn-sm">
+                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                    </button>
                     <!-- Tombol Hapus Masal -->
                     <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
                         <i class="fas fa-trash-alt"></i> Hapus Masal
@@ -40,7 +46,8 @@
                                     <input class="form-check-input" type="checkbox" id="checkAll" />
                                 </div>
                             </th>
-                            <th>nama management project</th>
+                            <th>ID</th>
+                            <th>nama project</th>
                             <th>nama asset</th>
                             <th>tanggal awal</th>
                             <th>tanggal akhir</th>
@@ -149,6 +156,10 @@
                         name: 'id',
                         orderable: false,
                         searchable: false
+                    },
+                    {
+                        data: 'format_id',
+                        name: 'format_id'
                     },
                     {
                         data: 'name',
@@ -307,6 +318,32 @@
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
                 });
+        }
+
+        function importExcel() {
+            $.ajax({
+                    url: "{{ route('management-project.import.form') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+                });
+        }
+
+        function exportExcel() {
+            const startDate = $('#date-range-picker').data('daterangepicker')?.startDate?.format('YYYY-MM-DD');
+            const endDate = $('#date-range-picker').data('daterangepicker')?.endDate?.format('YYYY-MM-DD');
+            const predefinedFilter = $('.dropdown-item.active').text().trim() || '';
+
+            var url =
+                "{{ route('management-project.export.excel') }}?startDate=" + startDate + "&endDate=" + endDate;
+
+            window.open(url);
         }
     </script>
 @endpush
