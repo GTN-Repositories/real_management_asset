@@ -16,12 +16,6 @@
             <div class="card-header">
                 <h5 class="card-title mb-0">Management Project</h5>
                 <div class="d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-success btn-sm d-flex align-items-center" onclick="importExcel()">
-                        <i class="fas fa-file-excel me-2"></i> Import Excel
-                    </button>
-                    <button onclick="exportExcel()" class="btn btn-success btn-sm">
-                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-                    </button>
                     <!-- Tombol Hapus Masal -->
                     <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
                         <i class="fas fa-trash-alt"></i> Hapus Masal
