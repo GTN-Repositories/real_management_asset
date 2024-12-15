@@ -25,7 +25,7 @@ class ItemController extends Controller
         return datatables()
             ->of($data)
             ->addIndexColumn()
-            ->addColumn('id', function ($data) {
+            ->addColumn('checklist', function ($data) {
                 $checkbox =
                     '<div class="custom-control custom-checkbox">
                     <input class="custom-control-input checkbox" id="checkbox' .
@@ -40,8 +40,11 @@ class ItemController extends Controller
 
                 return $checkbox;
             })
-            ->addColumn('item_id', function ($data) {
+            ->addColumn('id', function ($data) {
                 return $data->id ?? null;
+            })
+            ->addColumn('format_id', function ($data) {
+                return 'SPR-'.Crypt::decrypt($data->id);
             })
             ->addColumn('part', function ($data) {
                 return $data->part ?? null;
@@ -86,6 +89,9 @@ class ItemController extends Controller
             })
             ->addColumn('created_at', function ($data) {
                 return $data->created_at->format('d-m-Y');
+            })
+            ->addColumn('uom', function ($data) {
+                return $data->oum->name ?? null;
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
@@ -324,6 +330,8 @@ class ItemController extends Controller
                 $data = $request->all();
                 $data['item_id'] = Crypt::decrypt($data['item_id']);
                 $data['request_by'] = Auth::user()->id;
+                $data['stock'] = isset($data['stock']) && ($data['stock'] != '-') ? str_replace('.', '', $data['stock']) : 0;
+                $data['price'] = isset($data['price']) && ($data['price'] != '-') ? str_replace('.', '', $data['price']) : 0;
 
                 ItemStock::create($data);
                 return response()->json([

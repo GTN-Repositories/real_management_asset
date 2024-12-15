@@ -32,11 +32,11 @@
             placeholder="Masukan Nama Item" value="{{ old('name') }}" required />
     </div>
 
-    <div class="col-12 col-md-6">
+    {{-- <div class="col-12 col-md-6">
         <label class="form-label">Ukuran</label>
         <input type="text" name="size" class="form-control mb-3 mb-lg-0" placeholder="Ukuran"
             value="{{ old('size') }}" required />
-    </div>
+    </div> --}}
 
     <div class="col-12 col-md-6">
         <label class="form-label">Merk / Brand</label>
