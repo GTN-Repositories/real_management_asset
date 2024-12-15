@@ -333,30 +333,14 @@
         }
 
         function exportExcel() {
-            $.ajax({
-                url: "{{ route('item.export-excel') }}",
-                type: 'GET',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                },
-                xhrFields: {
-                    responseType: 'blob'
-                },
-                success: function(response) {
-                    const blob = new Blob([response], {
-                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    });
-                    const link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = 'FuelConsumptionReport.xlsx';
-                    link.click();
-                },
-                error: function() {
-                    Swal.fire('Error!',
-                        'An error occurred while exporting the report. Please try again later.',
-                        'error');
-                }
-            });
+            const startDate = $('#date-range-picker').data('daterangepicker')?.startDate?.format('YYYY-MM-DD');
+            const endDate = $('#date-range-picker').data('daterangepicker')?.endDate?.format('YYYY-MM-DD');
+            const predefinedFilter = $('.dropdown-item.active').text().trim() || '';
+
+            var url =
+                "{{ route('item.export-excel') }}?startDate=" + startDate + "&endDate=" + endDate;
+
+            window.open(url);
         }
 
         function importExcel() {

@@ -32,11 +32,11 @@
         <input type="date" id="date" name="date" class="form-control" placeholder="Masukkan tanggal"
             value="{{ date('Y-m-d') }}" required value="{{ $data->date }}" />
     </div>
-    {{-- <div class="col-12 col-md-6">
+    <div class="col-12 col-md-6">
         <label class="form-label" for="loadsheet">Loadsheet<span class="text-danger">*</span></label>
         <input type="text" id="loadsheet" name="loadsheet" class="form-control" placeholder="Masukkan loadsheet"
             required value="{{ $data->loadsheet }}" />
-    </div> --}}
+    </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="liter">Liter<span class="text-danger">*</span></label>
         <input type="text" id="liter" name="liter" class="form-control" placeholder="Masukkan liter" required
