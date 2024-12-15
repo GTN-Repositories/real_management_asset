@@ -13,13 +13,55 @@
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
+        <div class="card my-3 mb-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Inspection</h5>
+                <div class="d-flex justify-content-end gap-2">
+                    <!-- Tombol Hapus Masal -->
+                    {{-- <button type="button" class="btn btn-danger btn-sm" id="delete-btn"
+                        style="display: none !important;">
+                        <i class="fas fa-trash-alt"></i> Hapus Masal
+                    </button> --}}
+                    {{-- @if (auth()->user()->hasPermissionTo('asset-create')) --}}
+                    <button type="button" class="btn btn-primary btn-sm" onclick="createDataInspection()">
+                        <i class="fas fa-plus"></i> Tambah
+                    </button>
+                    {{-- @endif --}}
+                </div>
+            </div>
+
+            <div class="card-datatable table-responsive">
+                <table class="datatables table" id="data-table">
+                    <thead class="border-top">
+                        <tr>
+                            <th>
+                                #
+                            </th>
+                            <th>ID</th>
+                            <th>Nama</th>
+                            <th>Type</th>
+                            <th>Catatan</th>
+                            <th>Management Project</th>
+                            <th>Asset</th>
+                            <th>Tanggal</th>
+                            <th>Item</th>
+                            <th>Stok</th>
+                            <th>Stok Kanibal</th>
+                            <th>Asset Kanibal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
         <div class="card app-calendar-wrapper">
             <div class="row g-0">
                 <!-- Calendar Sidebar -->
                 <div class="col app-calendar-sidebar" id="app-calendar-sidebar">
                     <div class="border-bottom p-4 my-sm-0 mb-3">
                         <div class="d-grid">
-                            <button class="btn btn-primary btn-toggle-sidebar" onclick="createData()">
+                            <button class="btn btn-primary btn-toggle-sidebar" onclick="createDataMaintenance()">
                                 <i class="ti ti-plus me-1"></i>
                                 <span class="align-middle">Tambah Maintenance</span>
                             </button>
@@ -113,48 +155,6 @@
             </div>
         </div>
 
-        <!-- Product List Table -->
-        <div class="card my-3">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Inspection</h5>
-                <div class="d-flex justify-content-end gap-2">
-                    <!-- Tombol Hapus Masal -->
-                    {{-- <button type="button" class="btn btn-danger btn-sm" id="delete-btn"
-                        style="display: none !important;">
-                        <i class="fas fa-trash-alt"></i> Hapus Masal
-                    </button> --}}
-                    {{-- @if (auth()->user()->hasPermissionTo('asset-create')) --}}
-                    <button type="button" class="btn btn-primary btn-sm" onclick="createDataInspection()">
-                        <i class="fas fa-plus"></i> Tambah
-                    </button>
-                    {{-- @endif --}}
-                </div>
-            </div>
-
-            <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
-                    <thead class="border-top">
-                        <tr>
-                            <th>
-                                #
-                            </th>
-                            <th>Nama</th>
-                            <th>Type</th>
-                            <th>Catatan</th>
-                            <th>Management Project</th>
-                            <th>Asset</th>
-                            <th>Result</th>
-                            <th>Tanggal</th>
-                            <th>Item</th>
-                            <th>Stok</th>
-                            <th>Stok Kanibal</th>
-                            <th>Asset Kanibal</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-        </div>
-
         <div class="modal fade" id="modal-ce" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-xl modal-simple">
                 <div class="modal-content p-3 p-md-5">
@@ -178,7 +178,7 @@
 
     <!-- Page JS -->
     {{-- <script src="{{ asset('assets/js/app-calendar-events.js') }}"></script> --}}
-    <script src="{{ asset('assets/js/app-calendar.js?update=11') }}"></script>
+    <script src="{{ asset('assets/js/app-calendar.js?update=13') }}"></script>
     <script>
         $(document).ready(function() {
             init_table();
@@ -233,7 +233,7 @@
                 }],
                 ajax: {
                     type: "GET",
-                    url: "{{ route('maintenances.data') }}",
+                    url: "{{ route('inspection-schedule.data') }}",
                     data: {
                         'keyword': keyword,
                     }
@@ -243,6 +243,10 @@
                         name: 'DT_RowIndex',
                         orderable: false,
                         searchable: false
+                    },
+                    {
+                        data: 'format_id',
+                        name: 'format_id'
                     },
                     {
                         data: 'name',
@@ -265,10 +269,6 @@
                         name: 'asset_id',
                     },
                     {
-                        data: 'result',
-                        name: 'result'
-                    },
-                    {
                         data: 'date',
                         name: 'date'
                     },
@@ -288,7 +288,11 @@
                         data: 'asset_kanibal_name',
                         name: 'asset_kanibal_name'
                     },
-                ]
+                    {
+                        data: 'action',
+                        name: 'action'
+                    },
+                ]   
             });
         }
 
@@ -323,7 +327,7 @@
                 });
         }
 
-        function createDataInspection() {
+        function createDataMaintenance() {
             $.ajax({
                     url: "{{ route('maintenances.create') }}",
                     type: 'GET',
@@ -338,7 +342,7 @@
                 });
         }
 
-        function editDataInspection(id) {
+        function editDataMaintenance(id) {
             $.ajax({
                     url: "{{ route('maintenances.edit', ':id') }}".replace(':id', id),
                     type: 'GET',
@@ -372,6 +376,7 @@
             title: event.name,
             start: new Date(event.start),
             end: new Date(event.end),
+            allDay: false,
             extendedProps: {
                 calendar: event.type
             }

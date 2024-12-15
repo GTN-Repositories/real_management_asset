@@ -1,7 +1,7 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Edit Jadwal Maintenance</h3>
-    <p class="text-muted">Edit Data Sesuai Dengan Informasi Yang Tersedia</p>
+    <h3 class="mb-2">Detail Jadwal Inspeksi</h3>
+    <p class="text-muted">Detail Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
 
 <form method="POST" class="row g-3" id="formUpdate" action="{{ route('inspection-schedule.update', $data->id) }}"
@@ -10,7 +10,7 @@
     @method('PUT')
 
     <div class="col-12 col-md-12">
-        <label class="form-label">Judul Maintenance</label>
+        <label class="form-label">Judul Inspeksi</label>
         <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
             placeholder="Masukan Nama Item" value="{{ old('name', $data->name) }}" required disabled />
     </div>
@@ -22,7 +22,7 @@
     </div>
 
     <div class="col-12 col-md-6">
-        <label for="exampleFormControlSelect1" class="form-label">Jenis Maintenance</label>
+        <label for="exampleFormControlSelect1" class="form-label">Jenis Inspeksi</label>
         <select class="form-select" id="exampleFormControlSelect1" name="type" aria-label="Select Type" disabled>
             <option value="p2h" {{ $data->type == 'p2h' ? 'selected' : '' }}>P2H</option>
             <option value="pm" {{ $data->type == 'pm' ? 'selected' : '' }}>PM</option>
@@ -47,22 +47,6 @@
             {!! $data->note !!}
         </div>
     </div>
-
-    <div class="col-12 col-md-12">
-        <label for="exampleFormControlSelect1" class="form-label">Status</label>
-        <select class="form-select select2" id="exampleFormControlSelect1" name="status" aria-label="Select Status">
-            <option value="Scheduled" {{ $data->status == 'Scheduled' ? 'selected' : '' }}>Scheduled</option>
-            <option value="InProgress" {{ $data->status == 'InProgress' ? 'selected' : '' }}>In Progress</option>
-            <option value="OnHold" {{ $data->status == 'OnHold' ? 'selected' : '' }}>On Hold</option>
-            <option value="Finish" {{ $data->status == 'Finish' ? 'selected' : '' }}>Finish</option>
-        </select>
-    </div>
-
-    {{-- <div class="col-12 col-md-12" id="selectItem">
-        <label for="item_id" class="form-label">Sparepart</label>
-        <select id="item_id" class="form-select form-select-lg" name="item_id">
-        </select>
-    </div> --}}
 
     <div class="col-12 mt-3" id="selectedItemsContainer">
         <label class="form-label">Item yang Dipilih:</label>
@@ -95,37 +79,6 @@
             </tbody>
         </table>
     </div>
-
-    <div class="col-12 col-md-12">
-        <label class="form-label" for="alias">Komentar</label>
-        <textarea name="comment" id="comment" cols="30" rows="10" class="form-control"
-            placeholder="Masukkan Komentar"></textarea>
-    </div>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Komentar</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($comments as $comment)
-                <tr>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <span class="me-2">{{ $comment->user->name ?? 'anonymous' }}</span>
-                            <span class="text-muted">
-                                {{ $comment->time_note? \Carbon\Carbon::parse($comment->time_note)->locale('id')->translatedFormat('d F Y H:i'): '-' }}
-                            </span>
-                        </div>
-                        <div class="mt-1">
-                            {{ strip_tags($comment->comment) }}
-                        </div>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
 
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-2">Simpan</button>

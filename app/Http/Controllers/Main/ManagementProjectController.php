@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\ExportManageProject;
 use App\Http\Controllers\Controller;
+use App\Imports\ImportManageProject;
 use App\Models\Asset;
 use App\Models\Employee;
 use App\Models\Loadsheet;
@@ -12,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ManagementProjectController extends Controller
 {
@@ -41,6 +44,9 @@ class ManagementProjectController extends Controller
                 </div>';
 
                 return $checkbox;
+            })
+            ->addColumn('format_id', function ($data) {
+                return 'PRJ-'.Crypt::decrypt($data->id);
             })
             ->addColumn('managementRelationId', function ($data) {
                 return $data->id ?? null;
@@ -97,7 +103,7 @@ class ManagementProjectController extends Controller
             'value_project',
         ];
 
-        $keyword = $request->keyword ?? "";
+        $keyword = $request->search['value'] ?? '';
         $startDate = $request->startDate ?? null;
         $endDate = $request->endDate ?? null;
 
@@ -188,7 +194,7 @@ class ManagementProjectController extends Controller
                 foreach ($data['employee_id'] as $encryptedEmployeeId) {
                     $decryptedEmployeeIds[] = Crypt::decrypt($encryptedEmployeeId);
                 }
-                
+
                 $projectData = [
                     'name' => $data['name'],
                     'asset_id' => $decryptedAssetIds,
@@ -199,7 +205,7 @@ class ManagementProjectController extends Controller
                     'value_project' => $data['value_project'],
                     'location' => $data['location'],
                 ];
-                
+
                 ManagementProject::create($projectData);
                 Asset::whereIn('id', $decryptedAssetIds)->update(['status' => 'Active']);
 
@@ -392,6 +398,7 @@ class ManagementProjectController extends Controller
                 $data['created_by'] = Auth::user()->id;
                 $data['project_id'] = Crypt::decrypt($data['project_id']);
                 $data['status'] = 1;
+                $data['amount'] = isset($data['amount']) && ($data['amount'] != '-') ? str_replace('.', '', $data['amount']) : 0;
 
                 $create = PettyCash::create($data);
 
@@ -469,5 +476,78 @@ class ManagementProjectController extends Controller
                 'performance' => number_format($performance, 2)
             ]
         ]);
+    }
+
+    public function importForm()
+    {
+        return view('main.management_project.import');
+    }
+    protected $statusMapping = [
+        'aktif' => 'Active',
+        'tidak aktif' => 'Idle',
+        'siaga' => 'StandBy',
+        'selesai' => 'Finish',
+        'rusak' => 'Damaged',
+        'cukup' => 'Fair',
+        'perawatan' => 'UnderMaintenance',
+        'dijadwalkan' => 'Scheduled',
+        'proses' => 'InProgress',
+        'butuh perbaikan' => 'NeedsRepair',
+        'baik' => 'Good',
+        'ditahan' => 'OnHold'
+    ];
+
+    protected function mapStatus($status)
+    {
+        return $this->statusMapping[strtolower($status)] ?? 'Idle';
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            if (!$request->hasFile('excel_file')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No file uploaded!'
+                ], 400);
+            }
+
+            $file = $request->file('excel_file');
+            Excel::import(new ImportManageProject, $file);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data imported successfully!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error processing file: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function exportExcel()
+    {
+        // Nama file yang akan diunduh
+        $fileName = 'Management Project' . now()->format('Ymd_His') . '.xlsx';
+        $data = ManagementProject::all();
+        foreach ($data as $key => $value) {
+            $value['format_id'] = 'PRJ-'.Crypt::decrypt($value->id);
+            $employe = [];
+            if ($value['employee_id'] == null) {
+                $value['employees'] = null;
+            }else{
+                foreach (json_decode($value['employee_id']) as $key => $employee) {
+                    $employees = Employee::find($employee);
+                    $employe[] = $employees->name ?? null;
+                }
+                $value['employees'] = implode(', ', $employe);
+            }
+        }
+
+        // return view('main.management_project.excel', ['data' => $data]);
+
+        return Excel::download(new ExportManageProject($data), $fileName);
     }
 }

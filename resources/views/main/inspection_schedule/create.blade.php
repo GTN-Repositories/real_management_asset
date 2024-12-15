@@ -1,6 +1,6 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Tambah Jadwal Maintenance</h3>
+    <h3 class="mb-2">Tambah Inspeksi</h3>
     <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
 
@@ -8,21 +8,11 @@
     enctype="multipart/form-data">
     @csrf
     <div class="col-12 col-md-12">
-        <label class="form-label">Judul Maintenance</label>
+        <label class="form-label">Judul Inspeksi</label>
         <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
             placeholder="Masukan Nama Item" value="{{ old('name') }}" required />
     </div>
-    <div class="col-12 col-md-6">
-        <label class="form-label">Nama Bengkel</label>
-        <input type="text" name="workshop" id="workshop" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Bengkel" value="{{ old('workshop') }}" required />
-    </div>
-    <div class="col-12 col-md-6">
-        <label class="form-label">Nama Mekanik</label>
-        <input type="text" name="mechanic_name" id="mechanic_name" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Mekanik" value="{{ old('mechanic_name') }}" required />
-    </div>
-
+    
     <div class="col-12 col-md-6">
         <label class="form-label">Tanggal</label>
         <input type="date" name="date" id="date" class="form-control mb-3 mb-lg-0"
@@ -30,15 +20,26 @@
     </div>
 
     <div class="col-12 col-md-6">
-        <label for="exampleFormControlSelect1" class="form-label">Jenis Maintenance</label>
+        <label for="exampleFormControlSelect1" class="form-label">Jenis Inspeksi</label>
         <select class="form-select" id="exampleFormControlSelect1" name="type" aria-label="Select Type">
-            <option value="p2h">P2H</option>
-            <option value="pm">PM</option>
+            <option value="P2H">P2H (Harian)</option>
+            <option value="PMCHECK">PM Check(Migguan)</option>
         </select>
     </div>
 
+    <div class="col-12 col-md-12" id="employeeId">
+        <label for="employee_id" class="form-label">PIC<span class="text-danger">*</span></label>
+        <div class="select2-primary">
+            <div class="position-relative">
+                <select id="employee_id" name="employee_id" class="select2 form-select" required>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+        </div>
+    </div>
+
     <div class="col-12 col-md-6" id="managementRelation">
-        <label class="form-label" for="management_project_id">Nama Management Project<span
+        <label class="form-label" for="management_project_id">Nama Project<span
                 class="text-danger">*</span></label>
         <select id="management_project_id" name="management_project_id"
             class="select2 form-select select2-primary"data-allow-clear="true" required>
@@ -52,7 +53,7 @@
     </div>
 
     <div class="col-12 col-md-12">
-        <label class="form-label" for="alias">Catatan</label>
+        <label class="form-label" for="alias">Deskripsi</label>
         <textarea name="note" id="note" cols="30" rows="10" class="form-control"
             placeholder="Masukkan Deskripsi"></textarea>
     </div>
@@ -150,6 +151,35 @@
                         }).trigger('change');
                     }
                 });
+            }
+        });
+
+        $('#employee_id').select2({
+            dropdownParent: $('#employeeId'),
+            placeholder: 'Pilih karyawan',
+            ajax: {
+                url: "{{ route('employee.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term,
+                        limit: 10
+                    };
+                },
+                processResults: function(data) {
+                    apiResults = data.data.map(function(item) {
+                        return {
+                            text: item.nameTitle,
+                            id: item.relationId,
+                        };
+                    });
+
+                    return {
+                        results: apiResults
+                    };
+                },
+                cache: true
             }
         });
 

@@ -75,7 +75,7 @@
                             <input type="text" id="kilometer" name="kilometer" class="form-control" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="loadsheet">Loadsheet <span
+                            <label class="form-label" for="loadsheet">Total Loadsheet <span
                                     class="text-danger">*</span></label>
                             <input type="text" id="loadsheet" name="loadsheet" class="form-control" />
                         </div>
@@ -125,12 +125,14 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
                     };
                 },
                 processResults: function(data) {
                     let apiResults = data.data.map(item => ({
-                        text: item.name,
+                        text: item.format_id + ' - ' + item.name,
                         id: item.managementRelationId,
                     }));
                     return {
@@ -149,7 +151,7 @@
                     dataType: 'json',
                     delay: 250,
                     data: {
-                        projectId: projectId
+                        projectId: projectId,
                     },
                     success: function(data) {
                         if (data && typeof data === 'object' && Object.keys(data).length) {
@@ -196,7 +198,9 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
                     };
                 },
                 processResults: function(data) {
@@ -225,7 +229,9 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
                     };
                 },
                 processResults: function(data) {

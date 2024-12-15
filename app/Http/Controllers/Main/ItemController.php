@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\ItemExport;
 use App\Http\Controllers\Controller;
 use App\Models\CategoryItem;
 use App\Models\Item;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ItemController extends Controller
 {
@@ -25,7 +27,7 @@ class ItemController extends Controller
         return datatables()
             ->of($data)
             ->addIndexColumn()
-            ->addColumn('id', function ($data) {
+            ->addColumn('checklist', function ($data) {
                 $checkbox =
                     '<div class="custom-control custom-checkbox">
                     <input class="custom-control-input checkbox" id="checkbox' .
@@ -40,8 +42,11 @@ class ItemController extends Controller
 
                 return $checkbox;
             })
-            ->addColumn('item_id', function ($data) {
+            ->addColumn('id', function ($data) {
                 return $data->id ?? null;
+            })
+            ->addColumn('format_id', function ($data) {
+                return 'SPR-'.Crypt::decrypt($data->id);
             })
             ->addColumn('part', function ($data) {
                 return $data->part ?? null;
@@ -86,6 +91,9 @@ class ItemController extends Controller
             })
             ->addColumn('created_at', function ($data) {
                 return $data->created_at->format('d-m-Y');
+            })
+            ->addColumn('uom', function ($data) {
+                return $data->oum->name ?? null;
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
@@ -324,6 +332,8 @@ class ItemController extends Controller
                 $data = $request->all();
                 $data['item_id'] = Crypt::decrypt($data['item_id']);
                 $data['request_by'] = Auth::user()->id;
+                $data['stock'] = isset($data['stock']) && ($data['stock'] != '-') ? str_replace('.', '', $data['stock']) : 0;
+                $data['price'] = isset($data['price']) && ($data['price'] != '-') ? str_replace('.', '', $data['price']) : 0;
 
                 ItemStock::create($data);
                 return response()->json([
@@ -374,6 +384,50 @@ class ItemController extends Controller
                 }
 
                 $create->update($data);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil ditambahkan!',
+                ]);
+            });
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data gagal ditambahkan! ' . $th->getMessage(),
+            ]);
+        }
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $data = Item::all();
+        return Excel::download(new ItemExport($data), 'items.xlsx');
+    }
+
+    public function import()
+    {
+        return view('main.item.import');
+    }
+
+    public function importExcel(Request $request)
+    {
+        try {
+            return $this->atomic(function () use ($request) {
+                $file = $request->file('excel_file');
+                $importData = Excel::toArray([], $file);
+
+                foreach ($importData[0] as $row) {
+                    Item::create([
+                        'part' => $row[0],
+                        'name' => $row[1],
+                        'status' => $row[2],
+                        'brand' => $row[3],
+                        'stock' => $row[4],
+                        'no_invoice' => $row[5],
+                        'supplier_name' => $row[6],
+                        'supplier_address' => $row[7],
+                    ]);
+                }
 
                 return response()->json([
                     'status' => true,

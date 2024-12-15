@@ -14,8 +14,8 @@
     </div>
 
     <div class="col-12 col-md-12">
-        <label class="form-label">stock</label>
-        <input type="text" name="stock" class="form-control mb-3 mb-lg-0" placeholder="stock" required />
+        <label class="form-label">Stock</label>
+        <input type="text" name="stock" id="stock" class="form-control mb-3 mb-lg-0" placeholder="stock" required />
     </div>
 
     <div class="col-12 col-md-12">
@@ -25,6 +25,11 @@
             <option value="increase">Increase</option>
             <option value="decrease">Decrease</option>
         </select>
+    </div>
+
+    <div class="col-12 col-md-12">
+        <label class="form-label">Harga</label>
+        <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0" placeholder="Masukkan Harga" required />
     </div>
 
     <div class="col-12 text-center">
@@ -47,15 +52,17 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
                     };
                 },
                 processResults: function(data) {
                     apiResults = data.data
                         .map(function(item) {
                             return {
-                                text: item.name,
-                                id: item.item_id,
+                                text: item.format_id+' - '+item.name+'('+item.uom+')',
+                                id: item.id,
                             };
                         });
 
@@ -69,6 +76,11 @@
     });
 
     $(document).on('input', '#stock', function() {
+        value = formatCurrency($(this).val());
+        $(this).val(value);
+    });
+
+    $(document).on('input', '#price', function() {
         value = formatCurrency($(this).val());
         $(this).val(value);
     });

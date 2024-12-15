@@ -92,6 +92,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/asset/destroy-all', [AssetController::class, 'destroyAll'])->name('asset.destroyAll');
     Route::resource('asset', AssetController::class);
 
+    Route::get('/management-project/import', [ManagementProjectController::class, 'importForm'])->name('management-project.import.form');
+    Route::get('/management-project/export', [ManagementProjectController::class, 'exportExcel'])->name('management-project.export.excel');
+    Route::post('/management-project/import', [ManagementProjectController::class, 'import'])->name('management-project.import');
     Route::get('/management-project/by-project', [ManagementProjectController::class, 'getAssetsByProject'])->name('management-project.by_project');
     Route::get('/management-project/data', [ManagementProjectController::class, 'data'])->name('management-project.data');
     Route::get('/management-project/todoRequestPettyCash', [ManagementProjectController::class, 'todoRequestPettyCash'])->name('management-project.todoRequestPettyCash');
@@ -117,12 +120,16 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/item/stock', [ItemController::class, 'editStock'])->name('item.stock');
     Route::post('/item/stock/create', [ItemController::class, 'createStock'])->name('item.stock.create');
     Route::get('/item/data', [ItemController::class, 'data'])->name('item.data');
+    Route::get('/item/export-excel', [ItemController::class, 'exportExcel'])->name('item.export-excel');
+    Route::get('/item/import-excel', [ItemController::class, 'importExcel'])->name('item.import-excel');
+    Route::get('/item/import', [ItemController::class, 'import'])->name('item.import');
     Route::delete('/item/destroy-all', [ItemController::class, 'destroyAll'])->name('item.destroyAll');
     Route::resource('item', ItemController::class);
 
     Route::get('/form/data', [FormController::class, 'data'])->name('form.data');
     Route::delete('/form/destroy-all', [FormController::class, 'destroyAll'])->name('form.destroyAll');
     Route::resource('form', FormController::class);
+
 
     Route::post('/fuel-ipb/total-liter', [IpbController::class, 'getTotalLiter'])->name('fuel-ipb.total-liter');
     Route::get('/fuel-ipb/data', [IpbController::class, 'data'])->name('fuel-ipb.data');
@@ -147,6 +154,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/maintenances/destroy-all', [MaintenanceController::class, 'destroyAll'])->name('maintenances.destroyAll');
     Route::resource('maintenances', MaintenanceController::class);
 
+    Route::get('/fuel/export-excel', [FuelConsumptionController::class, 'exportExcel'])->name('fuel.export-excel');
+    Route::post('/fuel/import-excel', [FuelConsumptionController::class, 'importExcel'])->name('fuel.import-excel');
+    Route::get('/fuel/import', [FuelConsumptionController::class, 'import'])->name('fuel.import');
     Route::get('/fuel/data', [FuelConsumptionController::class, 'data'])->name('fuel.data');
     Route::delete('/fuel/destroy-all', [FuelConsumptionController::class, 'destroyAll'])->name('fuel.destroyAll');
     Route::resource('fuel', FuelConsumptionController::class);
@@ -183,6 +193,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/employee/destroy-all', [EmployeeController::class, 'destroyAll'])->name('employee.destroyAll');
     Route::resource('employee', EmployeeController::class);
 
+    Route::get('/loadsheet/import', [LoadsheetController::class, 'import'])->name('loadsheet.import');
+    Route::get('/loadsheet/export-excel', [LoadsheetController::class, 'exportExcel'])->name('loadsheet.export-excel');
+    Route::post('/loadsheet/import-excel', [LoadsheetController::class, 'importExcel'])->name('loadsheet.import-excel');
     Route::get('/loadsheet/data', [LoadsheetController::class, 'data'])->name('loadsheet.data');
     Route::delete('/loadsheet/destroy-all', [LoadsheetController::class, 'destroyAll'])->name('loadsheet.destroyAll');
     Route::resource('loadsheet', LoadsheetController::class);

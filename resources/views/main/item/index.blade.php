@@ -20,6 +20,12 @@
                     <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button>
+                    <button type="button" class="btn btn-success btn-sm d-flex align-items-center" onclick="importExcel()">
+                        <i class="fas fa-file-excel me-2"></i> Import Excel
+                    </button>
+                    <button onclick="exportExcel()" class="btn btn-success btn-sm">
+                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                    </button>
                     <!-- Tombol Tambah -->
                     <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
                         <i class="fas fa-plus"></i> Tambah
@@ -38,13 +44,14 @@
                                     <input class="form-check-input" type="checkbox" id="checkAll" />
                                 </div>
                             </th>
+                            <th>ID</th>
                             <th>Part Number</th>
                             <th>Foto</th>
                             <th>Nama</th>
                             <th>Kategori</th>
                             <th>Kode Barang</th>
                             <th>Status</th>
-                            <th>Ukuran</th>
+                            {{-- <th>Ukuran</th> --}}
                             <th>Merek</th>
                             {{-- <th>Warna</th> --}}
                             <th>Stock</th>
@@ -128,10 +135,14 @@
                     }
                 },
                 columns: [{
-                        data: 'id',
-                        name: 'id',
+                        data: 'checklist',
+                        name: 'checklist',
                         orderable: false,
                         searchable: false
+                    },
+                    {
+                        data: 'format_id',
+                        name: 'format_id'
                     },
                     {
                         data: 'part',
@@ -157,10 +168,10 @@
                         data: 'status',
                         name: 'status'
                     },
-                    {
-                        data: 'size',
-                        name: 'size'
-                    },
+                    // {
+                    //     data: 'size',
+                    //     name: 'size'
+                    // },
                     {
                         data: 'brand',
                         name: 'brand'
@@ -318,6 +329,48 @@
                 })
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
+                });
+        }
+
+        function exportExcel() {
+            $.ajax({
+                url: "{{ route('item.export-excel') }}",
+                type: 'GET',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                },
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function(response) {
+                    const blob = new Blob([response], {
+                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    });
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'FuelConsumptionReport.xlsx';
+                    link.click();
+                },
+                error: function() {
+                    Swal.fire('Error!',
+                        'An error occurred while exporting the report. Please try again later.',
+                        'error');
+                }
+            });
+        }
+
+        function importExcel() {
+            $.ajax({
+                    url: "{{ route('item.import') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
                 });
         }
     </script>

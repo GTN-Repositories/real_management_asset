@@ -1,115 +1,45 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Tambah Inspection</h3>
+    <h3 class="mb-2">Tambah Maintenance</h3>
     <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
 
-<form method="POST" class="row g-3" id="formCreateMaintenance" action="{{ route('inspection-schedule.store') }}"
+<form method="POST" class="row g-3" id="formCreateMaintenance" action="{{ route('maintenances.store') }}"
     enctype="multipart/form-data">
     @csrf
 
     <div class="col-12 col-md-12">
-        <label class="form-label">Judul Inspection</label>
+        <label class="form-label">Nama Maintenance</label>
         <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" required />
+            placeholder="Masukan Nama Bengkel" value="{{ old('name') }}" required />
+    </div>
+
+    <div class="col-12 col-md-6" id="inspectionScheduleId">
+        <label class="form-label">Inspeksi</label>
+        <div class="select2-primary">
+            <div class="position-relative">
+                <select id="inspection_schedule_id" name="inspection_schedule_id" class="select2 form-select" required>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+        </div>
     </div>
 
     <div class="col-12 col-md-6">
-        <label class="form-label">Tanggal</label>
-        <input type="date" name="date" id="date" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" required />
+        <label class="form-label">Nama Bengkel</label>
+        <input type="text" name="workshop" id="workshop" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Nama Bengkel" value="{{ old('workshop') }}" required />
     </div>
-
-    <div class="col-12 col-md-6">
-        <label for="exampleFormControlSelect1" class="form-label">Jenis Maintenance</label>
-        <select class="form-select" id="exampleFormControlSelect1" name="type" aria-label="Select Type">
-            <option value="day">Harian</option>
-            <option value="week">mingguan</option>
-        </select>
-    </div>
-
-    <div class="col-12 col-md-6" id="managementRelation">
-        <label class="form-label" for="management_project_id">Nama Management Project<span
-                class="text-danger">*</span></label>
-        <select id="management_project_id" name="management_project_id"
-            class="select2 form-select select2-primary"data-allow-clear="true" required>
-        </select>
-    </div>
-    <div class="col-12 col-md-6" id="assetRelation">
-        <label class="form-label" for="asset_id">Nama Asset<span class="text-danger">*</span></label>
-        <select id="asset_id" name="asset_id" class="select2 form-select select2-primary"data-allow-clear="true"
-            required>
-        </select>
-    </div>
-
-    <div class="col-12 col-md-12">
-        <label class="form-label" for="alias">Catatan</label>
-        <textarea name="note" id="note" cols="30" rows="10" class="form-control"
-            placeholder="Masukkan Deskripsi"></textarea>
-    </div>
-
-    <div class="col-12 col-md-6">
-        <label for="exampleFormControlSelect1" class="form-label">Result</label>
-        <select class="form-select" id="exampleFormControlSelect1" name="type" aria-label="Select Type">
-            <option value="ready">Ready To Use</option>
-            <option value="breakdown">Breakdown</option>
-        </select>
-    </div>
-
-    <div class="col-12 col-md-6">
-        <label class="form-label">Tanggal Breakdown</label>
-        <input type="date" name="date" id="date" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" />
-    </div>
-
-    <div class="col-12 col-md-6">
-        <label class="form-label">Hm</label>
-        <input type="text" name="hm" id="hm" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" />
-    </div>
-
-    <div class="col-12 col-md-6">
-        <label class="form-label">Km</label>
-        <input type="text" name="km" id="km" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" />
-    </div>
-
-    <div class="col-12 col-md-6">
-        <label class="form-label">Detail Problem</label>
-        <input type="text" name="detail_problem" id="detail_problem" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" />
-    </div>
-
-    <div class="col-12 col-md-6">
-        <label class="form-label">Action</label>
-        <input type="text" name="action" id="action" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" />
-    </div>
-
-    <div class="col-12 col-md-6">
-        <label class="form-label">Major Minor</label>
-        <input type="text" name="major_minor" id="major_minor" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" />
-    </div>
-
-    <div class="col-12 col-md-6">
-        <label class="form-label">Tanggal Pengingat</label>
-        <input type="date" name="date_reminder" id="date_reminder" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" />
-    </div>
-
-    <div class="col-12 col-md-12" id="selectItem">
-        <label for="item_id" class="form-label">Sparepart</label>
-        <select id="item_id" class="form-select form-select-lg" name="item_id">
-        </select>
-    </div>
-
-    <div class="col-12 mt-3" id="selectedItemsContainer">
-        <label class="form-label">Item yang Dipilih:</label>
-        <table class="table" id="selectedItemsTable">
-            <tbody></tbody>
-        </table>
-        <button id="clearAllButton" class="btn btn-warning btn-sm mt-2">Clear All</button>
+    
+    <div class="col-12 col-md-12" id="employeeId">
+        <label for="employee_id" class="form-label">Nama Mekanik<span class="text-danger">*</span></label>
+        <div class="select2-primary">
+            <div class="position-relative">
+                <select id="employee_id" name="employee_id[]" class="select2 form-select" multiple required>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+        </div>
     </div>
 
     <div class="col-12 text-center">
@@ -191,6 +121,64 @@
                         }).trigger('change');
                     }
                 });
+            }
+        });
+
+        $('#inspection_schedule_id').select2({
+            dropdownParent: $('#inspectionScheduleId'),
+            placeholder: 'Pilih Inspeksi',
+            ajax: {
+                url: "{{ route('inspection-schedule.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term,
+                        limit: 10
+                    };
+                },
+                processResults: function(data) {
+                    apiResults = data.data.map(function(item) {
+                        return {
+                            text: item.format_id,
+                            id: item.id,
+                        };
+                    });
+
+                    return {
+                        results: apiResults
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $('#employee_id').select2({
+            dropdownParent: $('#employeeId'),
+            placeholder: 'Pilih Mekanik',
+            ajax: {
+                url: "{{ route('employee.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term,
+                        limit: 10
+                    };
+                },
+                processResults: function(data) {
+                    apiResults = data.data.map(function(item) {
+                        return {
+                            text: item.nameTitle,
+                            id: item.relationId,
+                        };
+                    });
+
+                    return {
+                        results: apiResults
+                    };
+                },
+                cache: true
             }
         });
 
