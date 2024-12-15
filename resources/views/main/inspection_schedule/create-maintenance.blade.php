@@ -30,7 +30,7 @@
         <input type="text" name="workshop" id="workshop" class="form-control mb-3 mb-lg-0"
             placeholder="Masukan Nama Bengkel" value="{{ old('workshop') }}" required />
     </div>
-    
+
     <div class="col-12 col-md-12" id="employeeId">
         <label for="employee_id" class="form-label">Nama Mekanik<span class="text-danger">*</span></label>
         <div class="select2-primary">

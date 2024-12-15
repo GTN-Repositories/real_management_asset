@@ -26,6 +26,59 @@
             </div>
         </div>
 
+        <div class="row my-3">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Overdue and Due Soon</h5>
+                        <div class="row">
+                            <div class="col">
+                                <p class="card-text" id="overdue">Loading...</p>
+                            </div>
+                            <div class="col">
+                                <p class="card-text" id="underMaintenanceSecondDay">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row text-center mb-4">
+            <div class="col">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">Scheduled</h5>
+                        <p class="card-text" id="scheduled">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">In Progress</h5>
+                        <p class="card-text" id="inProgress">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card bg-secondary text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">On Hold</h5>
+                        <p class="card-text" id="onHold">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Finished</h5>
+                        <p class="card-text" id="finish">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- chart stock category --}}
         <div class="card mb-4">
             <div class="card-header">
@@ -101,6 +154,23 @@
                 $(this).val('');
                 reloadTableWithFilters(); // Reload without date range
                 reloadSparepartChart();
+            });
+
+            $.ajax({
+                url: "{{ route('report-sparepart.maintenance-status') }}",
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    $('#scheduled').text(data.scheduled);
+                    $('#inProgress').text(data.inProgress);
+                    $('#onHold').text(data.onHold);
+                    $('#finish').text(data.finish);
+                    $('#overdue').text(data.overdue);
+                    $('#underMaintenanceSecondDay').text(data.underMaintenanceSecondDay);
+                },
+                error: function(xhr, status, error) {
+                    console.log(xhr.responseText);
+                }
             });
         });
 

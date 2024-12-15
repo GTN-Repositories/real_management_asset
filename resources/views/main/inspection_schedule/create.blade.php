@@ -200,7 +200,7 @@
                     return {
                         results: data.data.map(item => ({
                             text: item.name,
-                            id: item.item_id,
+                            id: item.id,
                             code: item.code,
                             available_stock: item.stock || 0
                         }))

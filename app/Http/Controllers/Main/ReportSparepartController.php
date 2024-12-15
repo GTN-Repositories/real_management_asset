@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Models\InspectionSchedule;
 use App\Models\Item;
+use App\Models\Maintenance;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -193,5 +195,21 @@ class ReportSparepartController extends Controller
         }
 
         return response()->json($formattedData);
+    }
+
+    public function getMaintenanceStatus(Request $request)
+    {
+        $underMaintenanceSecondDayCount = InspectionSchedule::where('status', 'UnderMaintenance')
+            ->whereDate('updated_at', '=', Carbon::now()->subDays(2)->toDateString())
+            ->count();
+
+        return response()->json([
+            'scheduled' => InspectionSchedule::where('status', 'Scheduled')->count(),
+            'inProgress' => InspectionSchedule::where('status', 'InProgress')->count(),
+            'onHold' => InspectionSchedule::where('status', 'OnHold')->count(),
+            'finish' => InspectionSchedule::where('status', 'Finish')->count(),
+            'overdue' => InspectionSchedule::where('status', 'Overdue')->count(),
+            'underMaintenanceSecondDay' => $underMaintenanceSecondDayCount,
+        ]);
     }
 }
