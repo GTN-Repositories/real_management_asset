@@ -15,6 +15,10 @@
         </select>
     </div>
     <div class="col-12 col-md-12">
+        <label for="date" class="form-label">Tanggal</label>
+        <input type="date" id="date" name="date" value="{{ date('Y-m-d') }}" class="form-control" placeholder="Input Nilai">
+    </div>
+    <div class="col-12 col-md-12">
         <label for="amount" class="form-label">Nilai</label>
         <input type="text" id="amount" name="amount" class="form-control" placeholder="Input Nilai">
     </div>
@@ -33,6 +37,7 @@
                     <th>No</th>
                     <th>Nama Project</th>
                     <th>Nilai</th>
+                    <th>Tanggal</th>
                     <th>Dibuat Oleh</th>
                     <th>Dibuat Pada</th>
                     <th>Aksi</th>
@@ -44,6 +49,7 @@
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $item->project->name ?? null }}</td>
                         <td>{{ number_format($item->amount) ?? null }}</td>
+                        <td>{{ $item->date ?? null }}</td>
                         <td>{{ $item->createdBy->name ?? null }}</td>
                         <td>{{ $item->created_at->format('d-m-Y H:i') ?? null }}</td>
                         <td>
@@ -79,7 +85,7 @@
                 },
                 processResults: function(data) {
                     let apiResults = data.data.map(item => ({
-                        text: item.name,
+                        text: item.format_id +' - '+ item.name,
                         id: item.managementRelationId,
                     }));
                     return {
@@ -90,6 +96,34 @@
             }
         });
     });
+
+    $(document).on('input', '#amount', function() {
+        value = formatCurrency($(this).val());
+        $(this).val(value);
+    });
+
+    function formatCurrency(angka, prefix) {
+        if (!angka) {
+            return (prefix || '') + '-';
+        }
+
+        angka = angka.toString();
+        const splitDecimal = angka.split('.');
+        let number_string = angka.replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        // tambahkan titik jika yang di input sudah menjadi angka ribuan
+        if (ribuan) {
+            const separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+        return prefix === undefined ? rupiah : rupiah ? (prefix || '') + rupiah : '';
+    }
 
     function approvePettyCash(id, status) {
         Swal.fire({

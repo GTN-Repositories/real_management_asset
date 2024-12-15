@@ -1,28 +1,26 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Tambah Management Project</h3>
+    <h3 class="mb-2">Import Project</h3>
     <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
-<form method="POST" class="row g-3" id="formCreate" action="{{ route('management-project.import-excel') }}"
-    enctype="multipart/form-data">
+<form method="POST" class="row g-3" id="formCreate" action="{{ route('management-project.import') }}" enctype="multipart/form-data">
     @csrf
 
     <div class="col-12 col-md-12">
-        <label class="form-label" for="file">File <span class="text-danger">*</span></label>
-        <input type="file" id="file" name="file" class="form-control" placeholder="Masukkan file" />
+        <label for="excel_file" class="form-label">Excel File</label>
+        <input type="file" class="form-control" id="excel_file" name="excel_file" accept=".xlsx, .xls" required>
     </div>
-
     <div class="col-12 text-center">
-        <a href="{{ route('management-project.template') }}" class="btn btn-info me-sm-3 me-1">
+        <a href="{{ asset('assets/import/Format Import Manage Project.xlsx') }}" class="btn btn-info me-sm-3 me-1" download="">
             Download Template
         </a>
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
         <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
             aria-label="Close">Cancel</button>
     </div>
+</form> 
 
-</form>
-
+@include('components.select2_js')
 <script>
     document.getElementById('formCreate').addEventListener('submit', function(event) {
         event.preventDefault();

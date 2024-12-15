@@ -28,10 +28,10 @@
                         <th>Nama Item</th>
                         <td>{{ $data->name ?? '-' }}</td>
                     </tr>
-                    <tr>
+                    {{-- <tr>
                         <th>Ukuran</th>
                         <td>{{ $data->size ?? '-' }}</td>
-                    </tr>
+                    </tr> --}}
                     <tr>
                         <th>Brand</th>
                         <td>{{ $data->brand ?? '-' }}</td>
@@ -48,9 +48,13 @@
                         <th>Part</th>
                         <td>{{ $data->part ?? '-' }}</td>
                     </tr>
-                    <tr>
+                    {{-- <tr>
                         <th>Warna</th>
                         <td>{{ $data->color ?? '-' }}</td>
+                    </tr> --}}
+                    <tr>
+                        <th>Stock</th>
+                        <td>{{ $data->stock ?? '-' }}</td>
                     </tr>
                     <tr>
                         <th>Harga</th>
@@ -77,6 +81,7 @@
                         <th>No</th>
                         <th>Stock</th>
                         <th>Metode</th>
+                        <th>Harga</th>
                         <th>Dibuat Oleh</th>
                         <th>Status</th>
                         <th>Approve By</th>
@@ -90,6 +95,7 @@
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $item->stock ?? '-' }}</td>
                             <td>{{ $item->metode ?? '-' }}</td>
+                            <td>{{ number_format($item->price) ?? '-' }}</td>
                             <td>{{ $item->createdBy->name ?? '-' }}</td>
                             <td>{{ $item->status ?? '-' }}</td>
                             <td>{{ $item->approvedBy->name ?? '-' }}</td>

@@ -46,7 +46,8 @@
                                     <input class="form-check-input" type="checkbox" id="checkAll" />
                                 </div>
                             </th>
-                            <th>nama management project</th>
+                            <th>ID</th>
+                            <th>nama project</th>
                             <th>nama asset</th>
                             <th>tanggal awal</th>
                             <th>tanggal akhir</th>
@@ -155,6 +156,10 @@
                         name: 'id',
                         orderable: false,
                         searchable: false
+                    },
+                    {
+                        data: 'format_id',
+                        name: 'format_id'
                     },
                     {
                         data: 'name',
@@ -315,36 +320,9 @@
                 });
         }
 
-        function exportExcel() {
-            $.ajax({
-                url: "{{ route('management-project.export-excel') }}",
-                type: 'GET',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                },
-                xhrFields: {
-                    responseType: 'blob'
-                },
-                success: function(response) {
-                    const blob = new Blob([response], {
-                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    });
-                    const link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = 'FuelConsumptionReport.xlsx';
-                    link.click();
-                },
-                error: function() {
-                    Swal.fire('Error!',
-                        'An error occurred while exporting the report. Please try again later.',
-                        'error');
-                }
-            });
-        }
-
         function importExcel() {
             $.ajax({
-                    url: "{{ route('management-project.import') }}",
+                    url: "{{ route('management-project.import.form') }}",
                     type: 'GET',
                 })
                 .done(function(data) {
@@ -355,6 +333,17 @@
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
                 });
+        }
+
+        function exportExcel() {
+            const startDate = $('#date-range-picker').data('daterangepicker')?.startDate?.format('YYYY-MM-DD');
+            const endDate = $('#date-range-picker').data('daterangepicker')?.endDate?.format('YYYY-MM-DD');
+            const predefinedFilter = $('.dropdown-item.active').text().trim() || '';
+
+            var url =
+                "{{ route('management-project.export.excel') }}?startDate=" + startDate + "&endDate=" + endDate;
+
+            window.open(url);
         }
     </script>
 @endpush
