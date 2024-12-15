@@ -80,12 +80,14 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
                     };
                 },
                 processResults: function(data) {
                     let apiResults = data.data.map(item => ({
-                        text: item.name,
+                        text: item.format_id + ' - ' + item.name,
                         id: item.managementRelationId,
                     }));
                     return {
@@ -104,7 +106,7 @@
                     dataType: 'json',
                     delay: 250,
                     data: {
-                        projectId: projectId
+                        projectId: projectId,
                     },
                     success: function(data) {
                         if (data && typeof data === 'object' && Object.keys(data).length) {
@@ -153,7 +155,9 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
                     };
                 },
                 processResults: function(data) {

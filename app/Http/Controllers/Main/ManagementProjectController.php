@@ -103,7 +103,7 @@ class ManagementProjectController extends Controller
             'value_project',
         ];
 
-        $keyword = $request->keyword ?? "";
+        $keyword = $request->search['value'] ?? '';
         $startDate = $request->startDate ?? null;
         $endDate = $request->endDate ?? null;
 
