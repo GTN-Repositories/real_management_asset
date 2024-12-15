@@ -28,6 +28,7 @@ use App\Http\Controllers\Main\OumController;
 use App\Http\Controllers\Main\PermisionController;
 use App\Http\Controllers\Main\ReportFuelController;
 use App\Http\Controllers\Main\ReportLoadsheetController;
+use App\Http\Controllers\Main\ReportMaintenanceController;
 use App\Http\Controllers\Main\ReportSparepartController;
 use App\Http\Controllers\Main\RoleController;
 use App\Http\Controllers\Main\SiteController;
@@ -181,9 +182,14 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/report-asset/data', [AssetReportController::class, 'data'])->name('report-asset.data');
     Route::resource('report-asset', AssetReportController::class);
 
+    Route::get('/report-loadsheet/chart-project', [ReportLoadsheetController::class, 'chartProject'])->name('report-loadsheet.chart-project');
+    Route::get('/report-loadsheet/dataAsset', [ReportLoadsheetController::class, 'dataAsset'])->name('report-loadsheet.dataAsset');
     Route::get('/report-loadsheet/data', [ReportLoadsheetController::class, 'data'])->name('report-loadsheet.data');
     Route::get('/report-loadsheet/export-excel', [ReportLoadsheetController::class, 'exportExcel'])->name('report-loadsheet.export-excel');
     Route::resource('report-loadsheet', ReportLoadsheetController::class);
+
+    Route::get('/report-maintenance/data', [ReportMaintenanceController::class, 'data'])->name('report-maintenance.data');
+    Route::resource('report-maintenance', ReportMaintenanceController::class);
 
     Route::get('/monitoring/data', [MonitoringController::class, 'data'])->name('monitoring.data');
     Route::delete('/monitoring/destroy-all', [MonitoringController::class, 'destroyAll'])->name('monitoring.destroyAll');

@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Main;
 
 use App\Exports\ReportLoadsheetExport;
 use App\Http\Controllers\Controller;
+use App\Models\FuelConsumption;
 use App\Models\Loadsheet;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportLoadsheetController extends Controller
@@ -20,185 +22,52 @@ class ReportLoadsheetController extends Controller
 
     public function data(Request $request)
     {
-        $data = $this->getData($request);
+        $query = DB::table('loadsheets')
+            ->join('management_projects', 'loadsheets.management_project_id', '=', 'management_projects.id')
+            ->selectRaw('management_projects.name as project_name, SUM(loadsheets.loadsheet) as total_loadsheet')
+            ->groupBy('management_projects.name');
 
-        return datatables()
-            ->of($data)
+        $data = $query->get();
+
+        return datatables()->of($data)
+            ->addColumn('project_name', function ($row) {
+                return $row->project_name;
+            })
+            ->addColumn('total_loadsheet', function ($row) {
+                return $row->total_loadsheet;
+            })
             ->addIndexColumn()
-            ->addColumn('management_project_id', function ($data) {
-                return $data->management_project->name ?? '-';
-            })
-            ->addColumn('asset_id', function ($data) {
-                return ($data->asset->name ?? '') . ' ' . ($data->asset->license_plate ?? '') ?? '-';
-            })
-            ->addColumn('date', function ($data) {
-                return $data->date ?? '-';
-            })
-            ->addColumn('location', function ($data) {
-                return $data->location ?? '-';
-            })
-            ->addColumn('soil_type_id', function ($data) {
-                return $data->soilType->name ?? '-';
-            })
-            ->addColumn('bpit', function ($data) {
-                return $data->bpit ?? '-';
-            })
-            ->addColumn('kilometer', function ($data) {
-                return $data->kilometer ? number_format($data->kilometer, 0, ',', '.') : '-';
-            })
-            ->addColumn('loadsheet', function ($data) {
-                return $data->loadsheet ? number_format($data->loadsheet, 0, ',', '.') : '-';
-            })
-            ->addColumn('perload', function ($data) {
-                return $data->perload ? number_format($data->perload, 0, ',', '.') : '-';
-            })
-            ->addColumn('lose_factor', function ($data) {
-                return $data->lose_factor ?? '-';
-            })
-            ->addColumn('cubication', function ($data) {
-                return $data->cubication ? number_format($data->cubication, 0, ',', '.') : '-';
-            })
-            ->addColumn('price', function ($data) {
-                return $data->price ? number_format($data->price, 0, ',', '.') : '-';
-            })
-            ->addColumn('billing_status', function ($data) {
-                return $data->billing_status ?? '-';
-            })
-            ->addColumn('remarks', function ($data) {
-                return $data->remarks ?? '-';
-            })
-            ->escapeColumns([])
+            ->rawColumns(['action'])
             ->make(true);
     }
 
-    public function getData(Request $request)
+    public function dataAsset()
     {
-        $columns = [
-            'id',
-            'management_project_id',
-            'asset_id',
-            'date',
-            'location',
-            'soil_type_id',
-            'bpit',
-            'kilometer',
-            'loadsheet',
-            'perload',
-            'cubication',
-            'price',
-            'billing_status',
-            'remarks',
-            'lose_factor',
-        ];
+        $query = Loadsheet::join('assets', 'loadsheets.asset_id', '=', 'assets.id')
+            ->selectRaw('assets.id, assets.name, assets.asset_number, SUM(loadsheets.loadsheet) as total_loadsheet')
+            ->groupBy('assets.id', 'assets.name', 'assets.asset_number');
 
-        $keyword = $request->keyword ?? "";
-
-        $data = Loadsheet::orderBy('created_at', 'asc')
-            ->select($columns)
-            ->where(function ($query) use ($keyword, $columns) {
-                if ($keyword != '') {
-                    foreach ($columns as $column) {
-                        $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
-                    }
-                }
-            });
-
-        if (session('selected_project_id')) {
-            $data->whereHas('management_project', function ($q) {
-                $q->where('id', Crypt::decrypt(session('selected_project_id')));
-            });
-        }
-
-        if ($request->filled('startDate') && $request->filled('endDate')) {
-            $data->whereBetween('date', [
-                $request->startDate,
-                $request->endDate
-            ]);
-        }
-
-        // Apply predefined filters
-        if ($request->filled('predefinedFilter')) {
-            switch ($request->predefinedFilter) {
-                case 'hari ini':
-                    $data->whereDate('date', Carbon::today());
-                    break;
-                case 'minggu ini':
-                    $data->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                    break;
-                case 'bulan ini':
-                    $data->whereRaw('MONTH(date) = MONTH(NOW()) AND YEAR(date) = YEAR(NOW())');
-                    break;
-                case 'bulan kemarin':
-                    $data->whereRaw('MONTH(date) = MONTH(NOW()) - 1 AND YEAR(date) = YEAR(NOW())');
-                    break;
-                case 'tahun ini':
-                    $data->whereYear('date', Carbon::now()->year);
-                    break;
-                case 'tahun kemarin':
-                    $data->whereYear('date', Carbon::now()->subYear()->year);
-                    break;
-            }
-        }
-
-        return $data;
-    }
-
-    public function exportExcel(Request $request)
-    {
-        $query = $this->getFilteredDataQuery($request);
         $data = $query->get();
 
-        $name = 'Loadsheet';
-        $start_date = $request->startDate ?? now()->startOfMonth();
-        $end_date = $request->endDate ?? now()->endOfMonth();
-        $name .= '_' . $start_date . '_to_' . $end_date;
-
-        return Excel::download(new ReportLoadsheetExport($data), $name . '.xlsx');
-    }
-
-    private function getFilteredDataQuery(Request $request)
-    {
-        $query = Loadsheet::orderBy('id', 'asc');
-
-        $start_date = $request->startDate ?? now()->startOfMonth();
-        $end_date = $request->endDate ?? now()->endOfMonth();
-
-        if ($request->filled('predefinedFilter')) {
-            switch ($request->predefinedFilter) {
-                case 'hari ini':
-                    return $query->whereDate('date', Carbon::today());
-                case 'minggu ini':
-                    return $query->whereBetween('date', [
-                        Carbon::now()->startOfWeek(),
-                        Carbon::now()->endOfWeek()
-                    ]);
-                case 'bulan ini':
-                    return $query->whereBetween('date', [
-                        Carbon::now()->startOfMonth(),
-                        Carbon::now()->endOfMonth()
-                    ]);
-                case 'bulan kemarin':
-                    return $query->whereBetween('date', [
-                        Carbon::now()->subMonth()->startOfMonth(),
-                        Carbon::now()->subMonth()->endOfMonth()
-                    ]);
-                case 'tahun ini':
-                    return $query->whereBetween('date', [
-                        Carbon::now()->startOfYear(),
-                        Carbon::now()->endOfYear()
-                    ]);
-                case 'tahun kemarin':
-                    return $query->whereBetween('date', [
-                        Carbon::now()->subYear()->startOfYear(),
-                        Carbon::now()->subYear()->endOfYear()
-                    ]);
-                default:
-                    return $query;
-            }
-        }
-
-        $query->whereBetween('date', [$start_date, $end_date]);
-
-        return $query;
+        return datatables()->of($data)
+            ->addColumn('id', function ($row) {
+                return Crypt::decrypt($row->id);
+            })
+            ->addColumn('name', function ($row) {
+                return $row->name;
+            })
+            ->addColumn('asset_number', function ($row) {
+                return $row->asset_number;
+            })
+            ->addColumn('total_loadsheet', function ($row) {
+                return $row->total_loadsheet;
+            })
+            ->addColumn('liter', function ($row) {
+                $totalLiter = FuelConsumption::where('asset_id', Crypt::decrypt($row->id))->sum('liter');
+                return number_format($totalLiter, 0, ',', '.') ?? "kosong";
+            })
+            ->addIndexColumn()
+            ->rawColumns(['action'])
+            ->make(true);
     }
 }
