@@ -127,6 +127,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/form/destroy-all', [FormController::class, 'destroyAll'])->name('form.destroyAll');
     Route::resource('form', FormController::class);
 
+
     Route::post('/fuel-ipb/total-liter', [IpbController::class, 'getTotalLiter'])->name('fuel-ipb.total-liter');
     Route::get('/fuel-ipb/data', [IpbController::class, 'data'])->name('fuel-ipb.data');
     Route::delete('/fuel-ipb/destroy-all', [IpbController::class, 'destroyAll'])->name('fuel-ipb.destroyAll');

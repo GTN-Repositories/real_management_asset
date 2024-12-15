@@ -26,6 +26,12 @@
                     <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button>
+                    <button onclick="importExcel()" class="btn btn-success btn-sm">
+                        <i class="fa-solid fa-file-excel me-1"></i>Import Excel
+                    </button>
+                    <button onclick="exportExcel()" class="btn btn-success btn-sm">
+                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                    </button>
                     <!-- Tombol Tambah -->
                     @if (auth()->user()->hasPermissionTo('management-create'))
                         <button type="button" class="btn btn-primary btn-sm" onclick="createData()">

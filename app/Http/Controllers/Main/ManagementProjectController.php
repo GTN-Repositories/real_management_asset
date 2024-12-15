@@ -194,7 +194,7 @@ class ManagementProjectController extends Controller
                 foreach ($data['employee_id'] as $encryptedEmployeeId) {
                     $decryptedEmployeeIds[] = Crypt::decrypt($encryptedEmployeeId);
                 }
-                
+
                 $projectData = [
                     'name' => $data['name'],
                     'asset_id' => $decryptedAssetIds,
@@ -205,7 +205,7 @@ class ManagementProjectController extends Controller
                     'value_project' => $data['value_project'],
                     'location' => $data['location'],
                 ];
-                
+
                 ManagementProject::create($projectData);
                 Asset::whereIn('id', $decryptedAssetIds)->update(['status' => 'Active']);
 
