@@ -92,10 +92,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/asset/destroy-all', [AssetController::class, 'destroyAll'])->name('asset.destroyAll');
     Route::resource('asset', AssetController::class);
 
-    Route::get('/management-project/export-excel', [ManagementProjectController::class, 'excel'])->name('management-project.export-excel');
-    Route::get('/management-project/import-excel', [ManagementProjectController::class, 'importExcel'])->name('management-project.import-excel');
-    Route::get('/management-project/import', [ManagementProjectController::class, 'import'])->name('management-project.import');
-    Route::get('/management-project/template', [ManagementProjectController::class, 'templateExcel'])->name('management-project.template');
+    Route::get('/management-project/import', [ManagementProjectController::class, 'importForm'])->name('management-project.import.form');
+    Route::get('/management-project/export', [ManagementProjectController::class, 'exportExcel'])->name('management-project.export.excel');
+    Route::post('/management-project/import', [ManagementProjectController::class, 'import'])->name('management-project.import');
     Route::get('/management-project/by-project', [ManagementProjectController::class, 'getAssetsByProject'])->name('management-project.by_project');
     Route::get('/management-project/data', [ManagementProjectController::class, 'data'])->name('management-project.data');
     Route::get('/management-project/todoRequestPettyCash', [ManagementProjectController::class, 'todoRequestPettyCash'])->name('management-project.todoRequestPettyCash');

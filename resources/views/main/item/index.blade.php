@@ -38,13 +38,14 @@
                                     <input class="form-check-input" type="checkbox" id="checkAll" />
                                 </div>
                             </th>
+                            <th>ID</th>
                             <th>Part Number</th>
                             <th>Foto</th>
                             <th>Nama</th>
                             <th>Kategori</th>
                             <th>Kode Barang</th>
                             <th>Status</th>
-                            <th>Ukuran</th>
+                            {{-- <th>Ukuran</th> --}}
                             <th>Merek</th>
                             {{-- <th>Warna</th> --}}
                             <th>Stock</th>
@@ -128,10 +129,14 @@
                     }
                 },
                 columns: [{
-                        data: 'id',
-                        name: 'id',
+                        data: 'checklist',
+                        name: 'checklist',
                         orderable: false,
                         searchable: false
+                    },
+                    {
+                        data: 'format_id',
+                        name: 'format_id'
                     },
                     {
                         data: 'part',
@@ -157,10 +162,10 @@
                         data: 'status',
                         name: 'status'
                     },
-                    {
-                        data: 'size',
-                        name: 'size'
-                    },
+                    // {
+                    //     data: 'size',
+                    //     name: 'size'
+                    // },
                     {
                         data: 'brand',
                         name: 'brand'
