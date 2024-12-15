@@ -109,13 +109,38 @@
 
                 bulkDelete(ids);
             });
+
+            $('#date-range-picker').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
+
+            $('#date-range-picker').on('apply.daterangepicker', function(ev, picker) {
+                const startDate = picker.startDate.format('YYYY-MM-DD');
+                const endDate = picker.endDate.format('YYYY-MM-DD');
+                $(this).val(startDate + ' - ' + endDate);
+                reloadTableWithFilters(startDate, endDate, '');
+            });
+
+            $('#date-range-picker').on('cancel.daterangepicker', function() {
+                $(this).val('');
+                reloadTableWithFilters();
+            });
+
         });
+
+        function reloadTableWithFilters(startDate = '', endDate = '', predefinedFilter = '') {
+            $('#data-table').DataTable().destroy();
+            init_table('', startDate, endDate, predefinedFilter);
+        }
 
         $(document).on('input', '#searchData', function() {
             init_table($(this).val());
         })
 
-        function init_table(keyword = '') {
+        function init_table(keyword = '', startDate = '', endDate = '', predefinedFilter = '') {
             var csrf_token = $('meta[name="csrf-token"]').attr('content');
 
             var table = $('#data-table').DataTable({
@@ -131,7 +156,10 @@
                     type: "GET",
                     url: "{{ route('item.data') }}",
                     data: {
-                        'keyword': keyword
+                        keyword: keyword,
+                        startDate: startDate,
+                        endDate: endDate,
+                        predefinedFilter: predefinedFilter
                     }
                 },
                 columns: [{
