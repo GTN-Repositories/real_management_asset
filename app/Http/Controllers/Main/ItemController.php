@@ -131,7 +131,8 @@ class ItemController extends Controller
         ];
 
         $keyword = $request->search['value'] ?? '';
-
+        $startDate = $request->startDate ?? null;
+        $endDate = $request->endDate ?? null;
         $data = Item::orderBy('created_at', 'asc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
@@ -141,6 +142,11 @@ class ItemController extends Controller
                     }
                 }
             });
+
+        if ($startDate && $endDate) {
+            $data->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
 
         return $data;
     }
