@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\FuelConsumptionExport;
 use App\Http\Controllers\Controller;
+use App\Imports\ImportFuel;
 use App\Models\FuelConsumption;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Maatwebsite\Excel\Facades\Excel;
 use PhpParser\Node\Stmt\TryCatch;
 
 class FuelConsumptionController extends Controller
@@ -46,7 +49,7 @@ class FuelConsumptionController extends Controller
                 return $data->management_project->name ?? null;
             })
             ->addColumn('asset_id', function ($data) {
-                return $data->asset->license_plate . ' - ' . $data->asset->name . ' - ' . $data->asset->asset_number ?? null;
+                return Crypt::decrypt($data->asset->id) . ' - ' . $data->asset->name . ' - ' . $data->asset->license_plate ?? null;
             })
             ->addColumn('user_id', function ($data) {
                 return $data->employee->name ?? null;
@@ -277,5 +280,43 @@ class FuelConsumptionController extends Controller
                 'message' => 'Data Gagal Dihapus!',
             ]);
         }
+    }
+
+    public function import(Request $request)
+    {
+        return view('main.fuel_consumtion.import');
+    }
+
+    public function importExcel(Request $request)
+    {
+        try {
+            if (!$request->hasFile('excel_file')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No file uploaded!'
+                ], 400);
+            }
+
+            $file = $request->file('excel_file');
+            Excel::import(new ImportFuel, $file);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data imported successfully!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error processing file: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function exportExcel()
+    {
+        $fileName = 'Fuel Consumption' . now()->format('Ymd_His') . '.xlsx';
+        $data = FuelConsumption::all();
+
+        return Excel::download(new FuelConsumptionExport($data), $fileName);
     }
 }

@@ -28,7 +28,7 @@
                     <td>{{ $item->format_id ?? '-' }}</td>
                     <td>{{ $item->name ?? '-' }}</td>
                     <td>{{ implode(', ', $item->asset_id) ?? '-' }}</td>
-                    <td>{{ $item->employees ?? '-' }}</td> 
+                    <td>{{ $item->employees ?? '-' }}</td>
                     <td>{{ $item->start_date ?? '-' }}</td>
                     <td>{{ $item->end_date ?? '-' }}</td>
                     <td>{{ number_format($item->value_project, 0, ',', '.') ?? '-' }}</td>

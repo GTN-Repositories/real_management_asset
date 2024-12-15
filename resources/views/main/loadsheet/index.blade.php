@@ -15,6 +15,12 @@
                     <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button>
+                    <button onclick="importExcel()" class="btn btn-success btn-sm">
+                        <i class="fa-solid fa-file-excel me-1"></i>Import Excel
+                    </button>
+                    <button onclick="exportExcel()" class="btn btn-success btn-sm">
+                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                    </button>
                     <!-- Tombol Tambah -->
                     <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
                         <i class="fas fa-plus"></i> Tambah
@@ -287,6 +293,32 @@
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
                 });
+        }
+
+        function importExcel() {
+            $.ajax({
+                    url: "{{ route('loadsheet.import') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+                });
+        }
+
+        function exportExcel() {
+            const startDate = $('#date-range-picker').data('daterangepicker')?.startDate?.format('YYYY-MM-DD');
+            const endDate = $('#date-range-picker').data('daterangepicker')?.endDate?.format('YYYY-MM-DD');
+            const predefinedFilter = $('.dropdown-item.active').text().trim() || '';
+
+            var url =
+                "{{ route('loadsheet.export-excel') }}?startDate=" + startDate + "&endDate=" + endDate;
+
+            window.open(url);
         }
     </script>
 @endpush

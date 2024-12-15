@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\LoadsheetExport;
 use App\Http\Controllers\Controller;
+use App\Imports\ImportLoadsheet;
 use App\Models\Loadsheet;
 use App\Models\SoilType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LoadsheetController extends Controller
 {
@@ -51,7 +54,7 @@ class LoadsheetController extends Controller
                 return $data->location ?? '-';
             })
             ->addColumn('soil_type_id', function ($data) {
-                return $data->soilType->name ?? '-';
+                return optional($data->soilType)->name ?? '-';
             })
             ->addColumn('bpit', function ($data) {
                 return $data->bpit ?? '-';
@@ -314,5 +317,43 @@ class LoadsheetController extends Controller
                 'message' => 'Data Gagal Dihapus!',
             ]);
         }
+    }
+
+    public function import(Request $request)
+    {
+        return view('main.loadsheet.import');
+    }
+
+    public function importExcel(Request $request)
+    {
+        try {
+            if (!$request->hasFile('excel_file')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No file uploaded!'
+                ], 400);
+            }
+
+            $file = $request->file('excel_file');
+            Excel::import(new ImportLoadsheet, $file);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data imported successfully!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error processing file: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function exportExcel()
+    {
+        $fileName = 'Loadsheet' . now()->format('Ymd_His') . '.xlsx';
+        $data = Loadsheet::all();
+
+        return Excel::download(new LoadsheetExport($data), $fileName);
     }
 }
