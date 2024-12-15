@@ -53,7 +53,7 @@ class AssetController extends Controller
                 return $checkbox;
             })
             ->addColumn('noDecryptId', function ($data) {
-                return $data->id ?? null;
+                return 'AST - ' . Crypt::decrypt($data->id) ?? null;
             })
             ->addColumn('relationId', function ($data) {
                 return Crypt::decrypt($data->id) ?? null;
@@ -224,7 +224,7 @@ class AssetController extends Controller
                 }
 
                 $data['status'] = "Idle";
-                $data['asset_number'] = 'ast-' . ($lastNumber + 1);
+                $data['ast_id'] = 'ast-' . ($lastNumber + 1);
 
                 if (isset($data['image'])) {
                     $data['image'] = $data['image']->store('assets', 'public');

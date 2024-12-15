@@ -1,6 +1,7 @@
 <table class="table">
     <thead>
         <tr>
+            <th>ID</th>
             <th>Part Number</th>
             <th>Nama</th>
             <th>Kategori</th>
@@ -16,6 +17,7 @@
     <tbody>
         @foreach ($items as $item)
             <tr>
+                <td>{{ $item->format_id ?? '-' }}</td>
                 <td>{{ $item->part }}</td>
                 <td>{{ $item->name }}</td>
                 <td>{{ $item->category->name }}</td>

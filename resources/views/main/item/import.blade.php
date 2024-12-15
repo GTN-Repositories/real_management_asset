@@ -3,7 +3,8 @@
     <h3 class="mb-2">Import Sparepart</h3>
     <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
-<form method="POST" class="row g-3" id="formCreate" action="{{ route('asset.import') }}" enctype="multipart/form-data">
+<form method="POST" class="row g-3" id="formCreate" action="{{ route('item.import-excel') }}"
+    enctype="multipart/form-data">
     @csrf
 
     <div class="col-12 col-md-12">
@@ -11,7 +12,8 @@
         <input type="file" class="form-control" id="excel_file" name="excel_file" accept=".xlsx, .xls" required>
     </div>
     <div class="col-12 text-center">
-        <a href="{{ asset('template-item.xlsx') }}" class="btn btn-info me-sm-3 me-1" download="template-sparepart.xlsx">
+        <a href="{{ asset('assets/import/Format Import Sparepart.xlsx') }}" class="btn btn-info me-sm-3 me-1"
+            download="">
             Download Template
         </a>
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>

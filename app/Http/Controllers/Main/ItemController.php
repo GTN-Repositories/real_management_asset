@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Main;
 
 use App\Exports\ItemExport;
 use App\Http\Controllers\Controller;
+use App\Imports\ImportItem;
 use App\Models\CategoryItem;
 use App\Models\Item;
 use App\Models\ItemStock;
@@ -46,7 +47,7 @@ class ItemController extends Controller
                 return $data->id ?? null;
             })
             ->addColumn('format_id', function ($data) {
-                return 'SPR-'.Crypt::decrypt($data->id);
+                return 'SPR-' . Crypt::decrypt($data->id);
             })
             ->addColumn('part', function ($data) {
                 return $data->part ?? null;
@@ -400,8 +401,12 @@ class ItemController extends Controller
 
     public function exportExcel(Request $request)
     {
+        $fileName = 'Sparepart' . now()->format('Ymd_His') . '.xlsx';
         $data = Item::all();
-        return Excel::download(new ItemExport($data), 'items.xlsx');
+        foreach ($data as $key => $value) {
+            $value['format_id'] = 'SPR-' . Crypt::decrypt($value->id);
+        }
+        return Excel::download(new ItemExport($data), $fileName);
     }
 
     public function import()
@@ -412,33 +417,25 @@ class ItemController extends Controller
     public function importExcel(Request $request)
     {
         try {
-            return $this->atomic(function () use ($request) {
-                $file = $request->file('excel_file');
-                $importData = Excel::toArray([], $file);
-
-                foreach ($importData[0] as $row) {
-                    Item::create([
-                        'part' => $row[0],
-                        'name' => $row[1],
-                        'status' => $row[2],
-                        'brand' => $row[3],
-                        'stock' => $row[4],
-                        'no_invoice' => $row[5],
-                        'supplier_name' => $row[6],
-                        'supplier_address' => $row[7],
-                    ]);
-                }
-
+            if (!$request->hasFile('excel_file')) {
                 return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil ditambahkan!',
-                ]);
-            });
-        } catch (\Throwable $th) {
+                    'status' => false,
+                    'message' => 'No file uploaded!'
+                ], 400);
+            }
+
+            $file = $request->file('excel_file');
+            Excel::import(new ImportItem, $file);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data imported successfully!',
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Data gagal ditambahkan! ' . $th->getMessage(),
-            ]);
+                'message' => 'Error processing file: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

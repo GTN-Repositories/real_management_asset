@@ -271,8 +271,8 @@
                         name: 'image'
                     },
                     {
-                        data: 'relationId',
-                        name: 'relationId'
+                        data: 'noDecryptId',
+                        name: 'noDecryptId'
                     },
                     {
                         data: 'category',
