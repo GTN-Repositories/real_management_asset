@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Models\Asset;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
 use App\Models\Maintenance;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
 class ReportSparepartController extends Controller
@@ -127,11 +129,11 @@ class ReportSparepartController extends Controller
                     break;
                 case 'bulan ini':
                     $query->whereMonth('date', Carbon::now()->month)
-                          ->whereYear('date', Carbon::now()->year);
+                        ->whereYear('date', Carbon::now()->year);
                     break;
                 case 'bulan kemarin':
                     $query->whereMonth('date', Carbon::now()->subMonth()->month)
-                          ->whereYear('date', Carbon::now()->year);
+                        ->whereYear('date', Carbon::now()->year);
                     break;
                 case 'tahun ini':
                     $query->whereYear('date', Carbon::now()->year);
@@ -197,11 +199,83 @@ class ReportSparepartController extends Controller
         return response()->json($formattedData);
     }
 
+    public function dataProjectItem(Request $request)
+    {
+        $query = InspectionSchedule::selectRaw('management_project_id, GROUP_CONCAT(item_id) as item_ids, GROUP_CONCAT(asset_id) as asset_ids')
+            ->groupBy('management_project_id')
+            ->get()
+            ->map(function ($row) {
+                $itemIds = array_map(function ($value) {
+                    return trim($value, '[]');
+                }, explode(',', $row->item_ids));
+                $assetIds = array_map(function ($value) {
+                    return trim($value, '[]');
+                }, explode(',', $row->asset_ids ?? ''));
+                $uniqueItemIds = array_unique($itemIds);
+                $itemNamesWithCount = [];
+                foreach ($uniqueItemIds as $itemId) {
+                    $itemName = Item::where('id', $itemId)->value('name');
+                    if ($itemName !== null) {
+                        $itemNamesWithCount[] = $itemName . ' (' . count(array_keys($itemIds, $itemId)) . ')';
+                    }
+                }
+                $uniqueAssetIds = array_unique($assetIds);
+                $assetNamesWithCount = [];
+                foreach ($uniqueAssetIds as $assetId) {
+                    $assetName = Asset::where('id', $assetId)->value('name');
+                    if ($assetName !== null) {
+                        $assetNamesWithCount[] = $assetName;
+                    }
+                }
+                $projectName = DB::table('management_projects')->where('id', $row->management_project_id)->value('name');
+                $row->project_name = $projectName;
+                $row->item_names = implode(', ', $itemNamesWithCount);
+                $row->asset_names = implode(', ', $assetNamesWithCount);
+                return $row;
+            });
+
+        return datatables()->of($query)
+            ->addColumn('item_id', function ($row) {
+                return $row->item_names ?: '-';
+            })
+            ->addColumn('management_project_id', function ($row) {
+                return $row->project_name ?: '-';
+            })
+            ->addColumn('asset_id', function ($row) {
+                return $row->asset_names ?: '-';
+            })
+            ->addIndexColumn()
+            ->rawColumns(['action'])
+            ->make(true);
+    }
+
     public function getMaintenanceStatus(Request $request)
     {
         $underMaintenanceSecondDayCount = InspectionSchedule::where('status', 'UnderMaintenance')
             ->whereDate('updated_at', '=', Carbon::now()->subDays(2)->toDateString())
             ->count();
+
+        $totalItems = Item::count();
+        $currentYear = Carbon::now()->year;
+
+        $totalInspectionItemsYear = InspectionSchedule::whereYear('created_at', $currentYear)
+            ->pluck('item_id')
+            ->flatten()
+            ->unique()
+            ->count();
+
+        $totalInspectionItemsWeek = InspectionSchedule::whereYear('created_at', $currentYear)
+            ->whereBetween('created_at', [
+                Carbon::now()->startOfWeek(),
+                Carbon::now()->endOfWeek(),
+            ])
+            ->pluck('item_id')
+            ->flatten()
+            ->unique()
+            ->count();
+
+        $percentageItemsYear = ($totalInspectionItemsYear / $totalItems) * 100;
+        $percentageItemsWeek = ($totalInspectionItemsWeek / $totalItems) * 100;
 
         return response()->json([
             'scheduled' => InspectionSchedule::where('status', 'Scheduled')->count(),
@@ -210,6 +284,21 @@ class ReportSparepartController extends Controller
             'finish' => InspectionSchedule::where('status', 'Finish')->count(),
             'overdue' => InspectionSchedule::where('status', 'Overdue')->count(),
             'underMaintenanceSecondDay' => $underMaintenanceSecondDayCount,
+            'percentageItemsYear' => $percentageItemsYear,
+            'percentageItemsWeek' => $percentageItemsWeek,
+        ]);
+    }
+
+    public function getAssetStatus()
+    {
+        $underMaintenance = Asset::where('status', 'UnderMaintenance')->count();
+        $totalAssets = Asset::count();
+
+        return response()->json([
+            'series' => [
+                $underMaintenance,
+                $totalAssets - $underMaintenance
+            ]
         ]);
     }
 }

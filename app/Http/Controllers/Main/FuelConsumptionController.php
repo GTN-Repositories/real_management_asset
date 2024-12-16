@@ -49,7 +49,7 @@ class FuelConsumptionController extends Controller
                 return $data->management_project->name ?? null;
             })
             ->addColumn('asset_id', function ($data) {
-                return Crypt::decrypt($data->asset->id) . ' - ' . $data->asset->name . ' - ' . $data->asset->license_plate ?? null;
+                return isset($data->asset) ? Crypt::decrypt($data->asset->id) . ' - ' . $data->asset->name . ' - ' . $data->asset->license_plate : null;
             })
             ->addColumn('user_id', function ($data) {
                 return $data->employee->name ?? null;

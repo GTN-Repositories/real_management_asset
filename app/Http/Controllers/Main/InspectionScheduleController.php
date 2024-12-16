@@ -188,6 +188,7 @@ class InspectionScheduleController extends Controller
                             continue;
                         }
                     }
+                    sort($decryptedItemIds);
                 }
 
                 // Asset::where('id', $asset_id)->update([
