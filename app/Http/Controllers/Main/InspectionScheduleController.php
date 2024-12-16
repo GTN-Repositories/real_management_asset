@@ -92,7 +92,7 @@ class InspectionScheduleController extends Controller
             ->escapeColumns([])
             ->make(true);
     }
-    
+
     public function getData(Request $request)
     {
         $columns = [

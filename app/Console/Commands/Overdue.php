@@ -31,5 +31,11 @@ class Overdue extends Command
             ->each(function ($asset) {
                 $asset->update(['status' => 'Overdue']);
             });
+
+        \App\Models\InspectionSchedule::where('status', 'UnderMaintenance')
+            ->get()
+            ->each(function ($inspection) {
+                $inspection->update(['status' => 'Overdue']);
+            });
     }
 }
