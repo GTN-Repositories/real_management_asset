@@ -75,16 +75,6 @@
             </div>
         </div> --}}
 
-        {{-- chart manpower --}}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Manpower Data Over Time</h5>
-            </div>
-            <div class="card-body">
-                <div id="hours-chart"></div> <!-- Chart Div -->
-            </div>
-        </div>
-
         {{-- chart expense --}}
         <div id="dashboard-container">
             <div id="scorecard-section" class="scorecard-container">
@@ -171,7 +161,6 @@
             init_table();
             init_table_project();
             init_table_asset();
-            init_hours_chart(); // Initialize chart on page load
             init_expanse_chart(); // Initialize chart on page load
 
             $('.dropdown-item').on('click', function(e) {
@@ -200,14 +189,12 @@
                 $(this).val(startDate + ' - ' + endDate);
 
                 reloadTableWithFilters(startDate, endDate);
-                reloadHoursChartWithFilters(startDate, endDate);
                 reloadExpanseChartWithFilters(startDate, endDate);
             });
 
             $('#date-range-picker').on('cancel.daterangepicker', function() {
                 $(this).val('');
                 reloadTableWithFilters(); // Reload without date range
-                reloadHoursChartWithFilters(); // Reload chart without date range
                 reloadExpanseChartWithFilters(); // Reload chart without date range
             });
         });
@@ -219,11 +206,6 @@
         function reloadTableWithFilters(startDate = '', endDate = '', predefinedFilter = '') {
             $('#data-table').DataTable().destroy();
             init_table(startDate, endDate, predefinedFilter);
-        }
-
-        function reloadHoursChartWithFilters(startDate = '', endDate = '', predefinedFilter = '') {
-            if (hoursChart) hoursChart.destroy();
-            init_hours_chart(startDate, endDate, predefinedFilter);
         }
 
         function reloadExpanseChartWithFilters(startDate = '', endDate = '', predefinedFilter = '') {
