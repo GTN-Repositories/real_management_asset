@@ -38,6 +38,7 @@ use App\Http\Controllers\Main\SupplierController;
 use App\Http\Controllers\Main\UserController;
 use App\Http\Controllers\Main\WerehouseController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportManPowerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use SebastianBergmann\CodeCoverage\Report\Xml\Report;
@@ -167,14 +168,19 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/driver/project', [DriverProjectController::class, 'data'])->name('driver.data');
     Route::resource('driver', DriverProjectController::class);
 
+    Route::get('/report-fuel/get-by-project', [ReportFuelController::class, 'getDataProjectFuel'])->name('report-fuel.get-by-project');
+    Route::get('/report-fuel/get-by-asset', [ReportFuelController::class, 'getDataAssetFuel'])->name('report-fuel.get-by-asset');
     Route::get('/report-fuel/export-excel', [ReportFuelController::class, 'exportExcel'])->name('report-fuel.export-excel');
     Route::get('/report-fuel/export-excel-loadsheet', [ReportFuelController::class, 'exportExcelMonthly'])->name('report-fuel.export-excel-month');
     Route::post('report-fuel/export-pdf', [ReportFuelController::class, 'exportPDF'])->name('report-fuel.export-pdf');
     Route::get('/report-fuel/chart', [ReportFuelController::class, 'getChartData'])->name('report-fuel.chart');
-    Route::get('/report-fuel/hours-data', [ReportFuelController::class, 'getHoursData'])->name('report-fuel.hours-data');
     Route::get('/report-fuel/expanse-fuel', [ReportFuelController::class, 'getChartExpanseFuel'])->name('report-fuel.expanse-fuel');
     Route::get('/report-fuel/data', [ReportFuelController::class, 'data'])->name('report-fuel.data');
     Route::resource('report-fuel', ReportFuelController::class);
+
+    Route::get('/report-manpower/get-data-project-hours', [ReportManPowerController::class, 'getDataProjectHours'])->name('report-manpower.getDataProjectHours');
+    Route::get('/report-manpower/hours-data', [ReportManPowerController::class, 'getHoursData'])->name('report-manpower.hours-data');
+    Route::resource('/report-manpower', ReportManPowerController::class);
 
     Route::get('/report-asset/export-excel', [AssetReportController::class, 'exportExcel'])->name('report-asset.export-excel');
     Route::post('report-asset/export-pdf', [AssetReportController::class, 'exportPDF'])->name('report-asset.export-pdf');
