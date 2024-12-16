@@ -210,6 +210,8 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
 
     Route::get('/oum/data', [OumController::class, 'data'])->name('oum.data');
 
+    Route::get('/report-sparepart/asset-status', [ReportSparepartController::class, 'getAssetStatus'])->name('report-sparepart.asset-status');
+    Route::get('/report-sparepart/project-item', [ReportSparepartController::class, 'dataProjectItem'])->name('report-sparepart.project-item');
     Route::get('/report-sparepart/maintenance-status', [ReportSparepartController::class, 'getMaintenanceStatus'])->name('report-sparepart.maintenance-status');
     Route::get('/report-sparepart/data', [ReportSparepartController::class, 'data'])->name('report-sparepart.data');
     Route::get('/report-sparepart/data-inspection', [ReportSparepartController::class, 'getInspectionData'])->name('report-sparepart.data-inspection');
