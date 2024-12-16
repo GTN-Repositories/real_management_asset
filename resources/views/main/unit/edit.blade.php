@@ -71,7 +71,7 @@
     </div>
     <div class="col-12 col-md-6" id="managerParent">
         <label class="form-label" for="manager">Pemilik</label>
-        <input type="text" id="owner" name="owner" value="{{ $data->owner ?? '' }}" class="form-control"
+        <input type="text" id="owner" name="owner" value="{{ $data->manager ?? '' }}" class="form-control"
             placeholder="Masukkan Pemilik" />
         {{-- <select id="manager_id" name="manager" class="select2 form-select select2-primary"data-allow-clear="true">
         </select> --}}

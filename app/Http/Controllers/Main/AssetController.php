@@ -53,7 +53,7 @@ class AssetController extends Controller
                 return $checkbox;
             })
             ->addColumn('noDecryptId', function ($data) {
-                return $data->id ?? null;
+                return 'AST - ' . Crypt::decrypt($data->id) ?? null;
             })
             ->addColumn('relationId', function ($data) {
                 return Crypt::decrypt($data->id) ?? null;
@@ -95,7 +95,7 @@ class AssetController extends Controller
                 return $data->color;
             })
             ->addColumn('owner', function ($data) {
-                return $data->owner;
+                return $data->manager;
             })
             ->addColumn('assets_location', function ($data) {
                 return $data->assets_location;
@@ -136,6 +136,7 @@ class AssetController extends Controller
             'image',
             'name',
             'category',
+            'manager',
             'unit',
             'type',
             'license_plate',
@@ -224,7 +225,7 @@ class AssetController extends Controller
                 }
 
                 $data['status'] = "Idle";
-                $data['asset_number'] = 'ast-' . ($lastNumber + 1);
+                $data['ast_id'] = 'ast-' . ($lastNumber + 1);
 
                 if (isset($data['image'])) {
                     $data['image'] = $data['image']->store('assets', 'public');
@@ -238,6 +239,8 @@ class AssetController extends Controller
                 if (isset($data['file_tax'])) {
                     $data['file_tax'] = $data['file_tax']->store('assets', 'public');
                 }
+
+                $data['manager'] = $data['owner'];
 
                 $asset = Asset::create($data);
 
@@ -382,6 +385,8 @@ class AssetController extends Controller
                         $data['pic'] = $data['pic'];
                     }
                 }
+
+                $data['manager'] = $data['owner'];
 
                 $result = $asset->update($data);
 

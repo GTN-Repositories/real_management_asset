@@ -28,6 +28,7 @@ use App\Http\Controllers\Main\OumController;
 use App\Http\Controllers\Main\PermisionController;
 use App\Http\Controllers\Main\ReportFuelController;
 use App\Http\Controllers\Main\ReportLoadsheetController;
+use App\Http\Controllers\Main\ReportMaintenanceController;
 use App\Http\Controllers\Main\ReportSparepartController;
 use App\Http\Controllers\Main\RoleController;
 use App\Http\Controllers\Main\SiteController;
@@ -37,6 +38,7 @@ use App\Http\Controllers\Main\SupplierController;
 use App\Http\Controllers\Main\UserController;
 use App\Http\Controllers\Main\WerehouseController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportManPowerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use SebastianBergmann\CodeCoverage\Report\Xml\Report;
@@ -121,7 +123,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::post('/item/stock/create', [ItemController::class, 'createStock'])->name('item.stock.create');
     Route::get('/item/data', [ItemController::class, 'data'])->name('item.data');
     Route::get('/item/export-excel', [ItemController::class, 'exportExcel'])->name('item.export-excel');
-    Route::get('/item/import-excel', [ItemController::class, 'importExcel'])->name('item.import-excel');
+    Route::post('/item/import-excel', [ItemController::class, 'importExcel'])->name('item.import-excel');
     Route::get('/item/import', [ItemController::class, 'import'])->name('item.import');
     Route::delete('/item/destroy-all', [ItemController::class, 'destroyAll'])->name('item.destroyAll');
     Route::resource('item', ItemController::class);
@@ -166,14 +168,19 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/driver/project', [DriverProjectController::class, 'data'])->name('driver.data');
     Route::resource('driver', DriverProjectController::class);
 
+    Route::get('/report-fuel/get-by-project', [ReportFuelController::class, 'getDataProjectFuel'])->name('report-fuel.get-by-project');
+    Route::get('/report-fuel/get-by-asset', [ReportFuelController::class, 'getDataAssetFuel'])->name('report-fuel.get-by-asset');
     Route::get('/report-fuel/export-excel', [ReportFuelController::class, 'exportExcel'])->name('report-fuel.export-excel');
     Route::get('/report-fuel/export-excel-loadsheet', [ReportFuelController::class, 'exportExcelMonthly'])->name('report-fuel.export-excel-month');
     Route::post('report-fuel/export-pdf', [ReportFuelController::class, 'exportPDF'])->name('report-fuel.export-pdf');
     Route::get('/report-fuel/chart', [ReportFuelController::class, 'getChartData'])->name('report-fuel.chart');
-    Route::get('/report-fuel/hours-data', [ReportFuelController::class, 'getHoursData'])->name('report-fuel.hours-data');
     Route::get('/report-fuel/expanse-fuel', [ReportFuelController::class, 'getChartExpanseFuel'])->name('report-fuel.expanse-fuel');
     Route::get('/report-fuel/data', [ReportFuelController::class, 'data'])->name('report-fuel.data');
     Route::resource('report-fuel', ReportFuelController::class);
+
+    Route::get('/report-manpower/get-data-project-hours', [ReportManPowerController::class, 'getDataProjectHours'])->name('report-manpower.getDataProjectHours');
+    Route::get('/report-manpower/hours-data', [ReportManPowerController::class, 'getHoursData'])->name('report-manpower.hours-data');
+    Route::resource('/report-manpower', ReportManPowerController::class);
 
     Route::get('/report-asset/export-excel', [AssetReportController::class, 'exportExcel'])->name('report-asset.export-excel');
     Route::post('report-asset/export-pdf', [AssetReportController::class, 'exportPDF'])->name('report-asset.export-pdf');
@@ -181,9 +188,14 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/report-asset/data', [AssetReportController::class, 'data'])->name('report-asset.data');
     Route::resource('report-asset', AssetReportController::class);
 
+    Route::get('/report-loadsheet/chart-project', [ReportLoadsheetController::class, 'chartProject'])->name('report-loadsheet.chart-project');
+    Route::get('/report-loadsheet/dataAsset', [ReportLoadsheetController::class, 'dataAsset'])->name('report-loadsheet.dataAsset');
     Route::get('/report-loadsheet/data', [ReportLoadsheetController::class, 'data'])->name('report-loadsheet.data');
     Route::get('/report-loadsheet/export-excel', [ReportLoadsheetController::class, 'exportExcel'])->name('report-loadsheet.export-excel');
     Route::resource('report-loadsheet', ReportLoadsheetController::class);
+
+    Route::get('/report-maintenance/data', [ReportMaintenanceController::class, 'data'])->name('report-maintenance.data');
+    Route::resource('report-maintenance', ReportMaintenanceController::class);
 
     Route::get('/monitoring/data', [MonitoringController::class, 'data'])->name('monitoring.data');
     Route::delete('/monitoring/destroy-all', [MonitoringController::class, 'destroyAll'])->name('monitoring.destroyAll');
@@ -204,6 +216,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
 
     Route::get('/oum/data', [OumController::class, 'data'])->name('oum.data');
 
+    Route::get('/report-sparepart/asset-status', [ReportSparepartController::class, 'getAssetStatus'])->name('report-sparepart.asset-status');
+    Route::get('/report-sparepart/project-item', [ReportSparepartController::class, 'dataProjectItem'])->name('report-sparepart.project-item');
+    Route::get('/report-sparepart/maintenance-status', [ReportSparepartController::class, 'getMaintenanceStatus'])->name('report-sparepart.maintenance-status');
     Route::get('/report-sparepart/data', [ReportSparepartController::class, 'data'])->name('report-sparepart.data');
     Route::get('/report-sparepart/data-inspection', [ReportSparepartController::class, 'getInspectionData'])->name('report-sparepart.data-inspection');
     Route::resource('report-sparepart', ReportSparepartController::class);

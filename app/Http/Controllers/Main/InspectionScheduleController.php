@@ -92,7 +92,7 @@ class InspectionScheduleController extends Controller
             ->escapeColumns([])
             ->make(true);
     }
-    
+
     public function getData(Request $request)
     {
         $columns = [
@@ -188,6 +188,7 @@ class InspectionScheduleController extends Controller
                             continue;
                         }
                     }
+                    sort($decryptedItemIds);
                 }
 
                 // Asset::where('id', $asset_id)->update([

@@ -12,7 +12,7 @@
         <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
             placeholder="Masukan Nama Item" value="{{ old('name') }}" required />
     </div>
-    
+
     <div class="col-12 col-md-6">
         <label class="form-label">Tanggal</label>
         <input type="date" name="date" id="date" class="form-control mb-3 mb-lg-0"
@@ -200,7 +200,7 @@
                     return {
                         results: data.data.map(item => ({
                             text: item.name,
-                            id: item.item_id,
+                            id: item.id,
                             code: item.code,
                             available_stock: item.stock || 0
                         }))

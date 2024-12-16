@@ -26,6 +26,117 @@
             </div>
         </div>
 
+        <div class="row g-3 text-center mb-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Vehicle </h5>
+                        <div id="asset-status-chart" class="chart-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Overdue and Due Soon</h5>
+                        <div class="row">
+                            <div class="col">
+                                <p class="card-text" id="overdue">Loading...</p>
+                            </div>
+                            <div class="col">
+                                <p class="card-text" id="underMaintenanceSecondDay">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Percentage</h5>
+                        <div class="row">
+                            <div class="col">
+                                <p class="card-text">This year: <span id="percentageItemsYear">Loading...</span>%</p>
+                            </div>
+                            <div class="col">
+                                <p class="card-text">This week: <span id="percentageItemsWeek">Loading...</span>%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">Scheduled</h5>
+                        <p class="card-text" id="scheduled">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">In Progress</h5>
+                        <p class="card-text" id="inProgress">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-secondary text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">On Hold</h5>
+                        <p class="card-text" id="onHold">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Finished</h5>
+                        <p class="card-text" id="finish">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product List Table -->
+        <div class="card my-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Project Item</h5>
+            </div>
+            <div class="card-datatable table-responsive">
+                <table class="datatables table" id="data-table-project">
+                    <thead class="border-top">
+                        <tr>
+                            <th>#</th>
+                            <th>Nama Project</th>
+                            <th>Item</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <div class="card my-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Asset Item</h5>
+            </div>
+            <div class="card-datatable table-responsive">
+                <table class="datatables table" id="data-table-asset">
+                    <thead class="border-top">
+                        <tr>
+                            <th>#</th>
+                            <th>Nama Asset</th>
+                            <th>Item</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
         {{-- chart stock category --}}
         <div class="card mb-4">
             <div class="card-header">
@@ -67,7 +178,10 @@
     <script type="text/javascript">
         $(document).ready(function() {
             init_table();
+            init_table_asset();
+            init_table_project();
             init_stock_category_chart();
+            initAssetStatusChart();
 
             $('.dropdown-item').on('click', function(e) {
                 e.preventDefault();
@@ -101,6 +215,25 @@
                 $(this).val('');
                 reloadTableWithFilters(); // Reload without date range
                 reloadSparepartChart();
+            });
+
+            $.ajax({
+                url: "{{ route('report-sparepart.maintenance-status') }}",
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    $('#scheduled').text(data.scheduled);
+                    $('#inProgress').text(data.inProgress);
+                    $('#onHold').text(data.onHold);
+                    $('#finish').text(data.finish);
+                    $('#overdue').text(data.overdue);
+                    $('#underMaintenanceSecondDay').text(data.underMaintenanceSecondDay);
+                    $('#percentageItemsYear').text(data.percentageItemsYear);
+                    $('#percentageItemsWeek').text(data.percentageItemsWeek);
+                },
+                error: function(xhr, status, error) {
+                    console.log(xhr.responseText);
+                }
             });
         });
 
@@ -174,6 +307,128 @@
                     },
                 ]
             });
+        }
+
+        function init_table_project(startDate = '', endDate = '', predefinedFilter = '', keyword = '') {
+            $('#data-table-project').DataTable({
+                processing: true,
+                serverSide: true,
+                destroy: true,
+                ajax: {
+                    type: "GET",
+                    url: "{{ route('report-sparepart.project-item') }}",
+                    data: {
+                        'keyword': keyword,
+                        'startDate': startDate,
+                        'endDate': endDate,
+                        'predefinedFilter': predefinedFilter
+                    }
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'management_project_id',
+                        name: 'management_project_id'
+                    },
+                    {
+                        data: 'item_id',
+                        name: 'item_id'
+                    },
+                ]
+            });
+        }
+
+        function init_table_asset(startDate = '', endDate = '', predefinedFilter = '', keyword = '') {
+            $('#data-table-asset').DataTable({
+                processing: true,
+                serverSide: true,
+                destroy: true,
+                ajax: {
+                    type: "GET",
+                    url: "{{ route('report-sparepart.project-item') }}",
+                    data: {
+                        'keyword': keyword,
+                        'startDate': startDate,
+                        'endDate': endDate,
+                        'predefinedFilter': predefinedFilter
+                    }
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'asset_id',
+                        name: 'asset_id'
+                    },
+                    {
+                        data: 'item_id',
+                        name: 'item_id'
+                    },
+                ]
+            });
+        }
+
+        function initAssetStatusChart() {
+            $.ajax({
+                url: "{{ route('report-sparepart.asset-status') }}",
+                method: 'GET',
+                success: function(response) {
+                    var options = {
+                        series: response.series,
+                        chart: {
+                            type: 'donut',
+                            height: 350,
+                        },
+                        plotOptions: {
+                            pie: {
+                                donut: {
+                                    labels: {
+                                        show: true,
+                                        total: {
+                                            show: true,
+                                            label: 'Total',
+                                            formatter: function(w) {
+                                                return w.globals.seriesTotals.reduce((a, b) => a + b,
+                                                    0);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        legend: {
+                            position: 'bottom'
+                        },
+                        title: {
+                            text: 'Asset Status',
+                            align: 'center'
+                        },
+                        labels: ['Asset Maintenance', 'Asset Other']
+                    };
+
+                    var assetStatusChart = new ApexCharts(
+                        document.querySelector("#asset-status-chart"),
+                        options
+                    );
+                    assetStatusChart.render();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching asset status data:', error);
+                    document.querySelector("#asset-status-chart").innerHTML =
+                        '<div class="alert alert-danger">Failed to load asset status chart data. Please try again later.</div>';
+                }
+            });
+
         }
 
         let stockCategoryChart;

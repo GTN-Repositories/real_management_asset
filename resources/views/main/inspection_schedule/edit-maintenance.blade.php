@@ -18,7 +18,7 @@
     <div class="col-12 col-md-6">
         <label class="form-label">Tanggal</label>
         <input type="date" name="date" id="date" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Tanggal" value="{{ old('date', $data->date) }}" required disabled />
+            placeholder="Masukan Tanggal" value="{{ old('date', $maintenance->date) }}" required disabled />
     </div>
 
     <div class="col-12 col-md-6">
@@ -69,7 +69,7 @@
         <input type="text" name="delay_reason" value="{{ $maintenance->delay_reason }}" id="delay_reason" class="form-control mb-3 mb-lg-0"
             placeholder="Masukan Delay Reason" />
     </div>
-    
+
     <div class="col-12 col-md-6" id="estimate_finish_form" hidden>
         <label class="form-label">DateTime Estimate Finish/RFU</label>
         <input type="date" value="{{ date('Y-m-d') }}" name="estimate_finish" value="{{ $maintenance->estimate_finish }}" id="estimate_finish" class="form-control mb-3 mb-lg-0"
@@ -136,7 +136,7 @@
     </div>
 
     <div class="col-12 col-md-6" id="urgention_form" hidden>
-        <label class="form-label">Urgensi</label>
+        <label class="form-label">Jenis Kerusakan</label>
         <select name="urgention" id="urgention" class="form-select select2">
             <option value="Major">Major</option>
             <option value="Minor">Minor</option>
@@ -321,7 +321,7 @@
 
     $(document).on('change', '#statusMaintenance', function() {
         var status = $(this).val();
-        
+
         changeStatus(status);
     })
 

@@ -32,6 +32,7 @@ class MaintenanceController extends Controller
             'inspection_schedule_id',
             'employee_id',
             'status',
+            'date',
         ];
 
         $keyword = $request->search['value'] ?? '';
@@ -49,8 +50,8 @@ class MaintenanceController extends Controller
             })->get();
 
         foreach ($data as $key => $value) {
-            $value['start'] = Carbon::parse($value['created_at'])->format('Y-m-d') . ' 00:00:00';
-            $value['end'] = Carbon::parse($value['created_at'])->format('Y-m-d') . ' 23:59:59';
+            $value['start'] = Carbon::parse($value['date'])->format('Y-m-d') . ' 00:00:00';
+            $value['end'] = Carbon::parse($value['date'])->format('Y-m-d') . ' 23:59:59';
             $value['type'] = $value->inspection_schedule->type ?? '';
         }
 
@@ -75,6 +76,8 @@ class MaintenanceController extends Controller
                     $employee_id[] = Crypt::decrypt($value);
                 }
                 $data['employee_id'] = json_encode($employee_id);
+
+                $data['status'] = 1;
 
                 Asset::where('id', $inspection_schedule->asset_id)->update([
                     'status' => 'UnderMaintenance'

@@ -23,7 +23,7 @@
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button> --}}
                     {{-- @if (auth()->user()->hasPermissionTo('asset-create')) --}}
-                    <button type="button" class="btn btn-primary btn-sm" onclick="createDataInspection()">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
                         <i class="fas fa-plus"></i> Tambah
                     </button>
                     {{-- @endif --}}
@@ -292,7 +292,7 @@
                         data: 'action',
                         name: 'action'
                     },
-                ]   
+                ]
             });
         }
 
@@ -370,8 +370,10 @@
             .getMonth() - 1, 1);
 
         window.events = @json($data);
+        console.log(window.events);
 
         window.events = window.events.map(event => ({
+
             id: event.id,
             title: event.name,
             start: new Date(event.start),

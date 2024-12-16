@@ -4,40 +4,32 @@
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Loadsheet Report</h4>
-
+        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Maintenance Report</h4>
+        
         <!-- Product List Table -->
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Project Loadsheet</h5>
+                <h5 class="card-title mb-0">Maintenance</h5>
             </div>
             <div class="card-datatable table-responsive">
                 <table class="datatables table" id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>#</th>
-                            <th>Nama Project</th>
-                            <th>Total Loadsheet</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-        </div>
-
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Asset Loadsheet</h5>
-            </div>
-            <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table-asset">
-                    <thead class="border-top">
-                        <tr>
-                            <th>#</th>
-                            <th>ID Asset</th>
-                            <th>name</th>
-                            <th>asset number</th>
-                            <th>Total Loadsheet</th>
-                            <th>liter</th>
+                            <th>Management</th>
+                            <th>Asset</th>
+                            <th>Date</th>
+                            <th>Location</th>
+                            <th>Soil Type</th>
+                            <th>BPIT</th>
+                            <th>Kilometer</th>
+                            <th>Loadsheet</th>
+                            <th>Per Load</th>
+                            <th>Factor Lose</th>
+                            <th>Cubication</th>
+                            <th>Price</th>
+                            <th>Billing Status</th>
+                            <th>Remarks</th>
                         </tr>
                     </thead>
                 </table>
@@ -50,7 +42,6 @@
     <script type="text/javascript">
         $(document).ready(function() {
             init_table();
-            init_table_asset();
 
             $('.dropdown-item').on('click', function(e) {
                 e.preventDefault();
@@ -93,6 +84,7 @@
             init_table(startDate, endDate, predefinedFilter);
         }
 
+
         function init_table(keyword = '', startDate = '', endDate = '', predefinedFilter = '') {
             var csrf_token = $('meta[name="csrf-token"]').attr('content');
 
@@ -119,61 +111,60 @@
                         searchable: false
                     },
                     {
-                        data: 'project_name',
-                        name: 'project_name'
+                        data: 'management_project_id',
+                        name: 'management_project_id'
                     },
                     {
-                        data: 'total_loadsheet',
-                        name: 'total_loadsheet'
-                    },
-                ]
-            });
-        }
-
-        function init_table_asset(keyword = '', startDate = '', endDate = '', predefinedFilter = '') {
-            var csrf_token = $('meta[name="csrf-token"]').attr('content');
-
-            var table = $('#data-table-asset').DataTable({
-                processing: true,
-                serverSide: true,
-                columnDefs: [{
-                    target: 0,
-                    visible: true,
-                    searchable: false
-                }, ],
-
-                ajax: {
-                    type: "GET",
-                    url: "{{ route('report-loadsheet.dataAsset') }}",
-                    data: {
-                        'keyword': keyword
-                    }
-                },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
+                        data: 'asset_id',
+                        name: 'asset_id'
                     },
                     {
-                        data: 'id',
-                        name: 'id',
+                        data: 'date',
+                        name: 'date'
                     },
                     {
-                        data: 'name',
-                        name: 'name'
+                        data: 'location',
+                        name: 'location'
                     },
                     {
-                        data: 'asset_number',
-                        name: 'asset_number'
+                        data: 'soil_type_id',
+                        name: 'soil_type_id'
                     },
                     {
-                        data: 'total_loadsheet',
-                        name: 'total_loadsheet'
+                        data: 'bpit',
+                        name: 'bpit'
                     },
                     {
-                        data: 'liter',
-                        name: 'liter',
+                        data: 'kilometer',
+                        name: 'kilometer'
+                    },
+                    {
+                        data: 'loadsheet',
+                        name: 'loadsheet'
+                    },
+                    {
+                        data: 'perload',
+                        name: 'perload'
+                    },
+                    {
+                        data: 'lose_factor',
+                        name: 'lose_factor'
+                    },
+                    {
+                        data: 'cubication',
+                        name: 'cubication'
+                    },
+                    {
+                        data: 'price',
+                        name: 'price'
+                    },
+                    {
+                        data: 'billing_status',
+                        name: 'billing_status'
+                    },
+                    {
+                        data: 'remarks',
+                        name: 'remarks'
                     },
                 ]
             });
