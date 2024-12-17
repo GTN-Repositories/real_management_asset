@@ -67,6 +67,7 @@
                             <th>Unit</th>
                             <th>Tipe</th>
                             <th>Nopol</th>
+                            <th>Serial Number</th>
                             <th>Classification</th>
                             <th>No Rangka</th>
                             <th>No Mesin</th>
@@ -293,6 +294,10 @@
                     {
                         data: 'license_plate',
                         name: 'license_plate'
+                    },
+                    {
+                        data: 'serial_number',
+                        name: 'serial_number'
                     },
                     {
                         data: 'classification',
