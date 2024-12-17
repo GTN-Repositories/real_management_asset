@@ -455,47 +455,33 @@
             const startDate = $('#date-range-picker').data('daterangepicker')?.startDate.format('YYYY-MM-DD') || '';
             const endDate = $('#date-range-picker').data('daterangepicker')?.endDate.format('YYYY-MM-DD') || '';
             const predefinedFilter = $('.dropdown-item.active').text().trim() || '';
-
-            fuelConsumptionChart.dataURI().then(({
-                imgURI
-            }) => {
-                Swal.fire({
-                    title: 'Exporting PDF...',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading()
-                    }
-                });
-
-                $.ajax({
-                    url: "{{ route('report-fuel.export-pdf') }}",
-                    type: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        chartImage: imgURI,
-                        startDate: startDate,
-                        endDate: endDate,
-                        predefinedFilter: predefinedFilter
-                    },
-                    xhrFields: {
-                        responseType: 'blob'
-                    },
-                    success: function(response) {
-                        const blob = new Blob([response], {
-                            type: 'application/pdf'
-                        });
-                        const link = document.createElement('a');
-                        link.href = window.URL.createObjectURL(blob);
-                        link.download = 'FuelConsumptionReport.pdf';
-                        link.click();
-                        Swal.close();
-                    },
-                    error: function() {
-                        Swal.fire('Error!',
-                            'An error occurred while exporting the report. Please try again later.',
-                            'error');
-                    }
-                });
+            $.ajax({
+                url: "{{ route('report-fuel.export-pdf') }}",
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    startDate: startDate,
+                    endDate: endDate,
+                    predefinedFilter: predefinedFilter
+                },
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function(response) {
+                    const blob = new Blob([response], {
+                        type: 'application/pdf'
+                    });
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'FuelConsumptionReport.pdf';
+                    link.click();
+                    Swal.close();
+                },
+                error: function() {
+                    Swal.fire('Error!',
+                        'An error occurred while exporting the report. Please try again later.',
+                        'error');
+                }
             });
         }
 

@@ -134,8 +134,8 @@ class ReportFuelController extends Controller implements HasMiddleware
         $query = $this->getFilteredDataQuery($request);
         $data = $query->get();
 
-        $chartImage = $request->input('chartImage');
-        $pdf = Pdf::loadView('main.report_fuel.pdf', compact('data', 'chartImage'))
+        // $chartImage = $request->input('chartImage');
+        $pdf = Pdf::loadView('main.report_fuel.pdf', compact('data'))
             ->setPaper('a4', 'landscape');
 
         return $pdf->download('FuelConsumptionReport.pdf');
@@ -318,7 +318,7 @@ class ReportFuelController extends Controller implements HasMiddleware
             $startDate = Carbon::parse($request->startDate);
             $endDate = Carbon::parse($request->endDate);
 
-            if ($startDate->isSameDay($endDate)) {
+            if ($startDate->isSameDay($endDate) && $startDate->isSameMonth(Carbon::now())) {
                 return $query->whereBetween('date', [
                     Carbon::now()->startOfMonth(),
                     Carbon::now()->endOfMonth()
