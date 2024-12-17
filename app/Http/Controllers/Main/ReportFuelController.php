@@ -44,7 +44,7 @@ class ReportFuelController extends Controller implements HasMiddleware
                 return $data->management_project->name ?? null;
             })
             ->addColumn('asset_id', function ($data) {
-                return Crypt::decrypt($data->asset->id) . ' - ' . $data->asset->name . ' - ' . $data->asset->license_plate ?? null;
+                return 'AST-' . Crypt::decrypt($data->asset->id) . ' - ' . $data->asset->name . ' - ' . $data->asset->license_plate ?? null;
             })
             ->addColumn('date', function ($data) {
                 return \Carbon\Carbon::parse($data->date)->format('d-M-y') ?? null;
@@ -216,58 +216,6 @@ class ReportFuelController extends Controller implements HasMiddleware
         ]);
     }
 
-    public function getHoursData(Request $request)
-    {
-        $query = FuelConsumption::selectRaw('DATE_FORMAT(date, "%Y-%m") as month, SUM(hours) as total_hours')
-            ->groupBy('month')
-            ->orderBy('month', 'asc');
-
-        if ($request->filled('startDate') && $request->filled('endDate')) {
-            $query->whereBetween('date', [
-                Carbon::parse($request->startDate)->startOfDay(),
-                Carbon::parse($request->endDate)->endOfDay()
-            ]);
-        } else {
-            $query->whereBetween('date', [
-                Carbon::now()->startOfMonth(),
-                Carbon::now()->endOfMonth()
-            ]);
-        }
-
-        // Apply predefined filter if provided
-        if ($request->filled('predefinedFilter')) {
-            switch ($request->predefinedFilter) {
-                case 'tahun ini':
-                    $query->whereYear('date', Carbon::now()->year);
-                    break;
-                case 'tahun kemarin':
-                    $query->whereYear('date', Carbon::now()->subYear()->year);
-                    break;
-                case 'bulan ini':
-                    $query->whereMonth('date', Carbon::now()->month)
-                        ->whereYear('date', Carbon::now()->year);
-                    break;
-                case 'bulan kemarin':
-                    $query->whereMonth('date', Carbon::now()->subMonth()->month)
-                        ->whereYear('date', Carbon::now()->subMonth()->year);
-                    break;
-            }
-        }
-
-        if (session('selected_project_id')) {
-            $query->whereHas('management_project', function ($q) {
-                $q->where('id', Crypt::decrypt(session('selected_project_id')));
-            });
-        }
-
-        $hoursData = $query->get();
-
-        return response()->json([
-            'months' => $hoursData->pluck('month')->toArray(),
-            'hours' => $hoursData->pluck('total_hours')->toArray(),
-        ]);
-    }
-
     public function getChartExpanseFuel(Request $request)
     {
         $query = FuelConsumption::query();
@@ -387,5 +335,48 @@ class ReportFuelController extends Controller implements HasMiddleware
             Carbon::now()->startOfMonth(),
             Carbon::now()->endOfMonth()
         ]);
+    }
+
+    public function getDataProjectFuel(Request $request)
+    {
+        $query = FuelConsumption::join('management_projects', 'fuel_consumptions.management_project_id', '=', 'management_projects.id')
+            ->selectRaw('management_projects.id, management_projects.name, SUM(fuel_consumptions.liter) as total_liter')
+            ->groupBy('management_projects.id', 'management_projects.name');
+
+        $data = $query->get();
+
+        return datatables()->of($data)
+            ->addIndexColumn()
+            ->addColumn('name', function ($row) {
+                return $row->name;
+            })
+            ->addColumn('total_liter', function ($row) {
+                return $row->total_liter;
+            })
+            ->addIndexColumn()
+            ->rawColumns(['action'])
+            ->make(true);
+    }
+
+    public function getDataAssetFuel()
+    {
+        $query = FuelConsumption::join('assets', 'fuel_consumptions.asset_id', '=', 'assets.id')
+            ->selectRaw('assets.id, assets.name, assets.license_plate, SUM(fuel_consumptions.liter) as total_liter')
+            ->groupBy('assets.id', 'assets.name', 'assets.license_plate');
+
+
+        $data = $query->get();
+
+        return datatables()->of($data)
+            ->addIndexColumn()
+            ->addColumn('name', function ($row) {
+                return 'AST-' . Crypt::decrypt($row->id) . ' - ' . $row->name . ' - ' . $row->license_plate;
+            })
+            ->addColumn('total_liter', function ($row) {
+                return $row->total_liter;
+            })
+            ->addIndexColumn()
+            ->rawColumns(['action'])
+            ->make(true);
     }
 }

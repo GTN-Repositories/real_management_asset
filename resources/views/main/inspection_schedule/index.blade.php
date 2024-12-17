@@ -370,8 +370,10 @@
             .getMonth() - 1, 1);
 
         window.events = @json($data);
+        console.log(window.events);
 
         window.events = window.events.map(event => ({
+
             id: event.id,
             title: event.name,
             start: new Date(event.start),
