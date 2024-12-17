@@ -82,6 +82,9 @@ class AssetController extends Controller
             ->addColumn('classification', function ($data) {
                 return $data->classification;
             })
+            ->addColumn('serial_number', function ($data) {
+                return $data->serial_number;
+            })
             ->addColumn('chassis_number', function ($data) {
                 return $data->chassis_number;
             })
@@ -150,6 +153,7 @@ class AssetController extends Controller
             'assets_location',
             'pic',
             'status',
+            'serial_number',
             'created_at',
         ];
 
@@ -696,23 +700,23 @@ class AssetController extends Controller
         return view('main.unit.import');
     }
     protected $statusMapping = [
-        'aktif' => 'Active',
-        'tidak aktif' => 'Idle',
-        'siaga' => 'StandBy',
-        'selesai' => 'Finish',
-        'rusak' => 'Damaged',
-        'cukup' => 'Fair',
-        'perawatan' => 'UnderMaintenance',
-        'dijadwalkan' => 'Scheduled',
-        'proses' => 'InProgress',
-        'butuh perbaikan' => 'NeedsRepair',
-        'baik' => 'Good',
-        'ditahan' => 'OnHold'
+        'Active' => 'Active',
+        'Idle' => 'Idle',
+        'StandBy' => 'StandBy',
+        'Finish' => 'Finish',
+        'Damaged' => 'Damaged',
+        'Fair' => 'Fair',
+        'UnderMaintenance' => 'UnderMaintenance',
+        'Scheduled' => 'Scheduled',
+        'InProgress' => 'InProgress',
+        'NeedsRepair' => 'NeedsRepair',
+        'Good' => 'Good',
+        'OnHold' => 'OnHold'
     ];
 
     protected function mapStatus($status)
     {
-        return $this->statusMapping[strtolower($status)] ?? 'Idle';
+        return $this->statusMapping[$status] ?? 'Idle';
     }
 
     public function import(Request $request)
@@ -730,14 +734,14 @@ class AssetController extends Controller
             $worksheet = $spreadsheet->getActiveSheet();
 
             $rows = $worksheet->toArray();
-            $startRow = 4;
+            $startRow = 1;
             $failed = [];
             $success = 0;
 
             $headers = array_slice($rows[$startRow - 1], 1);
 
             for ($i = $startRow; $i < count($rows); $i++) {
-                $row = array_slice($rows[$i], 1);
+                $row = array_slice($rows[$i], 0);
 
                 if (empty(array_filter($row))) {
                     continue;
@@ -756,9 +760,8 @@ class AssetController extends Controller
                     'nik' => $row[10],
                     'color' => $row[11],
                     'manager' => $row[12],
-                    'assets_location' => $row[31],
-                    'image' => $row[32],
-                    'status' => $this->mapStatus($row[33]),
+                    'assets_location' => $row[14],
+                    'status' => $this->mapStatus($row[16]),
                 ];
 
                 try {

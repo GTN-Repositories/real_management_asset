@@ -136,15 +136,15 @@
                                 placeholder="Masukkan date_reminder" />
                         </div>
                         <div class="col-12 col-md-12">
-                            <label class="form-label" for="description">Keterangan</label>
-                            <textarea name="description" id="description" class="form-control" cols="30" rows="5"></textarea>
-                        </div>
-                        {{-- <div class="col-12 col-md-6">
                             <label class="form-label" for="serial_number">Nomor Seri</label>
                             <input type="text" id="serial_number" name="serial_number" class="form-control"
                                 placeholder="Masukkan serial_number" />
                         </div>
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-md-12">
+                            <label class="form-label" for="description">Keterangan</label>
+                            <textarea name="description" id="description" class="form-control" cols="30" rows="5"></textarea>
+                        </div>
+                        {{-- <div class="col-12 col-md-6">
                             <label class="form-label" for="model_number">Nomor Model</label>
                             <input type="text" id="model_number" name="model_number" class="form-control"
                                 placeholder="Masukkan model_number" />

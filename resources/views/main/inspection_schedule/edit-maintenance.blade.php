@@ -126,7 +126,7 @@
 
     <div class="col-12 col-md-12" id="detail_problem_form" hidden>
         <label class="form-label">Detail Problem</label>
-        <textarea name="detail_problem" value="{{ $maintenance->detail_problem }}" id="detail_problem" class="form-control mb-3 mb-lg-0" cols="30" rows="5"></textarea>
+        <textarea name="detail_problem" id="detail_problem" class="form-control mb-3 mb-lg-0" cols="30" rows="5">{{ $maintenance->detail_problem }}</textarea>
     </div>
 
     <div class="col-12 col-md-6" id="action_to_do_form" hidden>
