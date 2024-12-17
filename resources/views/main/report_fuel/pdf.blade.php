@@ -34,11 +34,11 @@
 
     <!-- Chart Image -->
     <h3>Fuel Consumption Over Time</h3>
-    @if ($chartImage)
+    {{-- @if ($chartImage)
         <img src="{{ $chartImage }}" alt="Fuel Consumption Chart" style="width:100%; height:auto;">
     @else
         <p>No chart data available.</p>
-    @endif
+    @endif --}}
 
     <!-- Table Data -->
     <h3>Fuel Consumption Data</h3>
