@@ -15,7 +15,14 @@
 
     <div class="col-12 col-md-12">
         <label class="form-label">Stock</label>
-        <input type="text" name="stock" id="stock" class="form-control mb-3 mb-lg-0" placeholder="stock" required />
+        <input type="text" name="stock" id="stock" class="form-control mb-3 mb-lg-0" placeholder="stock"
+            required />
+    </div>
+
+    <div class="col-12 col-md-12">
+        <label class="form-label">Stok Saat Ini</label>
+        <input type="text" name="balance" id="balance" class="form-control mb-3 mb-lg-0" placeholder="Balance"
+            required readonly />
     </div>
 
     <div class="col-12 col-md-12">
@@ -29,7 +36,8 @@
 
     <div class="col-12 col-md-12">
         <label class="form-label">Harga</label>
-        <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0" placeholder="Masukkan Harga" required />
+        <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukkan Harga" required />
     </div>
 
     <div class="col-12 text-center">
@@ -61,8 +69,10 @@
                     apiResults = data.data
                         .map(function(item) {
                             return {
-                                text: item.format_id+' - '+item.name+'('+item.uom+')',
+                                text: item.format_id + ' - ' + item.name + '(' + item.uom + ')',
                                 id: item.id,
+                                stock: item
+                                    .stock // Assuming this is the field for current stock
                             };
                         });
 
@@ -71,6 +81,11 @@
                     };
                 },
                 cache: true
+            }
+        }).on('change', function() {
+            const selectedOption = $(this).select2('data')[0];
+            if (selectedOption) {
+                $('#balance').val(selectedOption.stock);
             }
         });
     });

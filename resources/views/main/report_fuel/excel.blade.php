@@ -40,20 +40,20 @@
             @foreach ($groupedFuelConsumptions as $assetId => $group)
                 @php
                     $firstFuel = $group->first();
-                    $totalLiter = $group->whereBetween('date', [$startDate, $endDate])->sum('liter');
-                    $totalLoadsheet = $group->whereBetween('date', [$startDate, $endDate])->sum(function ($fuel) {
-                        return $fuel
-                            ->loadsheetsManagement()
-                            ->where('asset_id', $fuel->asset_id)
-                            ->sum('loadsheet');
-                    });
+                    $totalLiter = $group->sum('liter');
+                    $totalLoadsheet = $group
+                        ->first()
+                        ->loadsheetsManagement()
+                        ->where('asset_id', $assetId)
+                        ->sum('loadsheet');
                     $days = $startDate->diffInDays($endDate);
                 @endphp
+
                 <tr>
                     <td style="text-align: center;" colspan="2">{{ $loop->iteration }}</td>
                     <td style="text-align: center;" colspan="2">{{ $firstFuel->management_project->name ?? 'N/A' }}
                     </td>
-                    <td style="text-align: center;" colspan="2">{{ $firstFuel->asset->serial_number ?? 'N/A' }}</td>
+                    <td style="text-align: center;" colspan="2">{{ $firstFuel->asset->serial_number ?? '' }}</td>
                     <td style="text-align: center;" colspan="4">
                         {{ $firstFuel->asset->license_plate . ' - ' . $firstFuel->asset->name . ' - ' . $firstFuel->asset->asset_number ?? 'N/A' }}
                     </td>

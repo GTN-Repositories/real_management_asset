@@ -22,6 +22,9 @@
                         <i class="fa-solid fa-file-excel me-1"></i>Export Excel
                     </button>
                     <!-- Tombol Tambah -->
+                    <button type="button" class="btn btn-warning btn-sm" onclick="createDataRequest()">
+                        <i class="fas fa-plus"></i> Request Fuel
+                    </button>
                     <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
                         <i class="fas fa-plus"></i> Tambah
                     </button>
@@ -41,7 +44,7 @@
                             <th>Pengemudi</th>
                             <th>Tanggal</th>
                             <th>Banyak Penggunaan</th>
-                            <th>Loadsheet</th>
+                            {{-- <th>Loadsheet</th> --}}
                             <th>Harga/Liter</th>
                             <th>Kategori</th>
                             <th>Aksi</th>
@@ -146,10 +149,10 @@
                         data: 'liter',
                         name: 'liter'
                     },
-                    {
-                        data: 'loadsheet',
-                        name: 'loadsheet'
-                    },
+                    // {
+                    //     data: 'loadsheet',
+                    //     name: 'loadsheet'
+                    // },
                     {
                         data: 'price',
                         name: 'price'
@@ -232,6 +235,21 @@
                         });
                 }
             });
+        }
+
+        function createDataRequest() {
+            $.ajax({
+                    url: "{{ route('fuel-ipb.create') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+                });
         }
 
         function createData() {

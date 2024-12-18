@@ -113,7 +113,7 @@ class FuelConsumptionController extends Controller
         $keyword = $request->keyword ?? "";
         // $project_id = $this->projectId();
 
-        $data = FuelConsumption::orderBy('created_at', 'asc')
+        $data = FuelConsumption::orderBy('id', 'desc')
             ->select($columns)
             // ->whereIn($project_id)
             ->where(function ($query) use ($keyword, $columns) {
@@ -149,7 +149,7 @@ class FuelConsumptionController extends Controller
         try {
             return $this->atomic(function () use ($data) {
                 $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
-                $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
+                // $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
                 $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
                 $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
                 $data['lasted_km_asset'] = isset($data['lasted_km_asset']) && $data['lasted_km_asset'] != '-' ? str_replace('.', '', $data['lasted_km_asset']) : null;

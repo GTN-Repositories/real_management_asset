@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Models\Employee;
 use App\Models\Loadsheet;
 use App\Models\ManagementProject;
 use App\Models\SoilType;
@@ -18,27 +19,43 @@ class ImportLoadsheet implements ToModel, WithHeadingRow
      */
     public function model(array $row)
     {
-        $project = ManagementProject::where('name', $row['nama_project'])->first();
-        if ($project) {
-            return new Loadsheet([
-                'management_project_id' => Crypt::decrypt($project->id),
-                'asset_id' => $row['asset_id'],
-                'employee_id' => $row['nama_karyawan'],
-                'date' => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['date']),
-                'hours' => $row['hours'],
-                'type' => $row['type'],
-                'location' => $row['location'],
-                'soil_type_id' => optional(SoilType::where('name', $row['soil_type_id'])->first())->id ? Crypt::decrypt(optional(SoilType::where('name', $row['soil_type_id'])->first())->id) : null,
-                'kilometer' => $row['kilometer'],
-                'loadsheet' => $row['loadsheet'],
-                'perload' => $row['perload'],
-                'lose_factor' => $row['lose_factor'],
-                'cubication' => $row['cubication'],
-                'price' => $row['price'],
-                'billing_status' => $row['billing_status'],
-                'remarks' => $row['remarks'],
-                'bpit' => $row['bpit'],
-            ]);
+        try {
+            $project = ManagementProject::where('name', $row['nama_project'])->first();
+            $asset_id = explode('AST - ', $row['asset_id'])[1];
+            $employee = Employee::where('name', $row['nama_karyawan'])->first();
+
+            $soil_type_id = optional(SoilType::where('name', $row['soil_type_id'])->first())->id ? Crypt::decrypt(optional(SoilType::where('name', $row['soil_type_id'])->first())->id) : null;
+            $cubication = ($row['total_load'] * $row['perload']) * $row['lose_factor'];
+            $soilType = SoilType::find($soil_type_id);
+            $price = (int)($cubication * $soilType->value);
+
+            if ($project) {
+                $data = [
+                    'management_project_id' => Crypt::decrypt($project->id),
+                    'asset_id' => $asset_id,
+                    'employee_id' => Crypt::decrypt($employee->id) ?? $row['employee_id'],
+                    'date' => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['date']),
+                    'hours' => $row['hours'],
+                    'type' => $row['jenis_pekerjaan'],
+                    'location' => $row['location'],
+                    'soil_type_id' => $soil_type_id,
+                    'kilometer' => $row['kilometer'],
+                    'loadsheet' => $row['total_load'],
+                    'perload' => $row['perload'],
+                    'lose_factor' => $row['lose_factor'],
+                    'cubication' => $cubication,
+                    'price' => $price,
+                    'billing_status' => $row['billing_status'],
+                    'remarks' => $row['remarks'],
+                    'bpit' => $row['bpit'],
+                ];
+
+                // dd($data);
+                return new Loadsheet($data);
+            }
+        } catch (\Throwable $th) {
+            dd($row, $row['asset_id'], $th);
         }
+        
     }
 }

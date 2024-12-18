@@ -1,6 +1,6 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Edit Fuel Consumtion</h3>
+    <h3 class="mb-2">Edit Request Fuel</h3>
     <p class="text-muted">Edit Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
 <form method="POST" class="row g-3" id="formEdit" action="{{ route('fuel-ipb.update', $data->id) }}"

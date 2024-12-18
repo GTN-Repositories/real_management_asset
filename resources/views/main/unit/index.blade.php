@@ -495,7 +495,7 @@
                         });
                         const link = document.createElement('a');
                         link.href = window.URL.createObjectURL(blob);
-                        link.download = 'FuelConsumptionReport.xlsx';
+                        link.download = 'Export Asset.xlsx';
                         link.click();
                     },
                     error: function() {
@@ -523,7 +523,7 @@
                         });
                         const link = document.createElement('a');
                         link.href = window.URL.createObjectURL(blob);
-                        link.download = 'FuelConsumptionReport.xlsx';
+                        link.download = 'Export Asset.xlsx';
                         link.click();
                     },
                     error: function() {
