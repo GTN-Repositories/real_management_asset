@@ -127,7 +127,7 @@ class LoadsheetController extends Controller
 
         $keyword = $request->search['value'] ?? '';
 
-        $data = Loadsheet::orderBy('created_at', 'asc')
+        $data = Loadsheet::orderBy('id', 'desc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
