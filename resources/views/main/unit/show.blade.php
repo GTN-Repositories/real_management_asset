@@ -22,12 +22,12 @@
                         aria-selected="false">Project
                     </button>
                 </li> --}}
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                         data-bs-target="#navs-justified-payment" aria-controls="navs-justified-payment"
                         aria-selected="false">Payment
                     </button>
-                </li>
+                </li> --}}
                 <li class="nav-item">
                     <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                         data-bs-target="#navs-justified-history" aria-controls="navs-justified-history"
@@ -59,7 +59,7 @@
                     <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                         data-bs-target="#navs-justified-reminder" aria-controls="navs-justified-reminder"
                         aria-selected="false">
-                        Log History 
+                        Log History
                     </button>
                 </li>
                 <li class="nav-item">
@@ -278,7 +278,7 @@
                         data ini belum pernah memiliki project
                     @endforelse
                 </div>
-                <div class="tab-pane fade" id="navs-justified-payment" role="tabpanel">
+                {{-- <div class="tab-pane fade" id="navs-justified-payment" role="tabpanel">
                     <table class="datatables table">
                         <thead class="border-top">
                             <tr>
@@ -292,7 +292,7 @@
                             </tr>
                         </thead>
                     </table>
-                </div>
+                </div> --}}
                 <div class="tab-pane fade" id="navs-justified-history" role="tabpanel">
                     <table class="datatables table" id="data-table">
                         <thead class="border-top">
