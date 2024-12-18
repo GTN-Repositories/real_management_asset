@@ -174,16 +174,21 @@ class AssetController extends Controller
                 }
             });
 
-        if ($request->assets_location) {
-            $data->where('assets_location', 'LIKE', '%' . $request->assets_location . '%');
-        }
+            if ($request->assets_location) {
+                $assets_location = $request->assets_location;
+                $data->whereIn('assets_location', $assets_location);
+            }
 
-        if ($request->category) {
-            $data->where('category', 'LIKE', '%' . $request->category . '%');
-        }
-        if ($request->pic) {
-            $data->where('pic', 'LIKE', '%' . Crypt::decrypt($request->pic) . '%');
-        }
+            if ($request->category) {
+                $category = $request->category;
+                $data->whereIn('category', $category);
+            }
+
+            if ($request->pic) {
+                $pic = $request->pic;
+                $data->whereIn('pic', $pic);
+            }
+
 
         if (session('selected_project_id')) {
             $managementProject = ManagementProject::find(Crypt::decrypt(session('selected_project_id')));
