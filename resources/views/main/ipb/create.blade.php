@@ -24,15 +24,15 @@
         <input type="date" id="date" name="date" class="form-control" placeholder="Masukkan date" required />
     </div>
     <div class="col-12 col-md-6">
-        <label class="form-label" for="issued_liter">Liter yang dikeluarkan</label>
+        <label class="form-label" for="issued_liter">Liter Ditambahkan</label>
         <input type="text" id="issued_liter" name="issued_liter" class="form-control"
-            placeholder="Masukkan liter yang digunakan" />
+            placeholder="Masukkan liter yang ditambahkan" />
     </div>
     {{-- <div class="col-12 col-md-6">
-        <label class="form-label" for="usage_liter">Liter yang digunakan<span class="text-danger">*</span></label>
-        <input type="text" id="usage_liter" name="usage_liter" class="form-control" placeholder="otomatis terisi"
+        <label class="form-label" for="usage_liter">Liter yang digunakan<span class="text-danger">*</span></label> --}}
+        <input type="text" hidden id="usage_liter" name="usage_liter" class="form-control" placeholder="otomatis terisi"
             required readonly />
-    </div> --}}
+    {{-- </div> --}}
     <div class="col-12 col-md-6">
         <label class="form-label" for="unit_price">Harga<span class="text-danger">*</span></label>
         <input type="text" id="unit_price" name="unit_price" class="form-control" placeholder="masukkan harga"

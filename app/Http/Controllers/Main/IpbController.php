@@ -122,7 +122,7 @@ class IpbController extends Controller
 
         $keyword = $request->keyword ?? "";
 
-        $data = Ipb::orderBy('created_at', 'asc')
+        $data = Ipb::orderBy('date', 'desc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
