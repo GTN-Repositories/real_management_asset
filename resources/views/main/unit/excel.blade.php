@@ -44,7 +44,7 @@
                         <td style="text-align: center;" colspan="2">
                             {{-- image --}}
                         </td>
-                        <td style="text-align: center;" colspan="2">{{ $asset->relationId ?? 'N/A' }}</td>
+                        <td style="text-align: center;" colspan="2">{{ 'AST - ' . Crypt::decrypt($asset->id) ?? 'N/A' }}</td>
                         <td style="text-align: center;" colspan="2">{{ $asset->category ?? 'N/A' }}</td>
                         <td style="text-align: center;" colspan="2">{{ $asset->name ?? 'N/A' }}</td>
                         <td style="text-align: center;" colspan="2">{{ $asset->unit ?? 'N/A' }}</td>

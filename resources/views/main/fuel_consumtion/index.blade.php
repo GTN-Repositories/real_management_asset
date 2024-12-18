@@ -44,7 +44,7 @@
                             <th>Pengemudi</th>
                             <th>Tanggal</th>
                             <th>Banyak Penggunaan</th>
-                            <th>Loadsheet</th>
+                            {{-- <th>Loadsheet</th> --}}
                             <th>Harga/Liter</th>
                             <th>Kategori</th>
                             <th>Aksi</th>
@@ -149,10 +149,10 @@
                         data: 'liter',
                         name: 'liter'
                     },
-                    {
-                        data: 'loadsheet',
-                        name: 'loadsheet'
-                    },
+                    // {
+                    //     data: 'loadsheet',
+                    //     name: 'loadsheet'
+                    // },
                     {
                         data: 'price',
                         name: 'price'
