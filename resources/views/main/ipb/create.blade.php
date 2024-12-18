@@ -1,6 +1,6 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Tambah Fuel Consumtion</h3>
+    <h3 class="mb-2">Tambah Request Fuel</h3>
     <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
 <form method="POST" class="row g-3" id="formCreate" action="{{ route('fuel-ipb.store') }}" enctype="multipart/form-data">
