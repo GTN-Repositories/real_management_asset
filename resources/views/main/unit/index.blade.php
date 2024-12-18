@@ -11,20 +11,24 @@
                 <div class="row">
                     <div class="col-12 col-md-4" id="categoryParent">
                         <label class="form-label" for="category">Kategori</label>
-                        <select name="category" id="category_id" class="select2 form-select " data-allow-clear="true"
+                        <select name="category[]" id="category_id" class="select2 form-select" data-allow-clear="true"
+                            multiple required>
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-4" id="assets_locationParent">
+                        <label class="form-label" for="assets_location">Lokasi Aset</label>
+                        <select name="assets_location[]" id="assets_location_id" class="form-select select2" multiple>
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-4" id="picParent">
+                        <label class="form-label" for="pic">PIC</label>
+                        <select id="pic_id" name="pic[]" class="select2 form-select" data-allow-clear="true" multiple
                             required>
                         </select>
                     </div>
-                    <div class="col-12 col-md-4" id="assets_locationParent">
-                        <label class="form-label" for="assets_location">Lokasi Aset</label>
-                        <select name="assets_location" id="assets_location_id" class="form-select select2">
-                        </select>
-                    </div>
-                    <div class="col-12 col-md-4" id="picParent">
-                        <label class="form-label" for="pic">PIC</label>
-                        <select id="pic_id" name="pic" class="select2 form-select " data-allow-clear="true" required>
-                        </select>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -117,8 +121,7 @@
                                 if (!unique.some((i) => i.text === item.category)) {
                                     unique.push({
                                         text: item.category,
-                                        id: item
-                                            .category
+                                        id: item.category
                                     });
                                 }
                                 return unique;
@@ -147,13 +150,12 @@
                                 if (!unique.some((i) => i.text === item.assets_location)) {
                                     unique.push({
                                         text: item.assets_location,
-                                        id: item
-                                            .assets_location // Changed from relationId to assets_location
+                                        id: item.assets_location
                                     });
                                 }
                                 return unique;
                             }, [])
-                        }
+                        };
                     },
                     cache: true
                 }
@@ -182,7 +184,6 @@
                                     id: item.relationId,
                                 };
                             });
-
                         return {
                             results: apiResults
                         };
