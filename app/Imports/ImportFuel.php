@@ -27,7 +27,7 @@ class ImportFuel implements ToModel, WithHeadingRow
                 'user_id' => Crypt::decrypt($employee->id) ?? $row['employee_id'],
                 'date' => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['date']),
                 'liter' => $row['liter'],
-                'price' => $row['price'],
+                // 'price' => $row['price'],
                 'category' => $row['category'],
                 'lasted_km_asset' => $row['lasted_km_asset'],
                 // 'loadsheet' => $row['loadsheet'],
