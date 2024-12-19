@@ -45,7 +45,7 @@
                             <th>Tanggal</th>
                             <th>Banyak Penggunaan</th>
                             {{-- <th>Loadsheet</th> --}}
-                            <th>Harga/Liter</th>
+                            {{-- <th>Harga/Liter</th> --}}
                             <th>Kategori</th>
                             <th>Aksi</th>
                         </tr>
@@ -153,10 +153,10 @@
                     //     data: 'loadsheet',
                     //     name: 'loadsheet'
                     // },
-                    {
-                        data: 'price',
-                        name: 'price'
-                    },
+                    // {
+                    //     data: 'price',
+                    //     name: 'price'
+                    // },
                     {
                         data: 'category',
                         name: 'category'

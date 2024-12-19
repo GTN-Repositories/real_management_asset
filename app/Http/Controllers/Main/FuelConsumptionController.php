@@ -148,7 +148,7 @@ class FuelConsumptionController extends Controller
 
         try {
             return $this->atomic(function () use ($data) {
-                $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
+                // $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
                 // $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
                 $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
                 $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
@@ -203,7 +203,7 @@ class FuelConsumptionController extends Controller
         $data = $request->all();
         try {
             return $this->atomic(function () use ($data, $id) {
-                $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
+                // $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
                 $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
                 $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
                 $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
