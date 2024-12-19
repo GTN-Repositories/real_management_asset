@@ -174,6 +174,11 @@ class AssetController extends Controller
                 }
             });
 
+            if ($request->status) {
+                $status = $request->status;
+                $data->whereIn('status', $status);
+            }
+
             if ($request->assets_location) {
                 $assets_location = $request->assets_location;
                 $data->whereIn('assets_location', $assets_location);
@@ -186,7 +191,7 @@ class AssetController extends Controller
 
             if ($request->pic) {
                 $pic = $request->pic;
-                $data->whereIn('pic', $pic);
+                $data->whereIn('manager', $pic);
             }
 
 
@@ -249,7 +254,7 @@ class AssetController extends Controller
                     $data['file_tax'] = $data['file_tax']->store('assets', 'public');
                 }
 
-                $data['manager'] = $data['owner'];
+                $data['manager'] = $data['manager'];
 
                 $asset = Asset::create($data);
 
@@ -395,7 +400,7 @@ class AssetController extends Controller
                     }
                 }
 
-                $data['manager'] = $data['owner'];
+                $data['manager'] = $data['manager'];
 
                 $result = $asset->update($data);
 

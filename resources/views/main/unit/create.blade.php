@@ -60,8 +60,8 @@
         <input type="text" id="color" name="color" class="form-control" placeholder="Masukkan warna" />
     </div>
     <div class="col-12 col-md-6" id="managerParent">
-        <label class="form-label" for="owner">Pemilik</label>
-        <input type="text" id="owner" name="owner" class="form-control" placeholder="Masukkan Pemilik" />
+        <label class="form-label" for="manager">Asset Manager</label>
+        <input type="text" id="manager" name="manager" class="form-control" placeholder="Masukkan manager" />
         {{-- <select id="manager_id" name="manager" class="select2 form-select select2-primary"data-allow-clear="true">
         </select> --}}
     </div>

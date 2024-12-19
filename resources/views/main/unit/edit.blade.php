@@ -70,8 +70,8 @@
             value="{{ $data->color ?? '' }}" />
     </div>
     <div class="col-12 col-md-6" id="managerParent">
-        <label class="form-label" for="manager">Pemilik</label>
-        <input type="text" id="owner" name="owner" value="{{ $data->manager ?? '' }}" class="form-control"
+        <label class="form-label" for="manager">Asset Manager</label>
+        <input type="text" id="manager" name="manager" value="{{ $data->manager ?? '' }}" class="form-control"
             placeholder="Masukkan Pemilik" />
         {{-- <select id="manager_id" name="manager" class="select2 form-select select2-primary"data-allow-clear="true">
         </select> --}}
