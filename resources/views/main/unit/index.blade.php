@@ -23,9 +23,17 @@
                     </div>
 
                     <div class="col-12 col-md-4" id="picParent">
-                        <label class="form-label" for="pic">PIC</label>
-                        <select id="pic_id" name="pic[]" class="select2 form-select" data-allow-clear="true" multiple
+                        <label class="form-label" for="pic">Asset Manager</label>
+                        <select id="pic_id" name="manager[]" class="select2 form-select" data-allow-clear="true" multiple
                             required>
+                        </select>
+                    </div>
+
+
+                    <div class="col-12 col-md-4" id="statusParent">
+                        <label class="form-label" for="status">Status</label>
+                        <select name="status[]" id="asset_status_id" class="select2 form-select" data-allow-clear="true"
+                            multiple>
                         </select>
                     </div>
 
@@ -77,7 +85,7 @@
                             <th>No Mesin</th>
                             <th>NIK</th>
                             <th>Warna</th>
-                            <th>Pemilik</th>
+                            <th>Asset Manager</th>
                             <th>Location</th>
                             <th>PIC</th>
                             <th>Status</th>
@@ -161,11 +169,11 @@
                 }
             });
 
-            $('#pic_id').select2({
-                dropdownParent: $('#picParent'),
-                placeholder: 'Pilih PIC',
+            $('#asset_status_id').select2({
+                dropdownParent: $('#statusParent'),
+                placeholder: 'Pilih status',
                 ajax: {
-                    url: "{{ route('employee.data') }}",
+                    url: "{{ route('asset.data') }}",
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {
@@ -174,18 +182,46 @@
                         };
                     },
                     processResults: function(data) {
-                        apiResults = data.data
-                            .filter(function(item) {
-                                return item.relationId !== null;
-                            })
-                            .map(function(item) {
-                                return {
-                                    text: item.name + ' (' + item.nameTitle + ')',
-                                    id: item.relationId,
-                                };
-                            });
                         return {
-                            results: apiResults
+                            results: data.data.reduce((unique, item) => {
+                                if (!unique.some((i) => i.text === item.status)) {
+                                    unique.push({
+                                        text: item.status,
+                                        id: item.status
+                                    });
+                                }
+                                return unique;
+                            }, [])
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+
+            $('#pic_id').select2({
+                dropdownParent: $('#picParent'),
+                placeholder: 'Pilih Manager',
+                ajax: {
+                    url: "{{ route('asset.data') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            keyword: params.term,
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.data.reduce((unique, item) => {
+                                if (!unique.some((i) => i.text === item.manager)) {
+                                    unique.push({
+                                        text: item.manager,
+                                        id: item.manager
+                                    });
+                                }
+                                return unique;
+                            }, [])
                         };
                     },
                     cache: true
@@ -197,7 +233,7 @@
         $(document).ready(function() {
             init_table();
 
-            $('#category_id, #assets_location_id, #pic_id').on('change', function() {
+            $('#category_id, #assets_location_id, #pic_id, #asset_status_id').on('change', function() {
                 init_table();
             });
 
@@ -239,6 +275,7 @@
             var category = $('#category_id').val();
             var assets_location = $('#assets_location_id').val();
             var pic = $('#pic_id').val();
+            var status = $('#asset_status_id').val();
 
             if ($.fn.DataTable.isDataTable('#data-table')) {
                 $('#data-table').DataTable().clear().destroy();
@@ -259,7 +296,8 @@
                         'keyword': keyword,
                         'category': category,
                         'assets_location': assets_location,
-                        'pic': pic
+                        'pic': pic,
+                        'status': status,
                     }
                 },
                 columns: [{
