@@ -416,7 +416,9 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
                     };
                 },
                 processResults: function(data) {
@@ -442,7 +444,9 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
                     };
                 },
                 processResults: function(data) {
@@ -494,7 +498,9 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
                     };
                 },
                 processResults: function(data) {
