@@ -6,7 +6,7 @@
                     <th>Employee</th>
                     <th>Date</th>
                     <th>Liter</th>
-                    <th>Price</th>
+                    {{-- <th>Price</th> --}}
                     <th>Category</th>
                     <th>Lasted KM Asset</th>
                     {{-- <th>Loadsheet</th> --}}
@@ -21,7 +21,7 @@
                         <td>{{ $fuel->employee->name }}</td>
                         <td>{{ $fuel->date }}</td>
                         <td>{{ $fuel->liter }}</td>
-                        <td>{{ $fuel->price }}</td>
+                        {{-- <td>{{ $fuel->price }}</td> --}}
                         <td>{{ $fuel->category }}</td>
                         <td>{{ $fuel->lasted_km_asset }}</td>
                         {{-- <td>{{ $fuel->loadsheet }}</td> --}}
