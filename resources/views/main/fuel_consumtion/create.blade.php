@@ -40,11 +40,11 @@
         <input type="text" id="liter" name="liter" class="form-control" placeholder="Masukkan liter"
             required />
     </div>
-    <div class="col-12 col-md-6">
+    {{-- <div class="col-12 col-md-6">
         <label class="form-label" for="price">Harga/Liter<span class="text-danger">*</span></label>
         <input type="text" id="price" name="price" class="form-control" placeholder="Masukkan harga"
             required />
-    </div>
+    </div> --}}
     <div class="col-12 col-md-6">
         <label class="form-label" for="category">Kategori<span class="text-danger">*</span></label>
         <input type="text" id="category" name="category" class="form-control" placeholder="Masukkan kategori"
