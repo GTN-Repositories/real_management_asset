@@ -22,12 +22,12 @@
                         aria-selected="false">Project
                     </button>
                 </li> --}}
-                {{-- <li class="nav-item">
+                <li class="nav-item">
                     <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                         data-bs-target="#navs-justified-payment" aria-controls="navs-justified-payment"
-                        aria-selected="false">Payment
+                        aria-selected="false">Reminder
                     </button>
-                </li> --}}
+                </li>
                 <li class="nav-item">
                     <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                         data-bs-target="#navs-justified-history" aria-controls="navs-justified-history"
@@ -62,12 +62,12 @@
                         Log History
                     </button>
                 </li>
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                         data-bs-target="#navs-justified-notes" aria-controls="navs-justified-notes" aria-selected="false">
                         Note
                     </button>
-                </li>
+                </li> --}}
                 {{-- <li class="nav-item">
                     <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                         data-bs-target="#navs-justified-audits" aria-controls="navs-justified-audits" aria-selected="false">
@@ -278,21 +278,26 @@
                         data ini belum pernah memiliki project
                     @endforelse
                 </div>
-                {{-- <div class="tab-pane fade" id="navs-justified-payment" role="tabpanel">
-                    <table class="datatables table">
+                <div class="tab-pane fade" id="navs-justified-payment" role="tabpanel">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="createDataReminder()">
+                        <i class="fas fa-plus"></i> Tambah
+                    </button>
+                    <table class="datatables table" id="data-table-reminder">
                         <thead class="border-top">
                             <tr>
                                 <th>
                                     #
                                 </th>
-                                <th>Reminder</th>
-                                <th>Content</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
+                                <th>type</th>
+                                <th>title</th>
+                                <th>body</th>
+                                <th>sendto</th>
+                                <th>user</th>
+                                <th>aksi</th>
                             </tr>
                         </thead>
                     </table>
-                </div> --}}
+                </div>
                 <div class="tab-pane fade" id="navs-justified-history" role="tabpanel">
                     <table class="datatables table" id="data-table">
                         <thead class="border-top">
@@ -359,8 +364,7 @@
                                         width="50"></td>
                                 <td>{{ $asset->date_tax }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm"
-                                        onclick="createFile('tax')">
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="createFile('tax')">
                                         <i class="fas fa-pencil me-2"></i> Edit
                                     </button>
                                 </td>
@@ -418,7 +422,7 @@
                         </thead>
                     </table>
                 </div>
-                <div class="tab-pane fade" id="navs-justified-notes" role="tabpanel">
+                {{-- <div class="tab-pane fade" id="navs-justified-notes" role="tabpanel">
                     <form id="formNotes" action="{{ route('asset.note', $asset->id) }}" method="post">
                         @csrf
                         <div class="form-group">
@@ -440,7 +444,7 @@
                             </tr>
                         </thead>
                     </table>
-                </div>
+                </div> --}}
                 <div class="tab-pane fade" id="navs-justified-audits" role="tabpanel">
                     audits
                 </div>
@@ -467,6 +471,7 @@
             init_table();
             init_table_log();
             init_table_note();
+            data_table_reminder();
             init_table_attachment();
             loadAppreciationChart();
             loadDepreciationChart();
@@ -521,6 +526,65 @@
                     {
                         data: 'status_after',
                         name: 'status_after'
+                    },
+                ]
+            });
+        }
+
+        function data_table_reminder(keyword = '') {
+            var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+            if ($.fn.DataTable.isDataTable('#data-table-reminder')) {
+                $('#data-table-reminder').DataTable().clear().destroy();
+            }
+
+            var table = $('#data-table-reminder').DataTable({
+                processing: true,
+                serverSide: true,
+                columnDefs: [{
+                    target: 0,
+                    visible: true,
+                    searchable: false
+                }],
+                ajax: {
+                    type: "GET",
+                    url: "{{ route('asset-reminder.data') }}",
+                    data: {
+                        'keyword': keyword,
+                        'asset_id': asset_id,
+                    }
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'type',
+                        name: 'type'
+                    },
+                    {
+                        data: 'title',
+                        name: 'title'
+                    },
+                    {
+                        data: 'body',
+                        name: 'body'
+                    },
+                    {
+                        data: 'send_to',
+                        name: 'send_to'
+                    },
+                    {
+                        data: 'user_id',
+                        name: 'user_id'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
                     },
                 ]
             });
@@ -818,6 +882,73 @@
                         '<div class="alert alert-danger">Failed to load chart data. Please try again later.</div>';
                 }
             });
+        }
+
+        function deleteData(id) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You will not be able to recover this record!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var postForm = {
+                        '_token': '{{ csrf_token() }}',
+                        '_method': 'DELETE',
+                    };
+                    $.ajax({
+                            url: "{{ route('asset-reminder.destroy', ':id') }}".replace(':id', id),
+                            type: 'POST',
+                            data: postForm,
+                            dataType: 'json',
+                        })
+                        .done(function(data) {
+                            Swal.fire('Deleted!', data['message'], 'success');
+                            $('#data-table-reminder').DataTable().ajax.reload();
+                        })
+                        .fail(function() {
+                            Swal.fire('Error!', 'An error occurred while deleting the record.', 'error');
+                        });
+                }
+            });
+        }
+
+        function createDataReminder() {
+            $.ajax({
+                    url: "{{ route('asset-reminder.create') }}",
+                    type: 'GET',
+                    data: {
+                        asset_id: asset_id
+                    }
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+                });
+        }
+
+        function editData(id) {
+
+            $.ajax({
+                    url: "{{ route('asset-reminder.edit', ':id') }}".replace(':id', id),
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
+                });
         }
     </script>
     <script>
