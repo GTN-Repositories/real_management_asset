@@ -4,6 +4,7 @@ use App\Helpers\Helper;
 use App\Http\Controllers\Main\AssetAttachmentController;
 use App\Http\Controllers\Main\AssetController;
 use App\Http\Controllers\Main\AssetNoteController;
+use App\Http\Controllers\Main\AssetReminderController;
 use App\Http\Controllers\Main\AssetReportController;
 use App\Http\Controllers\Main\CategoryController;
 use App\Http\Controllers\Main\CategoryItemController;
@@ -200,6 +201,10 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/monitoring/data', [MonitoringController::class, 'data'])->name('monitoring.data');
     Route::delete('/monitoring/destroy-all', [MonitoringController::class, 'destroyAll'])->name('monitoring.destroyAll');
     Route::resource('monitoring', MonitoringController::class);
+
+    Route::get('/asset-reminder/data', [AssetReminderController::class, 'data'])->name('asset-reminder.data');
+    Route::delete('/asset-reminder/destroy-all', [AssetReminderController::class, 'destroyAll'])->name('asset-reminder.destroyAll');
+    Route::resource('asset-reminder', AssetReminderController::class);
 
     Route::get('/employee/data', [EmployeeController::class, 'data'])->name('employee.data');
     Route::delete('/employee/destroy-all', [EmployeeController::class, 'destroyAll'])->name('employee.destroyAll');
