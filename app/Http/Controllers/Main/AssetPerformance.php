@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
 use App\Models\AssetReminder;
+use App\Models\LoadhseetTarget;
+use App\Models\Loadsheet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
@@ -18,47 +20,30 @@ class AssetPerformance extends Controller
     public function data(Request $request)
     {
         $data = $this->getData($request);
+        $latestTarget = LoadhseetTarget::latest()->first();
 
         return datatables()
             ->of($data)
             ->addIndexColumn()
-            ->addColumn('id', function ($data) {
-                $checkbox =
-                    '<div class="custom-control custom-checkbox">
-                    <input class="custom-control-input checkbox" id="checkbox' .
-                    $data->id .
-                    '" type="checkbox" value="' .
-                    $data->id .
-                    '" />
-                    <label class="custom-control-label" for="checkbox' .
-                    $data->id .
-                    '"></label>
-                </div>';
+            ->addColumn('asset', function ($data) {
+                return $data->asset_id . '-' . $data->asset->name . '-' . $data->asset->serial_number ?? null;
+            })
+            ->addColumn('PerformanceRate', function ($data) use ($latestTarget) {
+                $percentage = (int) (($data->total_loadsheet / $latestTarget->target) * 100);
+                $color = 'success';
+                if ($percentage < 50) {
+                    $color = 'danger';
+                } elseif ($percentage >= 50 && $percentage < 80) {
+                    $color = 'warning';
+                }
 
-                return $checkbox;
+                return '<div class="progress">
+                    <div class="progress-bar bg-' . $color . '" role="progressbar" style="width: ' . $percentage . '%;" aria-valuenow="' . $percentage . '" aria-valuemin="0" aria-valuemax="100">' . $percentage . '%</div>
+                    </div>';
             })
-            ->addColumn('type', function ($data) {
-                return $data->type ?? null;
-            })
-            ->addColumn('title', function ($data) {
-                return $data->title ?? null;
-            })
-            ->addColumn('body', function ($data) {
-                return $data->body ?? null;
-            })
-            ->addColumn('send_to', function ($data) {
-                return $data->send_to ?? null;
-            })
-            ->addColumn('user_id', function ($data) {
-                return $data->user->name ?? null;
-            })
-            ->addColumn('action', function ($data) {
-                $btn = '<div class="d-flex">';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
-                $btn .= '</div>';
 
-                return $btn;
+            ->addColumn('Expenses', function ($data) {
+                return "expenses" ?? null;
             })
             ->escapeColumns([])
             ->make(true);
@@ -67,20 +52,12 @@ class AssetPerformance extends Controller
     public function getData(Request $request)
     {
         $columns = [
-            'id',
-            'user_id',
             'asset_id',
-            'type',
-            'title',
-            'body',
-            'send_to',
+            'loadsheet',
         ];
-
         $keyword = $request->search['value'] ?? '';
-        $assetId = Crypt::decrypt($request->asset_id);
 
-        $data = AssetReminder::orderBy('created_at', 'asc')
-            ->select($columns)
+        $data = Loadsheet::selectRaw('asset_id, SUM(loadsheet) as total_loadsheet')
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
                     foreach ($columns as $column) {
@@ -88,7 +65,7 @@ class AssetPerformance extends Controller
                     }
                 }
             })
-            ->where('asset_id', $assetId);
+            ->groupBy('asset_id');
 
         return $data;
     }
@@ -96,8 +73,7 @@ class AssetPerformance extends Controller
 
     public function create(Request $request)
     {
-        $assetId = $request->asset_id;
-        return view('main.asset_reminder.create', compact('assetId'));
+        return view('main.asset_performance.create');
     }
 
     /**
@@ -109,8 +85,7 @@ class AssetPerformance extends Controller
 
         try {
             return $this->atomic(function () use ($data) {
-                $data['asset_id'] = Crypt::decrypt($data['asset_id']);
-                $data = AssetReminder::create($data);
+                $data = LoadhseetTarget::create($data);
 
                 return response()->json([
                     'status' => true,

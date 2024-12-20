@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
 use App\Models\AssetReminder;
+use App\Models\Loadsheet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
@@ -22,43 +23,14 @@ class ExpensesController extends Controller
         return datatables()
             ->of($data)
             ->addIndexColumn()
-            ->addColumn('id', function ($data) {
-                $checkbox =
-                    '<div class="custom-control custom-checkbox">
-                    <input class="custom-control-input checkbox" id="checkbox' .
-                    $data->id .
-                    '" type="checkbox" value="' .
-                    $data->id .
-                    '" />
-                    <label class="custom-control-label" for="checkbox' .
-                    $data->id .
-                    '"></label>
-                </div>';
-
-                return $checkbox;
+            ->addColumn('asset', function ($data) {
+                return 'asset' ?? null;
             })
-            ->addColumn('type', function ($data) {
-                return $data->type ?? null;
+            ->addColumn('PerformanceRate', function ($data) {
+                return '$data->PerformanceRate' ?? null;
             })
-            ->addColumn('title', function ($data) {
-                return $data->title ?? null;
-            })
-            ->addColumn('body', function ($data) {
-                return $data->body ?? null;
-            })
-            ->addColumn('send_to', function ($data) {
-                return $data->send_to ?? null;
-            })
-            ->addColumn('user_id', function ($data) {
-                return $data->user->name ?? null;
-            })
-            ->addColumn('action', function ($data) {
-                $btn = '<div class="d-flex">';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
-                $btn .= '</div>';
-
-                return $btn;
+            ->addColumn('Expenses', function ($data) {
+                return '$data->Expenses' ?? null;
             })
             ->escapeColumns([])
             ->make(true);
@@ -68,18 +40,12 @@ class ExpensesController extends Controller
     {
         $columns = [
             'id',
-            'user_id',
             'asset_id',
-            'type',
-            'title',
-            'body',
-            'send_to',
+            'loadsheet',
         ];
 
         $keyword = $request->search['value'] ?? '';
-        $assetId = Crypt::decrypt($request->asset_id);
-
-        $data = AssetReminder::orderBy('created_at', 'asc')
+        $data = Loadsheet::orderBy('created_at', 'asc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
@@ -87,8 +53,7 @@ class ExpensesController extends Controller
                         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
                     }
                 }
-            })
-            ->where('asset_id', $assetId);
+            });
 
         return $data;
     }

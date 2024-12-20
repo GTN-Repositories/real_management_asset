@@ -6,6 +6,7 @@ use App\Exports\FuelConsumptionExport;
 use App\Http\Controllers\Controller;
 use App\Imports\ImportFuel;
 use App\Models\FuelConsumption;
+use App\Models\Ipb;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Maatwebsite\Excel\Facades\Excel;
@@ -151,13 +152,31 @@ class FuelConsumptionController extends Controller
                 // $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
                 // $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
                 $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
-                $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
+                // $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
                 $data['lasted_km_asset'] = isset($data['lasted_km_asset']) && $data['lasted_km_asset'] != '-' ? str_replace('.', '', $data['lasted_km_asset']) : null;
 
+                $data["hours"] = 0;
                 $data["asset_id"] = crypt::decrypt($data["asset_id"]);
                 $data["management_project_id"] = crypt::decrypt($data["management_project_id"]);
                 $data["user_id"] = crypt::decrypt($data["user_id"]);
                 $data = FuelConsumption::create($data);
+
+                $field['management_project_id'] = $data->management_project_id;
+                $field['usage_liter'] = $data->liter;
+                $field['date'] = $data->date;
+
+                $lastBalance = Ipb::where('management_project_id', $data["management_project_id"])
+                    ->orderBy('id', 'desc')
+                    ->value('balance');
+                $unitprice = Ipb::where('management_project_id', $data["management_project_id"])
+                    ->orderBy('id', 'desc')
+                    ->value('unit_price');
+
+                $lastBalance = $lastBalance ?? 0;
+                $field['issued_liter'] = 0;
+                $field['balance'] = $lastBalance - $field['usage_liter'];
+                $field['unit_price'] = $unitprice;
+                Ipb::create($field);
 
                 return response()->json([
                     'status' => true,
@@ -205,7 +224,7 @@ class FuelConsumptionController extends Controller
             return $this->atomic(function () use ($data, $id) {
                 // $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
                 $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
-                $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
+                // $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
                 $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
                 $data['lasted_km_asset'] = isset($data['lasted_km_asset']) && $data['lasted_km_asset'] != '-' ? str_replace('.', '', $data['lasted_km_asset']) : null;
 
@@ -224,7 +243,7 @@ class FuelConsumptionController extends Controller
                 } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
                     $data["user_id"] = $data["user_id"];
                 }
-
+                $data["hours"] = 0;
                 $data = FuelConsumption::findByEncryptedId($id)->update($data);
 
                 return response()->json([
