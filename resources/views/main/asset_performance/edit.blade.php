@@ -3,30 +3,15 @@
     <h3 class="mb-2">Edit Kategori Barang</h3>
     <p class="text-muted">Edit Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
-<form method="POST" class="row g-3" id="formEdit" action="{{ route('asset-reminder.update', $data->id) }}"
+<form method="POST" class="row g-3" id="formEdit" action="{{ route('report-asset-performance.update', $data->id) }}"
     enctype="multipart/form-data">
     @csrf
     @method('put')
 
     <div class="col-12 col-md-12">
-        <label class="form-label" for="type">Jenis Reminder <span class="text-danger">*</span></label>
-        <input type="text" id="type" name="type" class="form-control" placeholder="Masukkan Jenis Reminder"
-            value="{{ $data->type }}" />
-    </div>
-    <div class="col-12 col-md-12">
-        <label class="form-label" for="title">Title <span class="text-danger">*</span></label>
-        <input type="text" id="title" name="title" class="form-control" placeholder="Masukkan Title"
-            value="{{ $data->title }}" />
-    </div>
-    <div class="col-12 col-md-12">
-        <label class="form-label" for="body">Body <span class="text-danger">*</span></label>
-        <input type="text" id="body" name="body" class="form-control" placeholder="Masukkan Body"
-            value="{{ $data->body }}" />
-    </div>
-    <div class="col-12 col-md-12">
-        <label class="form-label" for="send_to">Send To <span class="text-danger">*</span></label>
-        <input type="text" id="send_to" name="send_to" class="form-control" placeholder="Masukkan Penerima"
-            value="{{ $data->send_to }}" />
+        <label class="form-label" for="target">Target Perbulan <span class="text-danger">*</span></label>
+        <input type="text" id="target" name="target" class="form-control" placeholder="Masukkan target"
+            value="{{ $data->target }}" />
     </div>
     <div class="col-12 col-md-12" id="userId">
         <label for="employee_id" class="form-label">User<span class="text-danger">*</span></label>
@@ -44,47 +29,6 @@
             aria-label="Close">Cancel</button>
     </div>
 </form>
-
-<script>
-    $(document).ready(function() {
-        $('#user_id').select2({
-            dropdownParent: $('#userId'),
-            placeholder: 'Pilih user',
-            ajax: {
-                url: "{{ route('user.data') }}",
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        'search[value]': params.term,
-                        start: 0,
-                        length: 10
-                    };
-                },
-                processResults: function(data) {
-                    apiResults = data.data.map(function(item) {
-                        return {
-                            text: item.name,
-                            id: item.idRelationAll,
-                        };
-                    });
-
-                    return {
-                        results: apiResults
-                    };
-                },
-                cache: true
-            }
-        });
-
-        var assetId = '{{ $data->user_id ?? '' }}';
-        var assetName = '{{ $data->user->name ?? '' }}';
-        if (assetId) {
-            var categoryOption = new Option(assetName, assetId, true, true);
-            $('#user_id').append(categoryOption).trigger('change');
-        }
-    })
-</script>
 <script>
     document.getElementById('formEdit').addEventListener('submit', function(event) {
         event.preventDefault();
