@@ -4,12 +4,15 @@ use App\Helpers\Helper;
 use App\Http\Controllers\Main\AssetAttachmentController;
 use App\Http\Controllers\Main\AssetController;
 use App\Http\Controllers\Main\AssetNoteController;
+use App\Http\Controllers\Main\AssetPerformance;
+use App\Http\Controllers\Main\AssetReminderController;
 use App\Http\Controllers\Main\AssetReportController;
 use App\Http\Controllers\Main\CategoryController;
 use App\Http\Controllers\Main\CategoryItemController;
 use App\Http\Controllers\Main\CustomerController;
 use App\Http\Controllers\Main\DriverProjectController;
 use App\Http\Controllers\Main\EmployeeController;
+use App\Http\Controllers\Main\ExpensesController;
 use App\Http\Controllers\Main\FormController;
 use App\Http\Controllers\Main\FuelConsumptionController;
 use App\Http\Controllers\Main\InspectionScheduleController;
@@ -200,6 +203,18 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/monitoring/data', [MonitoringController::class, 'data'])->name('monitoring.data');
     Route::delete('/monitoring/destroy-all', [MonitoringController::class, 'destroyAll'])->name('monitoring.destroyAll');
     Route::resource('monitoring', MonitoringController::class);
+
+    Route::get('/asset-reminder/data', [AssetReminderController::class, 'data'])->name('asset-reminder.data');
+    Route::delete('/asset-reminder/destroy-all', [AssetReminderController::class, 'destroyAll'])->name('asset-reminder.destroyAll');
+    Route::resource('asset-reminder', AssetReminderController::class);
+
+    Route::get('/report-asset-performance/data', [AssetPerformance::class, 'data'])->name('report-asset-performance.data');
+    Route::delete('/report-asset-performance/destroy-all', [AssetPerformance::class, 'destroyAll'])->name('report-asset-performance.destroyAll');
+    Route::resource('report-asset-performance', AssetPerformance::class);
+
+    Route::get('/report-expenses/data', [ExpensesController::class, 'data'])->name('report-expenses.data');
+    Route::delete('/report-expenses/destroy-all', [ExpensesController::class, 'destroyAll'])->name('report-expenses.destroyAll');
+    Route::resource('report-expenses', ExpensesController::class);
 
     Route::get('/employee/data', [EmployeeController::class, 'data'])->name('employee.data');
     Route::delete('/employee/destroy-all', [EmployeeController::class, 'destroyAll'])->name('employee.destroyAll');
