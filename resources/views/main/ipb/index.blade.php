@@ -1,10 +1,10 @@
 @extends('layouts.global')
 
-@section('title', 'Fuel Consumtion')
+@section('title', 'Fuel Stock')
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Fuel Consumtion Data</h4>
+        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Fuel Stock Data</h4>
         {{-- Tombol Filter --}}
         <div class="d-flex justify-content-end align-items-end mb-3 gap-3">
             <div>
@@ -15,7 +15,7 @@
         <!-- Product List Table -->
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Fuel Consumtion Data</h5>
+                <h5 class="card-title mb-0">Fuel Stock Data</h5>
                 <div class="d-flex justify-content-end gap-2">
                     <!-- Tombol Hapus Masal -->
                     <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">

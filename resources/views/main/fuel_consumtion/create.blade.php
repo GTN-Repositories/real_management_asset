@@ -50,6 +50,10 @@
         <input type="text" id="category" name="category" class="form-control" placeholder="Masukkan kategori"
             required />
     </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="hm">HM<span class="text-danger">*</span></label>
+        <input type="text" id="hm" name="hm" class="form-control" placeholder="Masukkan HM" required />
+    </div>
     {{-- <div class="col-12 col-md-6">
         <label class="form-label" for="hours">Jam Kerja<span class="text-danger">*</span></label>
         <input type="text" id="hours" name="hours" class="form-control" placeholder="Masukkan jam kerja"
@@ -57,8 +61,8 @@
     </div> --}}
     <div class="col-12 col-md-6">
         <label class="form-label" for="lasted_km_asset">KM Terakhir Asset<span class="text-danger">*</span></label>
-        <input type="text" id="lasted_km_asset" name="lasted_km_asset" class="form-control" placeholder="Masukkan km terakhir asset"
-            required />
+        <input type="text" id="lasted_km_asset" name="lasted_km_asset" class="form-control"
+            placeholder="Masukkan km terakhir asset" required />
     </div>
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
@@ -181,7 +185,7 @@
         });
     })
 
-    $(document).on('input', '#price, #loadsheet, #liter, #hours, #lasted_km_asset', function() {
+    $(document).on('input', '#price, #loadsheet, #liter, #hours,#hm, #lasted_km_asset', function() {
         value = formatCurrency($(this).val());
         $(this).val(value);
     });
