@@ -61,6 +61,9 @@ class FuelConsumptionController extends Controller
             ->addColumn('liter', function ($data) {
                 return number_format($data->liter, 0, ',', '.') . ' liter' ?? null;
             })
+            ->addColumn('hm', function ($data) {
+                return number_format($data->hm, 0, ',', '.') ?? null;
+            })
             ->addColumn('loadsheet', function ($data) {
                 return number_format($data->loadsheet, 0, ',', '.') ?? null;
             })
@@ -105,6 +108,7 @@ class FuelConsumptionController extends Controller
             'user_id',
             'date',
             'liter',
+            'hm',
             'price',
             'category',
             'loadsheet',
@@ -152,6 +156,7 @@ class FuelConsumptionController extends Controller
                 // $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
                 // $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
                 $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
+                $data['hm'] = isset($data['hm']) && $data['hm'] != '-' ? str_replace('.', '', $data['hm']) : null;
                 // $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
                 $data['lasted_km_asset'] = isset($data['lasted_km_asset']) && $data['lasted_km_asset'] != '-' ? str_replace('.', '', $data['lasted_km_asset']) : null;
 
@@ -225,7 +230,8 @@ class FuelConsumptionController extends Controller
                 // $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
                 $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
                 // $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
-                $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
+                // $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
+                $data['hm'] = isset($data['hm']) && $data['hm'] != '-' ? str_replace('.', '', $data['hm']) : null;
                 $data['lasted_km_asset'] = isset($data['lasted_km_asset']) && $data['lasted_km_asset'] != '-' ? str_replace('.', '', $data['lasted_km_asset']) : null;
 
                 try {

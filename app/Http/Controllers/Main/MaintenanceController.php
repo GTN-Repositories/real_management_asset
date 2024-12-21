@@ -71,11 +71,11 @@ class MaintenanceController extends Controller
                 $inspection_schedule = InspectionSchedule::findByEncryptedId($data['inspection_schedule_id']);
                 $data['inspection_schedule_id'] = Crypt::decrypt($inspection_schedule->id);
 
-                $employee_id = [];
-                foreach ($data['employee_id'] as $key => $value) {
-                    $employee_id[] = Crypt::decrypt($value);
-                }
-                $data['employee_id'] = json_encode($employee_id);
+                // $employee_id = [];
+                // foreach ($data['employee_id'] as $key => $value) {
+                //     $employee_id[] = Crypt::decrypt($value);
+                // }
+                $data['employee_id'] = json_encode($data['employee_id']);
 
                 $data['status'] = 1;
 

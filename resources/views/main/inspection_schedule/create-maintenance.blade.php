@@ -39,13 +39,15 @@
 
     <div class="col-12 col-md-6" id="employeeId">
         <label for="employee_id" class="form-label">Nama Mekanik<span class="text-danger">*</span></label>
-        <div class="select2-primary">
+        <input type="text" name="employee_id[]" id="employee_id" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Nama Mekanik" value="{{ old('employee_id') }}" required />
+        {{-- <div class="select2-primary">
             <div class="position-relative">
                 <select id="employee_id" name="employee_id[]" class="select2 form-select" multiple required>
                     <!-- Options will be populated dynamically -->
                 </select>
             </div>
-        </div>
+        </div> --}}
     </div>
 
     <div class="col-12 text-center">
@@ -159,34 +161,34 @@
             }
         });
 
-        $('#employee_id').select2({
-            dropdownParent: $('#employeeId'),
-            placeholder: 'Pilih Mekanik',
-            ajax: {
-                url: "{{ route('employee.data') }}",
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        keyword: params.term,
-                        limit: 10
-                    };
-                },
-                processResults: function(data) {
-                    apiResults = data.data.map(function(item) {
-                        return {
-                            text: item.nameTitle,
-                            id: item.relationId,
-                        };
-                    });
+        // $('#employee_id').select2({
+        //     dropdownParent: $('#employeeId'),
+        //     placeholder: 'Pilih Mekanik',
+        //     ajax: {
+        //         url: "{{ route('employee.data') }}",
+        //         dataType: 'json',
+        //         delay: 250,
+        //         data: function(params) {
+        //             return {
+        //                 keyword: params.term,
+        //                 limit: 10
+        //             };
+        //         },
+        //         processResults: function(data) {
+        //             apiResults = data.data.map(function(item) {
+        //                 return {
+        //                     text: item.nameTitle,
+        //                     id: item.relationId,
+        //                 };
+        //             });
 
-                    return {
-                        results: apiResults
-                    };
-                },
-                cache: true
-            }
-        });
+        //             return {
+        //                 results: apiResults
+        //             };
+        //         },
+        //         cache: true
+        //     }
+        // });
 
         $('#item_id').select2({
             dropdownParent: $('#selectItem'),
