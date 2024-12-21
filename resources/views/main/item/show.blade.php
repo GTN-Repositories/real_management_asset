@@ -68,6 +68,26 @@
             </table>
         </div>
 
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Pemakaian Sparepart</h5>
+            </div>
+
+            <div class="card-datatable table-responsive">
+                <table class="datatables table" id="data-table-usage-stock">
+                    <thead class="border-top">
+                        <tr>
+                            <th>No</th>
+                            <th>ID Inspeksi</th>
+                            <th>Asset</th>
+                            <th>Jumlah Penggunaan</th>
+                            <th>Tanggal</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">History Stock {{ $data->name ?? '-' }}</h5>
@@ -142,6 +162,60 @@
 @endsection
 
 @push('js')
+    <script>
+        $(document).ready(function() {
+            init_table();
+        });
+
+        function init_table(keyword = '', startDate = '', endDate = '', predefinedFilter = '') {
+                var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+                var table = $('#data-table-usage-stock').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    columnDefs: [{
+                        target: 0,
+                        visible: true,
+                        searchable: false
+                    }, ],
+
+                    ajax: {
+                        type: "GET",
+                        url: "{{ route('item.dataUsagePart') }}",
+                        data: {
+                            keyword: keyword,
+                            startDate: startDate,
+                            endDate: endDate,
+                            predefinedFilter: predefinedFilter,
+                            item_id: '{{ $data->id }}'
+                        }
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'inspection_id',
+                            name: 'inspection_id'
+                        },
+                        {
+                            data: 'asset',
+                            name: 'asset'
+                        },
+                        {
+                            data: 'usage',
+                            name: 'usage'
+                        },
+                        {
+                            data: 'created_at',
+                            name: 'created_at'
+                        },
+                    ]
+                });
+            }
+    </script>
     <script type="text/javascript">
         function approveStock(id, status) {
             Swal.fire({
