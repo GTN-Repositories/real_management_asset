@@ -49,18 +49,16 @@
     </div> --}}
     <div class="col-12 col-md-6">
         <label class="form-label" for="category">Kategori<span class="text-danger">*</span></label>
-        <input type="text" id="category" name="category" class="form-control" placeholder="Masukkan kategori"
-            required value="{{ $data->category }}" />
+        <input type="text" id="category" name="category" class="form-control" placeholder="Masukkan kategori" value="{{ $data->category }}" />
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="hm">HM<span class="text-danger">*</span></label>
         <input type="text" id="hm" name="hm" class="form-control" placeholder="Masukkan HM" required />
     </div>
-    {{-- <div class="col-12 col-md-6">
+    <div class="col-12 col-md-6">
         <label class="form-label" for="hours">Jam Kerja<span class="text-danger">*</span></label>
-        <input type="text" id="hours" name="hours" class="form-control" placeholder="Masukkan jam kerja"
-            required value="{{ $data->hours }}" />
-    </div> --}}
+        <input type="text" id="hours" name="hours" class="form-control" placeholder="Masukkan jam kerja" value="{{ $data->hours ?? 0 }}" />
+    </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="lasted_km_asset">KM Terakhir Asset<span class="text-danger">*</span></label>
         <input type="text" id="lasted_km_asset" name="lasted_km_asset" class="form-control"
