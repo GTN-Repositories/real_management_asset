@@ -6,6 +6,7 @@ use App\Exports\ItemExport;
 use App\Http\Controllers\Controller;
 use App\Imports\ImportItem;
 use App\Models\CategoryItem;
+use App\Models\InspectionSchedule;
 use App\Models\Item;
 use App\Models\ItemStock;
 use Illuminate\Http\Request;
@@ -443,5 +444,93 @@ class ItemController extends Controller
                 'message' => 'Error processing file: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function dataUsagePart(Request $request)
+    {
+        $data = $this->getDataUsagePart($request);
+
+        return datatables()
+            ->of($data)
+            ->addIndexColumn()
+            ->addColumn('id', function ($data) {
+                return $data->id ?? null;
+            })
+            ->addColumn('inspection_id', function ($data) {
+                return 'INS-' . Crypt::decrypt($data->id);
+            })
+            ->addColumn('asset', function ($data) {
+                $format_asset = 'AST-' . $data->asset_id . ' - ' . ($data->asset->name ?? '') . ' - ' . ($data->asset->serial_number ?? '');
+                return $format_asset;
+            })
+            ->addColumn('usage', function ($data) {
+                // Ambil jumlah penggunaan berdasarkan item_id
+                $itemId = Crypt::decrypt(request('item_id'));
+                $itemStock = json_decode($data->item_stock, true);
+                
+                return $itemStock[$itemId] ?? 0;
+            })
+            ->addColumn('created_at', function ($data) {
+                return $data->created_at->format('d-m-Y');
+            })
+            ->addColumn('action', function ($data) {
+                $btn = '<div class="d-flex">';
+                $btn .= '<a href="javascript:void(0);" class="btn btn-info btn-sm me-1" title="Show Data" onclick="showData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
+                $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                $btn .= '</div>';
+
+                return $btn;
+            })
+            ->escapeColumns([])
+            ->make(true);
+    }
+
+    public function getDataUsagePart(Request $request)
+    {
+        $columns = [
+            'id',
+            'name',
+            'type',
+            'asset_id',
+            'management_project_id',
+            'note',
+            'item_id',
+            'asset_kanibal_id',
+            'status',
+            'item_stock',
+            'kanibal_stock',
+            'created_at',
+            'updated_at',
+            'date',
+            'workshop',
+            'employee_id',
+        ];
+
+        $keyword = $request->search['value'] ?? '';
+        $startDate = $request->startDate ?? null;
+        $endDate = $request->endDate ?? null;
+        $itemId = $request->item_id ?? null;
+
+        $data = InspectionSchedule::orderBy('id', 'desc')
+            ->select($columns)
+            ->when($itemId, function ($query, $itemId) {
+                $itemId = Crypt::decrypt($itemId);
+                return $query->whereJsonContains('item_id', $itemId)
+                ->whereRaw("JSON_EXTRACT(item_stock, '$.\"$itemId\"') > 0");
+            })
+            ->where(function ($query) use ($keyword, $columns) {
+                if ($keyword != '') {
+                    foreach ($columns as $column) {
+                        $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
+                    }
+                }
+            });
+
+        if ($startDate && $endDate) {
+            $data->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        return $data;
     }
 }

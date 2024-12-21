@@ -128,6 +128,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/item/export-excel', [ItemController::class, 'exportExcel'])->name('item.export-excel');
     Route::post('/item/import-excel', [ItemController::class, 'importExcel'])->name('item.import-excel');
     Route::get('/item/import', [ItemController::class, 'import'])->name('item.import');
+    Route::get('/item/usage-stock', [ItemController::class, 'dataUsagePart'])->name('item.dataUsagePart');
     Route::delete('/item/destroy-all', [ItemController::class, 'destroyAll'])->name('item.destroyAll');
     Route::resource('item', ItemController::class);
 
