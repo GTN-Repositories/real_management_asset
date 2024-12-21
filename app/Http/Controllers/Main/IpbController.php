@@ -42,6 +42,9 @@ class IpbController extends Controller
             ->addColumn('relationId', function ($data) {
                 return $data->id ?? null;
             })
+            ->addColumn('management_project_id', function ($data) {
+                return $data->management_project->name ?? null;
+            })
             ->addColumn('date', function ($data) {
                 return $data->date ?? null;
             })
@@ -49,7 +52,7 @@ class IpbController extends Controller
                 return number_format($data->issued_liter, 0, ',', '.') ?? null;
             })
             ->addColumn('usage_liter', function ($data) {
-                return number_format($data->usage_liter, 0, ',', '.') ?? null;
+                return $data->usage_liter ?? null;
             })
             ->addColumn('balance', function ($data) {
                 return number_format($data->balance, 0, ',', '.') ?? null;
@@ -130,7 +133,7 @@ class IpbController extends Controller
                         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
                     }
                 }
-            })->get();
+            });
 
         if (session('selected_project_id')) {
             $data->whereHas('management_project', function ($q) {
@@ -178,7 +181,6 @@ class IpbController extends Controller
                 $data["user_id"] = Auth::user()->id;
 
                 $data['issued_liter'] = isset($data['issued_liter']) && $data['issued_liter'] != '-' ? str_replace('.', '', $data['issued_liter']) : null;
-                $data['usage_liter'] = isset($data['usage_liter']) && $data['usage_liter'] != '-' ? str_replace('.', '', $data['usage_liter']) : null;
                 $data['unit_price'] = isset($data['unit_price']) && $data['unit_price'] != '-' ? str_replace('.', '', $data['unit_price']) : null;
 
                 $lastBalance = Ipb::where('management_project_id', $data["management_project_id"])
@@ -188,9 +190,9 @@ class IpbController extends Controller
                 $lastBalance = $lastBalance ?? 0;
 
                 $issuedLiter = $data['issued_liter'] ?? 0;
-                $usageLiter = $data['usage_liter'] ?? 0;
+                $data['usage_liter'] = 0;
 
-                $data['balance'] = ($lastBalance + $issuedLiter) - $usageLiter;
+                $data['balance'] = $lastBalance + $issuedLiter;
 
                 $data = Ipb::create($data);
 

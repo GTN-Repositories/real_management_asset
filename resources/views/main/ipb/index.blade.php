@@ -36,6 +36,7 @@
                                     <input class="form-check-input" type="checkbox" id="checkAll" />
                                 </div>
                             </th>
+                            <th>Project</th>
                             <th>date</th>
                             <th>issued (liter)</th>
                             <th>usage (liter)</th>
@@ -157,6 +158,10 @@
                         name: 'id',
                         orderable: false,
                         searchable: false
+                    },
+                    {
+                        data: 'management_project_id',
+                        name: 'management_project_id'
                     },
                     {
                         data: 'date',

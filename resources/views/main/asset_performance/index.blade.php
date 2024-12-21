@@ -4,12 +4,12 @@
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Kategori Barang</h4>
+        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Asset Performance</h4>
 
         <!-- Product List Table -->
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Kategori Barang</h5>
+                <h5 class="card-title mb-0">Asset Performance</h5>
                 <div class="d-flex justify-content-end gap-2">
                     <!-- Tombol Hapus Masal -->
                     <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
@@ -17,7 +17,7 @@
                     </button>
                     <!-- Tombol Tambah -->
                     <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                        <i class="fas fa-plus"></i> Tambah
+                        <i class="fas fa-plus"></i> Ubah Target
                     </button>
                 </div>
             </div>
@@ -25,15 +25,10 @@
                 <table class="datatables table" id="data-table">
                     <thead class="border-top">
                         <tr>
-                            <th>
-                                <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                    <input class="form-check-input" type="checkbox" id="checkAll" />
-                                </div>
-                            </th>
-                            <th>Nama</th>
-                            <th>Deskripsi</th>
-                            <th>Dibuat Pada</th>
-                            <th>Aksi</th>
+                            <th>#</th>
+                            <th>Asset</th>
+                            <th>Performance Rate</th>
+                            <th>Expenses</th>
                         </tr>
                     </thead>
                 </table>
@@ -104,35 +99,29 @@
 
                 ajax: {
                     type: "GET",
-                    url: "{{ route('category-item.data') }}",
+                    url: "{{ route('report-asset-performance.data') }}",
                     data: {
                         'keyword': keyword
                     }
                 },
                 columns: [{
-                        data: 'id',
-                        name: 'id',
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
                         orderable: false,
                         searchable: false
                     },
                     {
-                        data: 'name',
-                        name: 'name'
+                        data: 'asset',
+                        name: 'asset'
                     },
                     {
-                        data: 'description',
-                        name: 'description'
+                        data: 'PerformanceRate',
+                        name: 'PerformanceRate'
                     },
                     {
-                        data: 'created_at',
-                        name: 'created_at'
+                        data: 'Expenses',
+                        name: 'Expenses'
                     },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
                 ]
             });
         }
@@ -205,7 +194,7 @@
 
         function createData() {
             $.ajax({
-                    url: "{{ route('category-item.create') }}",
+                    url: "{{ route('report-asset-performance.create') }}",
                     type: 'GET',
                 })
                 .done(function(data) {
@@ -221,7 +210,7 @@
         function editData(id) {
 
             $.ajax({
-                    url: "{{ route('category-item.edit', ':id') }}".replace(':id', id),
+                    url: "{{ route('report-asset-performance.edit', ':id') }}".replace(':id', id),
                     type: 'GET',
                 })
                 .done(function(data) {
