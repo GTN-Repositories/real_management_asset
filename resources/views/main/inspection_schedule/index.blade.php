@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/@form-validation/form-validation.css') }}" />
 
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/app-calendar.css') }}" />
+
+    <style>
+        .cke_notifications_area{
+            display: none !important;
+        }
+    </style>
 @endpush
 
 @section('content')
