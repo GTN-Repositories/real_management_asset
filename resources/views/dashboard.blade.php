@@ -265,8 +265,8 @@
                     let totalLoadsheet = loadsheetDashboard.length ? loadsheetDashboard.reduce((total,
                             num) =>
                         total + num) : 0;
-                    $('#total-loadsheet').text(totalLoadsheet ? totalLoadsheet + ' liter' : 0 +
-                        ' liter');
+                    $('#total-loadsheet').text(totalLoadsheet ? totalLoadsheet + ' Kubik' : 0 +
+                        ' Kubik');
                 },
                 error: function(xhr, status, error) {
                     $('#total-loadsheet').text('Error');
