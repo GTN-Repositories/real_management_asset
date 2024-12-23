@@ -96,6 +96,7 @@
                     }).then(() => {
                         $("#modal-ce").modal("hide");
 
+                        window.location.reload();
                         $('#data-table').DataTable().ajax.reload();
                     });
                 }
