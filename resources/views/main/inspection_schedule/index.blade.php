@@ -28,11 +28,11 @@
                         style="display: none !important;">
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button> --}}
-                    {{-- @if (auth()->user()->hasPermissionTo('asset-create')) --}}
-                    <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                        <i class="fas fa-plus"></i> Tambah
-                    </button>
-                    {{-- @endif --}}
+                    @if (auth()->user()->hasPermissionTo('inspection-schedule-create'))
+                        <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
+                            <i class="fas fa-plus"></i> Tambah
+                        </button>
+                    @endif
                 </div>
             </div>
 
@@ -67,10 +67,12 @@
                 <div class="col app-calendar-sidebar" id="app-calendar-sidebar">
                     <div class="border-bottom p-4 my-sm-0 mb-3">
                         <div class="d-grid">
-                            <button class="btn btn-primary btn-toggle-sidebar" onclick="createDataMaintenance()">
-                                <i class="ti ti-plus me-1"></i>
-                                <span class="align-middle">Tambah Maintenance</span>
-                            </button>
+                            @if (auth()->user()->hasPermissionTo('inspection-schedule-create-maintenance'))
+                                <button class="btn btn-primary btn-toggle-sidebar" onclick="createDataMaintenance()">
+                                    <i class="ti ti-plus me-1"></i>
+                                    <span class="align-middle">Tambah Maintenance</span>
+                                </button>
+                            @endif
                         </div>
                     </div>
                     <div class="p-3">
@@ -361,6 +363,72 @@
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
                 });
+        }
+
+        function deleteData(id) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You will not be able to recover this record!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var postForm = {
+                        '_token': '{{ csrf_token() }}',
+                        '_method': 'DELETE',
+                    };
+                    $.ajax({
+                            url: "{{ route('inspection-schedule.destroy', ':id') }}".replace(':id', id),
+                            type: 'POST',
+                            data: postForm,
+                            dataType: 'json',
+                        })
+                        .done(function(data) {
+                            Swal.fire('Deleted!', data['message'], 'success');
+                            $('#data-table').DataTable().ajax.reload();
+                        })
+                        .fail(function() {
+                            Swal.fire('Error!', 'An error occurred while deleting the record.', 'error');
+                        });
+                }
+            });
+        }
+
+        function bulkDelete(ids) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You will not be able to recover this record!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var postForm = {
+                        '_token': '{{ csrf_token() }}',
+                        '_method': 'DELETE',
+                        'ids': ids
+                    };
+                    $.ajax({
+                            url: "{{ route('inspection-schedule.destroyAll') }}",
+                            type: 'POST',
+                            data: postForm,
+                            dataType: 'json',
+                        })
+                        .done(function(data) {
+                            Swal.fire('Deleted!', data['message'], 'success');
+                            $('#data-table').DataTable().ajax.reload();
+                        })
+                        .fail(function() {
+                            Swal.fire('Error!', 'An error occurred while deleting the record.', 'error');
+                        });
+                }
+            });
         }
     </script>
     <script>

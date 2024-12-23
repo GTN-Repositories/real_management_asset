@@ -14,11 +14,11 @@ class MenuSeeder extends Seeder
     public function run(): void
     {
         $parent1Id = Menu::create([
-            'name' => 'ACL',
+            'name' => 'Setting',
             'icon' => null,
             'parent_id' => null,
             'route' => null,
-            'order' => 1,
+            'order' => 5,
         ])->id;
 
         $parent2Id = Menu::create([
@@ -26,7 +26,7 @@ class MenuSeeder extends Seeder
             'icon' => null,
             'parent_id' => null,
             'route' => null,
-            'order' => 6,
+            'order' => 1,
         ])->id;
 
         $parent3Id = Menu::create([
@@ -34,24 +34,24 @@ class MenuSeeder extends Seeder
             'icon' => null,
             'parent_id' => null,
             'route' => null,
-            'order' => 12,
+            'order' => 2,
         ])->id;
 
-        Menu::create([
-            'name' => 'Fuel Consumption',
+        $menu_report = Menu::create([
+            'name' => 'Report',
             'icon' => null,
             'parent_id' => null,
-            'route' => 'fuel',
-            'order' => 17,
-        ]);
+            'route' => null,
+            'order' => 3,
+        ])->id;
 
-        Menu::create([
-            'name' => 'Monitoring',
+        $menu_tracking = Menu::create([
+            'name' => 'Tracking And Monitoring',
             'icon' => null,
             'parent_id' => null,
-            'route' => 'monitoring',
-            'order' => 18,
-        ]);
+            'route' => null,
+            'order' => 4,
+        ])->id;
 
         Menu::insert([
             // ACL
@@ -59,43 +59,50 @@ class MenuSeeder extends Seeder
                 'name' => 'Roles',
                 'icon' => null,
                 'parent_id' => $parent1Id,
-                'route' => 'role',
-                'order' => 2,
+                'route' => '/role',
+                'order' => 20,
             ],
             [
                 'name' => 'Permissions',
                 'icon' => null,
                 'parent_id' => $parent1Id,
-                'route' => 'permision',
-                'order' => 3,
+                'route' => '/permision',
+                'order' => 21,
             ],
             [
                 'name' => 'Users',
                 'icon' => null,
                 'parent_id' => $parent1Id,
-                'route' => 'user',
-                'order' => 4,
+                'route' => '/user',
+                'order' => 22,
             ],
             [
                 'name' => 'Menu',
                 'icon' => null,
                 'parent_id' => $parent1Id,
-                'route' => 'menu',
-                'order' => 5,
+                'route' => '/menu',
+                'order' => 23,
             ],
             // MASTER DATA
             [
                 'name' => 'Asset',
                 'icon' => null,
                 'parent_id' => $parent2Id,
-                'route' => 'asset',
-                'order' => 7,
+                'route' => '/asset',
+                'order' => 6,
             ],
             [
                 'name' => 'Management Project',
                 'icon' => null,
                 'parent_id' => $parent2Id,
-                'route' => 'management-project',
+                'route' => '/management-project',
+                'order' => 7,
+            ],
+            [
+                'name' => 'Karyawan',
+                'icon' => null,
+                'parent_id' => $parent2Id,
+                'route' => '/employee',
                 'order' => 8,
             ],
             // INVENTORI
@@ -103,46 +110,81 @@ class MenuSeeder extends Seeder
                 'name' => 'Gudang',
                 'icon' => null,
                 'parent_id' => $parent3Id,
-                'route' => 'werehouse',
-                'order' => 13,
+                'route' => '/werehouse',
+                'order' => 9,
             ],
             [
                 'name' => 'Kategori',
                 'icon' => null,
                 'parent_id' => $parent3Id,
-                'route' => 'category-item',
-                'order' => 14,
+                'route' => '/category-item',
+                'order' => 10,
             ],
             [
                 'name' => 'Barang',
                 'icon' => null,
                 'parent_id' => $parent3Id,
-                'route' => 'item',
+                'route' => '/item',
+                'order' => 11,
+            ],
+            // report
+            [
+                'name' => 'Expanses Fuel',
+                'icon' => null,
+                'parent_id' => $menu_report,
+                'route' => '/report-fuel',
+                'order' => 12,
+            ],
+            [
+                'name' => 'Asset Project',
+                'icon' => null,
+                'parent_id' => $menu_report,
+                'route' => '/report-asset',
+                'order' => 13,
+            ],
+            [
+                'name' => 'Expenses Sparepart',
+                'icon' => null,
+                'parent_id' => $menu_report,
+                'route' => '/report-sparepart',
+                'order' => 14,
+            ],
+            [
+                'name' => 'Total Loadsheet',
+                'icon' => null,
+                'parent_id' => $menu_report,
+                'route' => '/report-loadsheet',
                 'order' => 15,
             ],
-        ]);
-
-        $menu_report = Menu::create([
-            'name' => 'Report',
-            'icon' => null,
-            'parent_id' => null,
-            'route' => null,
-            'order' => 13,
-        ])->id;
-
-        Menu::create([
-            'name' => 'Fuel Consumtion',
-            'icon' => null,
-            'parent_id' => $menu_report,
-            'route' => 'report-fuel',
-            'order' => 1,
-        ]);
-        Menu::create([
-            'name' => 'Asset Project',
-            'icon' => null,
-            'parent_id' => $menu_report,
-            'route' => 'report-asset',
-            'order' => 2,
+            // monitoring
+            [
+                'name' => 'Fuel Consumption',
+                'icon' => null,
+                'parent_id' => $menu_tracking,
+                'route' => '/fuel',
+                'order' => 16,
+            ],
+            [
+                'name' => 'Inspection Schedule',
+                'icon' => null,
+                'parent_id' => $menu_tracking,
+                'route' => '/inspection-schedule',
+                'order' => 17,
+            ],
+            [
+                'name' => 'Fuel Stock',
+                'icon' => null,
+                'parent_id' => $menu_tracking,
+                'route' => '/fuel-ipb',
+                'order' => 18,
+            ],
+            [
+                'name' => 'Loadsheet',
+                'icon' => null,
+                'parent_id' => $menu_tracking,
+                'route' => '/loadsheet',
+                'order' => 19,
+            ],
         ]);
     }
 }

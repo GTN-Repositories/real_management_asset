@@ -46,7 +46,7 @@ class ManagementProjectController extends Controller
                 return $checkbox;
             })
             ->addColumn('format_id', function ($data) {
-                return 'PRJ-'.Crypt::decrypt($data->id);
+                return 'PRJ-' . Crypt::decrypt($data->id);
             })
             ->addColumn('managementRelationId', function ($data) {
                 return $data->id ?? null;
@@ -76,11 +76,13 @@ class ManagementProjectController extends Controller
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
-                $btn .= '<a href="javascript:void(0);" class="btn btn-info btn-sm me-1" title="Detail Data" onclick="detailData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
-                if (auth()->user()->hasPermissionTo('management-edit')) {
+                if (auth()->user()->hasPermissionTo('management-project-show')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-info btn-sm me-1" title="Detail Data" onclick="detailData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
+                }
+                if (auth()->user()->hasPermissionTo('management-project-edit')) {
                     $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
                 }
-                if (auth()->user()->hasPermissionTo('management-delete')) {
+                if (auth()->user()->hasPermissionTo('management-project-delete')) {
                     $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
                 }
                 $btn .= '</div>';
@@ -160,7 +162,7 @@ class ManagementProjectController extends Controller
         $assets = Asset::whereIn('id', $assetIds)->get()->mapWithKeys(function ($asset) {
             return [$asset->id => Crypt::decrypt($asset->id) . ' - ' . $asset->name . ' - ' . $asset->serial_number];
         })->toArray();
-        
+
         return response()->json($assets);
     }
 
@@ -534,11 +536,11 @@ class ManagementProjectController extends Controller
         $fileName = 'Management Project' . now()->format('Ymd_His') . '.xlsx';
         $data = ManagementProject::all();
         foreach ($data as $key => $value) {
-            $value['format_id'] = 'PRJ-'.Crypt::decrypt($value->id);
+            $value['format_id'] = 'PRJ-' . Crypt::decrypt($value->id);
             $employe = [];
             if ($value['employee_id'] == null) {
                 $value['employees'] = null;
-            }else{
+            } else {
                 foreach (json_decode($value['employee_id']) as $key => $employee) {
                     $employees = Employee::find($employee);
                     $employe[] = $employees->name ?? null;

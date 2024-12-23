@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('soil_type', function (Blueprint $table) {
-            $table->integer('value')->default(0);
-        });
+        // Schema::table('soil_type', function (Blueprint $table) {
+        //     $table->integer('value')->default(0);
+        // });
     }
 
     /**

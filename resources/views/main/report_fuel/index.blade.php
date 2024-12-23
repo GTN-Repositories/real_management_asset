@@ -24,12 +24,16 @@
                 <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
                 <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
             </div>
-            <button id="exportPdfBtn" class="btn btn-primary" onclick="exportPDF()">
-                <i class="fa-solid fa-file-pdf me-1"></i>Export PDF
-            </button>
-            <button onclick="exportExcel()" class="btn btn-success">
-                <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-            </button>
+            {{-- @if (auth()->user()->hasPermissionTo('report-fuel-export-pdf'))
+                <button id="exportPdfBtn" class="btn btn-primary" onclick="exportPDF()">
+                    <i class="fa-solid fa-file-pdf me-1"></i>Export PDF
+                </button>
+            @endif --}}
+            @if (auth()->user()->hasPermissionTo('report-fuel-export-excel'))
+                <button onclick="exportExcel()" class="btn btn-success">
+                    <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                </button>
+            @endif
         </div>
         <div class="card my-3">
             <div class="card-body d-flex justify-content-end align-items-end">
@@ -60,9 +64,11 @@
                         @endfor
                     </select>
                 </div>
-                <button onclick="exportExcelMonth()" class="btn btn-success">
-                    <i class="fa-solid fa-file-excel me-1"></i>Excel Fuel Monthly
-                </button>
+                @if (auth()->user()->hasPermissionTo('report-fuel-export-excel-month'))
+                    <button onclick="exportExcelMonth()" class="btn btn-success">
+                        <i class="fa-solid fa-file-excel me-1"></i>Excel Fuel Monthly
+                    </button>
+                @endif
             </div>
         </div>
         <!-- Chart Container -->
