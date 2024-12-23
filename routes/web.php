@@ -155,6 +155,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('quiz', function () {
         return view('main.quiz.index');
     })->name('quiz');
+    Route::delete('/inspection-schedule/destroy-all', [InspectionScheduleController::class, 'destroyAll'])->name('inspection-schedule.destroyAll');
 
     Route::get('/maintenances/data', [MaintenanceController::class, 'data'])->name('maintenances.data');
     Route::delete('/maintenances/destroy-all', [MaintenanceController::class, 'destroyAll'])->name('maintenances.destroyAll');

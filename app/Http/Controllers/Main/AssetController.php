@@ -114,7 +114,7 @@ class AssetController extends Controller
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
-                if (auth()->user()->hasPermissionTo('asset-detail')) {
+                if (auth()->user()->hasPermissionTo('asset-show')) {
                     $btn .= '<a href="javascript:void(0);" class="btn btn-info btn-sm me-1" title="Detail Data" onclick="detailData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
                 }
                 if (auth()->user()->hasPermissionTo('asset-edit')) {

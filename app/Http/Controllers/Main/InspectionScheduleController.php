@@ -36,7 +36,7 @@ class InspectionScheduleController extends Controller
                 return $data->id;
             })
             ->addColumn('format_id', function ($data) {
-                return 'INS-'.Crypt::decrypt($data->id);
+                return 'INS-' . Crypt::decrypt($data->id);
             })
             ->addColumn('type', function ($data) {
                 return $data->type ?? '-';
@@ -79,11 +79,11 @@ class InspectionScheduleController extends Controller
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
-                // if (auth()->user()->hasPermissionTo('asset-edit')) {
+                if (auth()->user()->hasPermissionTo('inspection-schedule-show')) {
                     $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
-                // }
+                }
                 // if (auth()->user()->hasPermissionTo('asset-delete')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
                 // }
                 $btn .= '</div>';
 
@@ -182,7 +182,7 @@ class InspectionScheduleController extends Controller
                             }
 
                             if (isset($encryptedItemId['asset_kanibal_id'])) {
-                                    $assetKanibalIds[$decryptedItemId] = Crypt::decrypt($encryptedItemId['asset_kanibal_id']);
+                                $assetKanibalIds[$decryptedItemId] = Crypt::decrypt($encryptedItemId['asset_kanibal_id']);
                             }
                         } catch (\Exception $e) {
                             continue;
@@ -322,6 +322,49 @@ class InspectionScheduleController extends Controller
                 'status' => false,
                 'message' => 'Data gagal diperbarui! ' . $th->getMessage(),
             ], 500);
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $data = InspectionSchedule::findByEncryptedId($id);
+            $data->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data berhasil dihapus!',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data gagal dihapus! ' . $th->getMessage(),
+            ]);
+        }
+    }
+
+    public function destroyAll(Request $request)
+    {
+        try {
+            $ids = $request->ids;
+            return $this->atomic(function () use ($ids) {
+                $decryptedIds = [];
+                foreach ($ids as $encryptedId) {
+                    $decryptedIds[] = Crypt::decrypt($encryptedId);
+                }
+
+                $delete = InspectionSchedule::whereIn('id', $decryptedIds)->delete();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data Berhasil Dihapus!',
+                ]);
+            });
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data Gagal Dihapus!',
+            ]);
         }
     }
 }

@@ -120,25 +120,27 @@
                             <td>{{ $item->status ?? '-' }}</td>
                             <td>{{ $item->approvedBy->name ?? '-' }}</td>
                             <td>{{ $item->created_at->format('d-m-Y H:i') ?? '-' }}</td>
-                            <td>
-                                @if ($item->status == 'approved')
-                                    {{-- BUTTON REJECT --}}
-                                    <button type="button" onclick="approveStock('{{ $item->id }}', 'rejected')"
-                                        class="btn btn-sm btn-danger m-1"><i class="fas fa-close"></i></button>
-                                @elseif($item->status == 'rejected')
-                                    {{-- BUTTON APPROVE --}}
-                                    <button type="button" onclick="approveStock('{{ $item->id }}', 'approved')"
-                                        class="btn btn-sm btn-primary m-1"><i class="fas fa-check"></i></button>
-                                @elseif($item->status == 'pending')
-                                    {{-- BUTTON APPROVE --}}
-                                    <button type="button" onclick="approveStock('{{ $item->id }}', 'approved')"
-                                        class="btn btn-sm btn-primary m-1"><i class="fas fa-check"></i></button>
+                            @if (auth()->user()->hasPermissionTo('item-approve'))
+                                <td>
+                                    @if ($item->status == 'approved')
+                                        {{-- BUTTON REJECT --}}
+                                        <button type="button" onclick="approveStock('{{ $item->id }}', 'rejected')"
+                                            class="btn btn-sm btn-danger m-1"><i class="fas fa-close"></i></button>
+                                    @elseif($item->status == 'rejected')
+                                        {{-- BUTTON APPROVE --}}
+                                        <button type="button" onclick="approveStock('{{ $item->id }}', 'approved')"
+                                            class="btn btn-sm btn-primary m-1"><i class="fas fa-check"></i></button>
+                                    @elseif($item->status == 'pending')
+                                        {{-- BUTTON APPROVE --}}
+                                        <button type="button" onclick="approveStock('{{ $item->id }}', 'approved')"
+                                            class="btn btn-sm btn-primary m-1"><i class="fas fa-check"></i></button>
 
-                                    {{-- BUTTON REJECT --}}
-                                    <button type="button" onclick="approveStock('{{ $item->id }}', 'rejected')"
-                                        class="btn btn-sm btn-danger m-1"><i class="fas fa-close"></i></button>
-                                @endif
-                            </td>
+                                        {{-- BUTTON REJECT --}}
+                                        <button type="button" onclick="approveStock('{{ $item->id }}', 'rejected')"
+                                            class="btn btn-sm btn-danger m-1"><i class="fas fa-close"></i></button>
+                                    @endif
+                                </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>
@@ -168,53 +170,53 @@
         });
 
         function init_table(keyword = '', startDate = '', endDate = '', predefinedFilter = '') {
-                var csrf_token = $('meta[name="csrf-token"]').attr('content');
+            var csrf_token = $('meta[name="csrf-token"]').attr('content');
 
-                var table = $('#data-table-usage-stock').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    columnDefs: [{
-                        target: 0,
-                        visible: true,
+            var table = $('#data-table-usage-stock').DataTable({
+                processing: true,
+                serverSide: true,
+                columnDefs: [{
+                    target: 0,
+                    visible: true,
+                    searchable: false
+                }, ],
+
+                ajax: {
+                    type: "GET",
+                    url: "{{ route('item.dataUsagePart') }}",
+                    data: {
+                        keyword: keyword,
+                        startDate: startDate,
+                        endDate: endDate,
+                        predefinedFilter: predefinedFilter,
+                        item_id: '{{ $data->id }}'
+                    }
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
                         searchable: false
-                    }, ],
-
-                    ajax: {
-                        type: "GET",
-                        url: "{{ route('item.dataUsagePart') }}",
-                        data: {
-                            keyword: keyword,
-                            startDate: startDate,
-                            endDate: endDate,
-                            predefinedFilter: predefinedFilter,
-                            item_id: '{{ $data->id }}'
-                        }
                     },
-                    columns: [{
-                            data: 'DT_RowIndex',
-                            name: 'DT_RowIndex',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'inspection_id',
-                            name: 'inspection_id'
-                        },
-                        {
-                            data: 'asset',
-                            name: 'asset'
-                        },
-                        {
-                            data: 'usage',
-                            name: 'usage'
-                        },
-                        {
-                            data: 'created_at',
-                            name: 'created_at'
-                        },
-                    ]
-                });
-            }
+                    {
+                        data: 'inspection_id',
+                        name: 'inspection_id'
+                    },
+                    {
+                        data: 'asset',
+                        name: 'asset'
+                    },
+                    {
+                        data: 'usage',
+                        name: 'usage'
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'created_at'
+                    },
+                ]
+            });
+        }
     </script>
     <script type="text/javascript">
         function approveStock(id, status) {
