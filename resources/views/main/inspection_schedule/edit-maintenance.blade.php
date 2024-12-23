@@ -41,6 +41,20 @@
         <input type="hidden" name="asset_id" value="{{ $data->asset_id }}">
     </div>
 
+    <div class="col-12 col-md-6">
+        <label class="form-label">Workshop</label>
+        <input type="text" name="workshop" id="workshop" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Nama Workshop" value="{{ old('workshop', $maintenance->workshop) }}" required
+            disabled />
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Mekanik</label>
+        <input type="text" name="employee_id" id="employee_id" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Nama Mekanik" value="{{ old('employee_id', $maintenance->employee_id) }}" required
+            disabled />
+    </div>
+
     <div class="col-12 col-md-12">
         <label class="form-label" for="alias">Catatan</label>
         <div>
@@ -60,79 +74,82 @@
 
     <div class="col-12 col-md-6" id="code_delay_form" hidden>
         <label class="form-label">Code Delay</label>
-        <input type="text" name="code_delay" value="{{ $maintenance->code_delay }}" id="code_delay" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Code Delay" />
+        <input type="text" name="code_delay" value="{{ $maintenance->code_delay }}" id="code_delay"
+            class="form-control mb-3 mb-lg-0" placeholder="Masukan Code Delay" />
     </div>
 
     <div class="col-12 col-md-6" id="delay_reason_form" hidden>
         <label class="form-label">Delay Reason</label>
-        <input type="text" name="delay_reason" value="{{ $maintenance->delay_reason }}" id="delay_reason" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Delay Reason" />
+        <input type="text" name="delay_reason" value="{{ $maintenance->delay_reason }}" id="delay_reason"
+            class="form-control mb-3 mb-lg-0" placeholder="Masukan Delay Reason" />
     </div>
 
     <div class="col-12 col-md-6" id="estimate_finish_form" hidden>
         <label class="form-label">DateTime Estimate Finish/RFU</label>
-        <input type="date" value="{{ date('Y-m-d') }}" name="estimate_finish" value="{{ $maintenance->estimate_finish }}" id="estimate_finish" class="form-control mb-3 mb-lg-0"
+        <input type="date" value="{{ date('Y-m-d') }}" name="estimate_finish"
+            value="{{ $maintenance->estimate_finish }}" id="estimate_finish" class="form-control mb-3 mb-lg-0"
             placeholder="Masukan DateTime Estimate Finish/RFU" />
     </div>
 
     <div class="col-12 col-md-6" id="delay_hours_form" hidden>
         <label class="form-label">Delay (Strt-Bd) (hrs)</label>
-        <input type="number" name="delay_hours" value="{{ $maintenance->delay_hours }}" id="delay_hours" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Delay (Strt-Bd) (hrs)" />
+        <input type="number" name="delay_hours" value="{{ $maintenance->delay_hours }}" id="delay_hours"
+            class="form-control mb-3 mb-lg-0" placeholder="Masukan Delay (Strt-Bd) (hrs)" />
     </div>
 
     <div class="col-12 col-md-6" id="start_maintenace_form" hidden>
         <label class="form-label">DateTime Start Maintenance</label>
-        <input type="datetime-local" name="start_maintenace" value="{{ $maintenance->start_maintenace }}" id="start_maintenace" class="form-control mb-3 mb-lg-0"
+        <input type="datetime-local" name="start_maintenace" value="{{ $maintenance->start_maintenace }}"
+            id="start_maintenace" class="form-control mb-3 mb-lg-0"
             placeholder="Masukan DateTime Start Maintenance" />
     </div>
 
     <div class="col-12 col-md-6" id="end_maintenace_form" hidden>
         <label class="form-label">DateTime Stop Maintenance</label>
-        <input type="datetime-local" name="end_maintenace" value="{{ $maintenance->end_maintenace }}" id="end_maintenace" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan DateTime Stop Maintenance" />
+        <input type="datetime-local" name="end_maintenace" value="{{ $maintenance->end_maintenace }}"
+            id="end_maintenace" class="form-control mb-3 mb-lg-0" placeholder="Masukan DateTime Stop Maintenance" />
     </div>
 
     <div class="col-12 col-md-6" id="deviasi_form" hidden>
         <label class="form-label">Deviasi</label>
-        <input type="datetime-local" name="deviasi" value="{{ $maintenance->deviasi }}" id="deviasi" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Deviasi" />
+        <input type="datetime-local" name="deviasi" value="{{ $maintenance->deviasi }}" id="deviasi"
+            class="form-control mb-3 mb-lg-0" placeholder="Masukan Deviasi" />
     </div>
 
     <div class="col-12 col-md-6" id="finish_at_form" hidden>
         <label class="form-label">Finish / RFU</label>
-        <input type="datetime-local" name="finish_at" value="{{ $maintenance->finish_at }}" id="finish_at" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Finish / RFU" />
+        <input type="datetime-local" name="finish_at" value="{{ $maintenance->finish_at }}" id="finish_at"
+            class="form-control mb-3 mb-lg-0" placeholder="Masukan Finish / RFU" />
     </div>
 
     <div class="col-12 col-md-6" id="hm_form" hidden>
         <label class="form-label">HM</label>
-        <input type="text" name="hm" value="{{ $maintenance->hm }}" id="hm" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan HM" />
+        <input type="text" name="hm" value="{{ $maintenance->hm }}" id="hm"
+            class="form-control mb-3 mb-lg-0" placeholder="Masukan HM" />
     </div>
 
     <div class="col-12 col-md-6" id="km_form" hidden>
         <label class="form-label">KM</label>
-        <input type="text" name="km" value="{{ $maintenance->km }}" id="km" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan KM" />
+        <input type="text" name="km" value="{{ $maintenance->km }}" id="km"
+            class="form-control mb-3 mb-lg-0" placeholder="Masukan KM" />
     </div>
 
     <div class="col-12 col-md-6" id="location_form" hidden>
         <label class="form-label">Location</label>
-        <input type="text" name="location" value="{{ $maintenance->location }}" id="location" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Location" />
+        <input type="text" name="location" value="{{ $maintenance->location }}" id="location"
+            class="form-control mb-3 mb-lg-0" placeholder="Masukan Location" />
     </div>
 
     <div class="col-12 col-md-12" id="detail_problem_form" hidden>
         <label class="form-label">Detail Problem</label>
-        <textarea name="detail_problem" id="detail_problem" class="form-control mb-3 mb-lg-0" cols="30" rows="5">{{ $maintenance->detail_problem }}</textarea>
+        <textarea name="detail_problem" id="detail_problem" class="form-control mb-3 mb-lg-0" cols="30"
+            rows="5">{{ $maintenance->detail_problem }}</textarea>
     </div>
 
     <div class="col-12 col-md-6" id="action_to_do_form" hidden>
         <label class="form-label">Action To Do</label>
-        <input type="text" name="action_to_do" value="{{ $maintenance->action_to_do }}" id="action_to_do" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Action To Do" />
+        <input type="text" name="action_to_do" value="{{ $maintenance->action_to_do }}" id="action_to_do"
+            class="form-control mb-3 mb-lg-0" placeholder="Masukan Action To Do" />
     </div>
 
     <div class="col-12 col-md-6" id="urgention_form" hidden>

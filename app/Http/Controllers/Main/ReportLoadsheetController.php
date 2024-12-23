@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\ExportLoadsheedByAsset;
+use App\Exports\ExportLoadsheedByProject;
 use App\Exports\ReportLoadsheetExport;
 use App\Http\Controllers\Controller;
 use App\Models\FuelConsumption;
@@ -51,7 +53,7 @@ class ReportLoadsheetController extends Controller
 
         return datatables()->of($data)
             ->addColumn('id', function ($row) {
-                return Crypt::decrypt($row->id);
+                return 'AST- '. Crypt::decrypt($row->id);
             })
             ->addColumn('name', function ($row) {
                 return $row->name;
@@ -70,4 +72,37 @@ class ReportLoadsheetController extends Controller
             ->rawColumns(['action'])
             ->make(true);
     }
+
+    public function exportExcelByProject(Request $request)
+    {
+        $fileName = 'Project Loadsheet' . now()->format('Ymd_His') . '.xlsx';
+        $query = DB::table('loadsheets')
+        ->join('management_projects', 'loadsheets.management_project_id', '=', 'management_projects.id')
+        ->selectRaw('management_projects.name as project_name, SUM(loadsheets.loadsheet) as total_loadsheet')
+        ->groupBy('management_projects.name');
+
+        $data = $query->get();
+
+        return Excel::download(new ExportLoadsheedByProject($data), $fileName);
+    }
+
+    public function exportExcelByAsset(Request $request)
+    {
+        $fileName = 'Asset Loadsheet' . now()->format('Ymd_His') . '.xlsx';
+        $query = Loadsheet::join('assets', 'loadsheets.asset_id', '=', 'assets.id')
+        ->selectRaw('assets.id, assets.name, assets.asset_number, SUM(loadsheets.loadsheet) as total_loadsheet')
+        ->groupBy('assets.id', 'assets.name', 'assets.asset_number');
+
+        $data = $query->get();
+        
+
+        foreach ($data as $key => $value) {
+            $value['format_id'] = 'AST- '. Crypt::decrypt($value->id);
+            $totalLiter = FuelConsumption::where('asset_id', Crypt::decrypt($value->id))->sum('liter');
+            $value['liter'] = number_format($totalLiter, 0, ',', '.') ?? "kosong";
+        }
+
+        return Excel::download(new ExportLoadsheedByAsset($data), $fileName);
+    }
+
 }

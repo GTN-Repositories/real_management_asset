@@ -15,19 +15,27 @@
                     <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button>
-                    <button onclick="importExcel()" class="btn btn-success btn-sm">
-                        <i class="fa-solid fa-file-excel me-1"></i>Import Excel
-                    </button>
-                    <button onclick="exportExcel()" class="btn btn-success btn-sm">
-                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-                    </button>
+                    @if (auth()->user()->hasPermissionTo('fuel-import-excel'))
+                        <button onclick="importExcel()" class="btn btn-success btn-sm">
+                            <i class="fa-solid fa-file-excel me-1"></i>Import Excel
+                        </button>
+                    @endif
+                    @if (auth()->user()->hasPermissionTo('fuel-export-excel'))
+                        <button onclick="exportExcel()" class="btn btn-success btn-sm">
+                            <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                        </button>
+                    @endif
+                    @if (auth()->user()->hasPermissionTo('fuel-request'))
+                        <button type="button" class="btn btn-warning btn-sm" onclick="createDataRequest()">
+                            <i class="fas fa-plus"></i> Request Fuel
+                        </button>
+                    @endif
                     <!-- Tombol Tambah -->
-                    <button type="button" class="btn btn-warning btn-sm" onclick="createDataRequest()">
-                        <i class="fas fa-plus"></i> Request Fuel
-                    </button>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                        <i class="fas fa-plus"></i> Tambah
-                    </button>
+                    @if (auth()->user()->hasPermissionTo('fuel-create'))
+                        <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
+                            <i class="fas fa-plus"></i> Tambah
+                        </button>
+                    @endif
                 </div>
             </div>
             <div class="card-datatable table-responsive">

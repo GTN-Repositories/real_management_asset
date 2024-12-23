@@ -155,6 +155,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('quiz', function () {
         return view('main.quiz.index');
     })->name('quiz');
+    Route::delete('/inspection-schedule/destroy-all', [InspectionScheduleController::class, 'destroyAll'])->name('inspection-schedule.destroyAll');
 
     Route::get('/maintenances/data', [MaintenanceController::class, 'data'])->name('maintenances.data');
     Route::delete('/maintenances/destroy-all', [MaintenanceController::class, 'destroyAll'])->name('maintenances.destroyAll');
@@ -195,7 +196,8 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/report-loadsheet/chart-project', [ReportLoadsheetController::class, 'chartProject'])->name('report-loadsheet.chart-project');
     Route::get('/report-loadsheet/dataAsset', [ReportLoadsheetController::class, 'dataAsset'])->name('report-loadsheet.dataAsset');
     Route::get('/report-loadsheet/data', [ReportLoadsheetController::class, 'data'])->name('report-loadsheet.data');
-    Route::get('/report-loadsheet/export-excel', [ReportLoadsheetController::class, 'exportExcel'])->name('report-loadsheet.export-excel');
+    Route::get('/report-loadsheet/export-excel-by-project', [ReportLoadsheetController::class, 'exportExcelByProject'])->name('report-loadsheet.exportExcelByProject');
+    Route::get('/report-loadsheet/export-excel-by-assete', [ReportLoadsheetController::class, 'exportExcelByAsset'])->name('report-loadsheet.exportExcelByAsset');
     Route::resource('report-loadsheet', ReportLoadsheetController::class);
 
     Route::get('/report-maintenance/data', [ReportMaintenanceController::class, 'data'])->name('report-maintenance.data');
