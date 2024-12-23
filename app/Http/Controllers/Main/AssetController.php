@@ -400,7 +400,7 @@ class AssetController extends Controller
                     }
                 }
 
-                $data['manager'] = $data['manager'];
+                $data['manager'] = $data['manager'] ?? null;
 
                 $result = $asset->update($data);
 

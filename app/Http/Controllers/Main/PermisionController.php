@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class PermisionController extends Controller implements HasMiddleware
 {
@@ -115,6 +116,10 @@ class PermisionController extends Controller implements HasMiddleware
                 $data['user_id'] = Auth::user()->id;
                 $data['guard_name'] = 'web';
                 Permission::create($data);
+                $roles = Role::whereIn('name', ['superadmin', 'admin'])->get();
+                foreach ($roles as $role) {
+                    $role->givePermissionTo(Permission::latest()->first());
+                }
                 return response()->json([
                     'status' => true,
                     'message' => 'Data Berhasil di Tambahkan!',
