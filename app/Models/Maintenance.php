@@ -26,4 +26,9 @@ class Maintenance extends Model
     {
         return $this->belongsTo(InspectionSchedule::class, 'inspection_schedule_id', 'id');
     }
+
+    public function getEmployeeIdAttribute($value)
+    {
+        return implode(', ', json_decode($value));
+    }
 }

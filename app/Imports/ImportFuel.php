@@ -19,7 +19,7 @@ class ImportFuel implements ToModel, WithHeadingRow
     {
         $project = ManagementProject::where('name', $row['nama_project'])->first();
         $employee = Employee::where('name', $row['employee'])->first();
-        $asset_id = explode('AST - ', $row['asset_id'])[1];
+        $asset_id = explode('AST - ', $row['asset_id'])[1] ?? $row['asset_id'];
         if ($project) {
             return new FuelConsumption([
                 'management_project_id' => Crypt::decrypt($project->id),

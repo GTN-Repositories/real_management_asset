@@ -50,12 +50,17 @@
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button>
                     <!-- Tombol Tambah -->
-                    <button type="button" class="btn btn-success btn-sm d-flex align-items-center" onclick="importExcel()">
-                        <i class="fas fa-file-excel me-2"></i> Import Excel
-                    </button>
-                    <button onclick="exportExcel()" class="btn btn-success btn-sm">
-                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-                    </button>
+                    @if (auth()->user()->hasPermissionTo('asset-import-excel'))
+                        <button type="button" class="btn btn-success btn-sm d-flex align-items-center"
+                            onclick="importExcel()">
+                            <i class="fas fa-file-excel me-2"></i> Import Excel
+                        </button>
+                    @endif
+                    @if (auth()->user()->hasPermissionTo('asset-export-excel'))
+                        <button onclick="exportExcel()" class="btn btn-success btn-sm">
+                            <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                        </button>
+                    @endif
                     @if (auth()->user()->hasPermissionTo('asset-create'))
                         <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
                             <i class="fas fa-plus"></i> Tambah

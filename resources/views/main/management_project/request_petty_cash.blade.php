@@ -8,15 +8,15 @@
     @csrf
 
     <div class="col-12 col-md-12" id="managementRelation">
-        <label class="form-label" for="project_id">Nama Project<span
-                class="text-danger">*</span></label>
-        <select id="project_id" name="project_id"
-            class="select2 form-select select2-primary"data-allow-clear="true" required>
+        <label class="form-label" for="project_id">Nama Project<span class="text-danger">*</span></label>
+        <select id="project_id" name="project_id" class="select2 form-select select2-primary"data-allow-clear="true"
+            required>
         </select>
     </div>
     <div class="col-12 col-md-12">
         <label for="date" class="form-label">Tanggal</label>
-        <input type="date" id="date" name="date" value="{{ date('Y-m-d') }}" class="form-control" placeholder="Input Nilai">
+        <input type="date" id="date" name="date" value="{{ date('Y-m-d') }}" class="form-control"
+            placeholder="Input Nilai">
     </div>
     <div class="col-12 col-md-12">
         <label for="amount" class="form-label">Nilai</label>
@@ -52,14 +52,16 @@
                         <td>{{ $item->date ?? null }}</td>
                         <td>{{ $item->createdBy->name ?? null }}</td>
                         <td>{{ $item->created_at->format('d-m-Y H:i') ?? null }}</td>
-                        <td>
-                            {{-- BUTTON APPROVE --}}
-                            <button type="button" onclick="approvePettyCash('{{ $item->id }}', '2')"
-                                class="btn btn-sm btn-primary m-1"><i class="fas fa-check"></i></button>
-                            {{-- BUTTON REJECT --}}
-                            <button type="button" onclick="approvePettyCash('{{ $item->id }}', '3')"
-                                class="btn btn-sm btn-danger m-1"><i class="fas fa-close"></i></button>
-                        </td>
+                        @if (auth()->user()->hasPermissionTo('management-project-approve'))
+                            <td>
+                                {{-- BUTTON APPROVE --}}
+                                <button type="button" onclick="approvePettyCash('{{ $item->id }}', '2')"
+                                    class="btn btn-sm btn-primary m-1"><i class="fas fa-check"></i></button>
+                                {{-- BUTTON REJECT --}}
+                                <button type="button" onclick="approvePettyCash('{{ $item->id }}', '3')"
+                                    class="btn btn-sm btn-danger m-1"><i class="fas fa-close"></i></button>
+                            </td>
+                        @endif
                     </tr>
                 @endforeach
             </tbody>
@@ -85,7 +87,7 @@
                 },
                 processResults: function(data) {
                     let apiResults = data.data.map(item => ({
-                        text: item.format_id +' - '+ item.name,
+                        text: item.format_id + ' - ' + item.name,
                         id: item.managementRelationId,
                     }));
                     return {
@@ -142,18 +144,19 @@
                     'status': status
                 };
                 $.ajax({
-                    url: "{{ route('management-project.approvePettyCash', ':id') }}".replace(':id', id),
-                    type: 'POST',
-                    data : postForm,
-                    dataType  : 'json',
-                })
-                .done(function(data) {
-                    Swal.fire('Approved!', data['message'], 'success');
-                    location.reload();
-                })
-                .fail(function() {
-                    Swal.fire('Error!', 'An error occurred while approving the record.', 'error');
-                })
+                        url: "{{ route('management-project.approvePettyCash', ':id') }}".replace(':id',
+                            id),
+                        type: 'POST',
+                        data: postForm,
+                        dataType: 'json',
+                    })
+                    .done(function(data) {
+                        Swal.fire('Approved!', data['message'], 'success');
+                        location.reload();
+                    })
+                    .fail(function() {
+                        Swal.fire('Error!', 'An error occurred while approving the record.', 'error');
+                    })
             }
         });
     }

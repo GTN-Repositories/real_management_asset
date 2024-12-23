@@ -20,19 +20,28 @@
                     <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button>
-                    <button type="button" class="btn btn-success btn-sm d-flex align-items-center" onclick="importExcel()">
-                        <i class="fas fa-file-excel me-2"></i> Import Excel
-                    </button>
-                    <button onclick="exportExcel()" class="btn btn-success btn-sm">
-                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-                    </button>
+                    @if (auth()->user()->hasPermissionTo('item-import-excel'))
+                        <button type="button" class="btn btn-success btn-sm d-flex align-items-center"
+                            onclick="importExcel()">
+                            <i class="fas fa-file-excel me-2"></i> Import Excel
+                        </button>
+                    @endif
+                    @if (auth()->user()->hasPermissionTo('item-export-excel'))
+                        <button onclick="exportExcel()" class="btn btn-success btn-sm">
+                            <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                        </button>
+                    @endif
+                    @if (auth()->user()->hasPermissionTo('item-create'))
+                        <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
+                            <i class="fas fa-plus"></i> Tambah
+                        </button>
+                    @endif
+                    @if (auth()->user()->hasPermissionTo('item-request'))
+                        <button type="button" class="btn btn-warning btn-sm" onclick="editStock()">
+                            <i class="fas fa-box"></i> Request Stock
+                        </button>
+                    @endif
                     <!-- Tombol Tambah -->
-                    <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                        <i class="fas fa-plus"></i> Tambah
-                    </button>
-                    <button type="button" class="btn btn-warning btn-sm" onclick="editStock()">
-                        <i class="fas fa-box"></i> Request Stock
-                    </button>
                 </div>
             </div>
             <div class="card-datatable table-responsive">

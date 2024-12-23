@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\AssetLoadsheetExport;
+use App\Exports\ProjectLoadsheetExport;
 use App\Exports\ReportLoadsheetExport;
 use App\Http\Controllers\Controller;
 use App\Models\FuelConsumption;

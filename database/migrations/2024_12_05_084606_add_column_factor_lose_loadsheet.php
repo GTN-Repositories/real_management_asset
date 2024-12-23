@@ -9,22 +9,22 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::table('dev_real.loadsheets', function (Blueprint $table) {
-            $table->dropColumn('bpit');
-        });
+    // public function up(): void
+    // {
+    //     Schema::table('dev_real.loadsheets', function (Blueprint $table) {
+    //         $table->dropColumn('bpit');
+    //     });
 
-        Schema::table('dev_real.loadsheets', function (Blueprint $table) {
-            $table->string('bpit')->nullable();
-        });
-    }
+    //     Schema::table('dev_real.loadsheets', function (Blueprint $table) {
+    //         $table->string('bpit')->nullable();
+    //     });
+    // }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        //
-    }
+    // /**
+    //  * Reverse the migrations.
+    //  */
+    // public function down(): void
+    // {
+    //     //
+    // }
 };

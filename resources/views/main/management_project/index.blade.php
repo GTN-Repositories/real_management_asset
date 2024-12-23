@@ -20,21 +20,27 @@
                     <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button>
-                    <button onclick="importExcel()" class="btn btn-success btn-sm">
-                        <i class="fa-solid fa-file-excel me-1"></i>Import Excel
-                    </button>
-                    <button onclick="exportExcel()" class="btn btn-success btn-sm">
-                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-                    </button>
+                    @if (auth()->user()->hasPermissionTo('management-project-import-excel'))
+                        <button onclick="importExcel()" class="btn btn-success btn-sm">
+                            <i class="fa-solid fa-file-excel me-1"></i>Import Excel
+                        </button>
+                    @endif
+                    @if (auth()->user()->hasPermissionTo('management-project-export-excel'))
+                        <button onclick="exportExcel()" class="btn btn-success btn-sm">
+                            <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                        </button>
+                    @endif
                     <!-- Tombol Tambah -->
-                    @if (auth()->user()->hasPermissionTo('management-create'))
+                    @if (auth()->user()->hasPermissionTo('management-project-create'))
                         <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
                             <i class="fas fa-plus"></i> Tambah
                         </button>
                     @endif
-                    <button type="button" class="btn btn-warning btn-sm" onclick="requestPettyCash()">
-                        <i class="fas fa-dollar"></i> Request Petty Cash
-                    </button>
+                    @if (auth()->user()->hasPermissionTo('management-project-request'))
+                        <button type="button" class="btn btn-warning btn-sm" onclick="requestPettyCash()">
+                            <i class="fas fa-dollar"></i> Request Petty Cash
+                        </button>
+                    @endif
                 </div>
             </div>
             <div class="card-datatable table-responsive">
