@@ -17,8 +17,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(MenuSeeder::class);
-        $this->call(FormSeeder::class);
-        $this->call(UnitSeeder::class);
+        // $this->call(FormSeeder::class);
+        // $this->call(UnitSeeder::class);
         $this->call(MenuPermissionSeeder::class);
 
         $permissions = [
@@ -133,7 +133,16 @@ class DatabaseSeeder extends Seeder
             'loadsheet-import-excel',
             'loadsheet-export-excel',
 
-            'view-driver'
+            'view-driver',
+
+            ' view-status-asset',
+            'view-log-activity',
+            'view-asset-reminder',
+            'view-asset-attachment',
+            'view-oum',
+            'maintenances-create',
+            'view-soil-type',
+            'view-status-asset',
         ];
 
         foreach ($permissions as $permission) {
@@ -223,7 +232,7 @@ class DatabaseSeeder extends Seeder
 
 
         $permissions = Permission::all()->filter(function ($permission) {
-            return !Str::contains($permission->name, 'approve') && !Str::contains($permission->name, 'create');
+            return !Str::contains($permission->name, 'approve');
         });
 
         $Dhika->givePermissionTo($permissions);
