@@ -35,8 +35,9 @@ class ManagementProject extends Model
 
     protected $casts = [
         'asset_id' => 'array',
+        'employee_id' => 'array',
     ];
-
+    
     public function monitorings()
     {
         return $this->hasManyThrough(
