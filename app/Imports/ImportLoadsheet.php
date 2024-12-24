@@ -25,7 +25,7 @@ class ImportLoadsheet implements ToModel, WithHeadingRow
             $employee = Employee::where('name', $row['nama_karyawan'] ?? '')->first();
 
             $soil_type_id = optional(SoilType::where('name', $row['soil_type_id'] ?? '')->first())->id ? Crypt::decrypt(optional(SoilType::where('name', $row['soil_type_id'] ?? '')->first())->id) : null;
-            $cubication = ($row['total_load'] ?? 0 * $row['perload'] ?? 0) * $row['lose_factor'] ?? 0;
+            $cubication = (((int)$row['total_load'] ?? 0) * ((int)$row['perload'] ?? 0)) * $row['lose_factor'] ?? 0;
             $soilType = SoilType::find($soil_type_id);
             $price = (int)($cubication * ($soilType ? $soilType->value : 0));
 

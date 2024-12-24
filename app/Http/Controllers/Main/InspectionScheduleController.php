@@ -115,19 +115,19 @@ class InspectionScheduleController extends Controller
         ];
 
         $keyword = $request->search;
-        $start_date = ($request->start_date != '') ? $request->start_date . ' 00:00:00' : now()->startOfMonth()->format('Y-m-d') . ' 00:00:00';
-        $end_date = ($request->end_date != '') ? $request->end_date . ' 23:59:59' : now()->endOfMonth()->format('Y-m-d') . ' 23:59:59';
+        // $start_date = ($request->start_date != '') ? $request->start_date . ' 00:00:00' : now()->startOfMonth()->format('Y-m-d') . ' 00:00:00';
+        // $end_date = ($request->end_date != '') ? $request->end_date . ' 23:59:59' : now()->endOfMonth()->format('Y-m-d') . ' 23:59:59';
         $type = $request->type;
 
-        $data = InspectionSchedule::orderBy('created_at', 'asc')
+        $data = InspectionSchedule::orderBy('id', 'desc')
             ->select($columns)
-            ->whereBetween('date', [$start_date, $end_date])
+            // ->whereBetween('date', [$start_date, $end_date])
             ->where(function ($query) use ($type, $keyword, $columns) {
                 if ($type != '') {
                     $query->where('type', $type);
                 }
 
-                // if ($keyword != '') {
+                // if ($keyword != '') {    
                 //     foreach ($columns as $column) {
                 //         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
                 //     }
