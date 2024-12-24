@@ -181,6 +181,7 @@ class FuelConsumptionController extends Controller
                 $field['issued_liter'] = 0;
                 $field['balance'] = $lastBalance - $field['usage_liter'];
                 $field['unit_price'] = $unitprice;
+                $field['fuel_id'] = Crypt::decrypt($data->id);
                 Ipb::create($field);
 
                 return response()->json([
@@ -229,7 +230,7 @@ class FuelConsumptionController extends Controller
             return $this->atomic(function () use ($data, $id) {
                 // $data['price'] = isset($data['price']) && $data['price'] != '-' ? str_replace('.', '', $data['price']) : null;
                 $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
-                // $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
+                $data['liter'] = isset($data['liter']) && $data['liter'] != '-' ? str_replace('.', '', $data['liter']) : null;
                 // $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
                 $data['hm'] = isset($data['hm']) && $data['hm'] != '-' ? str_replace('.', '', $data['hm']) : null;
                 $data['lasted_km_asset'] = isset($data['lasted_km_asset']) && $data['lasted_km_asset'] != '-' ? str_replace('.', '', $data['lasted_km_asset']) : null;
@@ -250,7 +251,35 @@ class FuelConsumptionController extends Controller
                     $data["user_id"] = $data["user_id"];
                 }
                 $data["hours"] = 0;
-                $data = FuelConsumption::findByEncryptedId($id)->update($data);
+                $fuelRecord = FuelConsumption::findByEncryptedId($id);
+                if (!$fuelRecord) {
+                    throw new \Exception('Data FuelConsumption tidak ditemukan!');
+                }
+
+                $fuelRecord->update($data);
+                $field['usage_liter'] = $data['liter'];
+                $ipbRecords = Ipb::where('fuel_id', Crypt::decrypt($id))
+                    ->orderBy('id', 'asc')
+                    ->first();
+
+                $ipbRecords->update($field);
+                
+                $records = Ipb::where('management_project_id', $data["management_project_id"])
+                              ->orderBy('id', 'asc')
+                              ->get();
+
+                $lastBalance = 0;
+
+                foreach ($records as $row) {
+                    $issuedLiter = $row->issued_liter ?? 0;
+                    $usageLiter = $row->usage_liter ?? 0;
+
+                    $newBalance = ($lastBalance + $issuedLiter) - $usageLiter;
+
+                    $row->update(['balance' => $newBalance]);
+
+                    $lastBalance = $newBalance;
+                }
 
                 return response()->json([
                     'status' => true,
