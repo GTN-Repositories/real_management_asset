@@ -262,19 +262,24 @@ class IpbController extends Controller
                     throw new \Exception('Data tidak ditemukan!');
                 }
 
-                $lastBalance = Ipb::where('management_project_id', $data["management_project_id"])
-                    ->where('id', '<>', $record->id)
-                    ->orderBy('id', 'desc')
-                    ->value('balance');
-
-                $lastBalance = $lastBalance ?? 0;
-
-                $issuedLiter = $data['issued_liter'] ?? 0;
-                $usageLiter = $data['usage_liter'] ?? 0;
-
-                $data['balance'] = ($lastBalance + $issuedLiter) - $usageLiter;
-
                 $record->update($data);
+
+                $records = Ipb::where('management_project_id', $data["management_project_id"])
+                              ->orderBy('id', 'asc')
+                              ->get();
+
+                $lastBalance = 0;
+
+                foreach ($records as $row) {
+                    $issuedLiter = $row->issued_liter ?? 0;
+                    $usageLiter = $row->usage_liter ?? 0;
+
+                    $newBalance = ($lastBalance + $issuedLiter) - $usageLiter;
+
+                    $row->update(['balance' => $newBalance]);
+
+                    $lastBalance = $newBalance;
+                }
 
                 return response()->json([
                     'status' => true,
