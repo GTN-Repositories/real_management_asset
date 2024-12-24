@@ -163,8 +163,9 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        keyword: params.term,
-                        limit: 10
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
                     };
                 },
                 processResults: function(data) {
@@ -250,7 +251,6 @@
                                data-item-id="${item.id}"
                                value="${item.stock}"
                                min="1"
-                               max="${item.availableStock}"
                         >
                     </td>
                     <td>
