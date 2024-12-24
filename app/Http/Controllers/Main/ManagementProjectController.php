@@ -253,18 +253,27 @@ class ManagementProjectController extends Controller
     {
         $data = ManagementProject::findByEncryptedId($id);
 
-        $data->assets = $data->getAssetsAttribute();
+        $asset = Asset::whereIn('id', $data->asset_id)->select('id', 'name', 'asset_number')->get()->toArray();
+        $assetSelected = [];
+        foreach ($asset as $key => $value) {
+            $value['id'] = $value['id'];
+            $value['format_id'] = 'AST - '. Crypt::decrypt($value['id']);
+            $value['name'] = $value['format_id']. ' - ' .$value['name']. ' - '. $value['asset_number'];
 
-        $data->employee_id = is_string($data->employee_id)
-            ? json_decode($data->employee_id, true)
-            : ($data->employee_id ?? []);
+            $assetSelected[] = $value;
+        }
 
-        $data->employees = Employee::whereIn('id', $data->employee_id)
-            ->get()
-            ->each(function ($employee) {
-                $employee->job_title = $employee->jobTitle->name;
-            });
-        return view('main.management_project.edit', compact('data'));
+        $employee = Employee::whereIn('id', $data->employee_id)->get()->toArray();
+        $selectedEmployee = [];
+        foreach ($employee as $key => $value) {
+            $value['id'] = $value['id'];
+            $value['format_id'] = 'EMP - '. Crypt::decrypt($value['id']);
+            $value['name'] = $value['format_id']. ' - ' .$value['name']. ' - '. ($value->jobTitle->name ?? null);
+
+            $selectedEmployee[] = $value;
+        }
+
+        return view('main.management_project.edit', compact('data', 'assetSelected', 'selectedEmployee'));
     }
 
 

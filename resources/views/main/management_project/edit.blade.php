@@ -161,36 +161,24 @@
             }
         });
 
-        var asset_ids = {!! json_encode($data->asset_id ?? []) !!};
-        var asset_id = {!! json_encode($data->assets->pluck('id')->map(fn($id) => Crypt::decrypt($id)) ?? []) !!};
-        var asset_names = {!! json_encode($data->assets->pluck('name') ?? []) !!};
-        var asset_numbers = {!! json_encode($data->assets->pluck('asset_number') ?? []) !!};
+        var assetSelected = {!! json_encode($assetSelected ?? []) !!}
 
-        if (asset_ids && asset_names && asset_numbers) {
-            asset_ids.forEach(function(id, index) {
-                var option = new Option(
-                    `${asset_id[index]} - ${asset_names[index]} - ${asset_numbers[index]}`, id,
+        if (assetSelected) {
+            assetSelected.forEach(function(item, index) {
+                var option = new Option(item.name, item.id,
                     true,
                     true);
                 $('#asset_id').append(option);
+                // console.log(item);
             });
             $('#asset_id').trigger('change');
         }
 
-        var employee_ids = {!! json_encode($data->employee_id ?? []) !!};
-        var employee_names = {!! json_encode($data->employees->pluck('name') ?? []) !!};
-        var job_title_names = {!! json_encode($data->employees->map(function($employee) {
-            return $employee->jobTitle ? $employee->jobTitle->name : null;
-        })->toArray() ?? []) !!};
+        var selectedEmployee = {!! json_encode($selectedEmployee ?? []) !!};
 
-        employee_ids = Array.isArray(employee_ids) ? employee_ids : [];
-        employee_names = Array.isArray(employee_names) ? employee_names : [];
-        job_title_names = Array.isArray(job_title_names) ? job_title_names : [];
-
-        if (employee_ids.length > 0 && employee_names.length > 0 && job_title_names.length > 0) {
-            employee_ids.forEach(function(id, index) {
-                var name = `${employee_names[index]} - ${job_title_names[index] || 'Undefined'}`;
-                var option = new Option(name, id, true, true);
+        if (selectedEmployee) {
+            selectedEmployee.forEach(function(item, index) {
+                var option = new Option(item.name, item.id, true, true);
                 $('#employee_id').append(option);
             });
             $('#employee_id').trigger('change');
@@ -198,8 +186,6 @@
             $('#employee_id').empty();
             $('#employee_id').trigger('change');
         }
-
-
     });
 
     $(document).ready(function() {
