@@ -1,13 +1,13 @@
 @extends('layouts.global')
 
-@section('title', 'Report Asset Performance')
+@section('title', 'Report Summary')
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Asset Performance</h4>
+        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Report Summary</h4>
 
         <!-- Product List Table -->
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header">
                 <h5 class="card-title mb-0">Asset Performance</h5>
                 <div class="d-flex justify-content-end gap-2">
@@ -32,6 +32,15 @@
                         </tr>
                     </thead>
                 </table>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title">Chart Expenses</h5>
+            </div>
+            <div class="card-body">
+                <div id="chart" style="width: 100%; height: 300px;"></div>
             </div>
         </div>
 
@@ -78,6 +87,34 @@
                 });
 
                 bulkDelete(ids);
+            });
+        });
+
+        $(document).ready(function() {
+            $.ajax({
+                type: 'GET',
+                url: "{{ route('report-asset-performance.chart') }}",
+                dataType: 'json',
+                success: function(data) {
+                    var options = {
+                        chart: {
+                            type: 'pie',
+                            width: 400,
+                            height: 300,
+                        },
+                        series: data.series,
+                        labels: data.labels,
+                        colors: ['#FFD700', '#33CC33', '#2E865F'],
+                        legend: {
+                            show: true,
+                            position: 'bottom',
+                        },
+                    };
+
+
+                    var chart = new ApexCharts(document.querySelector("#chart"), options);
+                    chart.render();
+                }
             });
         });
 

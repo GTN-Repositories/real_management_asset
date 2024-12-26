@@ -4,8 +4,14 @@ namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
 use App\Models\AssetReminder;
+use App\Models\InspectionSchedule;
+use App\Models\Ipb;
+use App\Models\Item;
 use App\Models\LoadhseetTarget;
 use App\Models\Loadsheet;
+use App\Models\RecordInsurance;
+use App\Models\RecordRent;
+use App\Models\RecordTax;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
@@ -43,7 +49,20 @@ class AssetPerformance extends Controller
             })
 
             ->addColumn('Expenses', function ($data) {
-                return "expenses" ?? null;
+                $ipb = Ipb::whereHas('fuel', function ($query) use ($data) {
+                    $query->where('asset_id', $data->asset_id);
+                })->selectRaw('SUM(usage_liter * unit_price) as total_ipb')->value('total_ipb');
+                $ppn = $ipb * 0.11;
+                $inspections = InspectionSchedule::where('asset_id', $data->asset_id)
+                    ->where('status', 'finish')
+                    ->get();
+                $itemStocks = [];
+                foreach ($inspections as $inspection) {
+                    $itemStocks = array_merge($itemStocks, is_array(json_decode($inspection->item_stock, true)) ? json_decode($inspection->item_stock, true) : []);
+                }
+                $stock = array_sum($itemStocks);
+                $total = $stock > 0 ? ($ipb + $ppn) * $stock : ($ipb + $ppn);
+                return number_format($total, 0, ',', '.') ?? null;
             })
             ->escapeColumns([])
             ->make(true);
@@ -100,93 +119,36 @@ class AssetPerformance extends Controller
         }
     }
 
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function expanses()
     {
-        //
-    }
+        $tax = RecordTax::sum('summary');
+        $rent = RecordRent::sum('summary');
+        $insurance = RecordInsurance::sum('summary');
+        $other = $tax + $rent + $insurance;
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        $data = AssetReminder::findByEncryptedId($id);
+        $ipb = Ipb::selectRaw('SUM(usage_liter * unit_price) as total_ipb')->value('total_ipb');
+        $ppn = $ipb * 0.11;
+        $fuel = $ipb + $ppn;
 
-        return view('main.asset_reminder.edit', compact('data'));
-    }
-
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-        $data = $request->all();
-
-        try {
-            return $this->atomic(function () use ($data, $id) {
-                $data = AssetReminder::findByEncryptedId($id)->update($data);
-
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil diperbarui!',
-                ]);
-            });
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data gagal diperbarui! ' . $th->getMessage(),
-            ]);
+        $totalHarga = 0;
+        $dataItem = InspectionSchedule::all();
+        foreach ($dataItem as $item) {
+            $itemIds = json_decode($item->item_id, true) ?? [];
+            $itemStocks = json_decode($item->item_stock, true) ?? [];
+            dd($itemIds, $itemStocks);
+            foreach ($itemIds as $index => $itemId) {
+                $itemModel = Item::find($itemId);
+                $harga = $itemModel ? $itemModel->price : 0;
+                $stock = $itemStocks[$index] ?? 0;
+                $totalHarga += $harga * $stock;
+            }
         }
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        try {
-            $data = AssetReminder::findByEncryptedId($id);
-            $data->delete();
+        $data = [
+            'labels' => ['Other', 'Fuel', 'Item'],
+            'series' => [$other, $fuel, $totalHarga],
+        ];
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Data berhasil dihapus!',
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data gagal dihapus! ' . $th->getMessage(),
-            ]);
-        }
-    }
-
-    public function destroyAll(Request $request)
-    {
-        try {
-            $ids = $request->ids;
-            return $this->atomic(function () use ($ids) {
-                $decryptedIds = [];
-                foreach ($ids as $encryptedId) {
-                    $decryptedIds[] = Crypt::decrypt($encryptedId);
-                }
-
-                $delete = AssetReminder::whereIn('id', $decryptedIds)->delete();
-
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data Berhasil Dihapus!',
-                ]);
-            });
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data Gagal Dihapus!',
-            ]);
-        }
+        return response()->json($data);
     }
 }

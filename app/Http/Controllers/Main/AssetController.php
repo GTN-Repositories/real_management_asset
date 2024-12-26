@@ -407,51 +407,57 @@ class AssetController extends Controller
                 $latestRecord = RecordInsurance::where('asset_id', Crypt::decrypt($asset->id))->latest()->first();
                 $latestDate = $latestRecord ? $latestRecord->date : null;
 
-                $distance = 0;
-                if ($latestDate) {
-                    $distance = (int) date_diff(date_create($data['asuransi_date']), date_create($latestDate))->format('%m');
+                if ($latestDate !== $data['asuransi_date'] && $data['insurance_cost'] !== null) {
+                    $distance = 0;
+                    if ($latestDate) {
+                        $distance = (int) date_diff(date_create($data['asuransi_date']), date_create($latestDate))->format('%m');
+                    }
+
+                    $summary = $distance > 0 ? $distance * $data['insurance_cost'] : $data['insurance_cost'];
+
+                    RecordInsurance::create([
+                        'asset_id' => Crypt::decrypt($asset->id),
+                        'summary' => $summary,
+                        'insurance' => $data['insurance_cost'],
+                        'date' => $data['asuransi_date'],
+                    ]);
                 }
-
-                $summary = $distance > 0 ? $distance * $data['insurance_cost'] : $data['insurance_cost'];
-
-                RecordInsurance::create([
-                    'asset_id' => Crypt::decrypt($asset->id),
-                    'summary' => $summary,
-                    'insurance' => $data['insurance_cost'],
-                    'date' => $data['asuransi_date'],
-                ]);
 
                 $latestRecord = RecordTax::where('asset_id', Crypt::decrypt($asset->id))->latest()->first();
                 $latestDate = $latestRecord ? $latestRecord->date : null;
 
-                $distance = 0;
-                if ($latestDate) {
-                    $distance = (int) date_diff(date_create($data['tax_period']), date_create($latestDate))->format('%m');
-                }
-                $summary = $distance > 0 ? $distance * $data['tax_cost'] : $data['tax_cost'];
+                if ($latestDate !== $data['tax_period'] && $data['tax_cost'] !== null) {
+                    $distance = 0;
+                    if ($latestDate) {
+                        $distance = (int) date_diff(date_create($data['tax_period']), date_create($latestDate))->format('%m');
+                    }
+                    $summary = $distance > 0 ? $distance * $data['tax_cost'] : $data['tax_cost'];
 
-                RecordTax::create([
-                    'asset_id' => Crypt::decrypt($asset->id),
-                    'summary' => $summary,
-                    'tax' => $data['tax_cost'],
-                    'date' => $data['tax_period'],
-                ]);
+                    RecordTax::create([
+                        'asset_id' => Crypt::decrypt($asset->id),
+                        'summary' => $summary,
+                        'tax' => $data['tax_cost'],
+                        'date' => $data['tax_period'],
+                    ]);
+                }
 
                 $latestRecord = RecordRent::where('asset_id', Crypt::decrypt($asset->id))->latest()->first();
                 $latestDate = $latestRecord ? $latestRecord->date : null;
 
-                $distance = 0;
-                if ($latestDate) {
-                    $distance = (int) date_diff(date_create($data['contract_period']), date_create($latestDate))->format('%m');
-                }
-                $summary = $distance > 0 ? $distance * $data['cost'] : $data['cost'];
+                if ($latestDate !== $data['contract_period'] && $data['cost'] !== null) {
+                    $distance = 0;
+                    if ($latestDate) {
+                        $distance = (int) date_diff(date_create($data['contract_period']), date_create($latestDate))->format('%m');
+                    }
+                    $summary = $distance > 0 ? $distance * $data['cost'] : $data['cost'];
 
-                RecordRent::create([
-                    'asset_id' => Crypt::decrypt($asset->id),
-                    'summary' => $summary,
-                    'rent' => $data['cost'],
-                    'date' => $data['contract_period'],
-                ]);
+                    RecordRent::create([
+                        'asset_id' => Crypt::decrypt($asset->id),
+                        'summary' => $summary,
+                        'rent' => $data['cost'],
+                        'date' => $data['contract_period'],
+                    ]);
+                }
 
                 if ($statusBefore !== $asset->status) {
                     StatusAsset::create([
