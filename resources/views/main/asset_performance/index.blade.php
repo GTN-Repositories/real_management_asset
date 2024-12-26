@@ -105,7 +105,7 @@
                         series: data.series,
                         labels: data.labels,
                         colors: ['#FFD700', '#33CC33', '#2E865F'],
-                        legend: {
+                            legend: {
                             show: true,
                             position: 'bottom',
                         },
