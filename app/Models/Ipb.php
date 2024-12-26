@@ -40,4 +40,8 @@ class Ipb extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+    public function fuel(): BelongsTo
+    {
+        return $this->belongsTo(FuelConsumption::class, 'fuel_id', 'id');
+    }
 }
