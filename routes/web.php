@@ -216,6 +216,8 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::resource('report-asset-performance', AssetPerformance::class);
 
     Route::get('/report-expenses/data', [ExpensesController::class, 'data'])->name('report-expenses.data');
+    Route::get('/report-expenses/data-tax', [ExpensesController::class, 'dataTax'])->name('report-expenses.data-tax');
+    Route::get('/report-expenses/data-rent', [ExpensesController::class, 'dataRent'])->name('report-expenses.data-rent');
     Route::delete('/report-expenses/destroy-all', [ExpensesController::class, 'destroyAll'])->name('report-expenses.destroyAll');
     Route::resource('report-expenses', ExpensesController::class);
 
