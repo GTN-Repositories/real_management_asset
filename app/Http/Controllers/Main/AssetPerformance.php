@@ -132,17 +132,19 @@ class AssetPerformance extends Controller
 
         $totalHarga = 0;
         $dataItem = InspectionSchedule::all();
+
         foreach ($dataItem as $item) {
             $itemIds = json_decode($item->item_id, true) ?? [];
             $itemStocks = json_decode($item->item_stock, true) ?? [];
-            dd($itemIds, $itemStocks);
-            foreach ($itemIds as $index => $itemId) {
+
+            foreach ($itemIds as $itemId) {
                 $itemModel = Item::find($itemId);
                 $harga = $itemModel ? $itemModel->price : 0;
-                $stock = $itemStocks[$index] ?? 0;
+                $stock = $itemStocks[$itemId] ?? 0;
                 $totalHarga += $harga * $stock;
             }
         }
+
 
         $data = [
             'labels' => ['Other', 'Fuel', 'Item'],
