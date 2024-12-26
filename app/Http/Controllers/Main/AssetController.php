@@ -9,6 +9,9 @@ use App\Models\AssetNote;
 use App\Models\CostumField;
 use App\Models\LogActivity;
 use App\Models\ManagementProject;
+use App\Models\RecordInsurance;
+use App\Models\RecordRent;
+use App\Models\RecordTax;
 use App\Models\StatusAsset;
 use Carbon\Carbon;
 use Endroid\QrCode\QrCode;
@@ -159,9 +162,6 @@ class AssetController extends Controller
 
         $keyword = $request->search['value'] ?? '';
 
-
-        $limit = $request->limit ?? '';
-
         $data = Asset::orderBy('created_at', 'asc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
@@ -174,25 +174,25 @@ class AssetController extends Controller
                 }
             });
 
-            if ($request->status) {
-                $status = $request->status;
-                $data->whereIn('status', $status);
-            }
+        if ($request->status) {
+            $status = $request->status;
+            $data->whereIn('status', $status);
+        }
 
-            if ($request->assets_location) {
-                $assets_location = $request->assets_location;
-                $data->whereIn('assets_location', $assets_location);
-            }
+        if ($request->assets_location) {
+            $assets_location = $request->assets_location;
+            $data->whereIn('assets_location', $assets_location);
+        }
 
-            if ($request->category) {
-                $category = $request->category;
-                $data->whereIn('category', $category);
-            }
+        if ($request->category) {
+            $category = $request->category;
+            $data->whereIn('category', $category);
+        }
 
-            if ($request->pic) {
-                $pic = $request->pic;
-                $data->whereIn('manager', $pic);
-            }
+        if ($request->pic) {
+            $pic = $request->pic;
+            $data->whereIn('manager', $pic);
+        }
 
 
         if (session('selected_project_id')) {
@@ -403,6 +403,55 @@ class AssetController extends Controller
                 $data['manager'] = $data['manager'] ?? null;
 
                 $result = $asset->update($data);
+
+                $latestRecord = RecordInsurance::where('asset_id', Crypt::decrypt($asset->id))->latest()->first();
+                $latestDate = $latestRecord ? $latestRecord->date : null;
+
+                $distance = 0;
+                if ($latestDate) {
+                    $distance = (int) date_diff(date_create($data['asuransi_date']), date_create($latestDate))->format('%m');
+                }
+
+                $summary = $distance > 0 ? $distance * $data['insurance_cost'] : $data['insurance_cost'];
+
+                RecordInsurance::create([
+                    'asset_id' => Crypt::decrypt($asset->id),
+                    'summary' => $summary,
+                    'insurance' => $data['insurance_cost'],
+                    'date' => $data['asuransi_date'],
+                ]);
+
+                $latestRecord = RecordTax::where('asset_id', Crypt::decrypt($asset->id))->latest()->first();
+                $latestDate = $latestRecord ? $latestRecord->date : null;
+
+                $distance = 0;
+                if ($latestDate) {
+                    $distance = (int) date_diff(date_create($data['tax_period']), date_create($latestDate))->format('%m');
+                }
+                $summary = $distance > 0 ? $distance * $data['tax_cost'] : $data['tax_cost'];
+
+                RecordTax::create([
+                    'asset_id' => Crypt::decrypt($asset->id),
+                    'summary' => $summary,
+                    'tax' => $data['tax_cost'],
+                    'date' => $data['tax_period'],
+                ]);
+
+                $latestRecord = RecordRent::where('asset_id', Crypt::decrypt($asset->id))->latest()->first();
+                $latestDate = $latestRecord ? $latestRecord->date : null;
+
+                $distance = 0;
+                if ($latestDate) {
+                    $distance = (int) date_diff(date_create($data['contract_period']), date_create($latestDate))->format('%m');
+                }
+                $summary = $distance > 0 ? $distance * $data['cost'] : $data['cost'];
+
+                RecordRent::create([
+                    'asset_id' => Crypt::decrypt($asset->id),
+                    'summary' => $summary,
+                    'rent' => $data['cost'],
+                    'date' => $data['contract_period'],
+                ]);
 
                 if ($statusBefore !== $asset->status) {
                     StatusAsset::create([

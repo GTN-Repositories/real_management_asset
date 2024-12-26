@@ -1,6 +1,6 @@
 @extends('layouts.global')
 
-@section('title', 'Kategori Barang')
+@section('title', 'Report Asset Performance')
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
