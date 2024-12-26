@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Main;
 use App\Http\Controllers\Controller;
 use App\Models\AssetReminder;
 use App\Models\Loadsheet;
+use App\Models\RecordInsurance;
+use App\Models\RecordRent;
+use App\Models\RecordTax;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
@@ -23,14 +26,17 @@ class ExpensesController extends Controller
         return datatables()
             ->of($data)
             ->addIndexColumn()
-            ->addColumn('asset', function ($data) {
-                return 'asset' ?? null;
+            ->addColumn('asset_id', function ($data) {
+                return 'AST-' . Crypt::decrypt($data->asset->id) . ' - ' . $data->asset->name . ' - ' . $data->asset->license_plate ?? null;
             })
-            ->addColumn('PerformanceRate', function ($data) {
-                return '$data->PerformanceRate' ?? null;
+            ->addColumn('insurance', function ($data) {
+                return $data->insurance ?? null;
             })
-            ->addColumn('Expenses', function ($data) {
-                return '$data->Expenses' ?? null;
+            ->addColumn('summary', function ($data) {
+                return $data->summary ?? null;
+            })
+            ->addColumn('date', function ($data) {
+                return $data->date ?? null;
             })
             ->escapeColumns([])
             ->make(true);
@@ -41,12 +47,15 @@ class ExpensesController extends Controller
         $columns = [
             'id',
             'asset_id',
-            'loadsheet',
+            'insurance',
+            'summary',
+            'date',
         ];
 
         $keyword = $request->search['value'] ?? '';
-        $data = Loadsheet::orderBy('created_at', 'asc')
-            ->select($columns)
+
+        $data = RecordInsurance::selectRaw('asset_id, MAX(date) as date, SUM(summary) as summary, MAX(insurance) as insurance')
+            ->groupBy('asset_id')
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
                     foreach ($columns as $column) {
@@ -58,125 +67,99 @@ class ExpensesController extends Controller
         return $data;
     }
 
-
-    public function create(Request $request)
+    public function dataTax(Request $request)
     {
-        $assetId = $request->asset_id;
-        return view('main.asset_reminder.create', compact('assetId'));
+        $data = $this->getDataTax($request);
+
+        return datatables()
+            ->of($data)
+            ->addIndexColumn()
+            ->addColumn('asset_id', function ($data) {
+                return 'AST-' . Crypt::decrypt($data->asset->id) . ' - ' . $data->asset->name . ' - ' . $data->asset->license_plate ?? null;
+            })
+            ->addColumn('tax', function ($data) {
+                return $data->tax ?? null;
+            })
+            ->addColumn('summary', function ($data) {
+                return $data->summary ?? null;
+            })
+            ->addColumn('date', function ($data) {
+                return $data->date ?? null;
+            })
+            ->escapeColumns([])
+            ->make(true);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function getDataTax(Request $request)
     {
-        $data = $request->all();
+        $columns = [
+            'id',
+            'asset_id',
+            'tax',
+            'summary',
+            'date',
+        ];
 
-        try {
-            return $this->atomic(function () use ($data) {
-                $data['asset_id'] = Crypt::decrypt($data['asset_id']);
-                $data = AssetReminder::create($data);
+        $keyword = $request->search['value'] ?? '';
 
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil ditambahkan!',
-                ]);
-            });
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data gagal ditambahkan! ' . $th->getMessage(),
-            ]);
-        }
-    }
-
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        $data = AssetReminder::findByEncryptedId($id);
-
-        return view('main.asset_reminder.edit', compact('data'));
-    }
-
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-        $data = $request->all();
-
-        try {
-            return $this->atomic(function () use ($data, $id) {
-                $data = AssetReminder::findByEncryptedId($id)->update($data);
-
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil diperbarui!',
-                ]);
-            });
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data gagal diperbarui! ' . $th->getMessage(),
-            ]);
-        }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        try {
-            $data = AssetReminder::findByEncryptedId($id);
-            $data->delete();
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Data berhasil dihapus!',
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data gagal dihapus! ' . $th->getMessage(),
-            ]);
-        }
-    }
-
-    public function destroyAll(Request $request)
-    {
-        try {
-            $ids = $request->ids;
-            return $this->atomic(function () use ($ids) {
-                $decryptedIds = [];
-                foreach ($ids as $encryptedId) {
-                    $decryptedIds[] = Crypt::decrypt($encryptedId);
+        $data = RecordTax::selectRaw('asset_id, MAX(date) as date, SUM(summary) as summary,MAX(tax) as tax')
+            ->groupBy('asset_id')
+            ->where(function ($query) use ($keyword, $columns) {
+                if ($keyword != '') {
+                    foreach ($columns as $column) {
+                        $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
+                    }
                 }
-
-                $delete = AssetReminder::whereIn('id', $decryptedIds)->delete();
-
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data Berhasil Dihapus!',
-                ]);
             });
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data Gagal Dihapus!',
-            ]);
-        }
+
+        return $data;
+    }
+
+    public function dataRent(Request $request)
+    {
+        $data = $this->getDataRent($request);
+
+        return datatables()
+            ->of($data)
+            ->addIndexColumn()
+            ->addColumn('asset_id', function ($data) {
+                return 'AST-' . Crypt::decrypt($data->asset->id) . ' - ' . $data->asset->name . ' - ' . $data->asset->license_plate ?? null;
+            })
+            ->addColumn('rent', function ($data) {
+                return $data->rent ?? null;
+            })
+            ->addColumn('summary', function ($data) {
+                return $data->summary ?? null;
+            })
+            ->addColumn('date', function ($data) {
+                return $data->date ?? null;
+            })
+            ->escapeColumns([])
+            ->make(true);
+    }
+
+    public function getDataRent(Request $request)
+    {
+        $columns = [
+            'id',
+            'asset_id',
+            'rent',
+            'summary',
+            'date',
+        ];
+
+        $keyword = $request->search['value'] ?? '';
+
+        $data = RecordRent::selectRaw('asset_id, MAX(date) as date, SUM(summary) as summary,MAX(rent) as rent')
+            ->groupBy('asset_id')
+            ->where(function ($query) use ($keyword, $columns) {
+                if ($keyword != '') {
+                    foreach ($columns as $column) {
+                        $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
+                    }
+                }
+            });
+
+        return $data;
     }
 }
