@@ -17,22 +17,26 @@ class ImportFuel implements ToModel, WithHeadingRow
      */
     public function model(array $row)
     {
-        $project = ManagementProject::where('name', $row['nama_project'])->first();
-        $employee = Employee::where('name', $row['employee'])->first();
-        $asset_id = explode('AST - ', $row['asset_id'])[1] ?? $row['asset_id'];
-        if ($project) {
-            return new FuelConsumption([
-                'management_project_id' => Crypt::decrypt($project->id),
-                'asset_id' => $asset_id,
-                'user_id' => Crypt::decrypt($employee->id) ?? $row['employee_id'],
-                'date' => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['date']),
-                'liter' => $row['liter'],
-                // 'price' => $row['price'],
-                'category' => $row['category'],
-                'lasted_km_asset' => $row['lasted_km_asset'],
-                // 'loadsheet' => $row['loadsheet'],
-                'hours' => $row['hours'],
-            ]);
+        try {
+            $project = ManagementProject::where('name', $row['nama_project'])->first();
+            $employee = Employee::where('name', $row['employee'])->first();
+            $asset_id = explode('AST - ', $row['asset_id'])[1] ?? $row['asset_id'];
+            if ($project) {
+                return new FuelConsumption([
+                    'management_project_id' => Crypt::decrypt($project->id),
+                    'asset_id' => $asset_id,
+                    'user_id' => Crypt::decrypt($employee->id) ?? $row['employee_id'],
+                    'date' => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['date']),
+                    'liter' => $row['liter'],
+                    // 'price' => $row['price'],
+                    'category' => $row['category'],
+                    'lasted_km_asset' => $row['lasted_km_asset'],
+                    // 'loadsheet' => $row['loadsheet'],
+                    'hours' => $row['hours'],
+                ]);
+            }
+        } catch (\Throwable $th) {
+            dd($row, $th);
         }
     }
 }

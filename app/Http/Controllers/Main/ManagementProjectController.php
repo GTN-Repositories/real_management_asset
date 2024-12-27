@@ -550,7 +550,7 @@ class ManagementProjectController extends Controller
             if ($value['employee_id'] == null) {
                 $value['employees'] = null;
             } else {
-                foreach (json_decode($value['employee_id']) as $key => $employee) {
+                foreach ($value['employee_id'] as $key => $employee) {
                     $employees = Employee::find($employee);
                     $employe[] = $employees->name ?? null;
                 }
