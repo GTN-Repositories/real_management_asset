@@ -44,7 +44,7 @@ class EmployeeController extends Controller
                 return $data->name ?? null;
             })
             ->addColumn('nameTitle', function ($data) {
-                return $data->name . '-' . $data->jobTitle->name ?? null;
+                return ($data->name ?? null) . '-' . $data->jobTitle->name ?? null;
             })
             ->addColumn('job_title', function ($data) {
                 return $data->jobTitle->name ?? null;

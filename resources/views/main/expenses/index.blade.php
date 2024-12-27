@@ -1,16 +1,38 @@
 @extends('layouts.global')
 
-@section('title', 'Kategori Barang')
+@section('title', 'Report Expenses')
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Expenses</h4>
 
-        <!-- Product List Table -->
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header">
-                <h5 class="card-title mb-0">Kategori Barang</h5>
-                <div class="d-flex justify-content-end gap-2">
+                <h5 class="card-title mb-0">Fuel Consumption</h5>
+            </div>
+            <div class="card-datatable table-responsive">
+                <table class="datatables table" id="data-table-fuel">
+                    <thead class="border-top">
+                        <tr>
+                            <th>#</th>
+                            {{-- <th>Management Project</th> --}}
+                            <th>Unit</th>
+                            {{-- <th>Tanggal</th>
+                            <th>Total Hari</th> --}}
+                            <th>Pemakaian Solar</th>
+                            {{-- <th>Liter/Trip</th>
+                            <th>Rata-rata/Hari</th> --}}
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <!-- Product List Table -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Insurance</h5>
+                {{-- <div class="d-flex justify-content-end gap-2">
                     <!-- Tombol Hapus Masal -->
                     <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
                         <i class="fas fa-trash-alt"></i> Hapus Masal
@@ -19,18 +41,61 @@
                     <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
                         <i class="fas fa-plus"></i> Tambah
                     </button>
-                </div>
+                </div> --}}
             </div>
             <div class="card-datatable table-responsive">
                 <table class="datatables table" id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>
-                               #
+                                #
                             </th>
                             <th>Asset</th>
-                            <th>Performance Rate</th>
-                            <th>Expenses</th>
+                            <th>insurance</th>
+                            <th>Summary</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Tax</h5>
+            </div>
+            <div class="card-datatable table-responsive">
+                <table class="datatables table" id="data-table-tax">
+                    <thead class="border-top">
+                        <tr>
+                            <th>
+                                #
+                            </th>
+                            <th>Asset</th>
+                            <th>Tax</th>
+                            <th>Summary</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Rent</h5>
+            </div>
+            <div class="card-datatable table-responsive">
+                <table class="datatables table" id="data-table-rent">
+                    <thead class="border-top">
+                        <tr>
+                            <th>
+                                #
+                            </th>
+                            <th>Asset</th>
+                            <th>Rent</th>
+                            <th>Summary</th>
+                            <th>Date</th>
                         </tr>
                     </thead>
                 </table>
@@ -53,6 +118,9 @@
     <script type="text/javascript">
         $(document).ready(function() {
             init_table();
+            init_table_tax();
+            init_table_rent();
+            init_table_fuel();
 
             $('#checkAll').on('click', function() {
                 $('tbody input[type="checkbox"]').prop('checked', $(this).prop('checked'));
@@ -113,16 +181,143 @@
                         searchable: false
                     },
                     {
-                        data: 'asset',
-                        name: 'asset'
+                        data: 'asset_id',
+                        name: 'asset_id'
                     },
                     {
-                        data: 'PerformanceRate',
-                        name: 'PerformanceRate'
+                        data: 'insurance',
+                        name: 'insurance'
                     },
                     {
-                        data: 'Expenses',
-                        name: 'Expenses'
+                        data: 'summary',
+                        name: 'summary'
+                    },
+                    {
+                        data: 'date',
+                        name: 'date'
+                    },
+                ]
+            });
+        }
+
+        function init_table_tax(keyword = '') {
+            var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+            var table = $('#data-table-tax').DataTable({
+                processing: true,
+                serverSide: true,
+                columnDefs: [{
+                    target: 0,
+                    visible: true,
+                    searchable: false
+                }, ],
+
+                ajax: {
+                    type: "GET",
+                    url: "{{ route('report-expenses.data-tax') }}",
+                    data: {
+                        'keyword': keyword
+                    }
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'asset_id',
+                        name: 'asset_id'
+                    },
+                    {
+                        data: 'tax',
+                        name: 'tax'
+                    },
+                    {
+                        data: 'summary',
+                        name: 'summary'
+                    },
+                    {
+                        data: 'date',
+                        name: 'date'
+                    },
+                ]
+            });
+        }
+
+        function init_table_rent(keyword = '') {
+            var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+            var table = $('#data-table-rent').DataTable({
+                processing: true,
+                serverSide: true,
+                columnDefs: [{
+                    target: 0,
+                    visible: true,
+                    searchable: false
+                }, ],
+
+                ajax: {
+                    type: "GET",
+                    url: "{{ route('report-expenses.data-rent') }}",
+                    data: {
+                        'keyword': keyword
+                    }
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'asset_id',
+                        name: 'asset_id'
+                    },
+                    {
+                        data: 'rent',
+                        name: 'rent'
+                    },
+                    {
+                        data: 'summary',
+                        name: 'summary'
+                    },
+                    {
+                        data: 'date',
+                        name: 'date'
+                    },
+                ]
+            });
+        }
+
+        function init_table_fuel(startDate = '', endDate = '', predefinedFilter = '', keyword = '') {
+            $('#data-table-fuel').DataTable({
+                processing: true,
+                serverSide: true,
+                destroy: true,
+                ajax: {
+                    type: "GET",
+                    url: "{{ route('report-fuel.data') }}",
+                    data: {
+                        'keyword': keyword,
+                        'startDate': startDate,
+                        'endDate': endDate,
+                        'predefinedFilter': predefinedFilter
+                    }
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'asset_id',
+                        name: 'asset_id'
+                    },
+                    {
+                        data: 'liter',
+                        name: 'liter'
                     },
                 ]
             });

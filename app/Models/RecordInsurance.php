@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Crypt;
 
-class Ipb extends Model
+class RecordInsurance extends Model
 {
     //
     protected $guarded = ['id'];
@@ -24,24 +24,12 @@ class Ipb extends Model
     }
 
     /**
-     * Get the management_project that owns the Ipb
+     * Get the user that owns the RecordInsurance
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function management_project(): BelongsTo
+    public function asset(): BelongsTo
     {
-        return $this->belongsTo(ManagementProject::class, 'management_project_id', 'id');
-    }
-    public function employee(): BelongsTo
-    {
-        return $this->belongsTo(Employee::class, 'employee_id', 'id');
-    }
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'user_id', 'id');
-    }
-    public function fuel(): BelongsTo
-    {
-        return $this->belongsTo(FuelConsumption::class, 'fuel_id', 'id');
+        return $this->belongsTo(Asset::class, 'asset_id', 'id');
     }
 }
