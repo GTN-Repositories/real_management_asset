@@ -162,13 +162,13 @@
         }
 
         $(document).ready(function() {
-            $('#issued_liter, #usage_liter, #unit_price, #price, #liter').each(function() {
+            $('#issued_liter, #usage_liter, #price, #liter').each(function() {
                 var value = $(this).val();
                 $(this).val(formatCurrency(value));
             });
         });
 
-        $(document).on('input', '#issued_liter, #usage_liter, #unit_price, #price, #liter', function() {
+        $(document).on('input', '#issued_liter, #usage_liter, #price, #liter', function() {
             var value = $(this).val();
             $(this).val(formatCurrency(value));
         });

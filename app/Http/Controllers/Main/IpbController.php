@@ -58,7 +58,7 @@ class IpbController extends Controller
                 return number_format($data->balance, 0, ',', '.') ?? null;
             })
             ->addColumn('unit_price', function ($data) {
-                return 'Rp. ' . number_format($data->unit_price, 0, ',', '.') ?? null;
+                return 'Rp. ' . number_format($data->unit_price, 2, ',', '.') ?? null;
             })
             ->addColumn('total_harga', function ($data) {
                 return 'Rp. ' . number_format($data->unit_price * $data->usage_liter, 0, ',', '.') ?? null;
@@ -181,7 +181,7 @@ class IpbController extends Controller
                 $data["user_id"] = Auth::user()->id;
 
                 $data['issued_liter'] = isset($data['issued_liter']) && $data['issued_liter'] != '-' ? str_replace('.', '', $data['issued_liter']) : null;
-                $data['unit_price'] = isset($data['unit_price']) && $data['unit_price'] != '-' ? str_replace('.', '', $data['unit_price']) : null;
+                $data['unit_price'] = isset($data['unit_price']) && $data['unit_price'] != '-' ? str_replace(['.', ','], ['', '.'], $data['unit_price']) : null;
 
                 $lastBalance = Ipb::where('management_project_id', $data["management_project_id"])
                     ->orderBy('id', 'desc')
@@ -255,7 +255,7 @@ class IpbController extends Controller
 
                 $data['issued_liter'] = isset($data['issued_liter']) && $data['issued_liter'] != '-' ? str_replace('.', '', $data['issued_liter']) : null;
                 $data['usage_liter'] = isset($data['usage_liter']) && $data['usage_liter'] != '-' ? str_replace('.', '', $data['usage_liter']) : null;
-                $data['unit_price'] = isset($data['unit_price']) && $data['unit_price'] != '-' ? str_replace('.', '', $data['unit_price']) : null;
+                $data['unit_price'] = isset($data['unit_price']) && $data['unit_price'] != '-' ? str_replace(['.', ','], ['', '.'], $data['unit_price']) : null;
 
                 $record = Ipb::findByEncryptedId($id);
                 if (!$record) {
