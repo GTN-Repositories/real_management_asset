@@ -73,4 +73,9 @@ class Asset extends Model
     {
         return $this->belongsTo(Employee::class, 'pic', 'id');
     }
+
+    public function management_project()
+    {
+        return $this->belongsTo(ManagementProject::class, 'management_project_id', 'id');
+    }
 }
