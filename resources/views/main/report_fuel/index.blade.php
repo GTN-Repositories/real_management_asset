@@ -428,9 +428,6 @@
                                 show: true
                             }
                         },
-                        xaxis: {
-                            categories: response.dates
-                        },
                         title: {
                             text: 'Fuel Price Over Time',
                             align: 'left'

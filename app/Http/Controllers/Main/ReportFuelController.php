@@ -7,6 +7,7 @@ use App\Exports\MultiSheetExport;
 use App\Exports\ReportFuelExport;
 use App\Http\Controllers\Controller;
 use App\Models\FuelConsumption;
+use App\Models\Ipb;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -267,6 +268,15 @@ class ReportFuelController extends Controller implements HasMiddleware
 
         $chartData = $fuelConsumptions->groupBy('date');
 
+        $priceData = Ipb::query()
+            ->selectRaw('DATE(ipbs.date) as date, AVG(ipbs.unit_price) as price')
+            ->groupByRaw('DATE(ipbs.date)')
+            ->whereBetween('date', [
+                $chartData->keys()->min(),
+                $chartData->keys()->max()
+            ])
+            ->get();
+
         return response()->json([
             'avgPerDay' => $avgPerDay,
             'avgPerTrip' => $avgPerTrip,
@@ -274,7 +284,7 @@ class ReportFuelController extends Controller implements HasMiddleware
             'totalFuelCost' => $totalFuelCost,
             'dates' => $chartData->keys(),
             'litersData' => $chartData->map(fn($group) => $group->sum('liter'))->values(),
-            'priceData' => $chartData->map(fn($group) => $group->sum('price'))->values()
+            'priceData' => $priceData->map(fn($group) => $group->price)->values()
         ]);
     }
 

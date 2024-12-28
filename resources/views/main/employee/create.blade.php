@@ -19,6 +19,13 @@
         </select>
     </div>
 
+    <div class="col-12 col-md-6" id="projectRelation">
+        <label class="form-label" for="management_project_id">Nama Project<span class="text-danger">*</span></label>
+        <select id="management_project_id" name="management_project_id"
+            class="select2 form-select select2-primary"data-allow-clear="true" required>
+        </select>
+    </div>
+
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
         <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
@@ -49,6 +56,37 @@
                             return {
                                 text: item.name,
                                 id: item.relationId,
+                            };
+                        });
+
+                    return {
+                        results: apiResults
+                    };
+                },
+                cache: true
+            }
+        });
+        $('#management_project_id').select2({
+            dropdownParent: $('#projectRelation'),
+            placeholder: 'Pilih project',
+            ajax: {
+                url: "{{ route('management-project.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function(data) {
+                    apiResults = data.data
+                        .filter(function(item) {
+                            return item.relationId !== null;
+                        })
+                        .map(function(item) {
+                            return {
+                                text: item.name,
+                                id: item.managementRelationId,
                             };
                         });
 
