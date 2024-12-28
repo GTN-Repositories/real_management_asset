@@ -44,7 +44,7 @@ class ReportFuelController extends Controller implements HasMiddleware
                 return $data->management_project->name ?? null;
             })
             ->addColumn('asset_id', function ($data) {
-                return 'AST-' . Crypt::decrypt($data->asset->id) . ' - ' . $data->asset->name . ' - ' . $data->asset->license_plate ?? null;
+                return $data->asset ? 'AST-' . Crypt::decrypt($data->asset->id) . ' - ' . $data->asset->name . ' - ' . $data->asset->license_plate : null;
             })
             ->addColumn('date', function ($data) {
                 return \Carbon\Carbon::parse($data->date)->format('d-M-y') ?? null;

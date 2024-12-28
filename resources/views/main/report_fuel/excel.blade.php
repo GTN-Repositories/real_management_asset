@@ -35,6 +35,11 @@
                 $groupedFuelConsumptions = $fuelConsumptions->groupBy('asset_id');
                 $startDate = \Carbon\Carbon::parse($startDate);
                 $endDate = \Carbon\Carbon::parse($endDate);
+                $groupedFuelConsumptions = $groupedFuelConsumptions->sortByDesc(function ($group) {
+                    return $group->first()->loadsheetsManagement()->where('asset_id', $group->first()->asset_id)->sum('loadsheet');
+                })->sortBy(function ($group) {
+                    return $group->first()->asset->serial_number;
+                });
             @endphp
 
             @foreach ($groupedFuelConsumptions as $assetId => $group)

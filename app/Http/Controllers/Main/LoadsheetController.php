@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Imports\ImportLoadsheet;
 use App\Models\Loadsheet;
 use App\Models\SoilType;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Maatwebsite\Excel\Facades\Excel;
@@ -131,6 +132,8 @@ class LoadsheetController extends Controller
         ];
 
         $keyword = $request->search['value'] ?? '';
+        $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date) : null;
+        $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date) : null;
 
         $data = Loadsheet::orderBy('id', 'desc')
             ->select($columns)
@@ -141,6 +144,10 @@ class LoadsheetController extends Controller
                     }
                 }
             });
+
+        if ($startDate && $endDate) {
+            $data->whereBetween('date', [$startDate, $endDate]);
+        }
 
         if (session('selected_project_id')) {
             $data->whereHas('management_project', function ($q) {
