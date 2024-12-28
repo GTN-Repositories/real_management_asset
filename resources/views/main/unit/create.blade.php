@@ -79,6 +79,19 @@
             class="select2 form-select select2-primary"data-allow-clear="true">
         </select> --}}
     </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="payment_status">Status Pembayaran</label>
+        <select id="payment_status" name="payment_status" class="select2 form-select select2-primary"data-allow-clear="true">
+            <option value="Lunas">Paid</option>
+            <option value="Belum Lunas">Unpaid</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-6" id="management_project_idRelation">
+        <label class="form-label" for="management_project_id">Assign Project<span class="text-danger">*</span></label>
+        <select id="management_project_id" name="management_project_id" class="select2 form-select select2-primary"data-allow-clear="true"
+            required>
+        </select>
+    </div>
     {{-- <div class="col-12 col-md-6" id="userRelation">
         <label class="form-label" for="pic">pic<span class="text-danger">*</span></label>
         <select id="pic" name="pic" class="select2 form-select select2-primary"data-allow-clear="true"
@@ -463,6 +476,34 @@
             }
         });
 
+        $('#management_project_id').select2({
+            dropdownParent: $('#management_project_idRelation'),
+            placeholder: 'Pilih Project',
+            ajax: {
+                url: "{{ route('management-project.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.data.map(function(item) {
+                            return {
+                                text: item.format_id + ' - ' + item.name,
+                                id: item.managementRelationId
+                            };
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
+
         $('#assets_location_id').select2({
             dropdownParent: $('#assets_locationParent'),
             placeholder: 'Pilih lokasi',
@@ -510,7 +551,7 @@
                         })
                         .map(function(item) {
                             return {
-                                text: item.name + ' (' + item.nameTitle + ')',
+                                text: item.nameTitle,
                                 id: item.relationId,
                             };
                         });
