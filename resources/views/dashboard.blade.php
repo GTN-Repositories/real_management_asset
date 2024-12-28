@@ -6,6 +6,20 @@
     <div class="container-xxl flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4">Dashboard</h4>
         <div class="d-flex justify-content-end align-items-end mb-3 gap-3">
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    filter tanggal
+                </button>
+                <ul class="dropdown-menu" style="">
+                    <li><a class="dropdown-item" id="hari ini" href="javascript:void(0);">hari ini</a></li>
+                    <li><a class="dropdown-item" id="minggu ini" href="javascript:void(0);">minggu ini</a></li>
+                    <li><a class="dropdown-item" id="bulan ini" href="javascript:void(0);">bulan ini</a></li>
+                    <li><a class="dropdown-item" id="bulan kemarin" href="javascript:void(0);">bulan kemarin</a></li>
+                    <li><a class="dropdown-item" id="tahun ini" href="javascript:void(0);">tahun ini</a></li>
+                    <li><a class="dropdown-item" id="tahun kemarin" href="javascript:void(0);">tahun kemarin</a></li>
+                </ul>
+            </div>
             <div>
                 <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
                 <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
@@ -255,38 +269,6 @@
                     console.error('Error fetching data:', error);
                 }
             });
-            // $.ajax({
-            //     url: "{{ route('fuel.data') }}",
-            //     type: 'GET',
-            //     dataType: 'json',
-            //     success: function(response) {
-            //         let literDashboard = response.data.map(item => item.literDashboard);
-            //         let totalLiter = literDashboard.length ? literDashboard.reduce((total, num) =>
-            //             total + num) : 0;
-            //         $('#total-fuel').text(totalLiter ? totalLiter + ' liter' : 0 + ' liter');
-            //     },
-            //     error: function(xhr, status, error) {
-            //         $('#total-fuel').text('Error');
-            //         console.error('Error fetching data:', error);
-            //     }
-            // });
-            // $.ajax({
-            //     url: "{{ route('loadsheet.data') }}",
-            //     type: 'GET',
-            //     dataType: 'json',
-            //     success: function(response) {
-            //         let loadsheetDashboard = response.data.map(item => item.loadsheetDashboard);
-            //         let totalLoadsheet = loadsheetDashboard.length ? loadsheetDashboard.reduce((total,
-            //                 num) =>
-            //             total + num) : 0;
-            //         $('#total-loadsheet').text(totalLoadsheet ? totalLoadsheet + ' Kubik' : 0 +
-            //             ' Kubik');
-            //     },
-            //     error: function(xhr, status, error) {
-            //         $('#total-loadsheet').text('Error');
-            //         console.error('Error fetching data:', error);
-            //     }
-            // });
             $('#management_project_id').select2({
                 dropdownParent: $('#managementProject'),
                 placeholder: 'Pilih management project',
@@ -316,6 +298,18 @@
                 }
             });
 
+            $('.dropdown-item').on('click', function(e) {
+                e.preventDefault();
+                $('.dropdown-item').removeClass('active');
+                $(this).addClass('active');
+                const filterType = $(this).text().trim();
+                const filterBtn = $('.btn.btn-outline-primary.dropdown-toggle');
+                filterBtn.text(filterType);
+                updateSpeedometerWithDateRange(null, null, filterType);
+                fetchFuelData(null, null, filterType);
+                fetchLoadsheetData(null, null, filterType);
+            });
+
             $('#date-range-picker').daterangepicker({
                 autoUpdateInput: false,
                 locale: {
@@ -327,29 +321,30 @@
                 const startDate = picker.startDate.format('YYYY-MM-DD');
                 const endDate = picker.endDate.format('YYYY-MM-DD');
                 $(this).val(startDate + ' - ' + endDate);
-                updateSpeedometerWithDateRange(startDate, endDate);
-                fetchFuelData(startDate, endDate);
-                fetchLoadsheetData(startDate, endDate);
+                updateSpeedometerWithDateRange(startDate, endDate, null);
+                fetchFuelData(startDate, endDate, null);
+                fetchLoadsheetData(startDate, endDate, null);
             });
 
             $('#date-range-picker').on('cancel.daterangepicker', function() {
                 $(this).val('');
-                updateSpeedometerWithDateRange(null, null);
-                fetchFuelData(null, null); // Fetch default data
-                fetchLoadsheetData(null, null);
+                updateSpeedometerWithDateRange(null, null, null);
+                fetchFuelData(null, null, null); // Fetch default data
+                fetchLoadsheetData(null, null, null);
             });
 
             fetchFuelData();
             fetchLoadsheetData();
         });
 
-        function fetchFuelData(startDate = null, endDate = null) {
+        function fetchFuelData(startDate = null, endDate = null, filterType = null) {
             $.ajax({
                 url: "{{ route('fuel.data') }}",
                 type: 'GET',
                 data: {
                     start_date: startDate,
-                    end_date: endDate
+                    end_date: endDate,
+                    filterType: filterType,
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -367,13 +362,14 @@
         }
 
         // Fetch Loadsheet Data
-        function fetchLoadsheetData(startDate = null, endDate = null) {
+        function fetchLoadsheetData(startDate = null, endDate = null, filterType = null) {
             $.ajax({
                 url: "{{ route('loadsheet.data') }}",
                 type: 'GET',
                 data: {
                     start_date: startDate,
-                    end_date: endDate
+                    end_date: endDate,
+                    filterType: filterType,
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -395,15 +391,16 @@
             const dateRange = $('#date-range-picker').val();
             let startDate = null;
             let endDate = null;
+            const filterType = $('.dropdown-item.active').text().trim() || null;
 
             if (dateRange) {
                 [startDate, endDate] = dateRange.split(' - ');
             }
 
-            updateSpeedometerWithDateRange(startDate, endDate, managementProjectId);
+            updateSpeedometerWithDateRange(startDate, endDate, filterType, managementProjectId);
         });
 
-        function updateSpeedometerWithDateRange(startDate, endDate, managementProjectId = null) {
+        function updateSpeedometerWithDateRange(startDate, endDate, filterType, managementProjectId = null) {
             const managementProjectIdValue = managementProjectId || $('#management_project_id').val();
 
             $.ajax({
@@ -412,7 +409,8 @@
                 data: {
                     management_project_id: managementProjectIdValue,
                     start_date: startDate,
-                    end_date: endDate
+                    end_date: endDate,
+                    filterType: filterType, // Ensure filterType is sent
                 },
                 dataType: 'json',
                 success: function(response) {
