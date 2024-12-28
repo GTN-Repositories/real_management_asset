@@ -75,10 +75,20 @@ class EmployeeController extends Controller
         ];
 
         $keyword = $request->search['value'] ?? "";
+        $job_title = $request->job_title_id ?? [];
+        $jobTitleDecrypted = [];
+        foreach ($job_title as $value) {
+            $jobTitleDecrypted[] = Crypt::decrypt($value);
+        }
 
         $limit = $request->limit ?? '';
         $data = Employee::orderBy('created_at', 'asc')
             ->select($columns)
+            ->when($jobTitleDecrypted, function ($query) use ($jobTitleDecrypted) {
+                if (count($jobTitleDecrypted) > 0) {
+                    return $query->whereIn('job_title_id', $jobTitleDecrypted);
+                }
+            })
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
                     foreach ($columns as $column) {

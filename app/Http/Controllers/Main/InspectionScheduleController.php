@@ -127,7 +127,7 @@ class InspectionScheduleController extends Controller
                     $query->where('type', $type);
                 }
 
-                // if ($keyword != '') {    
+                // if ($keyword != '') {
                 //     foreach ($columns as $column) {
                 //         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
                 //     }
@@ -329,6 +329,9 @@ class InspectionScheduleController extends Controller
     {
         try {
             $data = InspectionSchedule::findByEncryptedId($id);
+            Asset::where('id', $data->asset_id)->update([
+                'status' => 'active'
+            ]);
             $data->delete();
 
             return response()->json([

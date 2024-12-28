@@ -67,6 +67,13 @@ class AssetController extends Controller
             ->addColumn('nameWithNumber', function ($data) {
                 return Crypt::decrypt($data->id) . '-' . $data->name . " - " . $data->license_plate ?? "-";
             })
+            ->addColumn('management_project', function ($data) {
+                if ($data->management_project_id) {
+                    return 'PRJ - '. $data->management_project_id .' '. ($data->management_project->name ?? '-');
+                } else {
+                    return '-';
+                }
+            })
             ->addColumn('category', function ($data) {
                 return $data->category;
             })
@@ -158,6 +165,7 @@ class AssetController extends Controller
             'status',
             'serial_number',
             'created_at',
+            'management_project_id',
         ];
 
         $keyword = $request->search['value'] ?? '';
@@ -238,6 +246,10 @@ class AssetController extends Controller
                     $data['pic'] = Crypt::decrypt($data['pic']);
                 }
 
+                if (isset($data['management_project_id'])) {
+                    $data['management_project_id'] = Crypt::decrypt($data['management_project_id']);
+                }
+
                 $data['status'] = "Idle";
                 $data['ast_id'] = 'ast-' . ($lastNumber + 1);
 
@@ -257,6 +269,8 @@ class AssetController extends Controller
                 $data['manager'] = $data['manager'];
 
                 $asset = Asset::create($data);
+
+                ManagementProject::find(Crypt::decrypt($data['management_project_id']))->asset_id()->attach($asset->id);
 
                 $customFieldNames = $data['custom_field_name'] ?? [];
                 $customFieldValues = $data['custom_field_value'] ?? [];
@@ -368,6 +382,26 @@ class AssetController extends Controller
                     } else {
                         $data['stnk'] = $data['stnk']->store('assets', 'public');
                     }
+                }
+
+                if (isset($data['management_project_id'])) {
+                    $data['management_project_id'] = Crypt::decrypt($data['management_project_id']);
+                }
+
+                $project = ManagementProject::find($data['management_project_id']);
+                $assignAsset = true;
+                foreach ($project->asset_id as $key => $value) {
+                    if ($value == $asset->id) {
+                        $assignAsset = false;
+                        break;
+                    }
+                }
+
+                if ($assignAsset) {
+                    $asset_id_project = $project->asset_id;
+                    $asset_id_project[] = Crypt::decrypt($asset->id);
+                    $project->asset_id = $asset_id_project;
+                    $project->save();
                 }
 
                 if (!isset($data['asuransi']) || !$data['asuransi']) {
@@ -591,8 +625,11 @@ class AssetController extends Controller
                 DB::raw('COUNT(CASE WHEN status = "Idle" THEN 1 END) as idle'),
                 DB::raw('COUNT(CASE WHEN status = "StandBy" THEN 1 END) as standby'),
                 DB::raw('COUNT(CASE WHEN status = "UnderMaintenance" THEN 1 END) as underMaintenance'),
-                DB::raw('COUNT(CASE WHEN status = "Active" THEN 1 END) as active')
+                DB::raw('COUNT(CASE WHEN status = "Active" THEN 1 END) as active'),
+                DB::raw('COUNT(CASE WHEN status = "Finish" THEN 1 END) as finish')
             )->first();
+
+            $active = $operationalStatus->active + $operationalStatus->finish;
 
             $maintenanceStatus = (clone $baseQuery)->select(
                 DB::raw('COUNT(CASE WHEN status = "OnHold" THEN 1 END) as onHold'),
@@ -617,7 +654,7 @@ class AssetController extends Controller
                 'idle' => (int) $operationalStatus->idle,
                 'standby' => (int) $operationalStatus->standby,
                 'underMaintenance' => (int) $operationalStatus->underMaintenance,
-                'active' => (int) $operationalStatus->active,
+                'active' => $active,
 
                 // Maintenance Status
                 'onHold' => (int) $maintenanceStatus->onHold,
@@ -638,7 +675,7 @@ class AssetController extends Controller
                         'idle' => $totalAssets > 0 ? round(($operationalStatus->idle / $totalAssets) * 100, 1) : 0,
                         'standby' => $totalAssets > 0 ? round(($operationalStatus->standby / $totalAssets) * 100, 1) : 0,
                         'underMaintenance' => $totalAssets > 0 ? round(($operationalStatus->underMaintenance / $totalAssets) * 100, 1) : 0,
-                        'active' => $totalAssets > 0 ? round(($operationalStatus->active / $totalAssets) * 100, 1) : 0
+                        'active' => $totalAssets > 0 ? round(($active / $totalAssets) * 100, 1) : 0
                     ],
                     'maintenance' => [
                         'onHold' => $totalAssets > 0 ? round(($maintenanceStatus->onHold / $totalAssets) * 100, 1) : 0,

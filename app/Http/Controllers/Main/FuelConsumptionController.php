@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Imports\ImportFuel;
 use App\Models\FuelConsumption;
 use App\Models\Ipb;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Maatwebsite\Excel\Facades\Excel;
@@ -117,6 +118,8 @@ class FuelConsumptionController extends Controller
 
         $keyword = $request->keyword ?? "";
         // $project_id = $this->projectId();
+        $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date) : null;
+        $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date) : null;
 
         $data = FuelConsumption::orderBy('id', 'desc')
             ->select($columns)
@@ -128,6 +131,10 @@ class FuelConsumptionController extends Controller
                     }
                 }
             });
+
+        if ($startDate && $endDate ) {
+            $data->whereBetween('date', [$startDate, $endDate]);
+        }
 
         if (session('selected_project_id')) {
             $data->whereHas('management_project', function ($q) {
@@ -263,10 +270,10 @@ class FuelConsumptionController extends Controller
                     ->first();
 
                 $ipbRecords->update($field);
-                
+
                 $records = Ipb::where('management_project_id', $data["management_project_id"])
-                              ->orderBy('id', 'asc')
-                              ->get();
+                    ->orderBy('id', 'asc')
+                    ->get();
 
                 $lastBalance = 0;
 

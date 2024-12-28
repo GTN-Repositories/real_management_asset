@@ -201,7 +201,7 @@ class ManagementProjectController extends Controller
                 $projectData = [
                     'name' => $data['name'],
                     'asset_id' => $decryptedAssetIds,
-                    'employee_id' => json_encode($decryptedEmployeeIds),
+                    'employee_id' => $decryptedEmployeeIds,
                     'start_date' => $start_date,
                     'end_date' => $end_date,
                     'calculation_method' => $data['calculation_method'],
@@ -209,8 +209,14 @@ class ManagementProjectController extends Controller
                     'location' => $data['location'],
                 ];
 
-                ManagementProject::create($projectData);
+                $create = ManagementProject::create($projectData);
                 Asset::whereIn('id', $decryptedAssetIds)->update(['status' => 'Active']);
+
+                foreach ($create->asset_id as $key => $value) {
+                    $asset = Asset::find($value);
+                    $asset->management_project_id = Crypt::decrypt($create->id);
+                    $asset->save();
+                }
 
                 return response()->json([
                     'status' => true,
@@ -334,6 +340,12 @@ class ManagementProjectController extends Controller
                 Asset::whereIn('id', $assetsToIdle)->update(['status' => 'Idle']);
 
                 Asset::whereIn('id', $assetsToActivate)->update(['status' => 'Active']);
+
+                foreach ($project->asset_id as $key => $value) {
+                    $asset = Asset::find($value);
+                    $asset->management_project_id = Crypt::decrypt($project->id);
+                    $asset->save();
+                }
 
                 return response()->json([
                     'status' => true,
@@ -468,9 +480,14 @@ class ManagementProjectController extends Controller
 
     public function spedometer(Request $request)
     {
+
         $managementProject = ManagementProject::findByEncryptedId($request->management_project_id);
 
+        $startDate = Carbon::parse($request->start_date);
+        $endDate = Carbon::parse($request->end_date);
+
         $totalPrice = Loadsheet::where('management_project_id', Crypt::decrypt($managementProject->id))
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->sum('price');
 
         $performance = ($totalPrice > 0 && $managementProject->value_project > 0) ?

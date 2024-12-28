@@ -109,6 +109,19 @@
             <option value="Overdue" {{ $data->status == 'Overdue' ? 'selected' : '' }}>Overdue</option>
         </select>
     </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="payment_status">Status Pembayaran</label>
+        <select id="payment_status" name="payment_status" class="select2 form-select select2-primary"data-allow-clear="true">
+            <option value="Lunas">Paid</option>
+            <option value="Belum Lunas">Unpaid</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-6" id="management_project_idRelation">
+        <label class="form-label" for="management_project_id">Assign Project<span class="text-danger">*</span></label>
+        <select id="management_project_id" name="management_project_id" class="select2 form-select select2-primary"data-allow-clear="true"
+            required>
+        </select>
+    </div>
 
     <div class="col-12">
         <hr class="my-4">
@@ -632,6 +645,40 @@
         if (picId) {
             var picOption = new Option(picName, picId, true, true);
             $('#pic').append(picOption).trigger('change');
+        }
+
+        $('#management_project_id').select2({
+            dropdownParent: $('#management_project_idRelation'),
+            placeholder: 'Pilih Project',
+            ajax: {
+                url: "{{ route('management-project.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.data.map(function(item) {
+                            return {
+                                text: item.format_id + ' - ' + item.name,
+                                id: item.managementRelationId
+                            };
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
+        var management_projectId = '{{ $data->management_project_id ?? '' }}';
+        var management_projectName = '{{ $data->management_project->name ?? '' }}';
+        if (management_projectId) {
+            var management_projectOption = new Option(management_projectName, management_projectId, true, true);
+            $('#management_project_id').append(management_projectOption).trigger('change');
         }
     });
 </script>
