@@ -480,9 +480,14 @@ class ManagementProjectController extends Controller
 
     public function spedometer(Request $request)
     {
+
         $managementProject = ManagementProject::findByEncryptedId($request->management_project_id);
 
+        $startDate = Carbon::parse($request->start_date);
+        $endDate = Carbon::parse($request->end_date);
+
         $totalPrice = Loadsheet::where('management_project_id', Crypt::decrypt($managementProject->id))
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->sum('price');
 
         $performance = ($totalPrice > 0 && $managementProject->value_project > 0) ?

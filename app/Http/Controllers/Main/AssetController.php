@@ -625,8 +625,11 @@ class AssetController extends Controller
                 DB::raw('COUNT(CASE WHEN status = "Idle" THEN 1 END) as idle'),
                 DB::raw('COUNT(CASE WHEN status = "StandBy" THEN 1 END) as standby'),
                 DB::raw('COUNT(CASE WHEN status = "UnderMaintenance" THEN 1 END) as underMaintenance'),
-                DB::raw('COUNT(CASE WHEN status = "Active" THEN 1 END) as active')
+                DB::raw('COUNT(CASE WHEN status = "Active" THEN 1 END) as active'),
+                DB::raw('COUNT(CASE WHEN status = "Finish" THEN 1 END) as finish')
             )->first();
+
+            $active = $operationalStatus->active + $operationalStatus->finish;
 
             $maintenanceStatus = (clone $baseQuery)->select(
                 DB::raw('COUNT(CASE WHEN status = "OnHold" THEN 1 END) as onHold'),
@@ -651,7 +654,7 @@ class AssetController extends Controller
                 'idle' => (int) $operationalStatus->idle,
                 'standby' => (int) $operationalStatus->standby,
                 'underMaintenance' => (int) $operationalStatus->underMaintenance,
-                'active' => (int) $operationalStatus->active,
+                'active' => $active,
 
                 // Maintenance Status
                 'onHold' => (int) $maintenanceStatus->onHold,
@@ -672,7 +675,7 @@ class AssetController extends Controller
                         'idle' => $totalAssets > 0 ? round(($operationalStatus->idle / $totalAssets) * 100, 1) : 0,
                         'standby' => $totalAssets > 0 ? round(($operationalStatus->standby / $totalAssets) * 100, 1) : 0,
                         'underMaintenance' => $totalAssets > 0 ? round(($operationalStatus->underMaintenance / $totalAssets) * 100, 1) : 0,
-                        'active' => $totalAssets > 0 ? round(($operationalStatus->active / $totalAssets) * 100, 1) : 0
+                        'active' => $totalAssets > 0 ? round(($active / $totalAssets) * 100, 1) : 0
                     ],
                     'maintenance' => [
                         'onHold' => $totalAssets > 0 ? round(($maintenanceStatus->onHold / $totalAssets) * 100, 1) : 0,
