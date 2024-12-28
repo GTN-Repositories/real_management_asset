@@ -27,4 +27,8 @@ class Employee extends Model
     {
         return $this->belongsTo(JobTitle::class, 'job_title_id', 'id');
     }
+    public function managementProject(): BelongsTo
+    {
+        return $this->belongsTo(ManagementProject::class, 'management_project_id', 'id');
+    }
 }

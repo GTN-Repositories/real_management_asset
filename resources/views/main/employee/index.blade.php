@@ -3,71 +3,78 @@
 @section('title', 'Karyawan')
 
 @section('content')
-<div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Data Karyawan</h4>
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Data Karyawan</h4>
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-12 col-md-6" id="job_titleParent">
-                    <label class="form-label" for="job_title">Jabatan</label>
-                    <select name="job_title[]" id="job_title" class="select2 form-select" data-allow-clear="true"
-                        multiple required>
-                    </select>
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-md-6" id="job_titleParent">
+                        <label class="form-label" for="job_title">Jabatan</label>
+                        <select name="job_title[]" id="job_title" class="select2 form-select" data-allow-clear="true"
+                            multiple required>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-6" id="management_projectParent">
+                        <label class="form-label" for="management_project_title">Management Project</label>
+                        <select name="management_project_title[]" id="management_project_title" class="select2 form-select"
+                            data-allow-clear="true" multiple required>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product List Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Karyawan</h5>
+                <div class="d-flex justify-content-end gap-2">
+                    <!-- Tombol Hapus Masal -->
+                    <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
+                        <i class="fas fa-trash-alt"></i> Hapus Masal
+                    </button>
+                    <!-- Tombol Tambah -->
+                    @if (auth()->user()->hasPermissionTo('employee-create'))
+                        <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
+                            <i class="fas fa-plus"></i> Tambah
+                        </button>
+                    @endif
+                </div>
+            </div>
+            <div class="card-datatable table-responsive">
+                <table class="datatables table" id="data-table">
+                    <thead class="border-top">
+                        <tr>
+                            <th>
+                                <div class="form-check form-check-sm form-check-custom form-check-solid">
+                                    <input class="form-check-input" type="checkbox" id="checkAll" />
+                                </div>
+                            </th>
+                            <th>Nama Karyawan</th>
+                            <th>Jabatan</th>
+                            <th>Project</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modal-ce" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-simple">
+                <div class="modal-content p-3 p-md-5">
+                    <div class="modal-body" id="content-modal-ce">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Product List Table -->
-    <div class="card">
-        <div class="card-header">
-            <h5 class="card-title mb-0">Karyawan</h5>
-            <div class="d-flex justify-content-end gap-2">
-                <!-- Tombol Hapus Masal -->
-                <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
-                    <i class="fas fa-trash-alt"></i> Hapus Masal
-                </button>
-                <!-- Tombol Tambah -->
-                @if (auth()->user()->hasPermissionTo('employee-create'))
-                <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                    <i class="fas fa-plus"></i> Tambah
-                </button>
-                @endif
-            </div>
-        </div>
-        <div class="card-datatable table-responsive">
-            <table class="datatables table" id="data-table">
-                <thead class="border-top">
-                    <tr>
-                        <th>
-                            <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" id="checkAll" />
-                            </div>
-                        </th>
-                        <th>Nama Karyawan</th>
-                        <th>Jabatan</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-    </div>
-
-    <div class="modal fade" id="modal-ce" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-simple">
-            <div class="modal-content p-3 p-md-5">
-                <div class="modal-body" id="content-modal-ce">
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection
 
 @push('js')
-<script type="text/javascript">
-    $(document).ready(function() {
+    <script type="text/javascript">
+        $(document).ready(function() {
             $('#job_title').select2({
                 dropdownParent: $('#job_titleParent'),
                 placeholder: 'Pilih Kategori',
@@ -96,7 +103,38 @@
                 }
             });
 
+            $('#management_project_title').select2({
+                dropdownParent: $('#management_projectParent'),
+                placeholder: 'Pilih Project',
+                ajax: {
+                    url: "{{ route('management-project.data') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            'search[value]': params.term,
+                            start: 0,
+                            length: 10
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.data.map(function(item) {
+                                return {
+                                    id: item.managementRelationId,
+                                    text: item.name
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                }
+            });
+
             $('#job_title').on('change', function() {
+                filter();
+            });
+            $('#management_project_title').on('change', function() {
                 filter();
             });
 
@@ -134,15 +172,16 @@
         $(document).on('input', '#searchData', function() {
             filter();
         })
-        
+
         function filter() {
             var keyword = $('#searchData').val();
             var job_title_id = $('#job_title').val();
+            var management_project_id = $('#management_project_title').val();
 
-            init_table(keyword, job_title_id);
+            init_table(keyword, job_title_id, management_project_id);
         }
 
-        function init_table(keyword = '', job_title_id = []) {
+        function init_table(keyword = '', job_title_id = [], management_project_id = []) {
             var csrf_token = $('meta[name="csrf-token"]').attr('content');
 
             if ($.fn.DataTable.isDataTable('#data-table')) {
@@ -163,7 +202,8 @@
                     url: "{{ route('employee.data') }}",
                     data: {
                         'keyword': keyword,
-                        'job_title_id': job_title_id
+                        'job_title_id': job_title_id,
+                        'management_project_id': management_project_id,
                     }
                 },
                 columns: [{
@@ -179,6 +219,10 @@
                     {
                         data: 'job_title',
                         name: 'job_title'
+                    },
+                    {
+                        data: 'management_project_id',
+                        name: 'management_project_id'
                     },
                     {
                         data: 'action',
@@ -286,5 +330,5 @@
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
                 });
         }
-</script>
+    </script>
 @endpush
