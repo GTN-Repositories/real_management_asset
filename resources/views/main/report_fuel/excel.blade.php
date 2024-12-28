@@ -14,20 +14,20 @@
     <table>
         <thead>
             <tr>
-                <th style="text-align: center;" rowspan="2" colspan="2">No.</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">Management Project</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">SN</th>
-                <th style="text-align: center;" rowspan="2" colspan="4">Unit</th>
-                <th style="text-align: center;" colspan="4">Periode</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">Total Hari</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">Pemakaian Solar</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">Total Loadsheet</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">Liter/Trip</th>
-                <th style="text-align: center;" rowspan="2" colspan="2">Rata-rata/Hari</th>
+                <th style="text-align: center;" rowspan="2" colspan="1">No.</th>
+                <th style="text-align: center;" rowspan="2" colspan="1">Management Project</th>
+                <th style="text-align: center;" rowspan="2" colspan="1">SN</th>
+                <th style="text-align: center;" rowspan="2" colspan="1">Unit</th>
+                <th style="text-align: center;" colspan="2">Periode</th>
+                <th style="text-align: center;" rowspan="2" colspan="1">Total Hari</th>
+                <th style="text-align: center;" rowspan="2" colspan="1">Pemakaian Solar</th>
+                <th style="text-align: center;" rowspan="2" colspan="1">Total Loadsheet</th>
+                <th style="text-align: center;" rowspan="2" colspan="1">Liter/Trip</th>
+                <th style="text-align: center;" rowspan="2" colspan="1">Rata-rata/Hari</th>
             </tr>
             <tr>
-                <th style="text-align: center;" colspan="2">Awal</th>
-                <th style="text-align: center;" colspan="2">Akhir</th>
+                <th style="text-align: center;" colspan="1">Awal</th>
+                <th style="text-align: center;" colspan="1">Akhir</th>
             </tr>
         </thead>
         <tbody>
@@ -36,9 +36,11 @@
                 $startDate = \Carbon\Carbon::parse($startDate);
                 $endDate = \Carbon\Carbon::parse($endDate);
                 $groupedFuelConsumptions = $groupedFuelConsumptions->sortByDesc(function ($group) {
-                    return $group->first()->loadsheetsManagement()->where('asset_id', $group->first()->asset_id)->sum('loadsheet');
-                })->sortBy(function ($group) {
-                    return $group->first()->asset->serial_number;
+                    return $group
+                        ->first()
+                        ->loadsheetsManagement()
+                        ->where('asset_id', $group->first()->asset_id)
+                        ->sum('loadsheet');
                 });
             @endphp
 
@@ -55,24 +57,24 @@
                 @endphp
 
                 <tr>
-                    <td style="text-align: center;" colspan="2">{{ $loop->iteration }}</td>
-                    <td style="text-align: center;" colspan="2">{{ $firstFuel->management_project->name ?? 'N/A' }}
+                    <td style="text-align: center;" colspan="1">{{ $loop->iteration }}</td>
+                    <td style="text-align: center;" colspan="1">{{ $firstFuel->management_project->name ?? 'N/A' }}
                     </td>
-                    <td style="text-align: center;" colspan="2">{{ $firstFuel->asset->serial_number ?? '' }}</td>
-                    <td style="text-align: center;" colspan="4">
+                    <td style="text-align: center;" colspan="1">{{ $firstFuel->asset->serial_number ?? '' }}</td>
+                    <td style="text-align: center;" colspan="1">
                         {{ $firstFuel->asset->license_plate . ' - ' . $firstFuel->asset->name . ' - ' . $firstFuel->asset->asset_number ?? 'N/A' }}
                     </td>
-                    <td style="text-align: center;" colspan="2">
+                    <td style="text-align: center;" colspan="1">
                         {{ $startDate->format('d-M-y') }}</td>
-                    <td style="text-align: center;" colspan="2">
+                    <td style="text-align: center;" colspan="1">
                         {{ $endDate->format('d-M-y') }}</td>
-                    <td style="text-align: center;" colspan="2">{{ $days }}</td>
-                    <td style="text-align: center;" colspan="2">{{ $totalLiter }}</td>
-                    <td style="text-align: center;" colspan="2">{{ $totalLoadsheet }}</td>
-                    <td style="text-align: center;" colspan="2">
+                    <td style="text-align: center;" colspan="1">{{ $days }}</td>
+                    <td style="text-align: center;" colspan="1">{{ $totalLiter }}</td>
+                    <td style="text-align: center;" colspan="1">{{ $totalLoadsheet }}</td>
+                    <td style="text-align: center;" colspan="1">
                         {{ number_format($totalLiter / max($totalLoadsheet, 1), 2) }}
                     </td>
-                    <td style="text-align: center;" colspan="2">
+                    <td style="text-align: center;" colspan="1">
                         {{ number_format($totalLiter / max($days, 1), 2) }}
                     </td>
                 </tr>

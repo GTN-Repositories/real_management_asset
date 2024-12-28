@@ -149,6 +149,29 @@ class LoadsheetController extends Controller
             $data->whereBetween('date', [$startDate, $endDate]);
         }
 
+        if ($request->filled('filterType')) {
+            switch ($request->filterType) {
+                case 'hari ini':
+                    $data->whereDate('date', Carbon::today());
+                    break;
+                case 'minggu ini':
+                    $data->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                    break;
+                case 'bulan ini':
+                    $data->whereRaw('MONTH(date) = MONTH(NOW()) AND YEAR(date) = YEAR(NOW())');
+                    break;
+                case 'bulan kemarin':
+                    $data->whereRaw('MONTH(date) = MONTH(NOW()) - 1 AND YEAR(date) = YEAR(NOW())');
+                    break;
+                case 'tahun ini':
+                    $data->whereYear('date', Carbon::now()->year);
+                    break;
+                case 'tahun kemarin':
+                    $data->whereYear('date', Carbon::now()->subYear()->year);
+                    break;
+            }
+        }
+
         if (session('selected_project_id')) {
             $data->whereHas('management_project', function ($q) {
                 $q->where('id', Crypt::decrypt(session('selected_project_id')));

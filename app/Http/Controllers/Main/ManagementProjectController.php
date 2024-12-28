@@ -263,8 +263,8 @@ class ManagementProjectController extends Controller
         $assetSelected = [];
         foreach ($asset as $key => $value) {
             $value['id'] = $value['id'];
-            $value['format_id'] = 'AST - '. Crypt::decrypt($value['id']);
-            $value['name'] = $value['format_id']. ' - ' .$value['name']. ' - '. $value['asset_number'];
+            $value['format_id'] = 'AST - ' . Crypt::decrypt($value['id']);
+            $value['name'] = $value['format_id'] . ' - ' . $value['name'] . ' - ' . $value['asset_number'];
 
             $assetSelected[] = $value;
         }
@@ -273,8 +273,8 @@ class ManagementProjectController extends Controller
         $selectedEmployee = [];
         foreach ($employee as $key => $value) {
             $value['id'] = $value['id'];
-            $value['format_id'] = 'EMP - '. Crypt::decrypt($value['id']);
-            $value['name'] = $value['format_id']. ' - ' .$value['name']. ' - '. ($value->jobTitle->name ?? null);
+            $value['format_id'] = 'EMP - ' . Crypt::decrypt($value['id']);
+            $value['name'] = $value['format_id'] . ' - ' . $value['name'] . ' - ' . ($value->jobTitle->name ?? null);
 
             $selectedEmployee[] = $value;
         }
@@ -480,15 +480,41 @@ class ManagementProjectController extends Controller
 
     public function spedometer(Request $request)
     {
-
         $managementProject = ManagementProject::findByEncryptedId($request->management_project_id);
 
-        $startDate = Carbon::parse($request->start_date);
-        $endDate = Carbon::parse($request->end_date);
+        $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date) : null;
+        $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date) : null;
 
-        $totalPrice = Loadsheet::where('management_project_id', Crypt::decrypt($managementProject->id))
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->sum('price');
+        $loadsheet = Loadsheet::where('management_project_id', Crypt::decrypt($managementProject->id));
+
+        if ($startDate && $endDate) {
+            $loadsheet->whereBetween('date', [$startDate, $endDate]);
+        }
+
+        if ($request->filled('filterType')) {
+            switch ($request->filterType) {
+                case 'hari ini':
+                    $loadsheet->whereDate('date', Carbon::today());
+                    break;
+                case 'minggu ini':
+                    $loadsheet->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                    break;
+                case 'bulan ini':
+                    $loadsheet->whereRaw('MONTH(date) = MONTH(CURDATE()) AND YEAR(date) = YEAR(CURDATE())');
+                    break;
+                case 'bulan kemarin':
+                    $loadsheet->whereRaw('MONTH(date) = MONTH(CURDATE()) - 1 AND YEAR(date) = YEAR(CURDATE())');
+                    break;
+                case 'tahun ini':
+                    $loadsheet->whereYear('date', Carbon::now()->year);
+                    break;
+                case 'tahun kemarin':
+                    $loadsheet->whereYear('date', Carbon::now()->subYear()->year);
+                    break;
+            }
+        }
+
+        $totalPrice = $loadsheet->sum('price');
 
         $performance = ($totalPrice > 0 && $managementProject->value_project > 0) ?
             ($totalPrice / $managementProject->value_project) * 100 : 0;
