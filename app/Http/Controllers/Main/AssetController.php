@@ -67,6 +67,13 @@ class AssetController extends Controller
             ->addColumn('nameWithNumber', function ($data) {
                 return Crypt::decrypt($data->id) . '-' . $data->name . " - " . $data->license_plate ?? "-";
             })
+            ->addColumn('management_project', function ($data) {
+                if ($data->management_project_id) {
+                    return 'PRJ - '. $data->management_project_id .' '. ($data->management_project->name ?? '-');
+                } else {
+                    return '-';
+                }
+            })
             ->addColumn('category', function ($data) {
                 return $data->category;
             })
@@ -158,6 +165,7 @@ class AssetController extends Controller
             'status',
             'serial_number',
             'created_at',
+            'management_project_id',
         ];
 
         $keyword = $request->search['value'] ?? '';
@@ -238,6 +246,10 @@ class AssetController extends Controller
                     $data['pic'] = Crypt::decrypt($data['pic']);
                 }
 
+                if (isset($data['management_project_id'])) {
+                    $data['management_project_id'] = Crypt::decrypt($data['management_project_id']);
+                }
+
                 $data['status'] = "Idle";
                 $data['ast_id'] = 'ast-' . ($lastNumber + 1);
 
@@ -257,6 +269,8 @@ class AssetController extends Controller
                 $data['manager'] = $data['manager'];
 
                 $asset = Asset::create($data);
+
+                ManagementProject::find(Crypt::decrypt($data['management_project_id']))->asset_id()->attach($asset->id);
 
                 $customFieldNames = $data['custom_field_name'] ?? [];
                 $customFieldValues = $data['custom_field_value'] ?? [];
@@ -368,6 +382,26 @@ class AssetController extends Controller
                     } else {
                         $data['stnk'] = $data['stnk']->store('assets', 'public');
                     }
+                }
+
+                if (isset($data['management_project_id'])) {
+                    $data['management_project_id'] = Crypt::decrypt($data['management_project_id']);
+                }
+
+                $project = ManagementProject::find($data['management_project_id']);
+                $assignAsset = true;
+                foreach ($project->asset_id as $key => $value) {
+                    if ($value == $asset->id) {
+                        $assignAsset = false;
+                        break;
+                    }
+                }
+
+                if ($assignAsset) {
+                    $asset_id_project = $project->asset_id;
+                    $asset_id_project[] = Crypt::decrypt($asset->id);
+                    $project->asset_id = $asset_id_project;
+                    $project->save();
                 }
 
                 if (!isset($data['asuransi']) || !$data['asuransi']) {

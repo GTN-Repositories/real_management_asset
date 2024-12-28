@@ -1,6 +1,6 @@
 @extends('layouts.global')
 
-@section('title', 'Kendaraan / Unit')
+@section('title', 'Asset')
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
@@ -91,6 +91,7 @@
                             <th>NIK</th>
                             <th>Warna</th>
                             <th>Asset Manager</th>
+                            <th>Assign to Project</th>
                             <th>Location</th>
                             <th>PIC</th>
                             <th>Status</th>
@@ -366,6 +367,10 @@
                     {
                         data: 'owner',
                         name: 'owner'
+                    },
+                    {
+                        data: 'management_project',
+                        name: 'management_project'
                     },
                     {
                         data: 'assets_location',
