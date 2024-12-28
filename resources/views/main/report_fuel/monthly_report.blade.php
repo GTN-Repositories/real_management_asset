@@ -48,7 +48,7 @@
                     Carbon::createFromDate(request()->year, request()->month, 1)->startOfMonth(),
                     Carbon::createFromDate(request()->year, request()->month, 1)->endOfMonth(),
                 ])->get()->groupBy(function ($item) {
-                    return $item->asset->name . '-' . ($item->user->name ?? 'N/A');
+                    return $item->asset->name . '-' . ($item->user->name ?? '');
                 });
 
                 $fuelConsumptions = $currentMonthData->map(function ($entries) {
@@ -62,7 +62,7 @@
                     }
                     return [
                         'asset_name' => $entries->first()->asset->name,
-                        'driver_name' => $entries->first()->user->name ?? 'N/A',
+                        'driver_name' => $entries->first()->employee->name ?? '',
                         'daily_consumption' => $dailyConsumption,
                     ];
                 });

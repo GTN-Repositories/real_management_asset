@@ -5,7 +5,12 @@
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4">Dashboard</h4>
-
+        <div class="d-flex justify-content-end align-items-end mb-3 gap-3">
+            <div>
+                <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
+                <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
+            </div>
+        </div>
         <!-- Card Border Shadow -->
         <div class="row">
             <div class="col-sm-6 col-lg-4 mb-4">
@@ -13,7 +18,8 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2 pb-1">
                             <div class="avatar me-2">
-                                <span class="avatar-initial rounded bg-label-primary"><i class="ti ti-truck ti-md"></i></span>
+                                <span class="avatar-initial rounded bg-label-primary"><i
+                                        class="ti ti-truck ti-md"></i></span>
                             </div>
                             <h4 class="ms-1 mb-0" id="total-asset">Loading...</h4>
                         </div>
@@ -181,6 +187,14 @@
 
 @push('js')
     <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchStatusData();
+
+            init_speedometer_chart();
+
+            setupDownloadButtons();
+        });
+
         $(document).ready(function() {
             $.ajax({
                 url: "{{ route('asset.data') }}",
@@ -241,38 +255,38 @@
                     console.error('Error fetching data:', error);
                 }
             });
-            $.ajax({
-                url: "{{ route('fuel.data') }}",
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    let literDashboard = response.data.map(item => item.literDashboard);
-                    let totalLiter = literDashboard.length ? literDashboard.reduce((total, num) =>
-                        total + num) : 0;
-                    $('#total-fuel').text(totalLiter ? totalLiter + ' liter' : 0 + ' liter');
-                },
-                error: function(xhr, status, error) {
-                    $('#total-fuel').text('Error');
-                    console.error('Error fetching data:', error);
-                }
-            });
-            $.ajax({
-                url: "{{ route('loadsheet.data') }}",
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    let loadsheetDashboard = response.data.map(item => item.loadsheetDashboard);
-                    let totalLoadsheet = loadsheetDashboard.length ? loadsheetDashboard.reduce((total,
-                            num) =>
-                        total + num) : 0;
-                    $('#total-loadsheet').text(totalLoadsheet ? totalLoadsheet + ' Kubik' : 0 +
-                        ' Kubik');
-                },
-                error: function(xhr, status, error) {
-                    $('#total-loadsheet').text('Error');
-                    console.error('Error fetching data:', error);
-                }
-            });
+            // $.ajax({
+            //     url: "{{ route('fuel.data') }}",
+            //     type: 'GET',
+            //     dataType: 'json',
+            //     success: function(response) {
+            //         let literDashboard = response.data.map(item => item.literDashboard);
+            //         let totalLiter = literDashboard.length ? literDashboard.reduce((total, num) =>
+            //             total + num) : 0;
+            //         $('#total-fuel').text(totalLiter ? totalLiter + ' liter' : 0 + ' liter');
+            //     },
+            //     error: function(xhr, status, error) {
+            //         $('#total-fuel').text('Error');
+            //         console.error('Error fetching data:', error);
+            //     }
+            // });
+            // $.ajax({
+            //     url: "{{ route('loadsheet.data') }}",
+            //     type: 'GET',
+            //     dataType: 'json',
+            //     success: function(response) {
+            //         let loadsheetDashboard = response.data.map(item => item.loadsheetDashboard);
+            //         let totalLoadsheet = loadsheetDashboard.length ? loadsheetDashboard.reduce((total,
+            //                 num) =>
+            //             total + num) : 0;
+            //         $('#total-loadsheet').text(totalLoadsheet ? totalLoadsheet + ' Kubik' : 0 +
+            //             ' Kubik');
+            //     },
+            //     error: function(xhr, status, error) {
+            //         $('#total-loadsheet').text('Error');
+            //         console.error('Error fetching data:', error);
+            //     }
+            // });
             $('#management_project_id').select2({
                 dropdownParent: $('#managementProject'),
                 placeholder: 'Pilih management project',
@@ -301,24 +315,104 @@
                     cache: true
                 }
             });
+
+            $('#date-range-picker').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
+
+            $('#date-range-picker').on('apply.daterangepicker', function(ev, picker) {
+                const startDate = picker.startDate.format('YYYY-MM-DD');
+                const endDate = picker.endDate.format('YYYY-MM-DD');
+                $(this).val(startDate + ' - ' + endDate);
+                updateSpeedometerWithDateRange(startDate, endDate);
+                fetchFuelData(startDate, endDate);
+                fetchLoadsheetData(startDate, endDate);
+            });
+
+            $('#date-range-picker').on('cancel.daterangepicker', function() {
+                $(this).val('');
+                updateSpeedometerWithDateRange(null, null);
+                fetchFuelData(null, null); // Fetch default data
+                fetchLoadsheetData(null, null);
+            });
+
+            fetchFuelData();
+            fetchLoadsheetData();
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            fetchStatusData();
+        function fetchFuelData(startDate = null, endDate = null) {
+            $.ajax({
+                url: "{{ route('fuel.data') }}",
+                type: 'GET',
+                data: {
+                    start_date: startDate,
+                    end_date: endDate
+                },
+                dataType: 'json',
+                success: function(response) {
+                    let literDashboard = response.data.map(item => item.literDashboard);
+                    let totalLiter = literDashboard.length ?
+                        literDashboard.reduce((total, num) => total + num) :
+                        0;
+                    $('#total-fuel').text(totalLiter ? totalLiter + ' liter' : '0 liter');
+                },
+                error: function(xhr, status, error) {
+                    $('#total-fuel').text('Error');
+                    console.error('Error fetching fuel data:', error);
+                }
+            });
+        }
 
-            init_speedometer_chart();
-
-            setupDownloadButtons();
-        });
-
+        // Fetch Loadsheet Data
+        function fetchLoadsheetData(startDate = null, endDate = null) {
+            $.ajax({
+                url: "{{ route('loadsheet.data') }}",
+                type: 'GET',
+                data: {
+                    start_date: startDate,
+                    end_date: endDate
+                },
+                dataType: 'json',
+                success: function(response) {
+                    let loadsheetDashboard = response.data.map(item => item.loadsheetDashboard);
+                    let totalLoadsheet = loadsheetDashboard.length ?
+                        loadsheetDashboard.reduce((total, num) => total + num) :
+                        0;
+                    $('#total-loadsheet').text(totalLoadsheet ? totalLoadsheet + ' Kubik' : '0 Kubik');
+                },
+                error: function(xhr, status, error) {
+                    $('#total-loadsheet').text('Error');
+                    console.error('Error fetching loadsheet data:', error);
+                }
+            });
+        }
 
         $('#management_project_id').on('change', function() {
             const managementProjectId = $(this).val();
+            const dateRange = $('#date-range-picker').val();
+            let startDate = null;
+            let endDate = null;
+
+            if (dateRange) {
+                [startDate, endDate] = dateRange.split(' - ');
+            }
+
+            updateSpeedometerWithDateRange(startDate, endDate, managementProjectId);
+        });
+
+        function updateSpeedometerWithDateRange(startDate, endDate, managementProjectId = null) {
+            const managementProjectIdValue = managementProjectId || $('#management_project_id').val();
+
             $.ajax({
                 url: "{{ route('management-project.spedometer') }}",
                 type: 'GET',
                 data: {
-                    management_project_id: managementProjectId
+                    management_project_id: managementProjectIdValue,
+                    start_date: startDate,
+                    end_date: endDate
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -329,7 +423,7 @@
                     showErrorMessage('Failed to load chart data');
                 }
             });
-        });
+        }
 
         function reloadSpeedometer(data) {
             if (speedometerChart) speedometerChart.destroy();
