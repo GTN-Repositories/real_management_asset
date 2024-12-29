@@ -78,8 +78,7 @@
     </div>
     <div class="col-12 col-md-6" id="picRelation">
         <label class="form-label" for="pic">PIC<span class="text-danger">*</span></label>
-        <select id="pic" name="pic" class="select2 form-select select2-primary"data-allow-clear="true"
-            required>
+        <select id="pic" name="pic" class="select2 form-select select2-primary"data-allow-clear="true">
         </select>
     </div>
     <div class="col-12 col-md-6" id="assets_locationParent">
@@ -112,14 +111,14 @@
     <div class="col-12 col-md-6">
         <label class="form-label" for="payment_status">Status Pembayaran</label>
         <select id="payment_status" name="payment_status" class="select2 form-select select2-primary"data-allow-clear="true">
-            <option value="Lunas">Paid</option>
-            <option value="Belum Lunas">Unpaid</option>
+            <option value="Lunas" {{ $data->payment_status == 'Lunas' ? 'selected' : '' }}>Paid</option>
+            <option value="Leasing" {{ $data->payment_status == 'Leasing' ? 'selected' : '' }}>Leased</option>
+            <option value="Belum Lunas" {{ $data->payment_status == 'Belum Lunas' ? 'selected' : '' }}>Unpaid</option>
         </select>
     </div>
     <div class="col-12 col-md-6" id="management_project_idRelation">
         <label class="form-label" for="management_project_id">Assign Project<span class="text-danger">*</span></label>
-        <select id="management_project_id" name="management_project_id" class="select2 form-select select2-primary"data-allow-clear="true"
-            required>
+        <select id="management_project_id" name="management_project_id" class="select2 form-select select2-primary"data-allow-clear="true">
         </select>
     </div>
 
@@ -674,8 +673,8 @@
                 cache: true
             }
         });
-        var management_projectId = '{{ $data->management_project_id ?? '' }}';
-        var management_projectName = '{{ $data->management_project->name ?? '' }}';
+        var management_projectId = '{{ $data->management_project_ids ?? '' }}';
+        var management_projectName = '{{ $data->management_project_name ?? '' }}';
         if (management_projectId) {
             var management_projectOption = new Option(management_projectName, management_projectId, true, true);
             $('#management_project_id').append(management_projectOption).trigger('change');
