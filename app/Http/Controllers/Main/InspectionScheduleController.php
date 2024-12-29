@@ -7,6 +7,7 @@ use App\Models\Asset;
 use App\Models\InspectionComment;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
+use App\Models\Maintenance;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -369,5 +370,23 @@ class InspectionScheduleController extends Controller
                 'message' => 'Data Gagal Dihapus!',
             ]);
         }
+    }
+
+
+    public function getStatusLast(Request $request)
+    {
+        $now = InspectionSchedule::where('id', Crypt::decrypt($request->inspectionScheduleId))->first();
+
+        $before = InspectionSchedule::where('id', '<', Crypt::decrypt($now->id))
+            ->where('asset_id', $now->asset_id)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $maintenance = Maintenance::where('inspection_schedule_id', Crypt::decrypt($before->id))->first();
+
+        return response()->json([
+            'status' => $before->status ?? null,
+            'maintenance' => $maintenance,
+        ]);
     }
 }

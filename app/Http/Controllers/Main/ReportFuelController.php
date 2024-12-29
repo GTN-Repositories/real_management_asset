@@ -261,10 +261,34 @@ class ReportFuelController extends Controller implements HasMiddleware
 
         $fuelConsumptions = $query->get();
 
+        if ($fuelConsumptions->isEmpty()) {
+            return response()->json([
+                'avgPerDay' => 0,
+                'avgPerTrip' => 0,
+                'avgPerLiter' => 0,
+                'totalFuelCost' => 0,
+                'dates' => [],
+                'litersData' => [],
+                'priceData' => []
+            ]);
+        }
+
         $avgPerDay = $fuelConsumptions->avg('liter') / max($fuelConsumptions->count(), 1);
         $avgPerTrip = $fuelConsumptions->avg('liter');
-        $avgPerLiter = $fuelConsumptions->avg('price');
-        $totalFuelCost = $fuelConsumptions->sum('price');
+        $avgPerLiter = Ipb::query()
+            ->selectRaw('AVG(unit_price) as price')
+            ->whereBetween('date', [
+                $fuelConsumptions->min('date'),
+                $fuelConsumptions->max('date')
+            ])
+            ->value('price');
+        $totalFuelCost = Ipb::query()
+            ->selectRaw('SUM(unit_price) as total')
+            ->whereBetween('date', [
+                $fuelConsumptions->min('date'),
+                $fuelConsumptions->max('date')
+            ])
+            ->value('total');
 
         $chartData = $fuelConsumptions->groupBy('date');
 
