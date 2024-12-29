@@ -88,6 +88,7 @@
             </div>
             <div class="card my-3">
                 <div class="card-body">
+                    <h6>Fuel Consumption Over Time</h6>
                     <div id="liters-chart-section" class="chart-container">
                         <!-- Liters chart will be rendered here dynamically -->
                     </div>
@@ -95,6 +96,7 @@
             </div>
             <div class="card my-3">
                 <div class="card-body">
+                    <h6>Fuel Price Over Time</h6>
                     <div id="price-chart-section" class="chart-container">
                         <!-- Price chart will be rendered here dynamically -->
                     </div>
@@ -361,7 +363,7 @@
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">Avg Per Day</h5>
-                                <p class="card-text">${response.avgPerDay.toFixed(2)} Liters</p>
+                                <p class="card-text">${response.avgPerDay ? response.avgPerDay.toFixed(2) : '0'} Liters</p>
                             </div>
                         </div>
                     </div>
@@ -369,7 +371,7 @@
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">Avg Per Trip</h5>
-                                <p class="card-text">${response.avgPerTrip.toFixed(2)} Liters</p>
+                                <p class="card-text">${response.avgPerTrip ? response.avgPerTrip.toFixed(2) : '0'} Liters</p>
                             </div>
                         </div>
                     </div>
@@ -377,7 +379,7 @@
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">Avg Per Liter</h5>
-                                <p class="card-text">${response.avgPerLiter.toFixed(2)} Price</p>
+                                <p class="card-text">${response.avgPerLiter ? response.avgPerLiter.toFixed(2) : '0'} Price</p>
                             </div>
                         </div>
                     </div>
@@ -385,7 +387,7 @@
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">Total Fuel Cost</h5>
-                                <p class="card-text">${response.totalFuelCost.toFixed(2)} Currency</p>
+                                <p class="card-text">${response.totalFuelCost ? response.totalFuelCost.toFixed(2) : '0'} Currency</p>
                             </div>
                         </div>
                     </div>
@@ -393,55 +395,63 @@
 
                     document.querySelector("#scorecard-section").innerHTML = scorecard;
 
-                    // Prepare chart options for liters
-                    var litersChartOptions = {
-                        series: [{
-                            name: 'Liters',
-                            data: response.litersData
-                        }],
-                        chart: {
-                            type: 'line',
-                            height: 350,
-                            toolbar: {
-                                show: true
+                    if (response.litersData.length === 0) {
+                        document.querySelector("#liters-chart-section").innerHTML =
+                            `<div class="alert alert-info">Data ini kosong.</div>`;
+                        document.querySelector("#price-chart-section").innerHTML =
+                            `<div class="alert alert-info">Data ini kosong.</div>`;
+                    } else {
+
+                        // Prepare chart options for liters
+                        var litersChartOptions = {
+                            series: [{
+                                name: 'Liters',
+                                data: response.litersData
+                            }],
+                            chart: {
+                                type: 'line',
+                                height: 350,
+                                toolbar: {
+                                    show: true
+                                }
+                            },
+                            xaxis: {
+                                categories: response.dates
+                            },
+                            title: {
+                                text: 'Fuel Consumption Over Time',
+                                align: 'left'
                             }
-                        },
-                        xaxis: {
-                            categories: response.dates
-                        },
-                        title: {
-                            text: 'Fuel Consumption Over Time',
-                            align: 'left'
-                        }
-                    };
+                        };
 
-                    // Prepare chart options for price
-                    var priceChartOptions = {
-                        series: [{
-                            name: 'Price',
-                            data: response.priceData
-                        }],
-                        chart: {
-                            type: 'line',
-                            height: 350,
-                            toolbar: {
-                                show: true
+                        // Prepare chart options for price
+                        var priceChartOptions = {
+                            series: [{
+                                name: 'Price',
+                                data: response.priceData
+                            }],
+                            chart: {
+                                type: 'line',
+                                height: 350,
+                                toolbar: {
+                                    show: true
+                                }
+                            },
+                            title: {
+                                text: 'Fuel Price Over Time',
+                                align: 'left'
                             }
-                        },
-                        title: {
-                            text: 'Fuel Price Over Time',
-                            align: 'left'
-                        }
-                    };
+                        };
 
-                    // Render the charts
-                    litersChartSection = new ApexCharts(document.querySelector("#liters-chart-section"),
-                        litersChartOptions);
-                    litersChartSection.render();
+                        // Render the charts
+                        let litersChartSection = new ApexCharts(document.querySelector("#liters-chart-section"),
+                            litersChartOptions);
+                        litersChartSection.render();
 
-                    priceChartSection = new ApexCharts(document.querySelector("#price-chart-section"),
-                        priceChartOptions);
-                    priceChartSection.render();
+                        let priceChartSection = new ApexCharts(document.querySelector("#price-chart-section"),
+                            priceChartOptions);
+                        priceChartSection.render();
+                    }
                 },
                 error: function(xhr, status, error) {
                     console.error('Error fetching expanse data:', error);
@@ -452,7 +462,6 @@
                 }
             });
         }
-
 
         function exportPDF() {
             const startDate = $('#date-range-picker').data('daterangepicker')?.startDate.format('YYYY-MM-DD') || '';

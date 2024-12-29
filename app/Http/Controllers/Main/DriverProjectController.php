@@ -34,18 +34,16 @@ class DriverProjectController extends Controller
                 ];
             });
 
-        // Only add All Projects card if user is superAdmin
-        if (in_array('superAdmin', $userRoles)) {
-            $allAssets = Asset::select('id', 'name')->take(5)->get();
-            $allProjectsCard = [
-                'id' => 'all',
-                'name' => 'All Projects',
-                'assets' => $allAssets
-            ];
+        // Add All Projects card
+        $allAssets = Asset::select('id', 'name')->take(5)->get();
+        $allProjectsCard = [
+            'id' => 'all',
+            'name' => 'All Projects',
+            'assets' => $allAssets
+        ];
 
-            // Add All Projects card at the beginning
-            $projects = collect([$allProjectsCard])->concat($projects);
-        }
+        // Add All Projects card at the beginning
+        $projects = collect([$allProjectsCard])->concat($projects);
 
         return response()->json($projects);
     }
@@ -55,15 +53,7 @@ class DriverProjectController extends Controller
         $projectId = $request->input('project_id');
 
         if ($projectId === 'all') {
-            // Verify user is superAdmin before allowing 'all' selection
-            if (in_array('superAdmin', auth()->user()->roles->pluck('name')->toArray())) {
-                session()->forget('selected_project_id');
-            } else {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Unauthorized access'
-                ], 403);
-            }
+            session()->forget('selected_project_id');
         } else {
             session(['selected_project_id' => $projectId]);
         }

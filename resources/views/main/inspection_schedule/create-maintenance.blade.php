@@ -14,6 +14,10 @@
             placeholder="Masukan Nama Bengkel" value="{{ old('name') }}" required />
     </div>
 
+    <div class="col-12 col-md-12" id="alertText">
+
+    </div>
+
     <div class="col-12 col-md-6" id="inspectionScheduleId">
         <label class="form-label">Inspeksi</label>
         <div class="select2-primary">
@@ -160,6 +164,58 @@
                 },
                 cache: true
             }
+        });
+
+        $('#inspection_schedule_id').on('change', function() {
+            var inspectionScheduleId = $(this).val();
+            $.ajax({
+                url: "{{ route('inspection-schedule.get_status_last') }}",
+                dataType: 'json',
+                delay: 250,
+                data: {
+                    inspectionScheduleId: inspectionScheduleId
+                },
+                success: function(data) {
+                    console.log(data);
+
+                    if (data && typeof data === 'object' && Object.keys(data).length) {
+                        var assetOptions = [{
+                            id: data.status,
+                            text: data.status
+                        }];
+
+                        if (data.status === 'OnHold') {
+                            $('#alertText').html(
+                                `<div class="alert alert-danger">
+                                    Note :  Asset sedang berada dalam kondisi maintenance, namun sedang dihentikan sementara dengan alasan <br> <b>${data.maintenance.code_delay} - ${data.maintenance.delay_reason}</b>
+                                </div>`
+                            );
+                        } else if (data.status === 'Finish') {
+                            $('#alertText').html('');
+                        } else {
+                            $('#alertText').html(
+                                `<div class="alert alert-danger">
+                                    Note : Asset sedang berada dalam kondisi maintenance
+                                </div>`
+                            );
+                        }
+                    } else {
+                        $('#asset_id').select2({
+                            dropdownParent: $('#assetRelation'),
+                            data: [],
+                            allowClear: true
+                        }).trigger('change');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error fetching assets:', xhr);
+                    $('#asset_id').select2({
+                        dropdownParent: $('#assetRelation'),
+                        data: [],
+                        allowClear: true
+                    }).trigger('change');
+                }
+            });
         });
 
         // $('#employee_id').select2({
