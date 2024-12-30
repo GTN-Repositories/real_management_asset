@@ -29,6 +29,15 @@
         const formData = new FormData(form);
         const url = form.action;
 
+        Swal.fire({
+            title: 'Loading...',
+            text: 'Please wait while the request is being processed.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
         fetch(url, {
                 method: 'POST',
                 headers: {
@@ -39,6 +48,7 @@
             })
             .then(response => response.json())
             .then(data => {
+                Swal.close(); // Close the loading Swal
                 if (data.errors) {
                     let errorMessages = '';
                     for (const [field, messages] of Object.entries(data.errors)) {
@@ -55,7 +65,7 @@
                         icon: 'error',
                         title: 'Oops...',
                         text: data.message
-                    })
+                    });
                 } else {
                     Swal.fire({
                         icon: 'success',
@@ -69,6 +79,7 @@
                 }
             })
             .catch(error => {
+                Swal.close(); // Close the loading Swal in case of error
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',

@@ -18,7 +18,7 @@
         <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
             aria-label="Close">Cancel</button>
     </div>
-</form> 
+</form>
 
 @include('components.select2_js')
 <script>
@@ -28,6 +28,14 @@
         const form = event.target;
         const formData = new FormData(form);
         const url = form.action;
+
+        Swal.fire({
+            title: 'Loading...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading()
+            }
+        });
 
         fetch(url, {
                 method: 'POST',
@@ -39,6 +47,7 @@
             })
             .then(response => response.json())
             .then(data => {
+                Swal.close();
                 if (data.errors) {
                     let errorMessages = '';
                     for (const [field, messages] of Object.entries(data.errors)) {
@@ -69,6 +78,7 @@
                 }
             })
             .catch(error => {
+                Swal.close();
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',

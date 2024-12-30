@@ -381,7 +381,7 @@ class AssetController extends Controller
             return $this->atomic(function () use ($data, $id) {
                 $asset = Asset::findByEncryptedId($id);
                 $statusBefore = $asset->status;
-                
+
                 if (!isset($data['image']) || !$data['image']) {
                     $data['image'] = $asset->image;
                 } else {
@@ -423,7 +423,7 @@ class AssetController extends Controller
                         $project->save();
                     }
 
-                    // REMOVE FROM OLD PROJECT  
+                    // REMOVE FROM OLD PROJECT
                     $oldProject = ManagementProject::find($asset->management_project_id);
                     $asset_id_project = $oldProject->asset_id;
                     $asset_id_project = array_diff($asset_id_project, [$asset->id]);
