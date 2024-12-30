@@ -118,6 +118,15 @@ class AssetReportController extends Controller
             }
         }
 
+        if (session('selected_project_id')) {
+            $managementProject = ManagementProject::find(Crypt::decrypt(session('selected_project_id')));
+
+            if ($managementProject) {
+                $assetIds = $managementProject->asset_id;
+                $query->whereIn('id', $assetIds);
+            }
+        }
+
         return $query;
     }
 

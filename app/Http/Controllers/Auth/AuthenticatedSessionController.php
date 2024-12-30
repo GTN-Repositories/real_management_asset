@@ -31,9 +31,9 @@ class AuthenticatedSessionController extends Controller
         if (Auth::user()->roles[0]->name === 'superAdmin') {
             return redirect()->intended(route('dashboard', absolute: false));
         }
-        // return redirect()->intended(route('driver.index', absolute: false));
+        return redirect()->intended(route('driver.index', absolute: false));
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // return redirect()->intended(route('dashboard', absolute: false));
     }
 
     /**

@@ -59,6 +59,30 @@
             z-index: 1100 !important;
             /* Pastikan lebih tinggi dari modal Bootstrap (biasanya 1050) */
         }
+
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            /* Ganti dengan warna latar yang sesuai */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+            /* Animasi untuk menghilangkan preloader */
+        }
+
+        /* Animasi untuk menghilangkan preloader */
+        #preloader.hidden {
+            display: none;
+            pointer-events: none;
+            opacity: 0;
+        }
     </style>
 
     <!-- Helpers -->
@@ -68,7 +92,14 @@
     <script src="{{ asset('assets/js/config.js') }}"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+
 <body>
+    <div id="preloader">
+        <dotlottie-player src="https://lottie.host/84ac97cb-fcef-4963-bb24-641ae7feea76/xgRgV63HnK.json"
+            background="transparent" speed="1" style="width: 300px; height: 300px" direction="1" playMode="normal"
+            loop autoplay></dotlottie-player>
+    </div>
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
         <div class="layout-container">
@@ -78,6 +109,9 @@
 
             <!-- Layout container -->
             <div class="layout-page">
+                <section id="loading">
+                    <div id="loading-content"></div>
+                </section>
                 <!-- Navbar -->
                 @include('components.navbar')
                 <!-- / Navbar -->
@@ -85,7 +119,6 @@
                 <!-- Content wrapper -->
                 <div class="content-wrapper">
                     <!-- Content -->
-
                     @yield('content')
                     <!-- / Content -->
 
@@ -156,6 +189,22 @@
     <script src="{{ asset('assets/js/app-logistics-dashboard.js') }}"></script>
     <script src="{{ asset('assets/js/forms-selects.js') }}"></script>
     <script src="{{ asset('assets/js/pages-profile.js') }}"></script>
+
+    <script>
+        $(document).ajaxStart(function() {
+            $("#preloader").removeClass("hidden");
+        }).ajaxStop(function() {
+            setTimeout(function() {
+                $("#preloader").addClass("hidden");
+            }, 1000);
+        });
+
+        window.addEventListener("load", function() {
+            setTimeout(function() {
+                $("#preloader").addClass("hidden");
+            }, 1000);
+        });
+    </script>
 
     @stack('js')
 </body>
