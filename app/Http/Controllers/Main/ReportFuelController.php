@@ -299,6 +299,20 @@ class ReportFuelController extends Controller implements HasMiddleware
 
         $chartData = $fuelConsumptions->groupBy('date');
 
+        $priceData = $ipbData->whereNotNull('fuel_id')
+            ->groupBy('date')
+            ->map(function ($group) {
+                return [
+                    'date' => $group->first()->date,
+                    'total_usage' => $group->sum('usage_liter'),
+                    'total_price' => $group->sum(function ($ipb) {
+                        return $ipb->usage_liter * $ipb->unit_price;
+                    }),
+                ];
+            })
+            ->values();
+
+
         // dd($priceData);
         return response()->json([
             'avgPerDay' => $avgPerDay,
@@ -307,8 +321,7 @@ class ReportFuelController extends Controller implements HasMiddleware
             'totalFuelCost' => $totalFuelCost,
             'dates' => $chartData->keys(),
             'litersData' => $chartData->map(fn($group) => $group->sum('liter'))->values(),
-            'priceData' => $ipbData->map(fn($ipb) => $ipb->usage_liter * $ipb->unit_price)->values(),
-            'priceDate' => $ipbData->map(fn($ipb) => $ipb->date)->values(),
+            'priceData' => $priceData,
         ]);
     }
 

@@ -168,7 +168,7 @@
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="{{ route('driver.index') }}">
+                            <a class="dropdown-item" href="{{ route('select-project.index') }}">
                                 <i class="ti ti-switch-3 me-2 ti-sm"></i>
                                 <span class="align-middle">Pilih Project</span>
                             </a>

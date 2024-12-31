@@ -19,7 +19,7 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $.ajax({
-                url: "{{ route('driver.data') }}",
+                url: "{{ route('select-project.data') }}",
                 type: 'GET',
                 dataType: 'json',
                 success: function(data) {
@@ -79,7 +79,7 @@
                         console.log('Selected project ID:', projectId); // Debug log
 
                         $.ajax({
-                            url: "{{ route('driver.selectProject') }}",
+                            url: "{{ route('select-project.selectProject') }}",
                             type: 'POST',
                             data: {
                                 project_id: projectId,
