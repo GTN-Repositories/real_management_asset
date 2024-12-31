@@ -102,6 +102,7 @@
                         <th>Stock</th>
                         <th>Metode</th>
                         <th>Harga</th>
+                        <th>Gudang</th>
                         <th>Dibuat Oleh</th>
                         <th>Status</th>
                         <th>Approve By</th>
@@ -116,6 +117,7 @@
                             <td>{{ $item->stock ?? '-' }}</td>
                             <td>{{ $item->metode ?? '-' }}</td>
                             <td>{{ number_format($item->price) ?? '-' }}</td>
+                            <td>{{ $item->warehouse->name ?? '-' }}</td>
                             <td>{{ $item->createdBy->name ?? '-' }}</td>
                             <td>{{ $item->status ?? '-' }}</td>
                             <td>{{ $item->approvedBy->name ?? '-' }}</td>

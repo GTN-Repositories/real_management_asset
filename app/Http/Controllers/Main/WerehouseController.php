@@ -37,11 +37,17 @@ class WerehouseController extends Controller
 
                 return $checkbox;
             })
+            ->addColumn('ids', function ($data) {
+                return $data->id ?? null;
+            })
             ->addColumn('name', function ($data) {
                 return $data->name ?? null;
             })
             ->addColumn('location', function ($data) {
                 return $data->location ?? null;
+            })
+            ->addColumn('management_project', function ($data) {
+                return 'PRJ - ' . $data->management_project_id . ' '. ($data->managementProject->name ?? null);
             })
             ->addColumn('created_at', function ($data) {
                 return $data->created_at->format('d-m-Y');
@@ -69,10 +75,11 @@ class WerehouseController extends Controller
             'id',
             'name',
             'location',
+            'management_project_id',
             'created_at',
         ];
 
-        $keyword = $request->search['value'];
+        $keyword = $request->search['value'] ?? null;
 
         $data = Werehouse::orderBy('created_at', 'asc')
             ->select($columns)
@@ -102,6 +109,10 @@ class WerehouseController extends Controller
 
         try {
             return $this->atomic(function () use ($data) {
+                if (isset($data['management_project_id'])) {
+                    $data['management_project_id'] = Crypt::decrypt($data['management_project_id']);
+                }
+
                 $data = Werehouse::create($data);
 
                 return response()->json([
