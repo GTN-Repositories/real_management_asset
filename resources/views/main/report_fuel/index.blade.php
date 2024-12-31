@@ -88,6 +88,7 @@
             </div>
             <div class="card my-3">
                 <div class="card-body">
+                    <h6>Fuel Consumption Over Time</h6>
                     <div id="liters-chart-section" class="chart-container">
                         <!-- Liters chart will be rendered here dynamically -->
                     </div>
@@ -95,6 +96,7 @@
             </div>
             <div class="card my-3">
                 <div class="card-body">
+                    <h6>Fuel Price Over Time</h6>
                     <div id="price-chart-section" class="chart-container">
                         <!-- Price chart will be rendered here dynamically -->
                     </div>
@@ -167,7 +169,7 @@
             init_table();
             init_table_project();
             init_table_asset();
-            init_expanse_chart(); // Initialize chart on page load
+            init_expanse_chart();
 
             $('.dropdown-item').on('click', function(e) {
                 e.preventDefault();
@@ -177,8 +179,7 @@
                 const filterBtn = $('.btn.btn-outline-primary.dropdown-toggle');
                 filterBtn.text(filterType);
 
-                reloadTableWithFilters(null, null, filterType);
-                reloadHoursChartWithFilters(null, null, filterType);
+                reloadTableWithFilters(filterType);
                 reloadExpanseChartWithFilters(null, null, filterType);
             });
 
@@ -200,8 +201,8 @@
 
             $('#date-range-picker').on('cancel.daterangepicker', function() {
                 $(this).val('');
-                reloadTableWithFilters(); // Reload without date range
-                reloadExpanseChartWithFilters(); // Reload chart without date range
+                reloadTableWithFilters();
+                reloadExpanseChartWithFilters();
             });
         });
 
@@ -218,6 +219,140 @@
             if (litersChartSection) litersChartSection.destroy();
             if (priceChartSection) priceChartSection.destroy();
             init_expanse_chart(startDate, endDate, predefinedFilter);
+        }
+
+        let litersChartSection;
+        let priceChartSection;
+
+        function init_expanse_chart(startDate = '', endDate = '', predefinedFilter = '') {
+            $.ajax({
+                url: "{{ route('report-fuel.expanse-fuel') }}",
+                method: 'GET',
+                data: {
+                    startDate: startDate,
+                    endDate: endDate,
+                    predefinedFilter: predefinedFilter
+                },
+                success: function(response) {
+                    // Render the scorecard
+                    const scorecard = `
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Avg Per Day</h5>
+                                <p class="card-text">${response.avgPerDay ? response.avgPerDay.toFixed(2) : '0'} Liters</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Avg Per Trip</h5>
+                                <p class="card-text">${response.avgPerTrip ? response.avgPerTrip.toFixed(2) : '0'} Liters</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Avg Per Liter</h5>
+                                <p class="card-text">${response.avgPerLiter ? response.avgPerLiter.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) : 'Rp0'}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Fuel Cost</h5>
+                                <p class="card-text">${response.totalFuelCost ? response.totalFuelCost.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) : 'Rp0'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+
+                    document.querySelector("#scorecard-section").innerHTML = scorecard;
+
+                    // Handle empty data for liters chart
+                    if (Array.isArray(response.litersData) && response.litersData.length === 0) {
+                        document.querySelector("#liters-chart-section").innerHTML =
+                            `<div class="alert alert-info">Data untuk konsumsi bahan bakar kosong.</div>`;
+                    } else {
+                        // Remove any existing alert if there is data
+                        document.querySelector("#liters-chart-section").innerHTML = "";
+
+                        // Prepare chart options for liters
+                        var litersChartOptions = {
+                            series: [{
+                                name: 'Liters',
+                                data: response.litersData
+                            }],
+                            chart: {
+                                type: 'line',
+                                height: 350,
+                                toolbar: {
+                                    show: true
+                                }
+                            },
+                            xaxis: {
+                                categories: response.dates
+                            },
+                            title: {
+                                text: 'Fuel Consumption Over Time',
+                                align: 'left'
+                            }
+                        };
+
+                        // Render the liters chart
+                        litersChartSection = new ApexCharts(document.querySelector("#liters-chart-section"),
+                            litersChartOptions);
+                        litersChartSection.render();
+                    }
+
+                    // Handle empty data for price chart
+                    if (Array.isArray(response.priceData) && response.priceData.length === 0) {
+                        document.querySelector("#price-chart-section").innerHTML =
+                            `<div class="alert alert-info">Data untuk harga bahan bakar kosong.</div>`;
+                    } else {
+                        // Remove any existing alert if there is data
+                        document.querySelector("#price-chart-section").innerHTML = "";
+
+                        // Prepare chart options for price
+                        var priceChartOptions = {
+                            series: [{
+                                name: 'Price',
+                                data: response.priceData.map(item => item.total_price)
+                            }],
+                            chart: {
+                                type: 'line',
+                                height: 350,
+                                toolbar: {
+                                    show: true
+                                }
+                            },
+                            xaxis: {
+                                categories: response.priceData.map(item => item.date)
+                            },
+                            title: {
+                                text: 'Fuel Price Over Time',
+                                align: 'left'
+                            }
+                        };
+
+                        // Render the price chart
+                        priceChartSection = new ApexCharts(document.querySelector("#price-chart-section"),
+                            priceChartOptions);
+                        priceChartSection.render();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching expanse data:', error);
+                    document.querySelector("#liters-chart-section").innerHTML =
+                        '<div class="alert alert-danger">Failed to load expanse chart data. Please try again later.</div>';
+                    document.querySelector("#price-chart-section").innerHTML =
+                        '<div class="alert alert-danger">Failed to load price chart data. Please try again later.</div>';
+                }
+            });
         }
 
 
@@ -339,123 +474,6 @@
                 ]
             });
         }
-
-
-        let litersChartSection;
-        let priceChartSection;
-
-        function init_expanse_chart(startDate = '', endDate = '', predefinedFilter = '') {
-            $.ajax({
-                url: "{{ route('report-fuel.expanse-fuel') }}",
-                method: 'GET',
-                data: {
-                    startDate: startDate,
-                    endDate: endDate,
-                    predefinedFilter: predefinedFilter
-                },
-                success: function(response) {
-                    // Render the scorecard
-                    const scorecard = `
-                <div class="row g-3">
-                    <div class="col-6 col-md-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Avg Per Day</h5>
-                                <p class="card-text">${response.avgPerDay.toFixed(2)} Liters</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Avg Per Trip</h5>
-                                <p class="card-text">${response.avgPerTrip.toFixed(2)} Liters</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Avg Per Liter</h5>
-                                <p class="card-text">${response.avgPerLiter.toFixed(2)} Price</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Total Fuel Cost</h5>
-                                <p class="card-text">${response.totalFuelCost.toFixed(2)} Currency</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-
-                    document.querySelector("#scorecard-section").innerHTML = scorecard;
-
-                    // Prepare chart options for liters
-                    var litersChartOptions = {
-                        series: [{
-                            name: 'Liters',
-                            data: response.litersData
-                        }],
-                        chart: {
-                            type: 'line',
-                            height: 350,
-                            toolbar: {
-                                show: true
-                            }
-                        },
-                        xaxis: {
-                            categories: response.dates
-                        },
-                        title: {
-                            text: 'Fuel Consumption Over Time',
-                            align: 'left'
-                        }
-                    };
-
-                    // Prepare chart options for price
-                    var priceChartOptions = {
-                        series: [{
-                            name: 'Price',
-                            data: response.priceData
-                        }],
-                        chart: {
-                            type: 'line',
-                            height: 350,
-                            toolbar: {
-                                show: true
-                            }
-                        },
-                        xaxis: {
-                            categories: response.dates
-                        },
-                        title: {
-                            text: 'Fuel Price Over Time',
-                            align: 'left'
-                        }
-                    };
-
-                    // Render the charts
-                    litersChartSection = new ApexCharts(document.querySelector("#liters-chart-section"),
-                        litersChartOptions);
-                    litersChartSection.render();
-
-                    priceChartSection = new ApexCharts(document.querySelector("#price-chart-section"),
-                        priceChartOptions);
-                    priceChartSection.render();
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching expanse data:', error);
-                    document.querySelector("#liters-chart-section").innerHTML =
-                        '<div class="alert alert-danger">Failed to load expanse chart data. Please try again later.</div>';
-                    document.querySelector("#price-chart-section").innerHTML =
-                        '<div class="alert alert-danger">Failed to load price chart data. Please try again later.</div>';
-                }
-            });
-        }
-
 
         function exportPDF() {
             const startDate = $('#date-range-picker').data('daterangepicker')?.startDate.format('YYYY-MM-DD') || '';

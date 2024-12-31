@@ -7,6 +7,7 @@ use App\Exports\MultiSheetExport;
 use App\Exports\ReportFuelExport;
 use App\Http\Controllers\Controller;
 use App\Models\FuelConsumption;
+use App\Models\Ipb;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -219,54 +220,100 @@ class ReportFuelController extends Controller implements HasMiddleware
     public function getChartExpanseFuel(Request $request)
     {
         $query = FuelConsumption::query();
+        $Ipbquery = Ipb::query();
 
-        if ($request->filled('startDate') && $request->filled('endDate')) {
-            $query->whereBetween('date', [
-                Carbon::parse($request->startDate)->startOfDay(),
-                Carbon::parse($request->endDate)->endOfDay()
-            ]);
-        } else {
-            $query->whereBetween('date', [
-                Carbon::now()->startOfMonth(),
-                Carbon::now()->endOfMonth()
-            ]);
+        if (session('selected_project_id')) {
+            $query->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+
+            $Ipbquery->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
         }
 
+        if (!$request->filled('predefinedFilter') && !$request->filled('startDate') && !$request->filled('endDate')) {
+            // Default to current month
+            $query->whereMonth('date', Carbon::now()->month)
+                ->whereYear('date', Carbon::now()->year);
+
+            $Ipbquery->whereMonth('date', Carbon::now()->month)
+                ->whereYear('date', Carbon::now()->year);
+        }
+
+        // Adjust query if predefined filter is provided
         if ($request->filled('predefinedFilter')) {
             switch ($request->predefinedFilter) {
                 case 'hari ini':
                     $query->whereDate('date', Carbon::today());
+                    $Ipbquery->whereDate('date', Carbon::today());
                     break;
                 case 'minggu ini':
                     $query->whereBetween('date', [
                         Carbon::now()->startOfWeek(),
                         Carbon::now()->endOfWeek()
                     ]);
+                    $Ipbquery->whereBetween('date', [
+                        Carbon::now()->startOfWeek(),
+                        Carbon::now()->endOfWeek()
+                    ]);
                     break;
                 case 'bulan ini':
                     $query->whereMonth('date', Carbon::now()->month);
+                    $Ipbquery->whereMonth('date', Carbon::now()->month);
                     break;
                 case 'bulan kemarin':
                     $query->whereMonth('date', Carbon::now()->subMonth()->month);
+                    $Ipbquery->whereMonth('date', Carbon::now()->subMonth()->month);
                     break;
                 case 'tahun ini':
                     $query->whereYear('date', Carbon::now()->year);
+                    $Ipbquery->whereYear('date', Carbon::now()->year);
                     break;
                 case 'tahun kemarin':
                     $query->whereYear('date', Carbon::now()->subYear()->year);
+                    $Ipbquery->whereYear('date', Carbon::now()->subYear()->year);
                     break;
             }
         }
 
+        // Adjust query if start and end dates are provided
+        if ($request->filled('startDate') && $request->filled('endDate')) {
+            $query->whereBetween('date', [
+                Carbon::parse($request->startDate)->startOfDay(),
+                Carbon::parse($request->endDate)->endOfDay()
+            ]);
+            $Ipbquery->whereBetween('date', [
+                Carbon::parse($request->startDate)->startOfDay(),
+                Carbon::parse($request->endDate)->endOfDay()
+            ]);
+        }
+
         $fuelConsumptions = $query->get();
+        $ipbData = $Ipbquery->get();
 
         $avgPerDay = $fuelConsumptions->avg('liter') / max($fuelConsumptions->count(), 1);
         $avgPerTrip = $fuelConsumptions->avg('liter');
-        $avgPerLiter = $fuelConsumptions->avg('price');
-        $totalFuelCost = $fuelConsumptions->sum('price');
+        $avgPerLiter = $ipbData->avg('unit_price');
+        $totalFuelCost = $ipbData->sum(fn($ipb) => $ipb->usage_liter * $ipb->unit_price);
 
         $chartData = $fuelConsumptions->groupBy('date');
 
+        $priceData = $ipbData->whereNotNull('fuel_id')
+            ->groupBy('date')
+            ->map(function ($group) {
+                return [
+                    'date' => $group->first()->date,
+                    'total_usage' => $group->sum('usage_liter'),
+                    'total_price' => $group->sum(function ($ipb) {
+                        return $ipb->usage_liter * $ipb->unit_price;
+                    }),
+                ];
+            })
+            ->values();
+
+
+        // dd($priceData);
         return response()->json([
             'avgPerDay' => $avgPerDay,
             'avgPerTrip' => $avgPerTrip,
@@ -274,7 +321,7 @@ class ReportFuelController extends Controller implements HasMiddleware
             'totalFuelCost' => $totalFuelCost,
             'dates' => $chartData->keys(),
             'litersData' => $chartData->map(fn($group) => $group->sum('liter'))->values(),
-            'priceData' => $chartData->map(fn($group) => $group->sum('price'))->values()
+            'priceData' => $priceData,
         ]);
     }
 
@@ -343,6 +390,10 @@ class ReportFuelController extends Controller implements HasMiddleware
             ->selectRaw('management_projects.id, management_projects.name, SUM(fuel_consumptions.liter) as total_liter')
             ->groupBy('management_projects.id', 'management_projects.name');
 
+        if (session('selected_project_id')) {
+            $query->where('management_projects.id', Crypt::decrypt(session('selected_project_id')));
+        }
+
         $data = $query->get();
 
         return datatables()->of($data)
@@ -364,6 +415,11 @@ class ReportFuelController extends Controller implements HasMiddleware
             ->selectRaw('assets.id, assets.name, assets.license_plate, SUM(fuel_consumptions.liter) as total_liter')
             ->groupBy('assets.id', 'assets.name', 'assets.license_plate');
 
+        if (session('selected_project_id')) {
+            $query->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
 
         $data = $query->get();
 

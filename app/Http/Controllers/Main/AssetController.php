@@ -270,7 +270,23 @@ class AssetController extends Controller
 
                 $asset = Asset::create($data);
 
-                ManagementProject::find(Crypt::decrypt($data['management_project_id']))->asset_id()->attach($asset->id);
+                if (isset($data['management_project_id'])) {
+                    $project = ManagementProject::find($data['management_project_id']);
+                    $assignAsset = true;
+                    foreach ($project->asset_id as $key => $value) {
+                        if ($value == $asset->id) {
+                            $assignAsset = false;
+                            break;
+                        }
+                    }
+
+                    if ($assignAsset) {
+                        $asset_id_project = $project->asset_id;
+                        $asset_id_project[] = Crypt::decrypt($asset->id);
+                        $project->asset_id = $asset_id_project;
+                        $project->save();
+                    }
+                }
 
                 $customFieldNames = $data['custom_field_name'] ?? [];
                 $customFieldValues = $data['custom_field_value'] ?? [];
@@ -346,6 +362,9 @@ class AssetController extends Controller
     {
         $data = Asset::findByEncryptedId($id);
         $customFields = CostumField::where('asset_id', Crypt::decrypt($data->id))->get();
+        $managementProject = ManagementProject::find($data->management_project_id);
+        $data->management_project_ids = $data->management_project_id;
+        $data->management_project_name = $managementProject->name ?? null;
 
         return view('main.unit.edit', compact('data', 'customFields'));
     }
@@ -362,6 +381,7 @@ class AssetController extends Controller
             return $this->atomic(function () use ($data, $id) {
                 $asset = Asset::findByEncryptedId($id);
                 $statusBefore = $asset->status;
+
                 if (!isset($data['image']) || !$data['image']) {
                     $data['image'] = $asset->image;
                 } else {
@@ -384,24 +404,31 @@ class AssetController extends Controller
                     }
                 }
 
-                if (isset($data['management_project_id'])) {
+                if (isset($data['management_project_id']) && $data['management_project_id'] != $asset->management_project_id) {
                     $data['management_project_id'] = Crypt::decrypt($data['management_project_id']);
-                }
 
-                $project = ManagementProject::find($data['management_project_id']);
-                $assignAsset = true;
-                foreach ($project->asset_id as $key => $value) {
-                    if ($value == $asset->id) {
-                        $assignAsset = false;
-                        break;
+                    $project = ManagementProject::find($data['management_project_id']);
+                    $assignAsset = true;
+                    foreach ($project->asset_id as $key => $value) {
+                        if ($value == $asset->id) {
+                            $assignAsset = false;
+                            break;
+                        }
                     }
-                }
 
-                if ($assignAsset) {
-                    $asset_id_project = $project->asset_id;
-                    $asset_id_project[] = Crypt::decrypt($asset->id);
-                    $project->asset_id = $asset_id_project;
-                    $project->save();
+                    if ($assignAsset) {
+                        $asset_id_project = $project->asset_id;
+                        $asset_id_project[] = Crypt::decrypt($asset->id);
+                        $project->asset_id = $asset_id_project;
+                        $project->save();
+                    }
+
+                    // REMOVE FROM OLD PROJECT
+                    $oldProject = ManagementProject::find($asset->management_project_id);
+                    $asset_id_project = $oldProject->asset_id;
+                    $asset_id_project = array_diff($asset_id_project, [$asset->id]);
+                    $oldProject->asset_id = $asset_id_project;
+                    $oldProject->save();
                 }
 
                 if (!isset($data['asuransi']) || !$data['asuransi']) {

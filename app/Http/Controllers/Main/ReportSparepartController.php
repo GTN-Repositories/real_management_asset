@@ -7,6 +7,7 @@ use App\Models\Asset;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
 use App\Models\Maintenance;
+use App\Models\ManagementProject;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -154,6 +155,10 @@ class ReportSparepartController extends Controller
             ]);
         }
 
+        if (session('selected_project_id')) {
+            $query->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+        }
+
         $inspectionSchedules = $query->get();
 
         $result = [];
@@ -234,6 +239,10 @@ class ReportSparepartController extends Controller
                 return $row;
             });
 
+        if (session('selected_project_id')) {
+            $query = $query->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+        }
+
         return datatables()->of($query)
             ->addColumn('item_id', function ($row) {
                 return $row->item_names ?: '-';
@@ -251,20 +260,23 @@ class ReportSparepartController extends Controller
 
     public function getMaintenanceStatus(Request $request)
     {
-        $underMaintenanceSecondDayCount = InspectionSchedule::where('status', 'UnderMaintenance')
+        $query = InspectionSchedule::query();
+
+        if (session('selected_project_id')) {
+            $query = $query->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+        }
+
+        $underMaintenanceSecondDayCount = $query->where('status', 'UnderMaintenance')
             ->whereDate('updated_at', '=', Carbon::now()->subDays(2)->toDateString())
             ->count();
-
         $totalItems = Item::count();
         $currentYear = Carbon::now()->year;
-
-        $totalInspectionItemsYear = InspectionSchedule::whereYear('created_at', $currentYear)
+        $totalInspectionItemsYear = $query->whereYear('created_at', $currentYear)
             ->pluck('item_id')
             ->flatten()
             ->unique()
             ->count();
-
-        $totalInspectionItemsWeek = InspectionSchedule::whereYear('created_at', $currentYear)
+        $totalInspectionItemsWeek = $query->whereYear('created_at', $currentYear)
             ->whereBetween('created_at', [
                 Carbon::now()->startOfWeek(),
                 Carbon::now()->endOfWeek(),
@@ -273,16 +285,14 @@ class ReportSparepartController extends Controller
             ->flatten()
             ->unique()
             ->count();
-
         $percentageItemsYear = ($totalInspectionItemsYear / $totalItems) * 100;
         $percentageItemsWeek = ($totalInspectionItemsWeek / $totalItems) * 100;
-
         return response()->json([
-            'scheduled' => InspectionSchedule::where('status', 'Scheduled')->count(),
-            'inProgress' => InspectionSchedule::where('status', 'InProgress')->count(),
-            'onHold' => InspectionSchedule::where('status', 'OnHold')->count(),
-            'finish' => InspectionSchedule::where('status', 'Finish')->count(),
-            'overdue' => InspectionSchedule::where('status', 'Overdue')->count(),
+            'scheduled' => $query->where('status', 'Scheduled')->count(),
+            'inProgress' => $query->where('status', 'InProgress')->count(),
+            'onHold' => $query->where('status', 'OnHold')->count(),
+            'finish' => $query->where('status', 'Finish')->count(),
+            'overdue' => $query->where('status', 'Overdue')->count(),
             'underMaintenanceSecondDay' => $underMaintenanceSecondDayCount,
             'percentageItemsYear' => $percentageItemsYear,
             'percentageItemsWeek' => $percentageItemsWeek,
@@ -291,8 +301,19 @@ class ReportSparepartController extends Controller
 
     public function getAssetStatus()
     {
-        $underMaintenance = Asset::where('status', 'UnderMaintenance')->count();
-        $totalAssets = Asset::count();
+        $query = Asset::selectRaw('status, COUNT(*) as count');
+        if (session('selected_project_id')) {
+            $managementProject = ManagementProject::find(Crypt::decrypt(session('selected_project_id')));
+            if ($managementProject) {
+                $assetIds = $managementProject->asset_id;
+                $query->whereIn('id', $assetIds);
+            }
+        }
+        $query->groupBy('status');
+        $result = $query->get();
+
+        $underMaintenance = $result->where('status', 'UnderMaintenance')->sum('count');
+        $totalAssets = $result->sum('count');
 
         return response()->json([
             'series' => [

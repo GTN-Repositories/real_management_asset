@@ -17,6 +17,12 @@
         <input type="text" id="location" name="location" value="{{ $data->location }}" class="form-control"
             placeholder="Surabaya" />
     </div>
+    <div class="col-12 col-md-12" id="projectRelation">
+        <label class="form-label" for="management_project_id">Nama Project<span class="text-danger">*</span></label>
+        <select id="management_project_id" name="management_project_id"
+            class="select2 form-select select2-primary"data-allow-clear="true" required>
+        </select>
+    </div>
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
         <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
@@ -24,6 +30,46 @@
     </div>
 </form>
 
+<script>
+    var management_project_id = '{{ $data->management_project_id ?? '' }}';
+    var project_name = '{{ $data->managementProject->name ?? '' }}';
+
+    $(document).ready(function() {
+        $('#management_project_id').select2({
+            dropdownParent: $('#projectRelation'),
+            placeholder: 'Pilih project',
+            ajax: {
+                url: "{{ route('management-project.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function(data) {
+                    apiResults = data.data
+                        .map(function(item) {
+                            return {
+                                text: item.name,
+                                id: item.managementRelationId,
+                            };
+                        });
+
+                    return {
+                        results: apiResults
+                    };
+                },
+                cache: true
+            }
+        });
+
+        if (management_project_id) {
+            var optionProject = new Option(project_name, management_project_id, true, true);
+            $('#management_project_id').append(optionProject).trigger('change');
+        }
+    });
+</script>
 <script>
     document.getElementById('formEdit').addEventListener('submit', function(event) {
         event.preventDefault();

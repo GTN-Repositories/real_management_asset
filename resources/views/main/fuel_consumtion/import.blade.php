@@ -31,6 +31,12 @@
         const formData = new FormData(form);
         const url = form.action;
 
+        Swal.fire({
+            title: 'Loading...',
+            didOpen: () => {
+                Swal.showLoading()
+            }
+        });
         fetch(url, {
                 method: 'POST',
                 headers: {
@@ -41,6 +47,7 @@
             })
             .then(response => response.json())
             .then(data => {
+                Swal.close();
                 if (data.errors) {
                     let errorMessages = '';
                     for (const [field, messages] of Object.entries(data.errors)) {
@@ -71,6 +78,7 @@
                 }
             })
             .catch(error => {
+                Swal.close();
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',

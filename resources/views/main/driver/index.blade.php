@@ -19,17 +19,15 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $.ajax({
-                url: "{{ route('driver.data') }}",
+                url: "{{ route('select-project.data') }}",
                 type: 'GET',
                 dataType: 'json',
                 success: function(data) {
-                    console.log('Received data:', data); // Debug log
 
                     let container = $('#manager-container');
                     container.empty();
 
                     $.each(data, function(index, manager) {
-                        console.log('Processing manager:', manager); // Debug log
 
                         // Special styling for "All Projects" card
                         const isAllProjects = manager.id === 'all';
@@ -45,7 +43,6 @@
                                         </div>
                                         <h3 class="card-title text-center text-capitalize mb-1">
                                             ${manager.name}
-                                            ${isAllProjects ? ' <span class="badge bg-primary">Super Admin</span>' : ''}
                                         </h3>
                                         ${isAllProjects ?
                                             '<p class="text-center text-muted">Access and manage all projects</p>' : ''
@@ -54,10 +51,10 @@
                                             ${manager.assets && manager.assets.length > 0 ?
                                                 manager.assets.slice(0, 5).map(
                                                     asset => `
-                                                        <li class="mb-2 d-flex align-items-center">
-                                                            <i class="ti ti-point ti-lg"></i>
-                                                            ${asset.name}
-                                                        </li>`
+                                                            <li class="mb-2 d-flex align-items-center">
+                                                                <i class="ti ti-point ti-lg"></i>
+                                                                ${asset.name}
+                                                            </li>`
                                                 ).join('') :
                                                 '<li class="text-muted">No assets available</li>'
                                             }
@@ -82,20 +79,23 @@
                         console.log('Selected project ID:', projectId); // Debug log
 
                         $.ajax({
-                            url: "{{ route('driver.selectProject') }}",
+                            url: "{{ route('select-project.selectProject') }}",
                             type: 'POST',
                             data: {
                                 project_id: projectId,
                                 _token: '{{ csrf_token() }}'
                             },
                             success: function(response) {
-                                console.log('Select project response:', response); // Debug log
+                                console.log('Select project response:',
+                                response); // Debug log
                                 if (response.status) {
-                                    window.location.href = "{{ route('report-fuel.index') }}";
+                                    window.location.href =
+                                        "{{ route('report-fuel.index') }}";
                                 }
                             },
                             error: function(error) {
-                                console.error('Select project error:', error); // Debug log
+                                console.error('Select project error:',
+                                error); // Debug log
                                 Swal.fire('Error!',
                                     'An error occurred while selecting the project.',
                                     'error');
@@ -105,7 +105,8 @@
                 },
                 error: function(error) {
                     console.error('Fetch data error:', error); // Debug log
-                    Swal.fire('Error!', 'An error occurred while fetching the management project.', 'error');
+                    Swal.fire('Error!', 'An error occurred while fetching the management project.',
+                        'error');
                 }
             });
         });

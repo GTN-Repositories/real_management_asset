@@ -204,12 +204,12 @@
                             <span class="align-middle">My Profile</span>
                         </a>
                     </li>
-                    {{-- <li>
+                    <li>
                         <div class="d-flex align-items-center ms-4">
                             <i class="ti ti-switch-3 me-2 ti-sm"></i>
-                            <a href="{{ route('driver.index') }}">Pilih Project Lain</a>
+                            <a href="{{ route('select-project.index') }}">Pilih Project Lain</a>
                         </div>
-                    </li> --}}
+                    </li>
                     <li>
                         <div class="dropdown-divider"></div>
                     </li>

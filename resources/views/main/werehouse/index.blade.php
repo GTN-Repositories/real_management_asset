@@ -34,6 +34,7 @@
                             </th>
                             <th>Nama</th>
                             <th>Lokasi</th>
+                            <th>Project</th>
                             <th>Dibuat Pada</th>
                             <th>Aksi</th>
                         </tr>
@@ -123,6 +124,10 @@
                     {
                         data: 'location',
                         name: 'location'
+                    },
+                    {
+                        data: 'management_project',
+                        name: 'management_project'
                     },
                     {
                         data: 'created_at',

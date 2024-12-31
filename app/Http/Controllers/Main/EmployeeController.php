@@ -43,6 +43,9 @@ class EmployeeController extends Controller
             ->addColumn('name', function ($data) {
                 return $data->name ?? null;
             })
+            ->addColumn('management_project_id', function ($data) {
+                return ($data->managementProject->name ?? null) ?? null;
+            })
             ->addColumn('nameTitle', function ($data) {
                 return ($data->name ?? null) . '-' . $data->jobTitle->name ?? null;
             })
@@ -71,6 +74,7 @@ class EmployeeController extends Controller
         $columns = [
             'id',
             'job_title_id',
+            'management_project_id',
             'name',
         ];
 
@@ -81,12 +85,29 @@ class EmployeeController extends Controller
             $jobTitleDecrypted[] = Crypt::decrypt($value);
         }
 
+        $management_project = $request->management_project_id ?? [];
+        $management_project_decrypt = [];
+        foreach ($management_project as $value) {
+            try {
+                //code...
+                $management_project_decrypt[] = Crypt::decrypt($value);
+            } catch (\Throwable $th) {
+                //throw $th;
+                $management_project_decrypt[] = $value;
+            }
+        }
+
         $limit = $request->limit ?? '';
         $data = Employee::orderBy('created_at', 'asc')
             ->select($columns)
             ->when($jobTitleDecrypted, function ($query) use ($jobTitleDecrypted) {
                 if (count($jobTitleDecrypted) > 0) {
                     return $query->whereIn('job_title_id', $jobTitleDecrypted);
+                }
+            })
+            ->when($management_project_decrypt, function ($query) use ($management_project_decrypt) {
+                if (count($management_project_decrypt) > 0) {
+                    return $query->whereIn('management_project_id', $management_project_decrypt);
                 }
             })
             ->where(function ($query) use ($keyword, $columns) {
@@ -117,6 +138,7 @@ class EmployeeController extends Controller
         try {
             return $this->atomic(function () use ($data) {
                 $data['job_title_id'] = Crypt::decrypt($data['job_title_id']);
+                $data['management_project_id'] = Crypt::decrypt($data['management_project_id']);
                 $data = Employee::create($data);
 
                 return response()->json([
@@ -161,7 +183,21 @@ class EmployeeController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id) {
-                $data['job_title_id'] = Crypt::decrypt($data['job_title_id']);
+                try {
+                    //code...
+                    $data['job_title_id'] = Crypt::decrypt($data['job_title_id']);
+                } catch (\Throwable $th) {
+                    //throw $th;
+                    $data['job_title_id'] = $data['job_title_id'];
+                }
+
+                try {
+                    //code...
+                    $data['management_project_id'] = Crypt::decrypt($data['management_project_id']);
+                } catch (\Throwable $th) {
+                    //throw $th;
+                    $data['management_project_id'] = $data['management_project_id'];
+                }
                 $data = Employee::findByEncryptedId($id)->update($data);
 
                 return response()->json([

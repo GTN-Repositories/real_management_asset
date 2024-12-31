@@ -28,12 +28,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if (Auth::user()->roles[0]->name === 'superAdmin') {
-            return redirect()->intended(route('dashboard', absolute: false));
-        }
-        // return redirect()->intended(route('driver.index', absolute: false));
+        // if (Auth::user()->roles[0]->name === 'superAdmin') {
+        //     return redirect()->intended(route('dashboard', absolute: true));
+        // }
+        return redirect()->intended(route('select-project.index', absolute: true));
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // return redirect()->intended(route('dashboard', absolute: false));
     }
 
     /**
