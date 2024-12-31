@@ -169,7 +169,7 @@
             init_table();
             init_table_project();
             init_table_asset();
-            init_expanse_chart(); // Initialize chart on page load
+            init_expanse_chart();
 
             $('.dropdown-item').on('click', function(e) {
                 e.preventDefault();
@@ -201,8 +201,8 @@
 
             $('#date-range-picker').on('cancel.daterangepicker', function() {
                 $(this).val('');
-                reloadTableWithFilters(); // Reload without date range
-                reloadExpanseChartWithFilters(); // Reload chart without date range
+                reloadTableWithFilters();
+                reloadExpanseChartWithFilters();
             });
         });
 
@@ -273,12 +273,13 @@
 
                     document.querySelector("#scorecard-section").innerHTML = scorecard;
 
-                    if (response.litersData.length === 0) {
+                    // Handle empty data for liters chart
+                    if (Array.isArray(response.litersData) && response.litersData.length === 0) {
                         document.querySelector("#liters-chart-section").innerHTML =
-                            `<div class="alert alert-info">Data ini kosong.</div>`;
-                        document.querySelector("#price-chart-section").innerHTML =
-                            `<div class="alert alert-info">Data ini kosong.</div>`;
+                            `<div class="alert alert-info">Data untuk konsumsi bahan bakar kosong.</div>`;
                     } else {
+                        // Remove any existing alert if there is data
+                        document.querySelector("#liters-chart-section").innerHTML = "";
 
                         // Prepare chart options for liters
                         var litersChartOptions = {
@@ -302,11 +303,25 @@
                             }
                         };
 
+                        // Render the liters chart
+                        litersChartSection = new ApexCharts(document.querySelector("#liters-chart-section"),
+                            litersChartOptions);
+                        litersChartSection.render();
+                    }
+
+                    // Handle empty data for price chart
+                    if (Array.isArray(response.priceData) && response.priceData.length === 0) {
+                        document.querySelector("#price-chart-section").innerHTML =
+                            `<div class="alert alert-info">Data untuk harga bahan bakar kosong.</div>`;
+                    } else {
+                        // Remove any existing alert if there is data
+                        document.querySelector("#price-chart-section").innerHTML = "";
+
                         // Prepare chart options for price
                         var priceChartOptions = {
                             series: [{
                                 name: 'Price',
-                                data: response.priceData
+                                data: response.priceData.map(item => item.total_price)
                             }],
                             chart: {
                                 type: 'line',
@@ -316,7 +331,7 @@
                                 }
                             },
                             xaxis: {
-                                categories: response.priceDate
+                                categories: response.priceData.map(item => item.date)
                             },
                             title: {
                                 text: 'Fuel Price Over Time',
@@ -324,12 +339,8 @@
                             }
                         };
 
-                        // Render the charts
-                        let litersChartSection = new ApexCharts(document.querySelector("#liters-chart-section"),
-                            litersChartOptions);
-                        litersChartSection.render();
-
-                        let priceChartSection = new ApexCharts(document.querySelector("#price-chart-section"),
+                        // Render the price chart
+                        priceChartSection = new ApexCharts(document.querySelector("#price-chart-section"),
                             priceChartOptions);
                         priceChartSection.render();
                     }
@@ -343,6 +354,7 @@
                 }
             });
         }
+
 
         function init_table(startDate = '', endDate = '', predefinedFilter = '', keyword = '') {
             $('#data-table').DataTable({

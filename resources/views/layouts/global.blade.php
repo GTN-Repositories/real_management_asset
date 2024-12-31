@@ -50,6 +50,7 @@
         href="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/spinkit/spinkit.css') }}">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     @stack('css')
     <!-- Page CSS -->
@@ -96,9 +97,14 @@
 
 <body>
     <div id="preloader">
-        <dotlottie-player src="https://lottie.host/84ac97cb-fcef-4963-bb24-641ae7feea76/xgRgV63HnK.json"
-            background="transparent" speed="1" style="width: 300px; height: 300px" direction="1" playMode="normal"
-            loop autoplay></dotlottie-player>
+        <div class="sk-chase sk-primary">
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+        </div>
     </div>
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
