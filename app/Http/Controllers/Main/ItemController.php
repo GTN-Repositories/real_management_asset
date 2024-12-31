@@ -9,6 +9,7 @@ use App\Models\CategoryItem;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
 use App\Models\ItemStock;
+use App\Models\Werehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -212,10 +213,9 @@ class ItemController extends Controller
      */
     public function show(string $id)
     {
-        //
         $data = Item::findByEncryptedId($id);
         $itemStock = ItemStock::where('item_id', Crypt::decrypt($data->id))->get();
-        return view('main.item.show', compact('data', 'itemStock'));
+        return view('main.item.show', compact('data', 'itemStock'));    
     }
 
     /**
@@ -349,6 +349,10 @@ class ItemController extends Controller
                 $data['request_by'] = Auth::user()->id;
                 $data['stock'] = isset($data['stock']) && ($data['stock'] != '-') ? str_replace('.', '', $data['stock']) : 0;
                 $data['price'] = isset($data['price']) && ($data['price'] != '-') ? str_replace('.', '', $data['price']) : 0;
+
+                $warehouse = Werehouse::findByEncryptedId($data['warehouse_id']);
+                $data['warehouse_id'] = Crypt::decrypt($warehouse->id);
+                $data['management_project_id'] = $warehouse->management_project_id;
 
                 ItemStock::create($data);
                 return response()->json([
