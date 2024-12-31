@@ -25,4 +25,9 @@ class Werehouse extends Model
     {
         return $this->belongsTo(Site::class, 'site_id', 'id');
     }
+
+    public function managementProject()
+    {
+        return $this->belongsTo(ManagementProject::class, 'management_project_id', 'id');
+    }
 }

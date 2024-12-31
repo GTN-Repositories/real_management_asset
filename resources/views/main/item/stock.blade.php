@@ -25,6 +25,13 @@
             required readonly />
     </div>
 
+    <div class="col-12 col-md-12" id="warehouseRelation">
+        <label class="form-label" for="warehouse_id">Nama Gudang<span class="text-danger">*</span></label>
+        <select id="warehouse_id" name="warehouse_id"
+            class="select2 form-select select2-primary"data-allow-clear="true" required>    
+        </select>
+    </div>
+
     <div class="col-12 col-md-12">
         <label class="form-label" for="metode">Jenis Metode<span class="text-danger">*</span></label>
         <select id="metode" name="metode" class="select2 form-select " data-allow-clear="true" required>
@@ -86,6 +93,37 @@
             const selectedOption = $(this).select2('data')[0];
             if (selectedOption) {
                 $('#balance').val(selectedOption.stock);
+            }
+        });
+
+        $('#warehouse_id').select2({
+            dropdownParent: $('#warehouseRelation'),
+            placeholder: 'Pilih Gudang',
+            ajax: {
+                url: "{{ route('werehouse.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
+                    };
+                },
+                processResults: function(data) {
+                    apiResults = data.data
+                        .map(function(item) {
+                            return {
+                                text: item.name,
+                                id: item.ids,
+                            };
+                        });
+
+                    return {
+                        results: apiResults
+                    };
+                },
+                cache: true
             }
         });
     });
