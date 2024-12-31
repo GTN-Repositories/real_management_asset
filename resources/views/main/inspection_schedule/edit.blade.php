@@ -48,6 +48,18 @@
         </div>
     </div>
 
+    <div class="col-12" id="selectWerehouse">
+        <label for="werehouse_id" class="form-label">Gudang</label>
+        <select id="werehouse_id" class="form-select" name="werehouse_id" disabled>
+            @if ($data->werehouse)
+                <option value="{{ $data->werehouse_id }}" selected>
+                    {{ $data->werehouse->name }}
+                </option>
+            @endif
+        </select>
+        <input type="hidden" name="asset_id" value="{{ $data->asset_id }}">
+    </div>
+
     <div class="col-12 mt-3" id="selectedItemsContainer">
         <label class="form-label">Item yang Dipilih:</label>
         <table class="table" id="selectedItemsTable">

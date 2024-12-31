@@ -39,6 +39,11 @@ class InspectionSchedule extends Model
         return $this->belongsTo(Item::class, 'item_id', 'id');
     }
 
+    public function werehouse()
+    {
+        return $this->belongsTo(Werehouse::class, 'werehouse_id', 'id');
+    }
+
     public function comment()
     {
         return $this->hasMany(InspectionComment::class, 'inspection_schedule_id', 'id');

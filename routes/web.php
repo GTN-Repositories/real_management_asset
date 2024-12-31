@@ -142,6 +142,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/fuel-ipb/destroy-all', [IpbController::class, 'destroyAll'])->name('fuel-ipb.destroyAll');
     Route::resource('fuel-ipb', IpbController::class);
 
+    Route::get('/werehouse/show-data-get', [WerehouseController::class, 'showData'])->name('werehouse.show-data');
     Route::get('/werehouse/data', [WerehouseController::class, 'data'])->name('werehouse.data');
     Route::delete('/werehouse/destroy-all', [WerehouseController::class, 'destroyAll'])->name('werehouse.destroyAll');
     Route::resource('werehouse', WerehouseController::class);
