@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Models\InspectionSchedule;
+use App\Models\Item;
 use App\Models\Site;
 use App\Models\Werehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 
 class WerehouseController extends Controller
 {
@@ -47,13 +50,17 @@ class WerehouseController extends Controller
                 return $data->location ?? null;
             })
             ->addColumn('management_project', function ($data) {
-                return 'PRJ - ' . $data->management_project_id . ' '. ($data->managementProject->name ?? null);
+                return 'PRJ - ' . $data->management_project_id . ' ' . ($data->managementProject->name ?? null);
             })
             ->addColumn('created_at', function ($data) {
                 return $data->created_at->format('d-m-Y');
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
+                if (auth()->user()->hasPermissionTo('werehouse-edit')) {
+                    # code...
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-info btn-sm me-1" title="Show Data" onclick="showData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
+                }
                 if (auth()->user()->hasPermissionTo('werehouse-edit')) {
                     # code...
                     $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
@@ -135,7 +142,87 @@ class WerehouseController extends Controller
     public function show(string $id)
     {
         //
+        $data = Werehouse::findByEncryptedId($id);
+        return view('main.werehouse.show', compact('data'));
     }
+
+    public function showData(Request $request)
+    {
+        $data = $this->showDataGet($request);
+
+        return datatables()
+            ->of($data)
+            ->addIndexColumn()
+            ->addColumn('name', function ($data) {
+                return $data->name ?? null;
+            })
+            ->addColumn('stock', function ($data) use ($request) {
+                $usedStock = $this->getUsedStock($data->item_id);
+                return ($data->stock ?? 0) + ($usedStock ?? 0);
+            })
+            ->addColumn('used_stock', function ($data) use ($request) {
+                $usedStock = $this->getUsedStock($data->item_id, $request->werehouse_id);
+                return $usedStock ?? 0;
+            })
+            ->addColumn('balance', function ($data) {
+                return $data->stock ?? null;
+            })
+            ->escapeColumns([])
+            ->make(true);
+    }
+
+    public function showDataGet(Request $request)
+    {
+        $columns = [
+            'items.id as item_id',
+            'items.name',
+            'items.stock'
+        ];
+
+        $keyword = $request->search['value'] ?? null;
+        $werehouseId = Crypt::decrypt($request->werehouse_id);
+
+        $data = InspectionSchedule::join('items', function ($join) {
+            $join->on('inspection_schedules.item_stock', 'LIKE', DB::raw("CONCAT('%', items.id, '%')"));
+        })
+            ->select($columns)
+            ->where('inspection_schedules.werehouse_id', $werehouseId)
+            ->where(function ($query) use ($keyword, $columns) {
+                if ($keyword != '') {
+                    foreach ($columns as $column) {
+                        $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
+                    }
+                }
+            })
+            ->groupBy('items.id', 'items.name', 'items.stock');
+
+        return $data;
+    }
+
+    private function getUsedStock($itemId, $werehouseId = null)
+    {
+        if ($werehouseId) {
+            $werehouseId = Crypt::decrypt($werehouseId);
+            $schedules = InspectionSchedule::where('werehouse_id', $werehouseId)
+                ->where('item_stock', 'LIKE', '%"' . $itemId . '"%')
+                ->get();
+        } else {
+            $schedules = InspectionSchedule::where('item_stock', 'LIKE', '%"' . $itemId . '"%')
+                ->get();
+        }
+
+        $usedStock = 0;
+
+        foreach ($schedules as $schedule) {
+            $itemStock = json_decode($schedule->item_stock, true);
+            if (isset($itemStock[$itemId])) {
+                $usedStock += $itemStock[$itemId];
+            }
+        }
+
+        return $usedStock;
+    }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -156,6 +243,12 @@ class WerehouseController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id) {
+                try {
+                    $data['management_project_id'] = Crypt::decrypt($data['management_project_id']);
+                } catch (\Throwable $th) {
+                    $data['management_project_id'] = $data['management_project_id'];
+                }
+
                 $data = Werehouse::findByEncryptedId($id)->update($data);
 
                 return response()->json([

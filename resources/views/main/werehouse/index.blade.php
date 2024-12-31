@@ -239,5 +239,19 @@
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
                 });
         }
+
+        function showData(id) {
+
+            $.ajax({
+                    url: "{{ route('werehouse.show', ':id') }}".replace(':id', id),
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    window.location.href = "{{ route('werehouse.show', ':id') }}".replace(':id', id);
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
+                });
+        }
     </script>
 @endpush
