@@ -170,9 +170,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::resource('fuel', FuelConsumptionController::class);
 
     // driver
-    Route::post('/driver/select-project', [DriverProjectController::class, 'selectProject'])->name('driver.selectProject');
-    Route::get('/driver/project', [DriverProjectController::class, 'data'])->name('driver.data');
-    Route::resource('driver', DriverProjectController::class);
+    Route::post('/select-project/select-project', [DriverProjectController::class, 'selectProject'])->name('select-project.selectProject');
+    Route::get('/select-project/project', [DriverProjectController::class, 'data'])->name('select-project.data');
+    Route::resource('select-project', DriverProjectController::class);
 
     Route::get('/report-fuel/get-by-project', [ReportFuelController::class, 'getDataProjectFuel'])->name('report-fuel.get-by-project');
     Route::get('/report-fuel/get-by-asset', [ReportFuelController::class, 'getDataAssetFuel'])->name('report-fuel.get-by-asset');
