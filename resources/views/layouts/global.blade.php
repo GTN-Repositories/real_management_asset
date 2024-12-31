@@ -67,7 +67,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #fff;
+            background-color: #00000038;
             /* Ganti dengan warna latar yang sesuai */
             display: flex;
             justify-content: center;
