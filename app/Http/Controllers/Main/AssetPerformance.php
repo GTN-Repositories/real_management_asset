@@ -9,6 +9,7 @@ use App\Models\Ipb;
 use App\Models\Item;
 use App\Models\LoadhseetTarget;
 use App\Models\Loadsheet;
+use App\Models\ManagementProject;
 use App\Models\RecordInsurance;
 use App\Models\RecordRent;
 use App\Models\RecordTax;
@@ -86,6 +87,10 @@ class AssetPerformance extends Controller
             })
             ->groupBy('asset_id');
 
+        if (session('selected_project_id')) {
+            $data->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+        }
+
         return $data;
     }
 
@@ -119,19 +124,38 @@ class AssetPerformance extends Controller
         }
     }
 
+
     public function expanses()
     {
-        $tax = RecordTax::sum('summary');
-        $rent = RecordRent::sum('summary');
-        $insurance = RecordInsurance::sum('summary');
+        if (session('selected_project_id')) {
+            $managementProject = ManagementProject::find(Crypt::decrypt(session('selected_project_id')));
+
+            $assetIds = $managementProject->asset_id;
+
+            $tax = RecordTax::whereIn('asset_id', $assetIds)->sum('summary');
+            $rent = RecordRent::whereIn('asset_id', $assetIds)->sum('summary');
+            $insurance = RecordInsurance::whereIn('asset_id', $assetIds)->sum('summary');
+        } else {
+            $tax = RecordTax::sum('summary');
+            $rent = RecordRent::sum('summary');
+            $insurance = RecordInsurance::sum('summary');
+        }
         $other = $tax + $rent + $insurance;
 
-        $ipb = Ipb::selectRaw('SUM(usage_liter * unit_price) as total_ipb')->value('total_ipb');
+        $ipbQuery = Ipb::selectRaw('SUM(usage_liter * unit_price) as total_ipb');
+        if (session('selected_project_id')) {
+            $ipbQuery->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+        }
+        $ipb = $ipbQuery->value('total_ipb');
+
         $ppn = $ipb * 0.11;
         $fuel = $ipb + $ppn;
 
         $totalHarga = 0;
         $dataItem = InspectionSchedule::all();
+        if (session('selected_project_id')) {
+            $dataItem->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+        }
 
         foreach ($dataItem as $item) {
             $itemIds = json_decode($item->item_id, true) ?? [];
