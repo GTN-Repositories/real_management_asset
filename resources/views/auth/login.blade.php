@@ -58,7 +58,7 @@
             z-index: 10;
             margin-top: -140px;
         }
-        
+
         .z-2 {
             z-index: 20;
             padding: 18px;
@@ -83,10 +83,10 @@
                     </div>
                     {{-- col right --}}
                     <div class="col d-flex flex-column justify-content-center">
+                      <img src="{{ asset('assets/img/logo_real.png') }}" class="mb-2 logo" alt="">
+                      <h5 class="login-text mb-2">Please sign-in to your account.</h5>
                         <form class="mb-3" action="{{ route('login') }}" method="POST">
                             @csrf
-                            <img src="{{ asset('assets/img/logo_real.png') }}" class="mb-2 logo" alt="">
-                            <h5 class="login-text mb-2">Please sign-in to your account.</h5>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
                                 <input type="text" class="form-control" id="email" name="email"
