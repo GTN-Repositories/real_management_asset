@@ -29,7 +29,7 @@
                 <li class="nav-item dropdown-shortcuts navbar-dropdown dropdown me-2 me-xl-0">
                     <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown"
                         data-bs-auto-close="outside" aria-expanded="false">
-                        <i class="ti ti-layout-grid-add ti-md"></i>
+                        <img src="{{ asset('images/app.png') }}" width="32" alt="" class="h-auto rounded-circle">
                     </a>
                     <div class="dropdown-menu dropdown-menu-end py-0">
                         <div class="dropdown-menu-header border-bottom">
@@ -84,7 +84,8 @@
             <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
                 <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown"
                     data-bs-auto-close="outside" aria-expanded="false">
-                    <i class="ti ti-bell ti-md text-white"></i>
+                    <img src="{{ asset('images/bell.png') }}" width="32" alt=""
+                            class="h-auto rounded-circle">
                     <span class="badge bg-danger rounded-pill badge-notifications">5</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end py-0">
