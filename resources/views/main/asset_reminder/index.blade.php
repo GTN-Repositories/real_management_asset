@@ -1,11 +1,10 @@
 @extends('layouts.global')
 
 @section('title', 'Kategori Barang')
+@section('title_page', 'Home / Kategori Barang')
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Kategori Barang</h4>
-
         <!-- Product List Table -->
         <div class="card">
             <div class="card-header">

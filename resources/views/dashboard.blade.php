@@ -1,122 +1,109 @@
 @extends('layouts.global')
 
 @section('title', 'Dashboard')
+@section('title_page', 'Dashboard')
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4">Dashboard</h4>
-        <div class="d-flex justify-content-end align-items-end mb-3 gap-3">
-            <div class="btn-group">
-                <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect" data-bs-toggle="dropdown"
-                    aria-expanded="false">
-                    filter tanggal
-                </button>
-                <ul class="dropdown-menu" style="">
-                    <li><a class="dropdown-item" id="hari ini" href="javascript:void(0);">hari ini</a></li>
-                    <li><a class="dropdown-item" id="minggu ini" href="javascript:void(0);">minggu ini</a></li>
-                    <li><a class="dropdown-item" id="bulan ini" href="javascript:void(0);">bulan ini</a></li>
-                    <li><a class="dropdown-item" id="bulan kemarin" href="javascript:void(0);">bulan kemarin</a></li>
-                    <li><a class="dropdown-item" id="tahun ini" href="javascript:void(0);">tahun ini</a></li>
-                    <li><a class="dropdown-item" id="tahun kemarin" href="javascript:void(0);">tahun kemarin</a></li>
-                </ul>
-            </div>
-            <div>
-                <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
-                <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
-            </div>
-        </div>
         <!-- Card Border Shadow -->
         <div class="row">
-            <div class="col-sm-6 col-lg-4 mb-4">
-                <div class="card card-border-shadow-primary">
+            <div class="col-sm-6 col-lg-12 mb-4">
+                <div class="card">
                     <div class="card-body">
-                        <div class="d-flex align-items-center mb-2 pb-1">
-                            <div class="avatar me-2">
-                                <span class="avatar-initial rounded bg-label-primary"><i
-                                        class="ti ti-truck ti-md"></i></span>
-                            </div>
-                            <h4 class="ms-1 mb-0" id="total-asset">Loading...</h4>
-                        </div>
-                        <p class="mb-1">Total Asset</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-4 mb-4">
-                <div class="card card-border-shadow-warning">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-2 pb-1">
-                            <div class="avatar me-2">
-                                <span class="avatar-initial rounded bg-label-primary"><i
-                                        class="ti ti-gas-station ti-md"></i></span>
-                            </div>
-                            <h4 class="ms-1 mb-0" id="total-fuel">Loading...</h4>
-                        </div>
-                        <p class="mb-1">Fuel Consumption</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-4 mb-4">
-                <div class="card card-border-shadow-danger">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-2 pb-1">
-                            <div class="avatar me-2">
-                                <span class="avatar-initial rounded bg-label-primary"><i
-                                        class="ti ti-git-fork ti-md"></i></span>
-                            </div>
-                            <h4 class="ms-1 mb-0">on progress</h4>
-                        </div>
-                        <p class="mb-1">Productivity</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-4 mb-4">
-                <div class="card card-border-shadow-info">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-2 pb-1">
-                            <div class="avatar me-2">
-                                <span class="avatar-initial rounded bg-label-primary"><i
-                                        class="ti ti-wallet ti-md"></i></span>
-                            </div>
-                            <h4 class="ms-1 mb-0" id="asset-value">Loading...</h4>
-                        </div>
-                        <p class="mb-1">Asset Value</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-4 mb-4">
-                <div class="card card-border-shadow-info">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-2 pb-1">
-                            <div class="avatar me-2">
-                                <span class="avatar-initial rounded bg-label-primary"><i
-                                        class="ti ti-file-text ti-md"></i></span>
-                            </div>
-                            <h4 class="ms-1 mb-0" id="total-loadsheet">Loading...</h4>
-                        </div>
-                        <p class="mb-1">Total Loadsheet</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-4 mb-4">
-                <div class="card card-border-shadow-info">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-2 pb-1">
-                            <div class="d-flex gap-3">
-                                <div class="d-flex flex-column">
-                                    <h4 class="ms-1 mb-0" id="total-maintenance">Loading...</h4>
-                                    <p class="mb-0">
-                                        Open
-                                    </p>
+                        <div class="d-flex align-items-center pb-1">
+                            <div class="d-flex justify-content-center align-items-end my-1 gap-3">
+                                <div>
+                                    <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
+                                    <input type="text" id="date-range-picker" class="form-control"
+                                        placeholder="Select Date Range">
                                 </div>
-                                <div class="d-flex flex-column">
-                                    <h4 class="ms-1 mb-0" id="total-overdue">Loading...</h4>
-                                    <p class="mb-0">
-                                        Overdue
-                                    </p>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        filter tanggal
+                                    </button>
+                                    <ul class="dropdown-menu" style="">
+                                        <li><a class="dropdown-item" id="hari ini" href="javascript:void(0);">hari ini</a>
+                                        </li>
+                                        <li><a class="dropdown-item" id="minggu ini" href="javascript:void(0);">minggu
+                                                ini</a></li>
+                                        <li><a class="dropdown-item" id="bulan ini" href="javascript:void(0);">bulan ini</a>
+                                        </li>
+                                        <li><a class="dropdown-item" id="bulan kemarin" href="javascript:void(0);">bulan
+                                                kemarin</a></li>
+                                        <li><a class="dropdown-item" id="tahun ini" href="javascript:void(0);">tahun ini</a>
+                                        </li>
+                                        <li><a class="dropdown-item" id="tahun kemarin" href="javascript:void(0);">tahun
+                                                kemarin</a></li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
-                        <p class="mb-1">Open Issue</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-2 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar me-2">
+                                <img src="{{ asset('images/truck.png') }}" alt="">
+                            </div>
+                            <strong class="mb-0 text-primary">Total Asset</strong>
+                        </div>
+                        <h4 class="ms-1 mb-0 text-muted" id="total-asset">Loading...</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar me-2">
+                                <img src="{{ asset('images/fuel.png') }}" alt="">
+                            </div>
+                            <strong class="mb-0 text-primary">Fuel Consumption</strong>
+                        </div>
+                        <h4 class="ms-1 mb-0 text-muted" id="total-fuel">Loading...</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-2 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar me-2">
+                                <img src="{{ asset('images/productivity.png') }}" alt="">
+                            </div>
+                            <strong class="mb-0 text-primary">Productivity</strong>
+                        </div>
+                        <h4 class="ms-1 mb-0 text-muted">On Progress</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-2 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar me-2">
+                                <img src="{{ asset('images/asset_value.png') }}" alt="">
+                            </div>
+                            <strong class="mb-0 text-primary">Asset Value</strong>
+                        </div>
+                        <h4 class="ms-1 mb-0 text-muted" id="asset-value">Loading...</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar me-2">
+                                <img src="{{ asset('images/loadsheet.png') }}" alt="">
+                            </div>
+                            <strong class="mb-0 text-primary">Total Loadsheet</strong>
+                        </div>
+                        <h4 class="ms-1 mb-0 text-muted" id="total-loadsheet">Loading...</h4>
                     </div>
                 </div>
             </div>
@@ -124,7 +111,7 @@
         <!-- Status Donut Charts -->
         <div class="row">
             <!-- Operational Status -->
-            <div class="col-md-6 col-lg-6 mb-4">
+            <div class="col-md-3 col-lg-3 mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Operational Status</h5>
@@ -141,14 +128,12 @@
             </div>
 
             <!-- Maintenance Status -->
-            <div class="col-md-6 col-lg-6 mb-4">
+            <div class="col-md-3 col-lg-3 mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Maintenance Status</h5>
                         <div class="btn-group">
-                            <button class="btn btn-sm btn-outline-secondary" id="maintenance-download">
-                                <i class="ti ti-download"></i>
-                            </button>
+                            <i class="ti ti-download" id="maintenance-download"></i>
                         </div>
                     </div>
                     <div class="card-body">
@@ -174,6 +159,23 @@
                 </div>
             </div>
 
+            <div class="col-md-6 col-lg-6 mb-4 d-flex flex-column justify-content-between">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center"><h5 class="m-0 text-primary fw-bold">Open Issue</h5></div>
+                    <div class="card-body d-flex justify-content-center">
+                        <div class="row gap-4">
+                            <div class="col d-flex flex-column align-items-center">
+                                <h1 class="text-primary fw-bold" style="font-size: 50px;" id="total-maintenance">Loading...</h1>
+                                <h3 class="text-muted">Open</h3>
+                            </div>
+                            <div class="col d-flex flex-column align-items-center">
+                                <h1 class="text-muted fw-bold" style="font-size: 50px;" id="total-overdue">Loading...</h1>
+                                <h3 class="text-muted">Overdue</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-md-6 col-lg-6 mb-4 d-flex flex-column justify-content-between">
                 <div class="col-12 col-md-12" id="managementProject">
                     <div class="select2-primary">
@@ -216,7 +218,7 @@
                 dataType: 'json',
                 success: function(response) {
                     let totalCount = response.recordsTotal;
-                    $('#total-asset').text(totalCount);
+                    $('#total-asset').text(totalCount + ' Unit');
                 },
                 error: function(xhr, status, error) {
                     $('#total-asset').text('Error');
@@ -617,7 +619,7 @@
             // Operational Status Chart
             const operationalChart = new ApexCharts(document.querySelector("#operationalStatusChart"), {
                 ...baseOptions,
-                colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                colors: ['#FFAC82', '#000BE1', '#FABE29', '#134B70'],
                 series: [data.idle || 0, data.standby || 0, data.underMaintenance || 0, data.active || 0],
                 labels: ['Idle', 'StandBy', 'Under Maintenance', 'Active']
             });
@@ -628,7 +630,7 @@
                 ...baseOptions,
                 colors: ['#FF9F40', '#4BC0C0', '#9966FF', '#FF6384'],
                 series: [data.onHold || 0, data.finish || 0, data.scheduled || 0, data.inProgress || 0],
-                labels: ['On Hold', 'Finish', 'Scheduled', 'In Progress']
+                labels: ['On Hold', 'Finish', 'Scheduled', 'In Progress'],
             });
             maintenanceChart.render();
 

@@ -32,7 +32,7 @@
                         <input type="hidden">
                     </form>
                     <div class="text-center">
-                        <a href="{{ route('login') }}" class="d-flex align-items-center justify-content-center">
+                        <a href="{{ route('login') }}" class="d-flex align-items-center justify-content-center text-primary">
                             <i class="ti ti-chevron-left scaleX-n1-rtl"></i>
                             Back to login
                         </a>
