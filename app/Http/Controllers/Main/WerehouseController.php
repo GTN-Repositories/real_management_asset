@@ -173,6 +173,7 @@ class WerehouseController extends Controller
 
     public function showDataGet(Request $request)
     {
+
         $columns = [
             'items.id as item_id',
             'items.name',
@@ -180,21 +181,30 @@ class WerehouseController extends Controller
         ];
 
         $keyword = $request->search['value'] ?? null;
-        $werehouseId = Crypt::decrypt($request->werehouse_id);
+        $werehouseId = $request->werehouse_id ? Crypt::decrypt($request->werehouse_id) : null;
 
-        $data = InspectionSchedule::join('items', function ($join) {
-            $join->on('inspection_schedules.item_stock', 'LIKE', DB::raw("CONCAT('%', items.id, '%')"));
-        })
-            ->select($columns)
-            ->where('inspection_schedules.werehouse_id', $werehouseId)
-            ->where(function ($query) use ($keyword, $columns) {
+        $data = Item::select($columns) // Mengambil data langsung dari tabel `items`
+            ->when($keyword, function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
                     foreach ($columns as $column) {
                         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
                     }
                 }
-            })
-            ->groupBy('items.id', 'items.name', 'items.stock');
+            });
+
+        // $data = InspectionSchedule::join('items', function ($join) {
+        //     $join->on('inspection_schedules.item_stock', 'LIKE', DB::raw("CONCAT('%', items.id, '%')"));
+        // })
+        //     ->select($columns)
+        //     ->where('inspection_schedules.werehouse_id', $werehouseId)
+        //     ->where(function ($query) use ($keyword, $columns) {
+        //         if ($keyword != '') {
+        //             foreach ($columns as $column) {
+        //                 $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
+        //             }
+        //         }
+        //     })
+        //     ->groupBy('items.id', 'items.name', 'items.stock');
 
         return $data;
     }
