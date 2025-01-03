@@ -47,7 +47,15 @@ class MaintenanceController extends Controller
                         }
                     });
                 }
-            })->get();
+            });
+
+        if (session('selected_project_id')) {
+            $data->whereHas('inspection_schedule', function ($q) {
+                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
+        
+        $data = $data->get();
 
         foreach ($data as $key => $value) {
             $value['start'] = Carbon::parse($value['date'])->format('Y-m-d') . ' 00:00:00';

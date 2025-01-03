@@ -201,15 +201,11 @@ class AssetController extends Controller
             $pic = $request->pic;
             $data->whereIn('manager', $pic);
         }
-
-
+        
         if (session('selected_project_id')) {
-            $managementProject = ManagementProject::find(Crypt::decrypt(session('selected_project_id')));
-
-            if ($managementProject) {
-                $assetIds = $managementProject->asset_id;
-                $data->whereIn('id', $assetIds);
-            }
+            $data->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
         }
 
         return $data;

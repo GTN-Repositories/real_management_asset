@@ -137,6 +137,10 @@ class ManagementProjectController extends Controller
             });
         }
 
+        if (session('selected_project_id')) {
+            $data->where('id', Crypt::decrypt(session('selected_project_id')));
+        }
+
         return $data;
     }
 

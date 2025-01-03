@@ -98,6 +98,12 @@ class WerehouseController extends Controller
                 }
             });
 
+        if (session('selected_project_id')) {
+            $data->whereHas('managementProject', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
+
         return $data;
     }
 
@@ -164,8 +170,16 @@ class WerehouseController extends Controller
                 $usedStock = $this->getUsedStock($data->item_id, $request->werehouse_id);
                 return $usedStock ?? 0;
             })
-            ->addColumn('balance', function ($data) {
-                return $data->stock ?? null;
+            ->addColumn('balance', function ($data) use ($request) {
+                // return $data->stock ?? null;
+
+                $stock = $this->getUsedStock($data->item_id);
+                $summary_stock = ($data->stock ?? 0) + ($stock ?? 0);
+                
+                $used_stock = $this->getUsedStock($data->item_id, $request->werehouse_id);
+                $summary_used_stock = $used_stock ?? 0;
+
+                return $summary_stock - $summary_used_stock;
             })
             ->escapeColumns([])
             ->make(true);
