@@ -139,6 +139,12 @@ class InspectionScheduleController extends Controller
                 // }
             });
 
+        if (session('selected_project_id')) {
+            $data->whereHas('managementProject', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
+
         foreach ($data as $key => $value) {
             $value['start'] = $value['date'] . ' 00:00:00';
             $value['end'] = $value['date'] . ' 23:59:59';

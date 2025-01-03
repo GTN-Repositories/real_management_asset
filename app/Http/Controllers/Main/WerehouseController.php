@@ -98,6 +98,12 @@ class WerehouseController extends Controller
                 }
             });
 
+        if (session('selected_project_id')) {
+            $data->whereHas('managementProject', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
+
         return $data;
     }
 
