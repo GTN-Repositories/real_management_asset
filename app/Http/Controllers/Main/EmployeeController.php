@@ -97,7 +97,6 @@ class EmployeeController extends Controller
             }
         }
 
-        $limit = $request->limit ?? '';
         $data = Employee::orderBy('created_at', 'asc')
             ->select($columns)
             ->when($jobTitleDecrypted, function ($query) use ($jobTitleDecrypted) {
@@ -116,8 +115,13 @@ class EmployeeController extends Controller
                         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
                     }
                 }
-            })
-            ->limit($limit);
+            });
+        
+        if (session('selected_project_id')) {
+            $data->whereHas('managementProject', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
 
         return $data;
     }

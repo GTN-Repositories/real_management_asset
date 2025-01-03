@@ -20,7 +20,7 @@
                             </th>
                             <th>Nama</th>
                             <th>Stock</th>
-                            <th>Terpakai</th>
+                            <th>Terpakai Sesuai Gudang</th>
                             <th>Balance</th>
                         </tr>
                     </thead>
