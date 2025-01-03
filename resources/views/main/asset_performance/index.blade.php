@@ -105,12 +105,18 @@
                         series: data.series,
                         labels: data.labels,
                         colors: ['#FFD700', '#33CC33', '#2E865F'],
-                            legend: {
+                        legend: {
                             show: true,
                             position: 'bottom',
                         },
+                        tooltip: {
+                            y: {
+                                formatter: function(value) {
+                                    return new Intl.NumberFormat('id-ID').format(value);
+                                }
+                            }
+                        }
                     };
-
 
                     var chart = new ApexCharts(document.querySelector("#chart"), options);
                     chart.render();

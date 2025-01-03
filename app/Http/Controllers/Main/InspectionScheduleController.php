@@ -54,6 +54,9 @@ class InspectionScheduleController extends Controller
             ->addColumn('date', function ($data) {
                 return $data->date ?? '-';
             })
+            ->addColumn('werehouse_id', function ($data) {
+                return $data->werehouse->name ?? '-';
+            })
             ->addColumn('item_name', function ($data) {
                 $itemIds = is_array(json_decode($data->item_id, true)) ? json_decode($data->item_id, true) : [];
                 $items = Item::whereIn('id', $itemIds)->get()->pluck('name')->implode(', ');
@@ -113,6 +116,7 @@ class InspectionScheduleController extends Controller
             'date',
             'workshop',
             'employee_id',
+            'werehouse_id',
         ];
 
         $keyword = $request->search;
@@ -134,6 +138,12 @@ class InspectionScheduleController extends Controller
                 //     }
                 // }
             });
+
+        if (session('selected_project_id')) {
+            $data->whereHas('managementProject', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
 
         foreach ($data as $key => $value) {
             $value['start'] = $value['date'] . ' 00:00:00';
@@ -162,6 +172,11 @@ class InspectionScheduleController extends Controller
                     $management_project_id = Crypt::decrypt($data['management_project_id']);
                 } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
                     $management_project_id = $data['management_project_id'];
+                }
+                try {
+                    $werehouse_id = Crypt::decrypt($data['werehouse_id']);
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                    $werehouse_id = $data['werehouse_id'];
                 }
 
                 $decryptedItemIds = [];
@@ -202,6 +217,7 @@ class InspectionScheduleController extends Controller
                     'type' => $data['type'],
                     'management_project_id' => $management_project_id,
                     'asset_id' => $asset_id,
+                    'werehouse_id' => $werehouse_id,
                     'note' => $data['note'],
                     // 'workshop' => $data['workshop'],
                     // 'mechanic_name' => $data['mechanic_name'],

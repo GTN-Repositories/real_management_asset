@@ -50,6 +50,7 @@
                             <th>Management Project</th>
                             <th>Asset</th>
                             <th>Tanggal</th>
+                            <th>Gudang</th>
                             <th>Item</th>
                             <th>Stok</th>
                             <th>Stok Kanibal</th>
@@ -279,6 +280,10 @@
                     {
                         data: 'date',
                         name: 'date'
+                    },
+                    {
+                        data: 'werehouse_id',
+                        name: 'werehouse_id'
                     },
                     {
                         data: 'item_name',

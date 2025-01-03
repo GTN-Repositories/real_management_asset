@@ -39,8 +39,7 @@
     </div>
 
     <div class="col-12 col-md-6" id="managementRelation">
-        <label class="form-label" for="management_project_id">Nama Project<span
-                class="text-danger">*</span></label>
+        <label class="form-label" for="management_project_id">Nama Project<span class="text-danger">*</span></label>
         <select id="management_project_id" name="management_project_id"
             class="select2 form-select select2-primary"data-allow-clear="true" required>
         </select>
@@ -56,6 +55,12 @@
         <label class="form-label" for="alias">Deskripsi</label>
         <textarea name="note" id="note" cols="30" rows="10" class="form-control"
             placeholder="Masukkan Deskripsi"></textarea>
+    </div>
+
+    <div class="col-12 col-md-12" id="werehouseParent">
+        <label for="werehouse_id" class="form-label">Gudang</label>
+        <select id="werehouse_id" class="form-select form-select-lg" name="werehouse_id">
+        </select>
     </div>
 
     <div class="col-12 col-md-12" id="selectItem">
@@ -205,6 +210,32 @@
                             id: item.id,
                             code: item.code,
                             available_stock: item.stock || 0
+                        }))
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $('#werehouse_id').select2({
+            dropdownParent: $('#werehouseParent'),
+            placeholder: 'Pilih Gudang',
+            ajax: {
+                url: "{{ route('werehouse.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.data.map(item => ({
+                            text: item.name,
+                            id: item.ids,
                         }))
                     };
                 },
