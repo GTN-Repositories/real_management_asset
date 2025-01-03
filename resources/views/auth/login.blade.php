@@ -29,23 +29,24 @@
         }
 
         .login-text {
-          color: #201E43;
-          font-weight: 600;
-          font-size: 16px;
+            color: #201E43;
+            font-weight: 600;
+            font-size: 16px;
         }
+
         .col-left {
             background-color: #201E43;
             border-radius: 21px;
         }
 
         .btn-main {
-          padding: 10px 0px;
-          width: 100%;
-          text-align: center;
-          color: #FFFFFF;
-          background-color: #201E43;
-          border-radius: 5px;
-          border: none;
+            padding: 10px 0px;
+            width: 100%;
+            text-align: center;
+            color: #FFFFFF;
+            background-color: #201E43;
+            border-radius: 5px;
+            border: none;
         }
 
         .title {
@@ -83,8 +84,8 @@
                     </div>
                     {{-- col right --}}
                     <div class="col d-flex flex-column justify-content-center">
-                      <img src="{{ asset('assets/img/logo_real.png') }}" class="mb-2 logo" alt="">
-                      <h5 class="login-text mb-2">Please sign-in to your account.</h5>
+                        <img src="{{ asset('assets/img/logo_real.png') }}" class="mb-2 logo" alt="">
+                        <h5 class="login-text mb-2">Please sign-in to your account.</h5>
                         <form class="mb-3" action="{{ route('login') }}" method="POST">
                             @csrf
                             <div class="mb-3">
@@ -95,6 +96,9 @@
                             <div class="mb-3 form-password-toggle">
                                 <div class="d-flex justify-content-between">
                                     <label class="form-label" for="password">Password</label>
+                                    <a class="text-primary" href="{{ route('password.request') }}">
+                                        <small>Forgot Password?</small>
+                                    </a>
                                 </div>
                                 <div class="input-group input-group-merge">
                                     <input type="password" id="password" class="form-control" name="password"
