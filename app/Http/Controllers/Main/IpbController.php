@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Mail\FuelStockAddedEmail;
 use App\Models\FuelConsumption;
+use App\Models\GeneralSetting;
 use App\Models\Ipb;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Mail;
 
 class IpbController extends Controller
 {
@@ -195,6 +198,12 @@ class IpbController extends Controller
                 $data['balance'] = $lastBalance + $issuedLiter;
 
                 $data = Ipb::create($data);
+
+                // SEND REMINDER EMAIL
+                $general = GeneralSetting::where('group', 'reminder')->where('key', 'fuel_stock_addition_period')->orderBy('id', 'desc')->first();
+                if ($general->status == 'active') {
+                    Mail::to('adin72978@gmail.com')->send(new FuelStockAddedEmail($data));
+                }
 
                 return response()->json([
                     'status' => true,

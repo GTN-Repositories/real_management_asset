@@ -36,4 +36,9 @@ class ItemStock extends Model
     {
         return $this->belongsTo(Werehouse::class, 'warehouse_id', 'id');
     }
+
+    public function item()
+    {
+        return $this->belongsTo(Item::class, 'item_id', 'id');
+    }
 }

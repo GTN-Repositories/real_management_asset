@@ -83,6 +83,9 @@ class ItemController extends Controller
             ->addColumn('stock', function ($data) {
                 return $data->stock ?? null;
             })
+            ->addColumn('minimum_stock', function ($data) {
+                return $data->minimum_stock ?? 0;
+            })
             ->addColumn('no_invoice', function ($data) {
                 return $data->no_invoice ?? null;
             })
@@ -132,6 +135,7 @@ class ItemController extends Controller
             'brand',
             'color',
             'stock',
+            'minimum_stock',
             'oum_id',
             'created_at',
             'no_invoice',
