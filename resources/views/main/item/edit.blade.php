@@ -7,7 +7,7 @@
     enctype="multipart/form-data">
     @csrf
     @method('PUT')
-    <div class="col-8 col-md-2">
+    {{-- <div class="col-8 col-md-2">
         <img src="https://ca.shop.runningroom.com/media/catalog/product/placeholder/default/placeholder-image-square.jpg"
             id="preview-image" class="img-fluid rounded mb-3 pt-1" alt="Image Preview">
     </div>
@@ -15,7 +15,7 @@
         <label class="form-label" for="image">Image</label>
         <input type="file" id="image" name="image" class="form-control"
             accept="image/png, image/jpeg, image/jpg" />
-    </div>
+    </div> --}}
     <div class="col-12 col-md-6">
         <label class="form-label">Kode Barang</label>
         <input type="text" name="code" id="code" class="form-control mb-3 mb-lg-0"
@@ -50,6 +50,12 @@
         <label class="form-label">Harga</label>
         <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0" placeholder="Harga"
             required value="{{ $data->price }}" />
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label" id="minimum_stock">Stok Minimal</label>
+        <input type="number" name="minimum_stock" class="form-control mb-3 mb-lg-0" placeholder="Stok Minimal"
+            value="{{ old('minimum_stock', $data->minimum_stock) }}" required />
     </div>
 
     <div class="col-12 col-md-6">

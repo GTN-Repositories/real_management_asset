@@ -35,4 +35,9 @@ class Item extends Model
     {
         return $this->hasMany(DetailPartInspection::class);
     }
+
+    public function scopeLowStock($query)
+    {
+        return $query->where('stock', '<=', 'minimum_stock');
+    }
 }
