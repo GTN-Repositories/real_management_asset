@@ -35,4 +35,11 @@ class PettyCash extends Model
     {
         return $this->belongsTo(User::class, 'approved_by', 'id');
     }
+
+    public function scopePendingRequests($query)
+    {
+        // Ambil data petty cash yang belum diproses dengan request_date mendekati batas waktu
+        return $query->where('status', 1)
+                     ->whereDate('date', '<=', now()->addDays(7)); // Reminder 7 hari sebelum deadline
+    }
 }

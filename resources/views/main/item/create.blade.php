@@ -5,15 +5,15 @@
 </div>
 <form method="POST" class="row g-3" id="formCreate" action="{{ route('item.store') }}" enctype="multipart/form-data">
     @csrf
-    <div class="col-8 col-md-2">
+    {{-- <div class="col-8 col-md-2">
         <img src="https://ca.shop.runningroom.com/media/catalog/product/placeholder/default/placeholder-image-square.jpg"
             id="preview-image" class="img-fluid rounded mb-3 pt-1" alt="Image Preview">
-    </div>
-    <div class="col-12">
+    </div> --}}
+    {{-- <div class="col-12">
         <label class="form-label" for="image">Image</label>
         <input type="file" id="image" name="image" class="form-control"
             accept="image/png, image/jpeg, image/jpg" />
-    </div>
+    </div> --}}
     <div class="col-12 col-md-6">
         <label class="form-label">Kode Barang</label>
         <input type="text" name="code" id="code" class="form-control mb-3 mb-lg-0"
@@ -51,6 +51,12 @@
     </div>
 
     <div class="col-12 col-md-6">
+        <label class="form-label" id="minimum_stock">Stok Minimal</label>
+        <input type="number" name="minimum_stock" class="form-control mb-3 mb-lg-0" placeholder="Stok Minimal"
+            value="{{ old('minimum_stock') }}" required />
+    </div>
+
+    <div class="col-12 col-md-6">
         <label for="exampleFormControlSelect1" class="form-label">Status</label>
         <select class="form-select" id="exampleFormControlSelect1" name="status" aria-label="Select Status">
             <option selected value="">None</option>
@@ -72,7 +78,7 @@
     </div> --}}
 
     <div class="col-12 col-md-6" id="oumRelation">
-        <label for="oum_id" class="form-label">Oum Tipe<span class="text-danger">*</span></label>
+        <label for="oum_id" class="form-label">UOM Tipe<span class="text-danger">*</span></label>
         <div class="select2-primary">
             <div class="position-relative">
                 <select id="oum_id" name="oum_id" class="select2 form-select" required>

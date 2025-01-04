@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\Menu;
+use App\Models\Notification;
 use Illuminate\Support\Facades\Crypt;
 
 class Helper
@@ -54,4 +55,42 @@ class Helper
 
         return $data;
     }
+
+    public static function notification()
+    {
+        $data = Notification::where('read', 0)->orderBy('id', 'desc')->limit(10)->get();
+
+        foreach ($data as $notification) {
+            $notification->body = self::getBodyContent($notification->body);
+        }
+
+        return $data;
+    }
+
+    public static function getBodyContent(string $html): string
+    {
+        $dom = new \DOMDocument();
+
+        // Suppress warnings caused by invalid HTML
+        libxml_use_internal_errors(true);
+
+        // Load the HTML string into DOMDocument
+        $dom->loadHTML($html);
+
+        // Reset error handling
+        libxml_clear_errors();
+
+        // Remove <h1> tags from the document
+        $h1Tags = $dom->getElementsByTagName('h1');
+        while ($h1Tags->length > 0) {
+            $h1Tags->item(0)->parentNode->removeChild($h1Tags->item(0));
+        }
+
+        // Extract the content inside the <body> tag
+        $body = $dom->getElementsByTagName('body')->item(0);
+
+        // Return the inner HTML of the body tag or empty string if not found
+        return $body ? $dom->saveHTML($body) : '';
+    }
+
 }
