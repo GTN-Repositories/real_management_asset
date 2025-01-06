@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Console\Commands\SendPettyCashReminderEmails;
 use App\Exports\ExportManageProject;
 use App\Http\Controllers\Controller;
 use App\Imports\ImportManageProject;
@@ -14,6 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ManagementProjectController extends Controller
@@ -135,6 +137,10 @@ class ManagementProjectController extends Controller
                         ->whereDate('end_date', '>=', $endDate);
                 });
             });
+        }
+
+        if (session('selected_project_id')) {
+            $data->where('id', Crypt::decrypt(session('selected_project_id')));
         }
 
         return $data;

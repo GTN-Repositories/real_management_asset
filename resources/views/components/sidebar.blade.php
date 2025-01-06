@@ -1,12 +1,18 @@
-<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+<style>
+    .gradient-background {
+        background: linear-gradient(to bottom, #134B70, #201E43);
+    }
+</style>
+
+<aside id="layout-menu" class="layout-menu menu-vertical menu gradient-background bg-menu-theme">
     <div class="app-brand demo">
         <a href="index.html" class="app-brand-link">
-            <img src="{{ asset('assets/img/logo_real.png') }}" width="80%" alt="">
+            <img src="{{ asset('assets/img/logo_real_white.png') }}" width="80%" alt="">
         </a>
 
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
-            <i class="ti menu-toggle-icon d-none d-xl-block ti-sm align-middle"></i>
-            <i class="ti ti-x d-block d-xl-none ti-sm align-middle"></i>
+            <i class="ti menu-toggle-icon d-none d-xl-block ti-sm align-middle text-white"></i>
+            <i class="ti ti-x d-block d-xl-none ti-sm align-middle text-white"></i>
         </a>
     </div>
 
@@ -15,7 +21,7 @@
     <ul class="menu-inner py-1">
         @can('view-dashboard')
             <li class="menu-item {{ request()->url() == url('/dashboard') ? 'active' : '' }}">
-                <a href="/dashboard" class="menu-link">
+                <a href="/dashboard" class="menu-link d-flex align-items-center">
                     <div data-i18n="Dashboard">Dashboard</div>
                 </a>
             </li>
@@ -33,7 +39,7 @@
 
             @if ($data->parent_id == null && $data->children->isEmpty())
                 @can($permissionName)
-                    <li class="menu-item {{ request()->url() == url($data->route) ? 'active' : '' }}">
+                    <li class="menu-item d-flex align-items-center {{ request()->url() == url($data->route) ? 'active' : '' }}">
                         <a href="{{ $data->route }}" class="menu-link">
                             <div data-i18n="{{ $data->name }}">{{ $data->name }}</div>
                         </a>

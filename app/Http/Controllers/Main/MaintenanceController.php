@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ChangeStatusAssetEmail;
 use App\Models\Asset;
+use App\Models\GeneralSetting;
 use App\Models\InspectionComment;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
@@ -13,6 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class MaintenanceController extends Controller
@@ -47,7 +50,15 @@ class MaintenanceController extends Controller
                         }
                     });
                 }
-            })->get();
+            });
+
+        if (session('selected_project_id')) {
+            $data->whereHas('inspection_schedule', function ($q) {
+                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
+        
+        $data = $data->get();
 
         foreach ($data as $key => $value) {
             $value['start'] = Carbon::parse($value['date'])->format('Y-m-d') . ' 00:00:00';
@@ -79,9 +90,18 @@ class MaintenanceController extends Controller
 
                 $data['status'] = 1;
 
-                Asset::where('id', $inspection_schedule->asset_id)->update([
+                
+                $asset = Asset::where('id', $inspection_schedule->asset_id)->first();
+                $asset->update([
                     'status' => 'UnderMaintenance'
                 ]);
+
+                // SEND EMAIL
+                $general = GeneralSetting::where('group', 'reminder')->where('key', 'reminder_change_status_asset')->orderBy('id', 'desc')->first();
+                if ($general && $general->status == 'active') {
+                    $generalEmailSmtp = GeneralSetting::orderBy('value', 'asc')->where('group', 'email_reminder')->where('key', 'email_sender_smtp')->pluck('value');
+                    Mail::to($generalEmailSmtp)->send(new ChangeStatusAssetEmail($asset));
+                }
 
                 $schedule = Maintenance::create($data);
 

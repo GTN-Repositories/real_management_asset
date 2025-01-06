@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ChangeStatusAssetEmail;
 use App\Models\Asset;
+use App\Models\GeneralSetting;
 use App\Models\InspectionComment;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
@@ -12,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Mail;
 
 class InspectionScheduleController extends Controller
 {
@@ -138,6 +141,12 @@ class InspectionScheduleController extends Controller
                 //     }
                 // }
             });
+
+        if (session('selected_project_id')) {
+            $data->whereHas('managementProject', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
 
         foreach ($data as $key => $value) {
             $value['start'] = $value['date'] . ' 00:00:00';
@@ -305,12 +314,20 @@ class InspectionScheduleController extends Controller
                     $assst_id = $data['asset_id'];
                 }
 
-                Asset::where('id', Crypt::decrypt($assst_id))->update([
+                $asset = Asset::where('id', Crypt::decrypt($assst_id))->first();
+                
+                $asset->update([
                     'status' => $data['status']
                 ]);
 
                 $schedule->update($data);
 
+                // SEND EMAIL
+                $general = GeneralSetting::where('group', 'reminder')->where('key', 'reminder_change_status_asset')->orderBy('id', 'desc')->first();
+                if ($general && $general->status == 'active') {
+                    $generalEmailSmtp = GeneralSetting::orderBy('value', 'asc')->where('group', 'email_reminder')->where('key', 'email_sender_smtp')->pluck('value');
+                    Mail::to($generalEmailSmtp)->send(new ChangeStatusAssetEmail($asset));
+                }
 
                 if (isset($data['comment'])) {
                     $comment = InspectionComment::create([

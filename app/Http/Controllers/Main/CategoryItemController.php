@@ -46,7 +46,7 @@ class CategoryItemController extends Controller
                 return $data->description ?? null;
             })
             ->addColumn('created_at', function ($data) {
-                return $data->created_at->format('d-m-Y') ?? null;
+                return isset($data->created_at) ? $data->created_at->format('d-m-Y') : null;
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';

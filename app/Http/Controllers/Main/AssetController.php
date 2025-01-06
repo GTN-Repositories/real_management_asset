@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Main;
 
 use App\Exports\AssetExport;
 use App\Http\Controllers\Controller;
+use App\Mail\ChangeStatusAssetEmail;
 use App\Models\Asset;
 use App\Models\AssetNote;
 use App\Models\CostumField;
+use App\Models\GeneralSetting;
 use App\Models\LogActivity;
 use App\Models\ManagementProject;
 use App\Models\RecordInsurance;
@@ -20,6 +22,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -201,15 +204,11 @@ class AssetController extends Controller
             $pic = $request->pic;
             $data->whereIn('manager', $pic);
         }
-
-
+        
         if (session('selected_project_id')) {
-            $managementProject = ManagementProject::find(Crypt::decrypt(session('selected_project_id')));
-
-            if ($managementProject) {
-                $assetIds = $managementProject->asset_id;
-                $data->whereIn('id', $assetIds);
-            }
+            $data->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
         }
 
         return $data;
@@ -463,7 +462,19 @@ class AssetController extends Controller
 
                 $data['manager'] = $data['manager'] ?? null;
 
-                $result = $asset->update($data);
+                // SEND EMAIL NOTIFICATION
+                $sendEmail = false;
+                if ($asset->status !== $data['status']) {
+                    $sendEmail = true;
+                }
+
+                $asset->update($data);
+
+                $general = GeneralSetting::where('group', 'reminder')->where('key', 'reminder_change_status_asset')->orderBy('id', 'desc')->first();
+                if ($sendEmail && $general && $general->status == 'active') {
+                    $generalEmailSmtp = GeneralSetting::orderBy('value', 'asc')->where('group', 'email_reminder')->where('key', 'email_sender_smtp')->pluck('value');
+                    Mail::to($generalEmailSmtp)->send(new ChangeStatusAssetEmail($asset));
+                }
 
                 $latestRecord = RecordInsurance::where('asset_id', Crypt::decrypt($asset->id))->latest()->first();
                 $latestDate = $latestRecord ? $latestRecord->date : null;
