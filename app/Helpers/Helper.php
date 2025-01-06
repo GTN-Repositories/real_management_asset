@@ -56,9 +56,9 @@ class Helper
         return $data;
     }
 
-    public static function notification()
+    public static function notification($limit = 10)
     {
-        $data = Notification::where('read', 0)->orderBy('id', 'desc')->limit(10)->get();
+        $data = Notification::where('read', 0)->orderBy('id', 'desc')->limit($limit)->get();
 
         foreach ($data as $notification) {
             $notification->body = self::getBodyContent($notification->body);
