@@ -124,11 +124,14 @@ class IpbController extends Controller
             'fuel_truck',
             'user_id',
             'location',
+            'created_at',
+            'updated_at',
         ];
 
         $keyword = $request->keyword ?? "";
 
-        $data = Ipb::orderBy('date', 'desc')
+        $data = Ipb::orderBy('updated_at', 'desc')
+            ->orderBy('created_at', 'desc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
