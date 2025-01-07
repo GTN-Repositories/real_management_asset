@@ -3,6 +3,17 @@
 @section('title', 'Dashboard')
 @section('title_page', 'Dashboard')
 
+@push('css')
+    <style>
+        .background-card {
+            background-image: url("{{ asset('images/backgorund_spedometer.png') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
         <!-- Card Border Shadow -->
@@ -42,7 +53,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-2 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
@@ -55,11 +66,11 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-3 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
-                            <div class="avatar me-2">
+                            <div class="avatar me-1">
                                 <img src="{{ asset('images/fuel.png') }}" alt="">
                             </div>
                             <strong class="mb-0 text-primary">Fuel Consumption</strong>
@@ -68,7 +79,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-2 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
@@ -81,7 +92,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-2 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
@@ -94,7 +105,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-3 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
@@ -111,7 +122,7 @@
         <!-- Status Donut Charts -->
         <div class="row">
             <!-- Operational Status -->
-            <div class="col-md-3 col-lg-3 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Operational Status</h5>
@@ -128,12 +139,14 @@
             </div>
 
             <!-- Maintenance Status -->
-            <div class="col-md-3 col-lg-3 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Maintenance Status</h5>
                         <div class="btn-group">
-                            <i class="ti ti-download" id="maintenance-download"></i>
+                            <button class="btn btn-sm btn-outline-secondary" id="maintenance-download">
+                                <i class="ti ti-download"></i>
+                            </button>
                         </div>
                     </div>
                     <div class="card-body">
@@ -143,7 +156,7 @@
             </div>
 
             <!-- Asset Status -->
-            <div class="col-md-6 col-lg-6 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Asset Status</h5>
@@ -158,39 +171,43 @@
                     </div>
                 </div>
             </div>
-
-            <div class="col-md-6 col-lg-6 mb-4 d-flex flex-column justify-content-between">
+        </div>
+        <div class="row mt-2">
+            <div class="col d-flex flex-column justify-content-between">
                 <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center"><h5 class="m-0 text-primary fw-bold">Open Issue</h5></div>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 text-primary fw-bold">Open Issue</h5>
+                    </div>
                     <div class="card-body d-flex justify-content-center">
                         <div class="row gap-4">
                             <div class="col d-flex flex-column align-items-center">
-                                <h1 class="text-primary fw-bold" style="font-size: 50px;" id="total-maintenance">Loading...</h1>
+                                <h1 class="text-primary fw-bold" style="font-size: 50px;" id="total-maintenance">
+                                    Loading...</h1>
                                 <h3 class="text-muted">Open</h3>
                             </div>
                             <div class="col d-flex flex-column align-items-center">
-                                <h1 class="text-muted fw-bold" style="font-size: 50px;" id="total-overdue">Loading...</h1>
+                                <h1 class="text-muted fw-bold" style="font-size: 50px;" id="total-overdue">Loading...
+                                </h1>
                                 <h3 class="text-muted">Overdue</h3>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-6 mb-4 d-flex flex-column justify-content-between">
+            <div class="col d-flex flex-column justify-content-between">
                 <div class="col-12 col-md-12" id="managementProject">
                     <div class="select2-primary">
                         <div class="position-relative">
                             <select id="management_project_id" name="management_project_id" class="select2 form-select"
                                 required>
-                                <!-- Options will be populated dynamically -->
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card background-card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="m-0">Speedometer</h5>
+                        <h4 class="m-0 text-white">Speedometer</h4>
                     </div>
                     <div class="card-body">
                         <div id="speedometerChart"></div>
@@ -436,15 +453,16 @@
             const options = {
                 chart: {
                     type: 'radialBar',
-                    height: 350,
+                    height: 200,
+                    colors: ['#426B80'],
                     sparkline: {
                         enabled: true
                     },
                     animations: {
                         enabled: false
-                    }
+                    },
                 },
-                series: [parseFloat(data.performance)], // Ubah ke format number
+                series: [parseFloat(data.performance)],
                 labels: ['Performance'],
                 plotOptions: {
                     radialBar: {
@@ -454,18 +472,18 @@
                             size: '60%'
                         },
                         track: {
-                            background: '#e7e7e7',
+                            background: '#FFFFFF',
                             strokeWidth: '97%',
                             margin: 5
                         },
                         dataLabels: {
                             name: {
                                 fontSize: '22px',
-                                color: '#212529'
+                                color: '#426B80'
                             },
                             value: {
                                 fontSize: '36px',
-                                color: '#343a40',
+                                color: '#FFFFFF',
                                 formatter: function(val) {
                                     return val.toFixed(2) + '%';
                                 }
@@ -473,6 +491,7 @@
                             total: {
                                 show: true,
                                 label: 'Actual Sales',
+                                color: '#FFFFFF',
                                 formatter: function(w) {
                                     return data.totalPrice;
                                 }
@@ -487,12 +506,23 @@
                     lineCap: 'round'
                 },
                 title: {
-                    text: `Project Value: ${data.maxValue}`,
-                    align: 'right',
-                    offsetX: 10,
+                    text: `Project Value`,
+                    align: 'left',
+                    weight: 'bold',
+                    offsetX: -10,
                     style: {
-                        color: '#212529',
-                        fontSize: '18px'
+                        color: '#FFFFFF',
+                        fontSize: '16px'
+                    }
+                },
+                subtitle: {
+                    text: `${data.maxValue}`,
+                    align: 'left',
+                    weight: 'bold',
+                    offsetX: -10,
+                    style: {
+                        color: '#FFFFFF',
+                        fontSize: '16px'
                     }
                 }
             };
@@ -621,23 +651,23 @@
                 ...baseOptions,
                 colors: ['#FFAC82', '#000BE1', '#FABE29', '#134B70'],
                 series: [data.idle || 0, data.standby || 0, data.underMaintenance || 0, data.active || 0],
-                labels: ['Idle', 'StandBy', 'Under Maintenance', 'Active']
+                labels: ['Idle', 'StandBy', 'Maintenance', 'Active']
             });
             operationalChart.render();
 
             // Maintenance Status Chart
             const maintenanceChart = new ApexCharts(document.querySelector("#maintenanceStatusChart"), {
                 ...baseOptions,
-                colors: ['#FF9F40', '#4BC0C0', '#9966FF', '#FF6384'],
+                colors: ['#FFAC82', '#000BE1', '#FABE29', '#134B70'],
                 series: [data.onHold || 0, data.finish || 0, data.scheduled || 0, data.inProgress || 0],
-                labels: ['On Hold', 'Finish', 'Scheduled', 'In Progress'],
+                labels: ['Hold', 'Finish', 'Scheduled', 'Progress'],
             });
             maintenanceChart.render();
 
             // Asset Status Chart
             const assetChart = new ApexCharts(document.querySelector("#assetStatusChart"), {
                 ...baseOptions,
-                colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                colors: ['#FFAC82', '#000BE1', '#FABE29', '#134B70'],
                 series: [data.damaged || 0, data.fair || 0, data.needsRepair || 0, data.good || 0],
                 labels: ['Damaged', 'Fair', 'Needs Repair', 'Good']
             });
