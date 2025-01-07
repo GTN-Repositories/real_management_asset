@@ -29,6 +29,7 @@ use App\Http\Controllers\Main\MenuController;
 use App\Http\Controllers\Main\MonitoringController;
 use App\Http\Controllers\Main\OumController;
 use App\Http\Controllers\Main\PermisionController;
+use App\Http\Controllers\Main\ReminderEmailController;
 use App\Http\Controllers\Main\ReportFuelController;
 use App\Http\Controllers\Main\ReportLoadsheetController;
 use App\Http\Controllers\Main\ReportMaintenanceController;
@@ -78,6 +79,10 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/user/data', [UserController::class, 'data'])->name('user.data');
     Route::delete('/user/destroy-all', [UserController::class, 'destroyAll'])->name('user.destroyAll');
     Route::resource('user', UserController::class);
+
+    Route::get('/reminder-email/data', [ReminderEmailController::class, 'data'])->name('reminder-email.data');
+    Route::delete('/reminder-email/destroy-all', [ReminderEmailController::class, 'destroyAll'])->name('reminder-email.destroyAll');
+    Route::resource('reminder-email', ReminderEmailController::class);
 
     Route::get('/site/data', [SiteController::class, 'data'])->name('site.data');
     Route::delete('/site/destroy-all', [SiteController::class, 'destroyAll'])->name('site.destroyAll');
@@ -137,6 +142,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::resource('form', FormController::class);
 
 
+    Route::get('/fuel-ipb/synchronize', [IpbController::class, 'synchronizeIpb'])->name('fuel-ipb.synchronize');
     Route::post('/fuel-ipb/total-liter', [IpbController::class, 'getTotalLiter'])->name('fuel-ipb.total-liter');
     Route::get('/fuel-ipb/data', [IpbController::class, 'data'])->name('fuel-ipb.data');
     Route::delete('/fuel-ipb/destroy-all', [IpbController::class, 'destroyAll'])->name('fuel-ipb.destroyAll');

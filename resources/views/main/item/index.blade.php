@@ -55,7 +55,7 @@
                             </th>
                             <th>ID</th>
                             <th>Part Number</th>
-                            <th>Foto</th>
+                            {{-- <th>Foto</th> --}}
                             <th>Nama</th>
                             <th>Kategori</th>
                             <th>Kode Barang</th>
@@ -64,6 +64,7 @@
                             <th>Merek</th>
                             {{-- <th>Warna</th> --}}
                             <th>Stock</th>
+                            <th>Minimum Stock</th>
                             <th>Nomor Invoice</th>
                             <th>Nama Supplier</th>
                             <th>Alamat Supplier</th>
@@ -185,10 +186,10 @@
                         data: 'part',
                         name: 'part'
                     },
-                    {
-                        data: 'image',
-                        name: 'image'
-                    },
+                    // {
+                    //     data: 'image',
+                    //     name: 'image'
+                    // },
                     {
                         data: 'name',
                         name: 'name'
@@ -216,6 +217,10 @@
                     {
                         data: 'stock',
                         name: 'stock'
+                    },
+                    {
+                        data: 'minimum_stock',
+                        name: 'minimum_stock'
                     },
                     {
                         data: 'no_invoice',

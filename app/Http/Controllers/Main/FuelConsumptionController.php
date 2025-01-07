@@ -405,6 +405,10 @@ class FuelConsumptionController extends Controller
         $fileName = 'Fuel Consumption' . now()->format('Ymd_His') . '.xlsx';
         $data = FuelConsumption::all();
 
+        if(session('selected_project_id')) {
+            $data = $data->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+        }
+
         return Excel::download(new FuelConsumptionExport($data), $fileName);
     }
 }

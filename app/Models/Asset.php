@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -77,5 +78,14 @@ class Asset extends Model
     public function management_project()
     {
         return $this->belongsTo(ManagementProject::class, 'management_project_id', 'id');
+    }
+
+    public function scopeExpiringSoon($query)
+    {
+        $today = Carbon::today();
+        $oneMonthFromNow = $today->copy()->addMonth();
+
+        return $query->whereDate('asuransi_date', '<=', $oneMonthFromNow)
+                     ->whereDate('asuransi_date', '>=', $today);
     }
 }
