@@ -1,28 +1,27 @@
 @extends('layouts.global')
 
 @section('title', 'Asset')
+@section('title_page', 'Master Data / Asset')
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Assets</h4>
-
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-12 col-md-4" id="categoryParent">
+                    <div class="col-12 col-md-3" id="categoryParent">
                         <label class="form-label" for="category">Kategori</label>
                         <select name="category[]" id="category_id" class="select2 form-select" data-allow-clear="true"
                             multiple required>
                         </select>
                     </div>
 
-                    <div class="col-12 col-md-4" id="assets_locationParent">
+                    <div class="col-12 col-md-3" id="assets_locationParent">
                         <label class="form-label" for="assets_location">Lokasi Aset</label>
                         <select name="assets_location[]" id="assets_location_id" class="form-select select2" multiple>
                         </select>
                     </div>
 
-                    <div class="col-12 col-md-4" id="picParent">
+                    <div class="col-12 col-md-3" id="picParent">
                         <label class="form-label" for="pic">Asset Manager</label>
                         <select id="pic_id" name="manager[]" class="select2 form-select" data-allow-clear="true" multiple
                             required>
@@ -30,7 +29,7 @@
                     </div>
 
 
-                    <div class="col-12 col-md-4" id="statusParent">
+                    <div class="col-12 col-md-3" id="statusParent">
                         <label class="form-label" for="status">Status</label>
                         <select name="status[]" id="asset_status_id" class="select2 form-select" data-allow-clear="true"
                             multiple>
@@ -40,34 +39,31 @@
                 </div>
             </div>
         </div>
+        <div class="d-flex justify-content-end gap-2 mb-3">
+            <!-- Tombol Hapus Masal -->
+            <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
+                <i class="fas fa-trash-alt"></i> Hapus Masal
+            </button>
+            <!-- Tombol Tambah -->
+            @if (auth()->user()->hasPermissionTo('asset-import-excel'))
+                <button type="button" class="btn btn-success btn-md d-flex align-items-center"
+                    onclick="importExcel()">
+                    <i class="fas fa-file-excel me-2"></i> Import Excel
+                </button>
+            @endif
+            @if (auth()->user()->hasPermissionTo('asset-export-excel'))
+                <button onclick="exportExcel()" class="btn btn-success btn-md">
+                    <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                </button>
+            @endif
+            @if (auth()->user()->hasPermissionTo('asset-create'))
+                <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                    <i class="fas fa-plus me-1"></i>Tambah
+                </button>
+            @endif
+        </div>
         <!-- Product List Table -->
         <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Assets</h5>
-                <div class="d-flex justify-content-end gap-2">
-                    <!-- Tombol Hapus Masal -->
-                    <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
-                        <i class="fas fa-trash-alt"></i> Hapus Masal
-                    </button>
-                    <!-- Tombol Tambah -->
-                    @if (auth()->user()->hasPermissionTo('asset-import-excel'))
-                        <button type="button" class="btn btn-success btn-sm d-flex align-items-center"
-                            onclick="importExcel()">
-                            <i class="fas fa-file-excel me-2"></i> Import Excel
-                        </button>
-                    @endif
-                    @if (auth()->user()->hasPermissionTo('asset-export-excel'))
-                        <button onclick="exportExcel()" class="btn btn-success btn-sm">
-                            <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-                        </button>
-                    @endif
-                    @if (auth()->user()->hasPermissionTo('asset-create'))
-                        <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                            <i class="fas fa-plus"></i> Tambah
-                        </button>
-                    @endif
-                </div>
-            </div>
             <div class="card-datatable table-responsive">
                 <table class="datatables table" id="data-table">
                     <thead class="border-top">
@@ -106,7 +102,6 @@
             <div class="modal-dialog modal-lg modal-simple">
                 <div class="modal-content p-3 p-md-5">
                     <div class="modal-body" id="content-modal-ce">
-
                     </div>
                 </div>
             </div>
