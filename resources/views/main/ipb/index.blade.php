@@ -22,6 +22,9 @@
                         <i class="fas fa-trash-alt"></i> Hapus Masal
                     </button>
                     <!-- Tombol Tambah -->
+                    <button type="button" class="btn btn-primary btn-sm" onclick="synchronize()">
+                        <i class="ti ti-refresh"></i> Synchronize
+                    </button>
                     @if (auth()->user()->hasPermissionTo('fuel-ipb-create'))
                         <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
                             <i class="fas fa-plus"></i> Tambah
@@ -316,6 +319,20 @@
                 })
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
+                });
+        }
+
+        function synchronize() {
+            $.ajax({
+                    url: "{{ route('fuel-ipb.synchronize') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    Swal.fire('Deleted!', data['message'], 'success');
+                    $('#data-table').DataTable().ajax.reload();
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while deleting the record.', 'error');
                 });
         }
     </script>

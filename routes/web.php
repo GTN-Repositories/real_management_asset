@@ -142,6 +142,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::resource('form', FormController::class);
 
 
+    Route::get('/fuel-ipb/synchronize', [IpbController::class, 'synchronizeIpb'])->name('fuel-ipb.synchronize');
     Route::post('/fuel-ipb/total-liter', [IpbController::class, 'getTotalLiter'])->name('fuel-ipb.total-liter');
     Route::get('/fuel-ipb/data', [IpbController::class, 'data'])->name('fuel-ipb.data');
     Route::delete('/fuel-ipb/destroy-all', [IpbController::class, 'destroyAll'])->name('fuel-ipb.destroyAll');
