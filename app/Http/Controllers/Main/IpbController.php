@@ -130,7 +130,7 @@ class IpbController extends Controller
 
         $keyword = $request->keyword ?? "";
 
-        $data = Ipb::orderBy('created_at', 'desc')
+        $data = Ipb::orderBy('date', 'desc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
@@ -355,7 +355,7 @@ class IpbController extends Controller
     {
         try {
             return $this->atomic(function () {
-                $records = Ipb::orderBy('id', 'asc')->get();
+                $records = Ipb::orderBy('date', 'asc')->get();
                 $lastBalances = [];
 
                 foreach ($records as $row) {
@@ -367,9 +367,14 @@ class IpbController extends Controller
                         $lastBalances[$managementProjectId] = 0;
                     }
 
-                    $newBalance = ($lastBalances[$managementProjectId] + $issuedLiter) - $usageLiter;
-                    $row->update(['balance' => $newBalance]);
+                    // Jika tidak ada issued_liter dan tiba-tiba menambah usage_liter
+                    if ($issuedLiter == 0 && $usageLiter > 0) {
+                        $newBalance = $lastBalances[$managementProjectId] - $usageLiter;
+                    } else {
+                        $newBalance = ($lastBalances[$managementProjectId] + $issuedLiter) - $usageLiter;
+                    }
 
+                    $row->update(['balance' => $newBalance]);
                     $lastBalances[$managementProjectId] = $newBalance;
                 }
 
