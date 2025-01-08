@@ -214,6 +214,8 @@ class FuelConsumptionController extends Controller
                 $field['fuel_id'] = Crypt::decrypt($data->id);
                 Ipb::create($field);
 
+                (app(IpbController::class))->synchronizeIpb();
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Data berhasil ditambahkan!',
@@ -311,6 +313,8 @@ class FuelConsumptionController extends Controller
                     $lastBalance = $newBalance;
                 }
 
+                (app(IpbController::class))->synchronizeIpb();
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Data berhasil diperbarui!',
@@ -331,7 +335,11 @@ class FuelConsumptionController extends Controller
     {
         try {
             $data = FuelConsumption::findByEncryptedId($id);
+            $ipb = Ipb::where('fuel_id', Crypt::decrypt($id))->first();
+            $ipb->delete();
             $data->delete();
+
+            (app(IpbController::class))->synchronizeIpb();
 
             return response()->json([
                 'status' => true,
@@ -355,7 +363,11 @@ class FuelConsumptionController extends Controller
                     $decryptedIds[] = Crypt::decrypt($encryptedId);
                 }
 
+                $ipb = Ipb::whereIn('fuel_id', $decryptedIds)->delete();
+
                 $delete = FuelConsumption::whereIn('id', $decryptedIds)->delete();
+
+                (app(IpbController::class))->synchronizeIpb();
 
                 return response()->json([
                     'status' => true,

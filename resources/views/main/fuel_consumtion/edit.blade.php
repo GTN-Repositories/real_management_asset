@@ -53,7 +53,7 @@
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="hm">HM<span class="text-danger">*</span></label>
-        <input type="text" id="hm" name="hm" class="form-control" placeholder="Masukkan HM" required />
+        <input type="text" id="hm" name="hm" class="form-control" placeholder="Masukkan HM" required value="{{ $data->hm }}" />
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="hours">Jam Kerja<span class="text-danger">*</span></label>
