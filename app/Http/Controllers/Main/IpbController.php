@@ -130,7 +130,8 @@ class IpbController extends Controller
 
         $keyword = $request->keyword ?? "";
 
-        $data = Ipb::orderBy('created_at', 'desc')
+        $data = Ipb::orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
@@ -200,6 +201,8 @@ class IpbController extends Controller
                 $data['balance'] = $lastBalance + $issuedLiter;
 
                 $data = Ipb::create($data);
+
+                (app(IpbController::class))->synchronizeIpb();
 
                 // SEND REMINDER EMAIL
                 $general = GeneralSetting::where('group', 'reminder')->where('key', 'fuel_stock_addition_period')->orderBy('id', 'desc')->first();
@@ -292,6 +295,8 @@ class IpbController extends Controller
                     $lastBalance = $newBalance;
                 }
 
+                (app(IpbController::class))->synchronizeIpb();
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Data berhasil diperbarui!',
@@ -313,6 +318,8 @@ class IpbController extends Controller
         try {
             $data = Ipb::findByEncryptedId($id);
             $data->delete();
+
+            (app(IpbController::class))->synchronizeIpb();
 
             return response()->json([
                 'status' => true,
@@ -338,6 +345,8 @@ class IpbController extends Controller
 
                 $delete = Ipb::whereIn('id', $decryptedIds)->delete();
 
+                (app(IpbController::class))->synchronizeIpb();
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Data Berhasil Dihapus!',
@@ -355,7 +364,7 @@ class IpbController extends Controller
     {
         try {
             return $this->atomic(function () {
-                $records = Ipb::orderBy('id', 'asc')->get();
+                $records = Ipb::orderBy('date', 'asc')->get();
                 $lastBalances = [];
 
                 foreach ($records as $row) {
@@ -367,9 +376,14 @@ class IpbController extends Controller
                         $lastBalances[$managementProjectId] = 0;
                     }
 
-                    $newBalance = ($lastBalances[$managementProjectId] + $issuedLiter) - $usageLiter;
-                    $row->update(['balance' => $newBalance]);
+                    // Jika tidak ada issued_liter dan tiba-tiba menambah usage_liter
+                    if ($issuedLiter == 0 && $usageLiter > 0) {
+                        $newBalance = $lastBalances[$managementProjectId] - $usageLiter;
+                    } else {
+                        $newBalance = ($lastBalances[$managementProjectId] + $issuedLiter) - $usageLiter;
+                    }
 
+                    $row->update(['balance' => $newBalance]);
                     $lastBalances[$managementProjectId] = $newBalance;
                 }
 

@@ -328,7 +328,7 @@
                     type: 'GET',
                 })
                 .done(function(data) {
-                    Swal.fire('Deleted!', data['message'], 'success');
+                    Swal.fire('Synchronize!', data['message'], 'success');
                     $('#data-table').DataTable().ajax.reload();
                 })
                 .fail(function() {
