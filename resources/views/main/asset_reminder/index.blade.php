@@ -4,7 +4,7 @@
 @section('title_page', 'Home / Kategori Barang')
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="mx-5 flex-grow-1 container-p-y">
         <!-- Product List Table -->
         <div class="card">
             <div class="card-header">

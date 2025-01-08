@@ -15,7 +15,7 @@
 @endpush
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="mx-5 flex-grow-1 container-p-y">
         <!-- Card Border Shadow -->
         <div class="row">
             <div class="col-sm-6 col-lg-12 mb-4">

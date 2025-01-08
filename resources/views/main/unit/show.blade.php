@@ -4,7 +4,7 @@
 @section('title_page', 'Master Data / Asset / Detail')
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="mx-5 flex-grow-1 container-p-y">
         <div class="nav-align-top nav-tabs-shadow mb-4">
             <ul class="nav nav-tabs nav-fill" role="tablist">
                 <li class="nav-item">

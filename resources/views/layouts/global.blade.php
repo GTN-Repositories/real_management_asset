@@ -42,6 +42,7 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/@form-validation/form-validation.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
@@ -120,29 +121,22 @@
                 </section>
                 <!-- Navbar -->
                 @include('components.navbar')
-                <!-- / Navbar -->
 
-                <!-- Content wrapper -->
                 <div class="content-wrapper">
-                    <!-- Content -->
                     @yield('content')
-                    <!-- / Content -->
 
-                    <!-- Footer -->
                     @include('components.footer')
-                    <!-- / Footer -->
 
                     <div class="content-backdrop fade"></div>
                 </div>
-                <!-- Content wrapper -->
+
             </div>
-            <!-- / Layout page -->
+
         </div>
 
         <!-- Overlay -->
         <div class="layout-overlay layout-menu-toggle"></div>
 
-        <!-- Drag Target Area To SlideIn Menu On Small Screens -->
         <div class="drag-target"></div>
     </div>
     <!-- / Layout wrapper -->
@@ -183,6 +177,12 @@
     <script src="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/pickr/pickr.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js')}}"></script>
+    <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js')}}"></script>
+    <script src="{{ asset('assets/vendor/libs/select2/select2.js')}}"></script>
+    <script src="{{ asset('assets/vendor/libs/%40form-validation/popular.js')}}"></script>
+    <script src="{{ asset('assets/vendor/libs/%40form-validation/bootstrap5.js')}}"></script>
+    <script src="{{ asset('assets/vendor/libs/%40form-validation/auto-focus.js')}}"></script>
 
     <!-- Main JS -->
     <script src="{{ asset('assets/js/main.js') }}"></script>
@@ -195,6 +195,8 @@
     <script src="{{ asset('assets/js/app-logistics-dashboard.js') }}"></script>
     <script src="{{ asset('assets/js/forms-selects.js') }}"></script>
     <script src="{{ asset('assets/js/pages-profile.js') }}"></script>
+    <script src="{{ asset('assets/js/modal-create-app.js') }}"></script>
+    <script src="{{ asset('assets/js/pages-pricing.js') }}"></script>
 
     <script>
         $(document).ajaxStart(function() {

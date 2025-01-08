@@ -4,7 +4,7 @@
 @section('title_page', 'Master Data / Asset')
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="mx-5 flex-grow-1 container-p-y">
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row">
@@ -98,6 +98,14 @@
             </div>
         </div>
 
+        <div class="modal fade" id="modal-create" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-simple modal-upgrade-plan">
+              <div class="modal-content">
+                <div class="modal-body" id="content-modal-create">
+                </div>
+              </div>
+            </div>
+          </div>
         <div class="modal fade" id="modal-ce" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-simple">
                 <div class="modal-content p-3 p-md-5">

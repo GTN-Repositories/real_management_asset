@@ -3,7 +3,7 @@
 @section('title', 'Reminder Email')
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="mx-5 flex-grow-1 container-p-y">
         <h4 class="mb-4">Reminder Email List</h4>
 
         <p class="mb-4">

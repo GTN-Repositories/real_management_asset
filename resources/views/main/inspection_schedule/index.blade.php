@@ -18,7 +18,7 @@
 @endpush
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="mx-5 flex-grow-1 container-p-y">
         <div class="card my-3 mb-3">
             <div class="card-header">
                 <h5 class="card-title mb-0">Inspection</h5>
