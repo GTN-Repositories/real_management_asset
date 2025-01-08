@@ -87,10 +87,10 @@ class IpbController extends Controller
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
                 if (auth()->user()->hasPermissionTo('fuel-ipb-edit')) {
-                $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
                 }
                 if (auth()->user()->hasPermissionTo('fuel-ipb-delete')) {
-                $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                    $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
                 }
                 $btn .= '</div>';
 
@@ -124,11 +124,13 @@ class IpbController extends Controller
             'fuel_truck',
             'user_id',
             'location',
+            'created_at',
+            'updated_at',
         ];
 
         $keyword = $request->keyword ?? "";
 
-        $data = Ipb::orderBy('date', 'desc')
+        $data = Ipb::orderBy('created_at', 'desc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
@@ -274,8 +276,8 @@ class IpbController extends Controller
                 $record->update($data);
 
                 $records = Ipb::where('management_project_id', $data["management_project_id"])
-                              ->orderBy('id', 'asc')
-                              ->get();
+                    ->orderBy('id', 'asc')
+                    ->get();
 
                 $lastBalance = 0;
 
@@ -345,6 +347,41 @@ class IpbController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Data Gagal Dihapus!',
+            ]);
+        }
+    }
+
+    public function synchronizeIpb()
+    {
+        try {
+            return $this->atomic(function () {
+                $records = Ipb::orderBy('id', 'asc')->get();
+                $lastBalances = [];
+
+                foreach ($records as $row) {
+                    $managementProjectId = $row->management_project_id;
+                    $issuedLiter = $row->issued_liter ?? 0;
+                    $usageLiter = $row->usage_liter ?? 0;
+
+                    if (!isset($lastBalances[$managementProjectId])) {
+                        $lastBalances[$managementProjectId] = 0;
+                    }
+
+                    $newBalance = ($lastBalances[$managementProjectId] + $issuedLiter) - $usageLiter;
+                    $row->update(['balance' => $newBalance]);
+
+                    $lastBalances[$managementProjectId] = $newBalance;
+                }
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil disinkronisasi!'
+                ]);
+            });
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Gagal sinkronisasi data! ' . $th->getMessage()
             ]);
         }
     }
