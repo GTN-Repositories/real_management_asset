@@ -131,6 +131,7 @@ class IpbController extends Controller
         $keyword = $request->keyword ?? "";
 
         $data = Ipb::orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
@@ -182,7 +183,7 @@ class IpbController extends Controller
         try {
             return $this->atomic(function () use ($data) {
                 $data["management_project_id"] = Crypt::decrypt($data["management_project_id"]);
-                $data["employee_id"] = Crypt::decrypt($data["employee_id"]);
+                $data["employee_id"] = isset($data["employee_id"]) ? Crypt::decrypt($data["employee_id"]) : null;
                 $data["user_id"] = Auth::user()->id;
 
                 $data['issued_liter'] = isset($data['issued_liter']) && $data['issued_liter'] != '-' ? str_replace('.', '', $data['issued_liter']) : null;
@@ -200,6 +201,8 @@ class IpbController extends Controller
                 $data['balance'] = $lastBalance + $issuedLiter;
 
                 $data = Ipb::create($data);
+
+                (app(IpbController::class))->synchronizeIpb();
 
                 // SEND REMINDER EMAIL
                 $general = GeneralSetting::where('group', 'reminder')->where('key', 'fuel_stock_addition_period')->orderBy('id', 'desc')->first();
@@ -292,6 +295,8 @@ class IpbController extends Controller
                     $lastBalance = $newBalance;
                 }
 
+                (app(IpbController::class))->synchronizeIpb();
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Data berhasil diperbarui!',
@@ -313,6 +318,8 @@ class IpbController extends Controller
         try {
             $data = Ipb::findByEncryptedId($id);
             $data->delete();
+
+            (app(IpbController::class))->synchronizeIpb();
 
             return response()->json([
                 'status' => true,
@@ -337,6 +344,8 @@ class IpbController extends Controller
                 }
 
                 $delete = Ipb::whereIn('id', $decryptedIds)->delete();
+
+                (app(IpbController::class))->synchronizeIpb();
 
                 return response()->json([
                     'status' => true,

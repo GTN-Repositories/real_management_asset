@@ -3,7 +3,7 @@
 @section('title', 'Supplier')
 
 @section('content')
-<div class="container-xxl flex-grow-1 container-p-y">
+<div class="mx-5 flex-grow-1 container-p-y">
     <h4 class="py-3 mb-4"><span class="text-muted fw-light">Master Data /</span> Supplier</h4>
 
     <!-- Product List Table -->

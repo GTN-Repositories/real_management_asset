@@ -1,10 +1,10 @@
 @extends('layouts.global')
 
 @section('title', 'Laporan Fuel Consumtion')
+@section('title_page', 'Report / Fuel Consumtion')
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Fuel Consumption</h4>
+    <div class="mx-5 flex-grow-1 container-p-y">
         <div class="d-flex justify-content-end align-items-end mb-3 gap-3">
             <div class="btn-group">
                 <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect" data-bs-toggle="dropdown"
@@ -29,47 +29,43 @@
                     <i class="fa-solid fa-file-pdf me-1"></i>Export PDF
                 </button>
             @endif --}}
+            <div class="me-2">
+                <label for="month" class="form-label">Bulan</label>
+                <select id="month" class="form-select select2">
+                    <option value="">Pilih Bulan</option>
+                    <option value="01">Januari</option>
+                    <option value="02">Februari</option>
+                    <option value="03">Maret</option>
+                    <option value="04">April</option>
+                    <option value="05">Mei</option>
+                    <option value="06">Juni</option>
+                    <option value="07">Juli</option>
+                    <option value="08">Agustus</option>
+                    <option value="09">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+                </select>
+            </div>
+            <div class="me-2">
+                <label for="year" class="form-label">Tahun</label>
+                <select id="year" class="form-select select2">
+                    <option value="">Pilih Tahun</option>
+                    @for ($i = date('Y'); $i >= 1985; $i--)
+                        <option value="{{ $i }}">{{ $i }}</option>
+                    @endfor
+                </select>
+            </div>
             @if (auth()->user()->hasPermissionTo('report-fuel-export-excel'))
                 <button onclick="exportExcel()" class="btn btn-success">
                     <i class="fa-solid fa-file-excel me-1"></i>Export Excel
                 </button>
             @endif
-        </div>
-        <div class="card my-3">
-            <div class="card-body d-flex justify-content-end align-items-end">
-                <div class="me-2">
-                    <label for="month" class="form-label">Bulan</label>
-                    <select id="month" class="form-select select2">
-                        <option value="">Pilih Bulan</option>
-                        <option value="01">Januari</option>
-                        <option value="02">Februari</option>
-                        <option value="03">Maret</option>
-                        <option value="04">April</option>
-                        <option value="05">Mei</option>
-                        <option value="06">Juni</option>
-                        <option value="07">Juli</option>
-                        <option value="08">Agustus</option>
-                        <option value="09">September</option>
-                        <option value="10">Oktober</option>
-                        <option value="11">November</option>
-                        <option value="12">Desember</option>
-                    </select>
-                </div>
-                <div class="me-2">
-                    <label for="year" class="form-label">Tahun</label>
-                    <select id="year" class="form-select select2">
-                        <option value="">Pilih Tahun</option>
-                        @for ($i = date('Y'); $i >= 1985; $i--)
-                            <option value="{{ $i }}">{{ $i }}</option>
-                        @endfor
-                    </select>
-                </div>
-                @if (auth()->user()->hasPermissionTo('report-fuel-export-excel-month'))
-                    <button onclick="exportExcelMonth()" class="btn btn-success">
-                        <i class="fa-solid fa-file-excel me-1"></i>Excel Fuel Monthly
-                    </button>
-                @endif
-            </div>
+            @if (auth()->user()->hasPermissionTo('report-fuel-export-excel-month'))
+                <button onclick="exportExcelMonth()" class="btn btn-success">
+                    <i class="fa-solid fa-file-excel me-1"></i>Excel Fuel Monthly
+                </button>
+            @endif
         </div>
         <!-- Chart Container -->
         {{-- <div class="card mb-4">
@@ -105,37 +101,39 @@
         </div>
 
         <!-- Product List Table -->
-        <div class="card my-3">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Grouping by project</h5>
+        <div class="row gap-3 mx-1">
+            <div class="col card my-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Grouping by project</h5>
+                </div>
+                <div class="card-datatable table-responsive">
+                    <table class="datatables table" id="data-table-project">
+                        <thead class="border-top">
+                            <tr>
+                                <th>#</th>
+                                <th>Management Project</th>
+                                <th>Total Liter</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
             </div>
-            <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table-project">
-                    <thead class="border-top">
-                        <tr>
-                            <th>#</th>
-                            <th>Management Project</th>
-                            <th>Total Liter</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-        </div>
 
-        <div class="card my-3">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Grouping by asset</h5>
-            </div>
-            <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table-asset">
-                    <thead class="border-top">
-                        <tr>
-                            <th>#</th>
-                            <th>Asset</th>
-                            <th>Total Liter</th>
-                        </tr>
-                    </thead>
-                </table>
+            <div class="col card my-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Grouping by asset</h5>
+                </div>
+                <div class="card-datatable table-responsive">
+                    <table class="datatables table" id="data-table-asset">
+                        <thead class="border-top">
+                            <tr>
+                                <th>#</th>
+                                <th>Asset</th>
+                                <th>Total Liter</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -236,40 +234,70 @@
                 success: function(response) {
                     // Render the scorecard
                     const scorecard = `
-                <div class="row g-3">
-                    <div class="col-6 col-md-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Avg Per Day</h5>
-                                <p class="card-text">${response.avgPerDay ? response.avgPerDay.toFixed(2) : '0'} Liters</p>
-                            </div>
+                    <div class="row g-3">
+    <div class="row g-3">
+        <div class="col-6 col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="avatar me-2">
+                            <img src="{{ asset('images/truck.png') }}" alt="">
                         </div>
+                        <strong class="mb-0 text-primary">Avg Per Day</strong>
                     </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Avg Per Trip</h5>
-                                <p class="card-text">${response.avgPerTrip ? response.avgPerTrip.toFixed(2) : '0'} Liters</p>
-                            </div>
+                    <h4 class="ms-1 mb-0 text-muted">${response.avgPerDay ? response.avgPerDay.toFixed(2) : '0'} Liters
+                    </h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="avatar me-2">
+                            <img src="{{ asset('images/fuel.png') }}" alt="">
                         </div>
+                        <strong class="mb-0 text-primary">Avg Per Trip</strong>
                     </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Avg Per Liter</h5>
-                                <p class="card-text">${response.avgPerLiter ? response.avgPerLiter.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) : 'Rp0'}</p>
-                            </div>
+                    <h4 class="ms-1 mb-0 text-muted">${response.avgPerTrip ? response.avgPerTrip.toFixed(2) : '0'}
+                        Liters</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="avatar me-2">
+                            <img src="{{ asset('images/productivity.png') }}" alt="">
                         </div>
+                        <strong class="mb-0 text-primary">Avg Per Liter</strong>
                     </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Total Fuel Cost</h5>
-                                <p class="card-text">${response.totalFuelCost ? response.totalFuelCost.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) : 'Rp0'}</p>
-                            </div>
+                    <h4 class="ms-1 mb-0 text-muted">${response.avgPerLiter ?
+                        response.avgPerLiter.toLocaleString('id-ID', { style:
+                        'currency', currency: 'IDR' }) : 'Rp0'}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="avatar me-2">
+                            <img src="{{ asset('images/asset_value.png') }}" alt="">
                         </div>
+                        <strong class="mb-0 text-primary">Total Fuel Cost</strong>
                     </div>
-                </div>`;
+                    <h4 class="ms-1 mb-0 text-muted">${response.totalFuelCost ?
+                        response.totalFuelCost.toLocaleString('id-ID', { style:
+                        'currency', currency: 'IDR' }) : 'Rp0'}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                    `;
 
                     document.querySelector("#scorecard-section").innerHTML = scorecard;
 

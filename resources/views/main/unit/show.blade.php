@@ -1,19 +1,16 @@
 @extends('layouts.global')
 
 @section('title', 'Asset')
+@section('title_page', 'Master Data / Asset / Detail')
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Assets Detail</h4>
-            <a href="{{ route('asset.index') ?? '' }}" class="btn btn-primary">Kembali</a>
-        </div>
+    <div class="mx-5 flex-grow-1 container-p-y">
         <div class="nav-align-top nav-tabs-shadow mb-4">
             <ul class="nav nav-tabs nav-fill" role="tablist">
                 <li class="nav-item">
                     <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
-                        data-bs-target="#navs-justified-general" aria-controls="navs-justified-general"
-                        aria-selected="true"> General
+                        data-bs-target="#navs-justified-general" aria-controls="navs-justified-general" aria-selected="true">
+                        General
                     </button>
                 </li>
                 {{-- <li class="nav-item">
@@ -78,9 +75,8 @@
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="navs-justified-general" role="tabpanel">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4>Asset Information</h4>
-                        <a href="{{ asset('storage/qr_codes/' . $encryptedId . '.png') }}" class="btn btn-success"
-                            download="qr_code_{{ $encryptedId }}.png">Download QR Code</a>
+                        <h4 class="text-primary">Asset Information</h4>
+                        <a href="{{ asset('storage/qr_codes/' . $encryptedId . '.png') }}" class="btn btn-primary" download="qr_code_{{ $encryptedId }}.png"><i class="fas fa-download me-2"></i> Download QR Code</a>
                     </div>
 
                     <div class="row mb-3">
@@ -95,170 +91,168 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col-md-6">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Asset Detail</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Asset Number</td>
-                                        <td>{{ $asset->asset_number ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Asset Name</td>
-                                        <td>{{ $asset->name ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Status</td>
-                                        <td>{{ $asset->status ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Model Number</td>
-                                        <td>{{ $asset->model_number ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Serial Number</td>
-                                        <td>{{ $asset->serial_number ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Asset Category</td>
-                                        <td>{{ $asset->category ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Purchase Cost</td>
-                                        <td>{{ number_format($asset->cost, 0, ',', '.') ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Purchase Date</td>
-                                        <td>{{ $asset->purchase_date ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Asset Location</td>
-                                        <td>{{ $asset->assets_location ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Asset Manager</td>
-                                        <td>{{ $asset->manager ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Warranty Period (Months)</td>
-                                        <td>{{ $asset->warranty_period ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Asset Description</td>
-                                        <td>{{ $asset->description ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Unit</td>
-                                        <td>{{ $asset->unit ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>License Plate</td>
-                                        <td>{{ $asset->license_plate ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Classification</td>
-                                        <td>{{ $asset->classification ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Machine Number</td>
-                                        <td>{{ $asset->machine_number ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Color</td>
-                                        <td>{{ $asset->color ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Nik</td>
-                                        <td>{{ $asset->nik ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Created at</td>
-                                        <td>{{ $asset->created_at ?? '' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="text-primary">Asset Detail</h5>
+                                    <hr>
+                                    <table class="table table-striped">
+                                        <tbody class="">
+                                            <tr>
+                                                <td>Asset Number</td>
+                                                <td>{{ $asset->asset_number ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Asset Name</td>
+                                                <td>{{ $asset->name ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Status</td>
+                                                <td>{{ $asset->status ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Model Number</td>
+                                                <td>{{ $asset->model_number ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Serial Number</td>
+                                                <td>{{ $asset->serial_number ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Asset Category</td>
+                                                <td>{{ $asset->category ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Purchase Cost</td>
+                                                <td>{{ number_format($asset->cost, 0, ',', '.') ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Purchase Date</td>
+                                                <td>{{ $asset->purchase_date ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Asset Location</td>
+                                                <td>{{ $asset->assets_location ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Asset Manager</td>
+                                                <td>{{ $asset->manager ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Warranty Period (Months)</td>
+                                                <td>{{ $asset->warranty_period ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Asset Description</td>
+                                                <td>{{ $asset->description ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Unit</td>
+                                                <td>{{ $asset->unit ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>License Plate</td>
+                                                <td>{{ $asset->license_plate ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Classification</td>
+                                                <td>{{ $asset->classification ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Machine Number</td>
+                                                <td>{{ $asset->machine_number ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Color</td>
+                                                <td>{{ $asset->color ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Nik</td>
+                                                <td>{{ $asset->nik ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Created at</td>
+                                                <td>{{ $asset->created_at ?? '' }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <table class="table mb-3">
-                                <thead>
-                                    <tr>
-                                        <th>Depreciation Details</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Depreciation (Months)</td>
-                                        <td>{{ $asset->depreciation ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Depreciation Percentage (%)</td>
-                                        <td>{{ $asset->depreciation_percentage ?? '' }}%</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Depreciation Method</td>
-                                        <td>{{ $asset->depreciation_method ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Residual Value</td>
-                                        <td>{{ $asset->residual_value ?? '' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <table class="table mb-3">
-                                <thead>
-                                    <tr>
-                                        <th>Appreciation Details</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Appreciation Rate (%)</td>
-                                        <td>{{ $asset->appreciation_rate ?? '' }}%</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Appreciation Period (Months)</td>
-                                        <td>{{ $asset->appreciation_period ?? '' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <table class="table mb-3">
-                                <thead>
-                                    <tr>
-                                        <th>Supplier Details</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Supplier Name</td>
-                                        <td>{{ $asset->supplier_name ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Supplier Phone Number</td>
-                                        <td>{{ $asset->supplier_phone_number ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Supplier Address</td>
-                                        <td>{{ $asset->supplier_address ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Supplier PIC Name</td>
-                                        <td>{{ $asset->supplier_pic_name ?? '' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Supplier PIC Phone Number</td>
-                                        <td>{{ $asset->supplier_pic_phone ?? '' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="text-primary">Depreciation Details</h5>
+                                    <hr>
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            <tr>
+                                                <td>Depreciation (Months)</td>
+                                                <td>{{ $asset->depreciation ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Depreciation Percentage (%)</td>
+                                                <td>{{ $asset->depreciation_percentage ?? '' }}%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Depreciation Method</td>
+                                                <td>{{ $asset->depreciation_method ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Residual Value</td>
+                                                <td>{{ $asset->residual_value ?? '' }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="text-primary">Appreciation Details</h5>
+                                    <hr>
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            <tr>
+                                                <td>Appreciation Rate (%)</td>
+                                                <td>{{ $asset->appreciation_rate ?? '' }}%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Appreciation Period (Months)</td>
+                                                <td>{{ $asset->appreciation_period ?? '' }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="text-primary">Supplier Details</h5>
+                                    <hr>
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            <tr>
+                                                <td>Supplier Name</td>
+                                                <td>{{ $asset->supplier_name ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Supplier Phone Number</td>
+                                                <td>{{ $asset->supplier_phone_number ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Supplier Address</td>
+                                                <td>{{ $asset->supplier_address ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Supplier PIC Name</td>
+                                                <td>{{ $asset->supplier_pic_name ?? '' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Supplier PIC Phone Number</td>
+                                                <td>{{ $asset->supplier_pic_phone ?? '' }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -279,9 +273,9 @@
                     @endforelse
                 </div>
                 <div class="tab-pane fade" id="navs-justified-payment" role="tabpanel">
-                    <button type="button" class="btn btn-primary btn-sm" onclick="createDataReminder()">
-                        <i class="fas fa-plus"></i> Tambah
-                    </button>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary btn-md" onclick="createDataReminder()"> <i class="fas fa-plus me-1"></i> Tambah </button>
+                    </div>
                     <table class="datatables table" id="data-table-reminder">
                         <thead class="border-top">
                             <tr>
@@ -376,13 +370,16 @@
                         action="{{ route('asset-attachment.store', $asset->id) }}" enctype="multipart/form-data">
                         @csrf
                         <div class="row col-12">
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label for="attachment">attachment</label>
-                                    <input type="file" class="form-control" name="attachment" id="attachment">
+                            <div class="card card-body shadow-none dropzone" id="customDropzone"
+                                style="background-color: #F8F8F8; border-radius: 4px; border: 2px dashed #000;">
+                                <div class="text-center">
+                                    <h3 class="fw-bold mb-1">Drop your files here!</h3>
+                                    <span class="note needsclick">or click to upload</span>
                                 </div>
                             </div>
                         </div>
+                        <input type="file" class="form-control" id="attachment" name="attachment" style="display: none;"
+                    multiple>
 
                         <div class="col-12 text-end">
                             <button type="submit" class="btn btn-primary">Submit</button>
@@ -449,6 +446,9 @@
                     audits
                 </div>
             </div>
+        </div>
+        <div class="d-flex justify-content-end align-items-center mb-3">
+            <a href="{{ route('asset.index') ?? '' }}" class="btn btn-primary">Kembali</a>
         </div>
 
         <div class="modal fade" id="modal-ce" tabindex="-1" aria-hidden="true">
@@ -1063,5 +1063,58 @@
                     });
                 });
         });
+    </script>
+    <script>
+        $(document).ready(function() {
+        const dropzone = document.getElementById("customDropzone");
+        const fileInput = document.getElementById("attachment");
+
+        dropzone.addEventListener("dragover", function(e) {
+            e.preventDefault();
+            dropzone.style.backgroundColor = "#D0D0D0";
+        });
+
+        // Event untuk menangani drag-leave
+        dropzone.addEventListener("dragleave", function() {
+            dropzone.style.backgroundColor = "#F8F8F8";
+        });
+
+        // Event untuk menangani drop file
+        dropzone.addEventListener("drop", function(e) {
+            e.preventDefault();
+            dropzone.style.backgroundColor = "#F8F8F8";
+
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        // Event untuk klik
+        dropzone.addEventListener("click", function() {
+            fileInput.click();
+        });
+
+        // Event untuk perubahan pada input file
+        fileInput.addEventListener("change", function() {
+            handleFiles(fileInput.files);
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+
+                console.log(file);
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    if (preview) {
+                        preview.src = e.target.result;
+                    }
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+    });
     </script>
 @endpush

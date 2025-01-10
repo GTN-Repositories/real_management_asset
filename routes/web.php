@@ -99,6 +99,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/asset/depreciation-data', [AssetController::class, 'getDepreciationData'])->name('asset.depreciation-data');
     Route::get('/asset/status-data', [AssetController::class, 'getStatusData'])->name('asset.statusData');
     Route::get('/asset/data', [AssetController::class, 'data'])->name('asset.data');
+    Route::get('/asset/by-category', [AssetController::class, 'getDataGroupedByCategory'])->name('asset.getDataGroupedByCategory');
     Route::delete('/asset/destroy-all', [AssetController::class, 'destroyAll'])->name('asset.destroyAll');
     Route::resource('asset', AssetController::class);
 

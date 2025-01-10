@@ -3,7 +3,7 @@
 @section('title', 'Item')
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="mx-5 flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Detail Item {{ $data->name }}</h4>
         <div class="d-flex justify-content-end align-items-center mb-3 gap-3">
             <div>
