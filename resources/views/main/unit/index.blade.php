@@ -28,7 +28,6 @@
                         </select>
                     </div>
 
-
                     <div class="col-12 col-md-3" id="statusParent">
                         <label class="form-label" for="status">Status</label>
                         <select name="status[]" id="asset_status_id" class="select2 form-select" data-allow-clear="true"
@@ -46,8 +45,7 @@
             </button>
             <!-- Tombol Tambah -->
             @if (auth()->user()->hasPermissionTo('asset-import-excel'))
-                <button type="button" class="btn btn-success btn-md d-flex align-items-center"
-                    onclick="importExcel()">
+                <button type="button" class="btn btn-success btn-md d-flex align-items-center" onclick="importExcel()">
                     <i class="fas fa-file-excel me-2"></i> Import Excel
                 </button>
             @endif
@@ -57,9 +55,8 @@
                 </button>
             @endif
             @if (auth()->user()->hasPermissionTo('asset-create'))
-                <button type="button" class="btn btn-primary btn-md" onclick="createData()">
-                    <i class="fas fa-plus me-1"></i>Tambah
-                </button>
+                <button type="button" class="btn btn-primary" onclick="createData()"><i
+                        class="fas fa-plus me-1"></i>Tambah</button>
             @endif
         </div>
         <!-- Product List Table -->
@@ -98,14 +95,15 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modal-create" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered modal-simple modal-upgrade-plan">
-              <div class="modal-content">
-                <div class="modal-body" id="content-modal-create">
+        <div class="modal fade" id="createApp" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-simple modal-upgrade-plan">
+                <div class="modal-content">
+                    <div class="modal-body" id="content-modal-create">
+                        
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
+        </div>
         <div class="modal fade" id="modal-ce" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-simple">
                 <div class="modal-content p-3 p-md-5">
@@ -469,9 +467,9 @@
                     type: 'GET',
                 })
                 .done(function(data) {
-                    $('#content-modal-ce').html(data);
+                    $('#content-modal-create').html(data);
 
-                    $("#modal-ce").modal("show");
+                    $("#createApp").modal("show");
                 })
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while creating the record.', 'error');

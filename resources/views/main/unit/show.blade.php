@@ -9,8 +9,8 @@
             <ul class="nav nav-tabs nav-fill" role="tablist">
                 <li class="nav-item">
                     <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
-                        data-bs-target="#navs-justified-general" aria-controls="navs-justified-general"
-                        aria-selected="true"> General
+                        data-bs-target="#navs-justified-general" aria-controls="navs-justified-general" aria-selected="true">
+                        General
                     </button>
                 </li>
                 {{-- <li class="nav-item">
@@ -76,8 +76,7 @@
                 <div class="tab-pane fade show active" id="navs-justified-general" role="tabpanel">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="text-primary">Asset Information</h4>
-                        <a href="{{ asset('storage/qr_codes/' . $encryptedId . '.png') }}" class="btn btn-primary"
-                            download="qr_code_{{ $encryptedId }}.png"><i class="fas fa-download me-2"></i> Download QR Code</a>
+                        <a href="{{ asset('storage/qr_codes/' . $encryptedId . '.png') }}" class="btn btn-primary" download="qr_code_{{ $encryptedId }}.png"><i class="fas fa-download me-2"></i> Download QR Code</a>
                     </div>
 
                     <div class="row mb-3">
@@ -370,17 +369,17 @@
                     <form method="POST" class="row g-3 my-4" id="formAttachment"
                         action="{{ route('asset-attachment.store', $asset->id) }}" enctype="multipart/form-data">
                         @csrf
-                        <div clas   s="row col-12">
-                            <div class="dropzone needsclick" id="dropzone-basic">
-                                <div class="dz-message needsclick">
-                                    Drop files here or click to upload
-                                    <span class="note needsclick">(This is just a demo dropzone. Selected files are <span class="fw-medium">not</span> actually uploaded.)</span>
-                                  </div>
-                                  <div class="fallback">
-                                    <input name="file" type="file" />
-                                  </div>
+                        <div class="row col-12">
+                            <div class="card card-body shadow-none dropzone" id="customDropzone"
+                                style="background-color: #F8F8F8; border-radius: 4px; border: 2px dashed #000;">
+                                <div class="text-center">
+                                    <h3 class="fw-bold mb-1">Drop your files here!</h3>
+                                    <span class="note needsclick">or click to upload</span>
+                                </div>
                             </div>
                         </div>
+                        <input type="file" class="form-control" id="attachment" name="attachment" style="display: none;"
+                    multiple>
 
                         <div class="col-12 text-end">
                             <button type="submit" class="btn btn-primary">Submit</button>
@@ -1064,5 +1063,58 @@
                     });
                 });
         });
+    </script>
+    <script>
+        $(document).ready(function() {
+        const dropzone = document.getElementById("customDropzone");
+        const fileInput = document.getElementById("attachment");
+
+        dropzone.addEventListener("dragover", function(e) {
+            e.preventDefault();
+            dropzone.style.backgroundColor = "#D0D0D0";
+        });
+
+        // Event untuk menangani drag-leave
+        dropzone.addEventListener("dragleave", function() {
+            dropzone.style.backgroundColor = "#F8F8F8";
+        });
+
+        // Event untuk menangani drop file
+        dropzone.addEventListener("drop", function(e) {
+            e.preventDefault();
+            dropzone.style.backgroundColor = "#F8F8F8";
+
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        // Event untuk klik
+        dropzone.addEventListener("click", function() {
+            fileInput.click();
+        });
+
+        // Event untuk perubahan pada input file
+        fileInput.addEventListener("change", function() {
+            handleFiles(fileInput.files);
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+
+                console.log(file);
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    if (preview) {
+                        preview.src = e.target.result;
+                    }
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+    });
     </script>
 @endpush

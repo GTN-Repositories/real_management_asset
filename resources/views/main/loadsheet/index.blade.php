@@ -1,38 +1,35 @@
 @extends('layouts.global')
 
 @section('title', 'Loadsheet')
+@section('title_page', 'Tracking and Monitoring / Loadsheet')
 
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Loadsheet</h4>
 
         <!-- Product List Table -->
+        <div class="d-flex justify-content-end gap-2 mb-3">
+            <!-- Tombol Hapus Masal -->
+            <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
+                <i class="fas fa-trash-alt"></i> Hapus Masal
+            </button>
+            @if (auth()->user()->hasPermissionTo('loadsheet-import-excel'))
+                <button onclick="importExcel()" class="btn btn-success btn-md">
+                    <i class="fa-solid fa-file-excel me-1"></i>Import Excel
+                </button>
+            @endif
+            @if (auth()->user()->hasPermissionTo('loadsheet-export-excel'))
+                <button onclick="exportExcel()" class="btn btn-success btn-md">
+                    <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                </button>
+            @endif
+            <!-- Tombol Tambah -->
+            @if (auth()->user()->hasPermissionTo('loadsheet-create'))
+                <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                    <i class="fas fa-plus"></i> Tambah
+                </button>
+            @endif
+        </div>
         <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Loadsheet</h5>
-                <div class="d-flex justify-content-end gap-2">
-                    <!-- Tombol Hapus Masal -->
-                    <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
-                        <i class="fas fa-trash-alt"></i> Hapus Masal
-                    </button>
-                    @if (auth()->user()->hasPermissionTo('loadsheet-import-excel'))
-                        <button onclick="importExcel()" class="btn btn-success btn-sm">
-                            <i class="fa-solid fa-file-excel me-1"></i>Import Excel
-                        </button>
-                    @endif
-                    @if (auth()->user()->hasPermissionTo('loadsheet-export-excel'))
-                        <button onclick="exportExcel()" class="btn btn-success btn-sm">
-                            <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-                        </button>
-                    @endif
-                    <!-- Tombol Tambah -->
-                    @if (auth()->user()->hasPermissionTo('loadsheet-create'))
-                        <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                            <i class="fas fa-plus"></i> Tambah
-                        </button>
-                    @endif
-                </div>
-            </div>
             <div class="card-datatable table-responsive">
                 <table class="datatables table" id="data-table">
                     <thead class="border-top">

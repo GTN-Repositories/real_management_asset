@@ -1,21 +1,19 @@
 @extends('layouts.global')
 
 @section('title', 'Laporan Loadsheet')
+@section('title_page', 'Report / Asset Report')
 
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Loadsheet Report</h4>
-
         <!-- Product List Table -->
+        <div class="d-flex justify-content-end mb-3">
+            <button onclick="exportExcelByProject()" class="btn btn-success btn-md">
+                <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+            </button>
+        </div>
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">Project Loadsheet</h5>
-
-                <div class="d-flex justify-content-end gap-2">
-                    <button onclick="exportExcelByProject()" class="btn btn-success btn-sm">
-                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-                    </button>
-                </div>
             </div>
             <div class="card-datatable table-responsive">
                 <table class="datatables table" id="data-table">
@@ -30,14 +28,14 @@
             </div>
         </div>
 
+        <div class="d-flex justify-content-end my-3">
+            <button onclick="exportExcelByAsset()" class="btn btn-success btn-md">
+                <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+            </button>
+        </div>
         <div class="card mt-4">
             <div class="card-header">
                 <h5 class="card-title mb-0">Asset Loadsheet</h5>
-                <div class="d-flex justify-content-end gap-2">
-                    <button onclick="exportExcelByAsset()" class="btn btn-success btn-sm">
-                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-                    </button>
-                </div>
             </div>
             <div class="card-datatable table-responsive">
                 <table class="datatables table" id="data-table-asset">
