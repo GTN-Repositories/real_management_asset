@@ -215,6 +215,27 @@
                 </div>
             </div>
         </div>
+
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="m-0 text-primary fw-bold">Total Asset By Kategori</h5>
+                        <div class="card-datatable table-responsive">
+                            <table class="datatables table border-top" id="data-table-by-category-asset">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Kategori</th>
+                                        <th>Total Aset</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -354,6 +375,7 @@
 
             fetchFuelData();
             fetchLoadsheetData();
+            init_table_category_asset();
         });
 
         function fetchFuelData(startDate = null, endDate = null, filterType = null) {
@@ -703,6 +725,43 @@
 
         function showErrorMessage(message) {
             console.error(message);
+        }
+
+        function init_table_category_asset(keyword = '') {
+            var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+            var table = $('#data-table-by-category-asset').DataTable({
+                processing: true,
+                serverSide: true,
+                destroy: true,
+                columnDefs: [{
+                    target: 0,
+                    visible: true,
+                    searchable: false
+                }, ],
+
+                ajax: {
+                    type: "GET",
+                    url: "{{ route('asset.getDataGroupedByCategory') }}",
+                    data: {
+                        'keyword': keyword
+                    }
+                },
+                columns: [
+                    {
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                    },
+                    {
+                        data: 'category',
+                        name: 'category'
+                    },
+                    {
+                        data: 'total_asset',
+                        name: 'total_asset'
+                    },
+                ]
+            });
         }
     </script>
 @endpush
