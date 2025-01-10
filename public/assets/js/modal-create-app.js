@@ -78,7 +78,22 @@ $(function () {
 
       if (wizardCreateAppBtnSubmit) {
         wizardCreateAppBtnSubmit.addEventListener('click', event => {
-          alert('Submitted..!!');
+
+          const form = wizardCreateApp.querySelector('formCreate');
+          const submit = form.submit();
+
+          if (submit) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: 'Data Berhasil Ditambahkan',
+            }).then(() => {
+              $("#createApp").modal("hide");
+
+              $('#data-table').DataTable().ajax.reload();
+            });
+          }
+
         });
       }
     }
