@@ -195,7 +195,7 @@
                 </div>
             </div>
             <div class="col d-flex flex-column justify-content-between">
-                <div class="col-12 col-md-12" id="managementProject">
+                {{-- <div class="col-12 col-md-12" id="managementProject">
                     <div class="select2-primary">
                         <div class="position-relative">
                             <select id="management_project_id" name="management_project_id" class="select2 form-select"
@@ -203,7 +203,7 @@
                             </select>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
                 <div class="card background-card">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -376,6 +376,7 @@
             fetchFuelData();
             fetchLoadsheetData();
             init_table_category_asset();
+            updateSpeedometerWithDateRange();
         });
 
         function fetchFuelData(startDate = null, endDate = null, filterType = null) {

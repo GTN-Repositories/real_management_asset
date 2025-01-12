@@ -8,6 +8,7 @@ use App\Models\ManagementProject;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 
 class DriverProjectController extends Controller
 {
@@ -27,15 +28,23 @@ class DriverProjectController extends Controller
             ->get()
             ->map(function ($project) {
                 $assetIds = $project->asset_id;
+                $asset = Asset::whereIn('id', $assetIds)->take(4)->get();
+
+                foreach ($asset as $key => $value) {
+                    $value['ids'] = Crypt::decrypt($value['id']);
+                }
                 return [
                     'id' => $project->id,
                     'name' => $project->name,
-                    'assets' => Asset::whereIn('id', $assetIds)->get(),
+                    'assets' => $asset,
                 ];
             });
 
         // Add All Projects card
-        $allAssets = Asset::select('id', 'name')->take(5)->get();
+        $allAssets = Asset::select('id', 'name')->take(4)->get();
+        foreach ($allAssets as $key => $value) {
+            $value['ids'] = Crypt::decrypt($value['id']);
+        }
         $allProjectsCard = [
             'id' => 'all',
             'name' => 'All Projects',
