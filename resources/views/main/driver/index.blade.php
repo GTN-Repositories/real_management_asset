@@ -83,7 +83,7 @@
                                                     asset => `
                                                             <li class="mb-2 d-flex align-items-center">
                                                                 <i class="ti ti-point ti-lg"></i>
-                                                                ${asset.name}
+                                                                AST - ${asset.ids} - ${asset.name}
                                                             </li>`
                                                 ).join('') :
                                                 '<li class="text-muted">No assets available</li>'
