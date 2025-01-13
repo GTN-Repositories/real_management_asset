@@ -84,7 +84,7 @@
                                             '<p class="text-center fw-bold">Access and manage all projects</p>' : '<p class="text-center fw-bold">Access and manage projects</p>'
                                         }
                                         <hr>
-                                        <ul class="ps-0 my-4 pt-2 circle-bullets">
+                                        <ul class="ps-0 my-4 pt-2 circle-bullets list-scroll" style="height: 150px;">
                                             ${manager.assets && manager.assets.length > 0 ?
                                                 manager.assets.slice(0, 5).map(
                                                     asset => `
