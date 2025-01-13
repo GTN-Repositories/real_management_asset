@@ -214,6 +214,51 @@ class AssetController extends Controller
         return $data;
     }
 
+    public function getDataGroupedByCategory(Request $request)
+    {
+        $keyword = $request->search['value'] ?? '';
+
+        $data = Asset::selectRaw('category, COUNT(id) as total_asset')
+            ->when($keyword, function ($query) use ($keyword) {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('category', 'LIKE', '%' . $keyword . '%');
+                });
+            })
+            ->when($request->status, function ($query) use ($request) {
+                $query->whereIn('status', $request->status);
+            })
+            ->when($request->assets_location, function ($query) use ($request) {
+                $query->whereIn('assets_location', $request->assets_location);
+            })
+            ->when($request->category, function ($query) use ($request) {
+                $query->whereIn('category', $request->category);
+            })
+            ->when($request->pic, function ($query) use ($request) {
+                $query->whereIn('manager', $request->pic);
+            })
+            ->when(session('selected_project_id'), function ($query) {
+                $query->whereHas('management_project', function ($q) {
+                    $q->where('id', Crypt::decrypt(session('selected_project_id')));
+                });
+            })
+            ->groupBy('category')
+            ->orderBy('category', 'asc')
+            ->get();
+
+            return datatables()
+                ->of($data)
+                ->addIndexColumn()
+                ->addColumn('category', function ($data) {
+                    return $data->category;
+                })
+                ->addColumn('total_asset', function ($data) {
+                    return $data->total_asset;
+                })
+                ->escapeColumns([])
+                ->make(true);
+    }
+
+
 
     public function create()
     {

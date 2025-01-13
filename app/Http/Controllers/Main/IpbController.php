@@ -183,7 +183,7 @@ class IpbController extends Controller
         try {
             return $this->atomic(function () use ($data) {
                 $data["management_project_id"] = Crypt::decrypt($data["management_project_id"]);
-                $data["employee_id"] = Crypt::decrypt($data["employee_id"]);
+                $data["employee_id"] = isset($data["employee_id"]) ? Crypt::decrypt($data["employee_id"]) : null;
                 $data["user_id"] = Auth::user()->id;
 
                 $data['issued_liter'] = isset($data['issued_liter']) && $data['issued_liter'] != '-' ? str_replace('.', '', $data['issued_liter']) : null;

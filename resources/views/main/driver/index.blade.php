@@ -84,18 +84,18 @@
                                             '<p class="text-center fw-bold">Access and manage all projects</p>' : '<p class="text-center fw-bold">Access and manage projects</p>'
                                         }
                                         <hr>
-                                            <ul class="ps-0 my-4 pt-2 circle-bullets list-scroll" style="height: 150px">
-                                                ${manager.assets && manager.assets.length > 0 ?
-                                                    manager.assets.slice(0, 5).map(
-                                                        asset => `
-                                                                        <li class="mb-2 d-flex align-items-center">
-                                                                            <i class="ti ti-point ti-lg"></i>
-                                                                            ${asset.name}
-                                                                        </li>`
-                                                    ).join('') :
-                                                    '<li class="text-muted">No assets available</li>'
-                                                }
-                                            </ul>
+                                        <ul class="ps-0 my-4 pt-2 circle-bullets">
+                                            ${manager.assets && manager.assets.length > 0 ?
+                                                manager.assets.slice(0, 5).map(
+                                                    asset => `
+                                                            <li class="mb-2 d-flex align-items-center">
+                                                                <i class="ti ti-point ti-lg"></i>
+                                                                AST - ${asset.ids} - ${asset.name}
+                                                            </li>`
+                                                ).join('') :
+                                                '<li class="text-muted">No assets available</li>'
+                                            }
+                                        </ul>
                                     </div>
                                     <div class="card-footer">
                                         <button class="btn ${isAllProjects ? 'btn-primary' : 'btn-outline-primary'} d-grid w-100 select-project-btn"
