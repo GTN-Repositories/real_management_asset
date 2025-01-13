@@ -19,37 +19,31 @@
         <!-- Card Border Shadow -->
         <div class="row">
             <div class="col-sm-6 col-lg-12 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center pb-1">
-                            <div class="d-flex justify-content-center align-items-end my-1 gap-3">
-                                <div>
-                                    <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
-                                    <input type="text" id="date-range-picker" class="form-control"
-                                        placeholder="Select Date Range">
-                                </div>
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        filter tanggal
-                                    </button>
-                                    <ul class="dropdown-menu" style="">
-                                        <li><a class="dropdown-item" id="hari ini" href="javascript:void(0);">hari ini</a>
-                                        </li>
-                                        <li><a class="dropdown-item" id="minggu ini" href="javascript:void(0);">minggu
-                                                ini</a></li>
-                                        <li><a class="dropdown-item" id="bulan ini" href="javascript:void(0);">bulan ini</a>
-                                        </li>
-                                        <li><a class="dropdown-item" id="bulan kemarin" href="javascript:void(0);">bulan
-                                                kemarin</a></li>
-                                        <li><a class="dropdown-item" id="tahun ini" href="javascript:void(0);">tahun ini</a>
-                                        </li>
-                                        <li><a class="dropdown-item" id="tahun kemarin" href="javascript:void(0);">tahun
-                                                kemarin</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                <div class="d-flex justify-content-end align-items-end my-1 gap-3">
+                    <div>
+                        <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
+                        <input type="text" id="date-range-picker" class="form-control"
+                            placeholder="Select Date Range">
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            filter tanggal
+                        </button>
+                        <ul class="dropdown-menu" style="">
+                            <li><a class="dropdown-item" id="hari ini" href="javascript:void(0);">hari ini</a>
+                            </li>
+                            <li><a class="dropdown-item" id="minggu ini" href="javascript:void(0);">minggu
+                                    ini</a></li>
+                            <li><a class="dropdown-item" id="bulan ini" href="javascript:void(0);">bulan ini</a>
+                            </li>
+                            <li><a class="dropdown-item" id="bulan kemarin" href="javascript:void(0);">bulan
+                                    kemarin</a></li>
+                            <li><a class="dropdown-item" id="tahun ini" href="javascript:void(0);">tahun ini</a>
+                            </li>
+                            <li><a class="dropdown-item" id="tahun kemarin" href="javascript:void(0);">tahun
+                                    kemarin</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -174,7 +168,7 @@
         </div>
         <div class="row mt-2">
             <div class="col d-flex flex-column justify-content-between">
-                <div class="card">
+                <div class="card" style="height: 300px;">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0 text-primary fw-bold">Open Issue</h5>
                     </div>
@@ -195,7 +189,7 @@
                 </div>
             </div>
             <div class="col d-flex flex-column justify-content-between">
-                <div class="col-12 col-md-12" id="managementProject">
+                {{-- <div class="col-12 col-md-12" id="managementProject">
                     <div class="select2-primary">
                         <div class="position-relative">
                             <select id="management_project_id" name="management_project_id" class="select2 form-select"
@@ -203,9 +197,9 @@
                             </select>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
-                <div class="card background-card">
+                <div class="card background-card" style="height: 300px;">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="m-0 text-white">Speedometer</h4>
                     </div>
@@ -216,8 +210,23 @@
             </div>
         </div>
 
-        <div class="row mt-5">
-            <div class="col-md-6">
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="m-0">Total Asset By Kategori</h5>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-secondary" id="group-asset-by-category-download">
+                                <i class="ti ti-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="groupAssetByCategoryChart"></div>
+                    </div>
+                </div>
+            </div>
+            {{-- <div class="col-12">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="m-0 text-primary fw-bold">Total Asset By Kategori</h5>
@@ -233,7 +242,7 @@
                             </table>
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -376,6 +385,7 @@
             fetchFuelData();
             fetchLoadsheetData();
             init_table_category_asset();
+            updateSpeedometerWithDateRange();
         });
 
         function fetchFuelData(startDate = null, endDate = null, filterType = null) {
@@ -721,6 +731,12 @@
                     window.chartInstances.asset.exportToSVG();
                 }
             });
+
+            document.getElementById('group-asset-by-category-download').addEventListener('click', function() {
+                if (window.chartInstances?.asset) {
+                    window.chartInstances.asset.exportToSVG();
+                }
+            });
         }
 
         function showErrorMessage(message) {
@@ -728,40 +744,182 @@
         }
 
         function init_table_category_asset(keyword = '') {
-            var csrf_token = $('meta[name="csrf-token"]').attr('content');
+            // var csrf_token = $('meta[name="csrf-token"]').attr('content');
 
-            var table = $('#data-table-by-category-asset').DataTable({
-                processing: true,
-                serverSide: true,
-                destroy: true,
-                columnDefs: [{
-                    target: 0,
-                    visible: true,
-                    searchable: false
-                }, ],
+            // var table = $('#data-table-by-category-asset').DataTable({
+            //     processing: true,
+            //     serverSide: true,
+            //     destroy: true,
+            //     columnDefs: [{
+            //         target: 0,
+            //         visible: true,
+            //         searchable: false
+            //     }, ],
 
-                ajax: {
-                    type: "GET",
-                    url: "{{ route('asset.getDataGroupedByCategory') }}",
-                    data: {
-                        'keyword': keyword
-                    }
-                },
-                columns: [
-                    {
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                    },
-                    {
-                        data: 'category',
-                        name: 'category'
-                    },
-                    {
-                        data: 'total_asset',
-                        name: 'total_asset'
-                    },
-                ]
+            //     ajax: {
+            //         type: "GET",
+            //         url: "{{ route('asset.getDataGroupedByCategory') }}",
+            //         data: {
+            //             'keyword': keyword
+            //         }
+            //     },
+            //     columns: [
+            //         {
+            //             data: 'DT_RowIndex',
+            //             name: 'DT_RowIndex',
+            //         },
+            //         {
+            //             data: 'category',
+            //             name: 'category'
+            //         },
+            //         {
+            //             data: 'total_asset',
+            //             name: 'total_asset'
+            //         },
+            //     ]
+            // });
+
+            var postForm = {
+                'keyword': keyword,
+            };
+            $.ajax({
+                url: '{{ route("asset.getDataGroupedByCategory") }}', 
+                type: 'GET', 
+                data : postForm,
+                dataType  : 'json',
+            })
+            .done(function(data) {
+                initializeChartsCategoryAsset(data);
+            })
+            .fail(function() {
+                alert('Load data failed.');
             });
         }
+
+        function initializeChartsCategoryAsset(data) {
+            // Base options for all donut charts
+            const baseOptions = {
+                chart: {
+                    type: 'donut',
+                    height: 350,
+                    toolbar: {
+                        show: true
+                    },
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 800,
+                        animateGradually: {
+                            enabled: true,
+                            delay: 150
+                        },
+                        dynamicAnimation: {
+                            enabled: true,
+                            speed: 350
+                        }
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '70%',
+                            labels: {
+                                show: true,
+                                name: {
+                                    show: true,
+                                    fontSize: '22px',
+                                    fontFamily: 'Helvetica, Arial, sans-serif',
+                                    color: undefined,
+                                    offsetY: -10
+                                },
+                                value: {
+                                    show: true,
+                                    fontSize: '16px',
+                                    fontFamily: 'Helvetica, Arial, sans-serif',
+                                    color: undefined,
+                                    offsetY: 16,
+                                    formatter: function(val) {
+                                        return val
+                                    }
+                                },
+                                total: {
+                                    show: true,
+                                    label: 'Total',
+                                    color: '#373d3f',
+                                    formatter: function(w) {
+                                        return w.globals.seriesTotals.reduce((a, b) => a + b, 0)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: function(val, opts) {
+                        return Math.round(val) + '%'
+                    }
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 320
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }],
+                legend: {
+                    position: 'bottom',
+                    horizontalAlign: 'center',
+                    floating: false,
+                    fontSize: '14px',
+                    offsetY: 7
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['transparent']
+                },
+                tooltip: {
+                    enabled: true,
+                    y: {
+                        formatter: function(val) {
+                            return val + " units"
+                        }
+                    }
+                }
+            };
+
+            const labels = data.map(item => item.category); // Ambil semua kategori
+            const series = data.map(item => item.total_asset); // Ambil semua total_asset
+            const randomColors = data.map(() => getRandomColor());
+
+            // Operational Status Chart
+            const operationalChart = new ApexCharts(document.querySelector("#groupAssetByCategoryChart"), {
+                ...baseOptions,
+                colors: randomColors,
+                series: series,
+                labels: labels
+            });
+            operationalChart.render();
+
+            // Store chart instances for download functionality
+            window.chartInstances = {
+                operational: operationalChart,
+            };
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
     </script>
 @endpush

@@ -245,17 +245,18 @@ class AssetController extends Controller
             ->orderBy('category', 'asc')
             ->get();
 
-            return datatables()
-                ->of($data)
-                ->addIndexColumn()
-                ->addColumn('category', function ($data) {
-                    return $data->category;
-                })
-                ->addColumn('total_asset', function ($data) {
-                    return $data->total_asset;
-                })
-                ->escapeColumns([])
-                ->make(true);
+        return response()->json($data);
+            // return datatables()
+            //     ->of($data)
+            //     ->addIndexColumn()
+            //     ->addColumn('category', function ($data) {
+            //         return $data->category;
+            //     })
+            //     ->addColumn('total_asset', function ($data) {
+            //         return $data->total_asset;
+            //     })
+            //     ->escapeColumns([])
+            //     ->make(true);
     }
 
 

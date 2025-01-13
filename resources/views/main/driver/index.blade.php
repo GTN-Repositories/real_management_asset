@@ -4,28 +4,34 @@
 
 @push('css')
     <style>
-        .card-project{
+        .card-project {
             border-radius: 39px;
             max-width: 356px;
             background-color: #f4f3fa;
         }
-        .border-logo{
+
+        .border-logo {
             border-radius: 100%;
             box-shadow: 0 8px 4px rgba(165, 163, 174, 0.3);
             width: 100px;
             height: 100px;
             margin: auto;
-            background-color: #FFFFFF; 
+            background-color: #FFFFFF;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        .card-footer{
+        .list-scroll {
+            overflow-y: scroll;
+        }
+
+        .card-footer {
             display: flex;
             justify-content: center;
         }
-        .select-project-btn{
+
+        .select-project-btn {
             max-width: 250px;
         }
     </style>
@@ -61,7 +67,8 @@
                         // Special styling for "All Projects" card
                         const isAllProjects = manager.id === 'all';
                         const cardClass = isAllProjects ? 'border-primary' : 'border';
-                        const iconClass = isAllProjects ? '{{ asset('images/globe.png') }}' : '{{ asset('images/corporate.png') }}';
+                        const iconClass = isAllProjects ? '{{ asset('images/globe.png') }}' :
+                            '{{ asset('images/corporate.png') }}';
 
                         const cardHtml = `
                             <div class="col-md-4 mb-md-0 mb-4">
@@ -77,13 +84,13 @@
                                             '<p class="text-center fw-bold">Access and manage all projects</p>' : '<p class="text-center fw-bold">Access and manage projects</p>'
                                         }
                                         <hr>
-                                        <ul class="ps-0 my-4 pt-2 circle-bullets">
+                                        <ul class="ps-0 my-4 pt-2 circle-bullets list-scroll" style="height: 150px;">
                                             ${manager.assets && manager.assets.length > 0 ?
                                                 manager.assets.slice(0, 5).map(
                                                     asset => `
                                                             <li class="mb-2 d-flex align-items-center">
                                                                 <i class="ti ti-point ti-lg"></i>
-                                                                ${asset.name}
+                                                                AST - ${asset.ids} - ${asset.name}
                                                             </li>`
                                                 ).join('') :
                                                 '<li class="text-muted">No assets available</li>'
@@ -117,7 +124,7 @@
                             },
                             success: function(response) {
                                 console.log('Select project response:',
-                                response); // Debug log
+                                    response); // Debug log
                                 if (response.status) {
                                     window.location.href =
                                         "{{ route('report-fuel.index') }}";
@@ -125,7 +132,7 @@
                             },
                             error: function(error) {
                                 console.error('Select project error:',
-                                error); // Debug log
+                                    error); // Debug log
                                 Swal.fire('Error!',
                                     'An error occurred while selecting the project.',
                                     'error');

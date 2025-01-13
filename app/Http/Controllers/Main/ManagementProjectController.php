@@ -486,12 +486,25 @@ class ManagementProjectController extends Controller
 
     public function spedometer(Request $request)
     {
-        $managementProject = ManagementProject::findByEncryptedId($request->management_project_id);
+        $projectId = [];
+        $value_project = 0;
+        if (session('selected_project_id') == null) {
+            $managementProject = ManagementProject::get();
+            foreach ($managementProject as $key => $value) {
+                $projectId[] = Crypt::decrypt($value->id);
+                $value_project += $value->value_project;
+            }
+        } else {
+            $projectId[] = Crypt::decrypt(session('selected_project_id'));
+            $managementProject = ManagementProject::findByEncryptedId(session('selected_project_id'));
+            $value_project = $managementProject->value_project;
+        }
+
 
         $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date) : null;
         $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date) : null;
 
-        $loadsheet = Loadsheet::where('management_project_id', Crypt::decrypt($managementProject->id));
+        $loadsheet = Loadsheet::whereIn('management_project_id', $projectId);
 
         if ($startDate && $endDate) {
             $loadsheet->whereBetween('date', [$startDate, $endDate]);
@@ -522,8 +535,8 @@ class ManagementProjectController extends Controller
 
         $totalPrice = $loadsheet->sum('price');
 
-        $performance = ($totalPrice > 0 && $managementProject->value_project > 0) ?
-            ($totalPrice / $managementProject->value_project) * 100 : 0;
+        $performance = ($totalPrice > 0 && $value_project > 0) ?
+            ($totalPrice / $value_project) * 100 : 0;
 
         if ($performance > 100) {
             $performance = 100;
@@ -533,7 +546,7 @@ class ManagementProjectController extends Controller
             'success' => true,
             'data' => [
                 'totalPrice' => number_format($totalPrice, 0),
-                'maxValue' => number_format($managementProject->value_project, 0),
+                'maxValue' => number_format($value_project, 0),
                 'performance' => number_format($performance, 2)
             ]
         ]);
