@@ -19,37 +19,31 @@
         <!-- Card Border Shadow -->
         <div class="row">
             <div class="col-sm-6 col-lg-12 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center pb-1">
-                            <div class="d-flex justify-content-center align-items-end my-1 gap-3">
-                                <div>
-                                    <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
-                                    <input type="text" id="date-range-picker" class="form-control"
-                                        placeholder="Select Date Range">
-                                </div>
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        filter tanggal
-                                    </button>
-                                    <ul class="dropdown-menu" style="">
-                                        <li><a class="dropdown-item" id="hari ini" href="javascript:void(0);">hari ini</a>
-                                        </li>
-                                        <li><a class="dropdown-item" id="minggu ini" href="javascript:void(0);">minggu
-                                                ini</a></li>
-                                        <li><a class="dropdown-item" id="bulan ini" href="javascript:void(0);">bulan ini</a>
-                                        </li>
-                                        <li><a class="dropdown-item" id="bulan kemarin" href="javascript:void(0);">bulan
-                                                kemarin</a></li>
-                                        <li><a class="dropdown-item" id="tahun ini" href="javascript:void(0);">tahun ini</a>
-                                        </li>
-                                        <li><a class="dropdown-item" id="tahun kemarin" href="javascript:void(0);">tahun
-                                                kemarin</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                <div class="d-flex justify-content-end align-items-end my-1 gap-3">
+                    <div>
+                        <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
+                        <input type="text" id="date-range-picker" class="form-control"
+                            placeholder="Select Date Range">
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            filter tanggal
+                        </button>
+                        <ul class="dropdown-menu" style="">
+                            <li><a class="dropdown-item" id="hari ini" href="javascript:void(0);">hari ini</a>
+                            </li>
+                            <li><a class="dropdown-item" id="minggu ini" href="javascript:void(0);">minggu
+                                    ini</a></li>
+                            <li><a class="dropdown-item" id="bulan ini" href="javascript:void(0);">bulan ini</a>
+                            </li>
+                            <li><a class="dropdown-item" id="bulan kemarin" href="javascript:void(0);">bulan
+                                    kemarin</a></li>
+                            <li><a class="dropdown-item" id="tahun ini" href="javascript:void(0);">tahun ini</a>
+                            </li>
+                            <li><a class="dropdown-item" id="tahun kemarin" href="javascript:void(0);">tahun
+                                    kemarin</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -174,7 +168,7 @@
         </div>
         <div class="row mt-2">
             <div class="col d-flex flex-column justify-content-between">
-                <div class="card">
+                <div class="card" style="height: 300px;">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0 text-primary fw-bold">Open Issue</h5>
                     </div>
@@ -205,7 +199,7 @@
                     </div>
                 </div> --}}
 
-                <div class="card background-card">
+                <div class="card background-card" style="height: 300px;">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="m-0 text-white">Speedometer</h4>
                     </div>
@@ -216,8 +210,8 @@
             </div>
         </div>
 
-        <div class="row mt-5">
-            <div class="col-md-6">
+        <div class="row mt-4">
+            <div class="col-12">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="m-0 text-primary fw-bold">Total Asset By Kategori</h5>
