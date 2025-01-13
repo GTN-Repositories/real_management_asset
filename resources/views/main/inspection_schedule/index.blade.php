@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/@form-validation/form-validation.css') }}" />
-
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/fullcalendar/fullcalendar.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/app-calendar.css') }}" />
 
     <style>
