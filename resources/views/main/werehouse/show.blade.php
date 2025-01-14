@@ -12,7 +12,7 @@
                 <h5 class="card-title mb-0">Gudang Detail</h5>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
+                <table class="datatables table table-striped table-poppins " id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>

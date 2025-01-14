@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <table class="datatables table" id="data-table">
+    <table class="datatables table table-striped table-poppins " id="data-table">
         <thead class="border-top">
             <tr>
                 <th>ID</th>

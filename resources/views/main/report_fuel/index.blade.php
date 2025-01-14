@@ -107,7 +107,7 @@
                     <h5 class="card-title mb-0">Grouping by project</h5>
                 </div>
                 <div class="card-datatable table-responsive">
-                    <table class="datatables table" id="data-table-project">
+                    <table class="datatables table table-striped table-poppins " id="data-table-project">
                         <thead class="border-top">
                             <tr>
                                 <th>#</th>
@@ -124,7 +124,7 @@
                     <h5 class="card-title mb-0">Grouping by asset</h5>
                 </div>
                 <div class="card-datatable table-responsive">
-                    <table class="datatables table" id="data-table-asset">
+                    <table class="datatables table table-striped table-poppins " id="data-table-asset">
                         <thead class="border-top">
                             <tr>
                                 <th>#</th>
@@ -142,7 +142,7 @@
                 <h5 class="card-title mb-0">Fuel Consumption</h5>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
+                <table class="datatables table table-striped table-poppins " id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>#</th>
