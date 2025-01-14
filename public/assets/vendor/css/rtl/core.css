@@ -3266,15 +3266,16 @@ textarea.form-control-lg {
 .nav-tabs {
   --bs-nav-tabs-border-width: var(--bs-border-width);
   --bs-nav-tabs-border-color: transparent;
-  --bs-nav-tabs-border-radius: var(--bs-border-radius);
+  --bs-nav-tabs-border-radius: 0;
   --bs-nav-tabs-link-hover-border-color: var(--bs-secondary-bg) var(--bs-secondary-bg) transparent;
-  --bs-nav-tabs-link-active-color: #134B70;
+  --bs-nav-tabs-link-active-color: #201E43;
   --bs-nav-tabs-link-active-bg: #fff;
   --bs-nav-tabs-link-active-border-color: var(--bs-border-color) var(--bs-border-color) #fff;
-  border-bottom: var(--bs-nav-tabs-border-width) solid var(--bs-nav-tabs-border-color);
+  border-top: var(--bs-nav-tabs-border-width) solid var(--bs-nav-tabs-border-color);
+  border-bottom: 1px solid #d4d4d4;
 }
 .nav-tabs .nav-link {
-  margin-bottom: calc(-1 * var(--bs-nav-tabs-border-width));
+  margin-top: calc(-1 * var(--bs-nav-tabs-border-width));
   border: var(--bs-nav-tabs-border-width) solid transparent;
   border-top-left-radius: var(--bs-nav-tabs-border-radius);
   border-top-right-radius: var(--bs-nav-tabs-border-radius);
@@ -7102,7 +7103,7 @@ a.invert-bg-dark:hover, a.invert-bg-dark:focus {
 }
 
 .table:not(.table-dark) thead:not(.table-dark) th {
-  color: #5d596c;
+  color: #201E43;
 }
 
 .table-border-bottom-0 tr:last-child td,
@@ -8667,7 +8668,7 @@ html:not([dir=rtl]) .input-group > .btn-group:last-child > .btn:not([class*=btn-
 }
 
 .nav-tabs {
-  border-bottom: var(--bs-border-width) solid #dbdade;
+  border-top: var(--bs-border-width) solid #dbdade;
   border-top-left-radius: 0.375rem;
   border-top-right-radius: 0.375rem;
   background-color: #fff;

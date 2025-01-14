@@ -27,7 +27,7 @@
                 </div>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table border-top" id="data-table">
+                <table class="datatables table table-striped table-poppins  border-top" id="data-table">
                     <thead>
                         <tr>
                             <th>

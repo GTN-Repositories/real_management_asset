@@ -22,8 +22,7 @@
                 <div class="d-flex justify-content-end align-items-end my-1 gap-3">
                     <div>
                         <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
-                        <input type="text" id="date-range-picker" class="form-control"
-                            placeholder="Select Date Range">
+                        <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
                     </div>
                     <div class="btn-group">
                         <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect"
@@ -203,8 +202,18 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="m-0 text-white">Speedometer</h4>
                     </div>
-                    <div class="card-body">
-                        <div id="speedometerChart"></div>
+                    <div class="card-body row">
+                        <div class="col-6" id="speedometerChart"></div>
+                        <div class="col-6 d-flex flex-column">
+                            <div class="mb-2">
+                                <h5 class="text-white fw-bold mb-0">Project Value</h5>
+                                <h2 class="text-white fw-bold" id="max-value-speedometer"></h2>
+                            </div>
+                            <div class="mb-3">
+                                <h5 class="text-white fw-bold mb-0">Actual Sales</h5>
+                                <h2 class="text-white fw-bold" id="current-value-speedometer"></h2>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -446,7 +455,7 @@
                     management_project_id: managementProjectIdValue,
                     start_date: startDate,
                     end_date: endDate,
-                    filterType: filterType, // Ensure filterType is sent
+                    filterType: filterType,
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -467,6 +476,11 @@
         let speedometerChart;
 
         function init_speedometer_chart(data) {
+            const maxValue = data.maxValue;
+            const currentValue = Math.min(data.totalPrice, maxValue) || 0;
+            document.getElementById('max-value-speedometer').innerText = maxValue;
+            document.getElementById('current-value-speedometer').innerText = currentValue;
+
             const options = {
                 chart: {
                     type: 'radialBar',
@@ -476,10 +490,10 @@
                         enabled: true
                     },
                     animations: {
-                        enabled: false
+                        enabled: true
                     },
                 },
-                series: [parseFloat(data.performance)],
+                series: [currentValue],
                 labels: ['Performance'],
                 plotOptions: {
                     radialBar: {
@@ -502,15 +516,15 @@
                                 fontSize: '36px',
                                 color: '#FFFFFF',
                                 formatter: function(val) {
-                                    return val.toFixed(2) + '%';
+                                    return val.toFixed(2);
                                 }
                             },
                             total: {
                                 show: true,
-                                label: 'Actual Sales',
+                                label: '',
                                 color: '#FFFFFF',
                                 formatter: function(w) {
-                                    return data.totalPrice;
+                                    return w.globals.seriesTotals.reduce((a, b) => a + b, 0)
                                 }
                             }
                         }
@@ -522,33 +536,12 @@
                 stroke: {
                     lineCap: 'round'
                 },
-                title: {
-                    text: `Project Value`,
-                    align: 'left',
-                    weight: 'bold',
-                    offsetX: -10,
-                    style: {
-                        color: '#FFFFFF',
-                        fontSize: '16px'
-                    }
-                },
-                subtitle: {
-                    text: `${data.maxValue}`,
-                    align: 'left',
-                    weight: 'bold',
-                    offsetX: -10,
-                    style: {
-                        color: '#FFFFFF',
-                        fontSize: '16px'
-                    }
-                }
             };
 
-
-            speedometerChart = new ApexCharts(document.querySelector("#speedometerChart"),
-                options);
+            const speedometerChart = new ApexCharts(document.querySelector("#speedometerChart"), options);
             speedometerChart.render();
         }
+
 
 
         function fetchStatusData() {
@@ -742,8 +735,7 @@
                         'keyword': keyword
                     }
                 },
-                columns: [
-                    {
+                columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                     },

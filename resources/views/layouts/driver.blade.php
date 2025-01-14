@@ -60,6 +60,14 @@
             z-index: 1100 !important;
             /* Pastikan lebih tinggi dari modal Bootstrap (biasanya 1050) */
         }
+        .btn-edit-data{
+            background-color: #000BE1;
+            color: #FFFFFF;
+        }
+        .btn-delete-data{
+            background-color: #FFFFFF;
+            color: #252525;
+        }
     </style>
 
     <!-- Helpers -->

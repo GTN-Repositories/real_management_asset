@@ -276,7 +276,7 @@
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-primary btn-md" onclick="createDataReminder()"> <i class="fas fa-plus me-1"></i> Tambah </button>
                     </div>
-                    <table class="datatables table" id="data-table-reminder">
+                    <table class="datatables table table-striped table-poppins " id="data-table-reminder">
                         <thead class="border-top">
                             <tr>
                                 <th>
@@ -293,7 +293,7 @@
                     </table>
                 </div>
                 <div class="tab-pane fade" id="navs-justified-history" role="tabpanel">
-                    <table class="datatables table" id="data-table">
+                    <table class="datatables table table-striped table-poppins " id="data-table">
                         <thead class="border-top">
                             <tr>
                                 <th>
@@ -386,7 +386,7 @@
                         </div>
                     </form>
 
-                    <table class="datatables table" id="data-table-attachment">
+                    <table class="datatables table table-striped table-poppins " id="data-table-attachment">
                         <thead class="border-top">
                             <tr>
                                 <th>
@@ -400,13 +400,81 @@
                 <div class="tab-pane fade" id="navs-justified-appresiations" role="tabpanel">
                     <div id="appreciation-chart" style="height: 400px;"></div>
                     <div id="chart-error" class="alert alert-danger d-none"></div>
+                    <div class="card">
+                        <table class="table">
+                            <tr class="fw-bold" style="background-color: #f1f1f1">
+                                <th>Year</th>
+                                <th>Monthly Appresiations</th>
+                                <th>Total Appresiations</th>
+                                <th>Book Value</th>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">2024/03/20</td>
+                                <td class="text-success">$29.71</td>
+                                <td class="text-success">$29.71</td>
+                                <td class="text-black">$5,470.29</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">2024/03/20</td>
+                                <td class="text-success">$29.71</td>
+                                <td class="text-success">$29.71</td>
+                                <td class="text-black">$5,470.29</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">2024/03/20</td>
+                                <td class="text-success">$29.71</td>
+                                <td class="text-success">$29.71</td>
+                                <td class="text-black">$5,470.29</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">2024/03/20</td>
+                                <td class="text-success">$29.71</td>
+                                <td class="text-success">$29.71</td>
+                                <td class="text-black">$5,470.29</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="navs-justified-depresiation" role="tabpanel">
                     <div id="depreciation-chart"></div>
+                    <div class="card">
+                        <table class="table">
+                            <tr class="fw-bold" style="background-color: #f1f1f1">
+                                <th>Year</th>
+                                <th>Depreciation Expense</th>
+                                <th>Accumulated Depreciation</th>
+                                <th>Book Value</th>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">2024/03/20</td>
+                                <td class="text-danger">$29.71</td>
+                                <td class="text-danger">$29.71</td>
+                                <td class="text-black">$5,470.29</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">2024/03/20</td>
+                                <td class="text-danger">$29.71</td>
+                                <td class="text-danger">$29.71</td>
+                                <td class="text-black">$5,470.29</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">2024/03/20</td>
+                                <td class="text-danger">$29.71</td>
+                                <td class="text-danger">$29.71</td>
+                                <td class="text-black">$5,470.29</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">2024/03/20</td>
+                                <td class="text-danger">$29.71</td>
+                                <td class="text-danger">$29.71</td>
+                                <td class="text-black">$5,470.29</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="navs-justified-reminder" role="tabpanel">
                     <h5>Log Asset</h5>
-                    <table class="datatables table" id="data-table-log">
+                    <table class="datatables table table-striped table-poppins " id="data-table-log">
                         <thead class="border-top">
                             <tr>
                                 <th>
@@ -430,7 +498,7 @@
                             <button type="submit" class="btn btn-primary mt-3">Submit</button>
                         </div>
                     </form>
-                    <table class="datatables table" id="data-table-note">
+                    <table class="datatables table table-striped table-poppins " id="data-table-note">
                         <thead class="border-top">
                             <tr>
                                 <th>

@@ -11,7 +11,7 @@
                 <h5 class="card-title mb-0">Fuel Consumption</h5>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table-fuel">
+                <table class="datatables table table-striped table-poppins " id="data-table-fuel">
                     <thead class="border-top">
                         <tr>
                             <th>#</th>
@@ -44,7 +44,7 @@
                 </div> --}}
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
+                <table class="datatables table table-striped table-poppins " id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>
@@ -65,7 +65,7 @@
                 <h5 class="card-title mb-0">Tax</h5>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table-tax">
+                <table class="datatables table table-striped table-poppins " id="data-table-tax">
                     <thead class="border-top">
                         <tr>
                             <th>
@@ -86,7 +86,7 @@
                 <h5 class="card-title mb-0">Rent</h5>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table-rent">
+                <table class="datatables table table-striped table-poppins " id="data-table-rent">
                     <thead class="border-top">
                         <tr>
                             <th>

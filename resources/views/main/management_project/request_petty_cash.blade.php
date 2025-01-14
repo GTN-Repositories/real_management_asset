@@ -31,7 +31,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <table class="datatables table" id="data-table">
+        <table class="datatables table table-striped table-poppins " id="data-table">
             <thead class="border-top">
                 <tr>
                     <th>No</th>

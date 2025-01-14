@@ -1,51 +1,46 @@
 @extends('layouts.global')
 
 @section('title', 'Barang')
+@section('title_page', 'Sparepart Management / Barang')
 
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Inventory /</span> Barang</h4>
-        <div class="d-flex justify-content-end align-items-end mb-3 gap-3">
+        <div class="d-flex justify-content-end align-items-end gap-3 mb-4">
+            <!-- Tombol Hapus Masal -->
+            <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
+                <i class="fas fa-trash-alt"></i> Hapus Masal
+            </button>
             <div>
                 <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
                 <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
             </div>
+            @if (auth()->user()->hasPermissionTo('item-import-excel'))
+                <button type="button" class="btn btn-success btn-md d-flex align-items-center"
+                    onclick="importExcel()">
+                    <i class="fas fa-file-excel me-2"></i> Import Excel
+                </button>
+            @endif
+            @if (auth()->user()->hasPermissionTo('item-export-excel'))
+                <button onclick="exportExcel()" class="btn btn-success btn-md">
+                    <i class="fa-solid fa-file-excel me-2"></i>Export Excel
+                </button>
+            @endif
+            @if (auth()->user()->hasPermissionTo('item-create'))
+                <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                    <i class="fas fa-plus me-2"></i> Tambah
+                </button>
+            @endif
+            @if (auth()->user()->hasPermissionTo('item-request'))
+                <button type="button" class="btn btn-warning btn-md" onclick="editStock()">
+                    <i class="fas fa-box me-2"></i> Request Stock
+                </button>
+            @endif
+            <!-- Tombol Tambah -->
         </div>
         <!-- Product List Table -->
         <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Barang</h5>
-                <div class="d-flex justify-content-end gap-2">
-                    <!-- Tombol Hapus Masal -->
-                    <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
-                        <i class="fas fa-trash-alt"></i> Hapus Masal
-                    </button>
-                    @if (auth()->user()->hasPermissionTo('item-import-excel'))
-                        <button type="button" class="btn btn-success btn-sm d-flex align-items-center"
-                            onclick="importExcel()">
-                            <i class="fas fa-file-excel me-2"></i> Import Excel
-                        </button>
-                    @endif
-                    @if (auth()->user()->hasPermissionTo('item-export-excel'))
-                        <button onclick="exportExcel()" class="btn btn-success btn-sm">
-                            <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-                        </button>
-                    @endif
-                    @if (auth()->user()->hasPermissionTo('item-create'))
-                        <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                            <i class="fas fa-plus"></i> Tambah
-                        </button>
-                    @endif
-                    @if (auth()->user()->hasPermissionTo('item-request'))
-                        <button type="button" class="btn btn-warning btn-sm" onclick="editStock()">
-                            <i class="fas fa-box"></i> Request Stock
-                        </button>
-                    @endif
-                    <!-- Tombol Tambah -->
-                </div>
-            </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
+                <table class="datatables table table-striped table-poppins " id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>
