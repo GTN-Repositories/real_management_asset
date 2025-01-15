@@ -164,7 +164,7 @@ class WerehouseController extends Controller
             })
             ->addColumn('stock', function ($data) use ($request) {
                 $usedStock = $this->getUsedStock($data->item_id);
-                return ($data->stock ?? 0) + ($usedStock ?? 0);
+                return ((int)$data->stock ?? 0) + ($usedStock ?? 0);
             })
             ->addColumn('used_stock', function ($data) use ($request) {
                 $usedStock = $this->getUsedStock($data->item_id, $request->werehouse_id);
