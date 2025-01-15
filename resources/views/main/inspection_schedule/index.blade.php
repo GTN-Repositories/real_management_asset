@@ -34,7 +34,7 @@
         </div>
         <div class="card my-3 mb-3">
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
+                <table class="datatables table table-striped table-poppins " id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>

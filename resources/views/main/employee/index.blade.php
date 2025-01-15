@@ -1,49 +1,39 @@
 @extends('layouts.global')
 
 @section('title', 'Karyawan')
+@section('title_page', 'Master Data / Data Karyawan')
 
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Data Karyawan</h4>
 
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12 col-md-6" id="job_titleParent">
-                        <label class="form-label" for="job_title">Jabatan</label>
-                        <select name="job_title[]" id="job_title" class="select2 form-select" data-allow-clear="true"
-                            multiple required>
-                        </select>
-                    </div>
-                    <div class="col-12 col-md-6" id="management_projectParent">
-                        <label class="form-label" for="management_project_title">Management Project</label>
-                        <select name="management_project_title[]" id="management_project_title" class="select2 form-select"
-                            data-allow-clear="true" multiple required>
-                        </select>
-                    </div>
-                </div>
+        <div class="d-flex justify-content-end align-items-end gap-3 mb-4">
+            <div id="job_titleParent" style="max-width: 200px; width: 100%;">
+                <label class="form-label" for="job_title">Jabatan</label>
+                <select name="job_title[]" id="job_title" class="select2 form-select" data-allow-clear="true" multiple
+                    required>
+                </select>
             </div>
+            <div id="management_projectParent" style="max-width: 200px; width: 100%;">
+                <label class="form-label" for="management_project_title">Management Project</label>
+                <select name="management_project_title[]" id="management_project_title" class="select2 form-select"
+                    data-allow-clear="true" multiple required>
+                </select>
+            </div>
+            <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
+                <i class="fas fa-trash-alt"></i> Hapus Masal
+            </button>
+            <!-- Tombol Tambah -->
+            @if (auth()->user()->hasPermissionTo('employee-create'))
+                <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                    <i class="fas fa-plus me-2"></i> Tambah
+                </button>
+            @endif
         </div>
 
         <!-- Product List Table -->
         <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Karyawan</h5>
-                <div class="d-flex justify-content-end gap-2">
-                    <!-- Tombol Hapus Masal -->
-                    <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
-                        <i class="fas fa-trash-alt"></i> Hapus Masal
-                    </button>
-                    <!-- Tombol Tambah -->
-                    @if (auth()->user()->hasPermissionTo('employee-create'))
-                        <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                            <i class="fas fa-plus"></i> Tambah
-                        </button>
-                    @endif
-                </div>
-            </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
+                <table class="datatables table table-striped table-poppins " id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>

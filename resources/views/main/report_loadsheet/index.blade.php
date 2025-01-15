@@ -6,17 +6,17 @@
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
         <!-- Product List Table -->
-        <div class="d-flex justify-content-end mb-3">
+        <div class="d-flex justify-content-end mb-4">
             <button onclick="exportExcelByProject()" class="btn btn-success btn-md">
                 <i class="fa-solid fa-file-excel me-1"></i>Export Excel
             </button>
         </div>
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header">
                 <h5 class="card-title mb-0">Project Loadsheet</h5>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
+                <table class="datatables table table-striped table-poppins " id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>#</th>
@@ -27,8 +27,8 @@
                 </table>
             </div>
         </div>
-
-        <div class="d-flex justify-content-end my-3">
+        <br>
+        <div class="d-flex justify-content-end mt-3">
             <button onclick="exportExcelByAsset()" class="btn btn-success btn-md">
                 <i class="fa-solid fa-file-excel me-1"></i>Export Excel
             </button>
@@ -38,7 +38,7 @@
                 <h5 class="card-title mb-0">Asset Loadsheet</h5>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table-asset">
+                <table class="datatables table table-striped table-poppins " id="data-table-asset">
                     <thead class="border-top">
                         <tr>
                             <th>#</th>

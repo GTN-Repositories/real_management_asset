@@ -21,7 +21,7 @@
                 <h5 class="card-title mb-0">Grouping by project</h5>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table-project">
+                <table class="datatables table table-striped table-poppins " id="data-table-project">
                     <thead class="border-top">
                         <tr>
                             <th>#</th>

@@ -27,6 +27,7 @@ use App\Http\Controllers\Main\ManagementProjectController;
 use App\Http\Controllers\Main\ManagerController;
 use App\Http\Controllers\Main\MenuController;
 use App\Http\Controllers\Main\MonitoringController;
+use App\Http\Controllers\Main\NotificationController;
 use App\Http\Controllers\Main\OumController;
 use App\Http\Controllers\Main\PermisionController;
 use App\Http\Controllers\Main\ReminderEmailController;
@@ -263,6 +264,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
 
     Route::get('/asset-attachment/data', [AssetAttachmentController::class, 'data'])->name('asset-attachment.data');
     Route::post('/asset-attachment/{id}', [AssetAttachmentController::class, 'store'])->name('asset-attachment.store');
+
+    Route::get('/detail-notification', [NotificationController::class, 'index'])->name('notification.index');
+    Route::get('/detail-notification/{id}', [NotificationController::class, 'show'])->name('notification.show');
 });
 
 require __DIR__ . '/auth.php';

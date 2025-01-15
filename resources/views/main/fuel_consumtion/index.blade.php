@@ -5,36 +5,36 @@
 
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
-        <div class="d-flex justify-content-end gap-2 mb-3">
+        <div class="d-flex justify-content-end gap-3 mb-3">
             <!-- Tombol Hapus Masal -->
             <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
                 <i class="fas fa-trash-alt"></i> Hapus Masal
             </button>
             @if (auth()->user()->hasPermissionTo('fuel-import-excel'))
                 <button onclick="importExcel()" class="btn btn-success btn-md">
-                    <i class="fa-solid fa-file-excel me-1"></i>Import Excel
+                    <i class="fa-solid fa-file-excel me-2"></i>Import Excel
                 </button>
             @endif
             @if (auth()->user()->hasPermissionTo('fuel-export-excel'))
                 <button onclick="exportExcel()" class="btn btn-success btn-md">
-                    <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                    <i class="fa-solid fa-file-excel me-2"></i>Export Excel
                 </button>
             @endif
             @if (auth()->user()->hasPermissionTo('fuel-request'))
                 <button type="button" class="btn btn-warning btn-md" onclick="createDataRequest()">
-                    <i class="fas fa-plus"></i> Request Fuel
+                    <i class="fas fa-plus me-2"></i> Request Fuel
                 </button>
             @endif
             <!-- Tombol Tambah -->
             @if (auth()->user()->hasPermissionTo('fuel-create'))
                 <button type="button" class="btn btn-primary btn-md" onclick="createData()">
-                    <i class="fas fa-plus"></i> Tambah
+                    <i class="fas fa-plus me-2"></i> Tambah
                 </button>
             @endif
         </div>
         <div class="card">
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
+                <table class="datatables table table-striped table-poppins " id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>
