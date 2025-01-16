@@ -72,7 +72,7 @@ class AssetController extends Controller
             })
             ->addColumn('management_project', function ($data) {
                 if ($data->management_project_id) {
-                    return 'PRJ - '. $data->management_project_id .' '. ($data->management_project->name ?? '-');
+                    return 'PRJ - ' . $data->management_project_id . ' ' . ($data->management_project->name ?? '-');
                 } else {
                     return '-';
                 }
@@ -131,10 +131,14 @@ class AssetController extends Controller
                     $btn .= '<a href="javascript:void(0);" class="btn-info-data btn-sm me-2 shadow" title="Detail Data" onclick="detailData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
                 }
                 if (auth()->user()->hasPermissionTo('asset-edit')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                    if (!auth()->user()->hasRole('Read only')) {
+                        $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                    }
                 }
                 if (auth()->user()->hasPermissionTo('asset-delete')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                    if (!auth()->user()->hasRole('Read only')) {
+                        $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                    }
                 }
                 $btn .= '</div>';
 
@@ -204,7 +208,7 @@ class AssetController extends Controller
             $pic = $request->pic;
             $data->whereIn('manager', $pic);
         }
-        
+
         if (session('selected_project_id')) {
             $data->whereHas('management_project', function ($q) {
                 $q->where('id', Crypt::decrypt(session('selected_project_id')));
@@ -246,17 +250,17 @@ class AssetController extends Controller
             ->get();
 
         return response()->json($data);
-            // return datatables()
-            //     ->of($data)
-            //     ->addIndexColumn()
-            //     ->addColumn('category', function ($data) {
-            //         return $data->category;
-            //     })
-            //     ->addColumn('total_asset', function ($data) {
-            //         return $data->total_asset;
-            //     })
-            //     ->escapeColumns([])
-            //     ->make(true);
+        // return datatables()
+        //     ->of($data)
+        //     ->addIndexColumn()
+        //     ->addColumn('category', function ($data) {
+        //         return $data->category;
+        //     })
+        //     ->addColumn('total_asset', function ($data) {
+        //         return $data->total_asset;
+        //     })
+        //     ->escapeColumns([])
+        //     ->make(true);
     }
 
 

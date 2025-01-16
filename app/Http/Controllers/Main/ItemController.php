@@ -108,10 +108,14 @@ class ItemController extends Controller
                     $btn .= '<a href="javascript:void(0);" class="btn btn-info btn-sm me-1" title="Show Data" onclick="showData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
                 }
                 if (auth()->user()->hasPermissionTo('item-edit')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                    if (!auth()->user()->hasRole('Read only')) {
+                        $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                    }
                 }
                 if (auth()->user()->hasPermissionTo('item-delete')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                    if (!auth()->user()->hasRole('Read only')) {
+                        $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                    }
                 }
                 $btn .= '</div>';
 
@@ -219,7 +223,7 @@ class ItemController extends Controller
     {
         $data = Item::findByEncryptedId($id);
         $itemStock = ItemStock::where('item_id', Crypt::decrypt($data->id))->get();
-        return view('main.item.show', compact('data', 'itemStock'));    
+        return view('main.item.show', compact('data', 'itemStock'));
     }
 
     /**
@@ -491,8 +495,12 @@ class ItemController extends Controller
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
                 $btn .= '<a href="javascript:void(0);" class="btn btn-info btn-sm me-1" title="Show Data" onclick="showData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
-                $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
-                $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                if (!auth()->user()->hasRole('Read only')) {
+                        $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                    }
+                if (!auth()->user()->hasRole('Read only')) {
+                        $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                    }
                 $btn .= '</div>';
 
                 return $btn;

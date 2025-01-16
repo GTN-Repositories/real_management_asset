@@ -86,12 +86,16 @@ class InspectionScheduleController extends Controller
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
-                $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow me-2" title="Edit Data" onclick="showData(\'' . $data->id . '\')"><i class="ti ti-edit"></i></a>';
+                if (!auth()->user()->hasRole('Read only')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow me-2" title="Edit Data" onclick="showData(\'' . $data->id . '\')"><i class="ti ti-edit"></i></a>';
+                }
                 if (auth()->user()->hasPermissionTo('inspection-schedule-show')) {
                     $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
                 }
                 // if (auth()->user()->hasPermissionTo('asset-delete')) {
-                $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                if (!auth()->user()->hasRole('Read only')) {
+                    $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                }
                 // }
                 $btn .= '</div>';
 

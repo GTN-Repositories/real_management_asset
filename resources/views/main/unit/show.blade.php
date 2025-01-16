@@ -76,7 +76,9 @@
                 <div class="tab-pane fade show active" id="navs-justified-general" role="tabpanel">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="text-primary">Asset Information</h4>
-                        <a href="{{ asset('storage/qr_codes/' . $encryptedId . '.png') }}" class="btn btn-primary" download="qr_code_{{ $encryptedId }}.png"><i class="fas fa-download me-2"></i> Download QR Code</a>
+                        <a href="{{ asset('storage/qr_codes/' . $encryptedId . '.png') }}" class="btn btn-primary"
+                            download="qr_code_{{ $encryptedId }}.png"><i class="fas fa-download me-2"></i> Download QR
+                            Code</a>
                     </div>
 
                     <div class="row mb-3">
@@ -274,7 +276,10 @@
                 </div>
                 <div class="tab-pane fade" id="navs-justified-payment" role="tabpanel">
                     <div class="d-flex justify-content-end">
-                        <button type="button" class="btn btn-primary btn-md" onclick="createDataReminder()"> <i class="fas fa-plus me-1"></i> Tambah </button>
+                        @if (!auth()->user()->hasRole('Read only'))
+                            <button type="button" class="btn btn-primary btn-md" onclick="createDataReminder()"> <i
+                                    class="fas fa-plus me-1"></i> Tambah </button>
+                        @endif
                     </div>
                     <table class="datatables table table-striped table-poppins " id="data-table-reminder">
                         <thead class="border-top">
@@ -324,9 +329,12 @@
                                 </td>
                                 <td>never</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="createFile('asset')">
-                                        <i class="fas fa-pencil me-2"></i> Edit
-                                    </button>
+                                    @if (!auth()->user()->hasRole('Read only'))
+                                        <button type="button" class="btn btn-primary btn-sm"
+                                            onclick="createFile('asset')">
+                                            <i class="fas fa-pencil me-2"></i> Edit
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                             <tr>
@@ -335,9 +343,12 @@
                                 </td>
                                 <td>{{ $asset->stnk_date }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="createFile('stnk')">
-                                        <i class="fas fa-pencil me-2"></i> Edit
-                                    </button>
+                                    @if (!auth()->user()->hasRole('Read only'))
+                                        <button type="button" class="btn btn-primary btn-sm"
+                                            onclick="createFile('stnk')">
+                                            <i class="fas fa-pencil me-2"></i> Edit
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                             <tr>
@@ -346,10 +357,12 @@
                                         width="50"></td>
                                 <td>{{ $asset->asuransi_date }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm"
-                                        onclick="createFile('asuransi')">
-                                        <i class="fas fa-pencil me-2"></i> Edit
-                                    </button>
+                                    @if (!auth()->user()->hasRole('Read only'))
+                                        <button type="button" class="btn btn-primary btn-sm"
+                                            onclick="createFile('asuransi')">
+                                            <i class="fas fa-pencil me-2"></i> Edit
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                             <tr>
@@ -358,9 +371,12 @@
                                         width="50"></td>
                                 <td>{{ $asset->date_tax }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="createFile('tax')">
-                                        <i class="fas fa-pencil me-2"></i> Edit
-                                    </button>
+                                    @if (!auth()->user()->hasRole('Read only'))
+                                        <button type="button" class="btn btn-primary btn-sm"
+                                            onclick="createFile('tax')">
+                                            <i class="fas fa-pencil me-2"></i> Edit
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                         </tbody>
@@ -378,11 +394,13 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="file" class="form-control" id="attachment" name="attachment" style="display: none;"
-                    multiple>
+                        <input type="file" class="form-control" id="attachment" name="attachment"
+                            style="display: none;" multiple>
 
                         <div class="col-12 text-end">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            @if (!auth()->user()->hasRole('Read only'))
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            @endif
                         </div>
                     </form>
 
@@ -1134,55 +1152,55 @@
     </script>
     <script>
         $(document).ready(function() {
-        const dropzone = document.getElementById("customDropzone");
-        const fileInput = document.getElementById("attachment");
+            const dropzone = document.getElementById("customDropzone");
+            const fileInput = document.getElementById("attachment");
 
-        dropzone.addEventListener("dragover", function(e) {
-            e.preventDefault();
-            dropzone.style.backgroundColor = "#D0D0D0";
-        });
+            dropzone.addEventListener("dragover", function(e) {
+                e.preventDefault();
+                dropzone.style.backgroundColor = "#D0D0D0";
+            });
 
-        // Event untuk menangani drag-leave
-        dropzone.addEventListener("dragleave", function() {
-            dropzone.style.backgroundColor = "#F8F8F8";
-        });
+            // Event untuk menangani drag-leave
+            dropzone.addEventListener("dragleave", function() {
+                dropzone.style.backgroundColor = "#F8F8F8";
+            });
 
-        // Event untuk menangani drop file
-        dropzone.addEventListener("drop", function(e) {
-            e.preventDefault();
-            dropzone.style.backgroundColor = "#F8F8F8";
+            // Event untuk menangani drop file
+            dropzone.addEventListener("drop", function(e) {
+                e.preventDefault();
+                dropzone.style.backgroundColor = "#F8F8F8";
 
-            const files = e.dataTransfer.files;
-            handleFiles(files);
-        });
+                const files = e.dataTransfer.files;
+                handleFiles(files);
+            });
 
-        // Event untuk klik
-        dropzone.addEventListener("click", function() {
-            fileInput.click();
-        });
+            // Event untuk klik
+            dropzone.addEventListener("click", function() {
+                fileInput.click();
+            });
 
-        // Event untuk perubahan pada input file
-        fileInput.addEventListener("change", function() {
-            handleFiles(fileInput.files);
-        });
+            // Event untuk perubahan pada input file
+            fileInput.addEventListener("change", function() {
+                handleFiles(fileInput.files);
+            });
 
-        function handleFiles(files) {
-            if (files.length > 0) {
-                const file = files[0];
+            function handleFiles(files) {
+                if (files.length > 0) {
+                    const file = files[0];
 
-                console.log(file);
+                    console.log(file);
 
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('imagePreview');
-                    if (preview) {
-                        preview.src = e.target.result;
-                    }
-                };
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.getElementById('imagePreview');
+                        if (preview) {
+                            preview.src = e.target.result;
+                        }
+                    };
 
-                reader.readAsDataURL(file);
+                    reader.readAsDataURL(file);
+                }
             }
-        }
-    });
+        });
     </script>
 @endpush

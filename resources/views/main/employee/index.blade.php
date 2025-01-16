@@ -9,8 +9,7 @@
         <div class="d-flex justify-content-end align-items-end gap-3 mb-4">
             <div id="job_titleParent" style="max-width: 200px; width: 100%;">
                 <label class="form-label" for="job_title">Jabatan</label>
-                <select name="job_title[]" id="job_title" class="select2 form-select" data-allow-clear="true" multiple
-                    required>
+                <select name="job_title[]" id="job_title" class="select2 form-select" data-allow-clear="true" multiple required>
                 </select>
             </div>
             <div id="management_projectParent" style="max-width: 200px; width: 100%;">
@@ -19,14 +18,16 @@
                     data-allow-clear="true" multiple required>
                 </select>
             </div>
-            <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
-                <i class="fas fa-trash-alt me-2"></i> Hapus Masal
-            </button>
-            <!-- Tombol Tambah -->
-            @if (auth()->user()->hasPermissionTo('employee-create'))
-                <button type="button" class="btn btn-primary btn-md" onclick="createData()">
-                    <i class="fas fa-plus me-2"></i> Tambah
+            @if (!auth()->user()->hasRole('Read only'))
+                <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
+                    <i class="fas fa-trash-alt"></i> Hapus Masal
                 </button>
+                <!-- Tombol Tambah -->
+                @if (auth()->user()->hasPermissionTo('employee-create'))
+                    <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                        <i class="fas fa-plus me-2"></i> Tambah
+                    </button>
+                @endif
             @endif
         </div>
 
