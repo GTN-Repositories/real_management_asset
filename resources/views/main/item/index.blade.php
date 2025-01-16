@@ -11,30 +11,31 @@
                 <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
                 <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
             </div>
-            <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
-                <i class="fas fa-trash-alt me-2"></i> Hapus Masal
-            </button>
-            @if (auth()->user()->hasPermissionTo('item-import-excel'))
-                <button type="button" class="btn btn-success btn-md d-flex align-items-center" onclick="importExcel()">
-                    <i class="fas fa-file-excel me-2"></i> Import Excel
+            @if (!auth()->user()->hasRole('Read only'))
+                <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
+                    <i class="fas fa-trash-alt"></i> Hapus Masal
                 </button>
+                @if (auth()->user()->hasPermissionTo('item-import-excel'))
+                    <button type="button" class="btn btn-success btn-md d-flex align-items-center" onclick="importExcel()">
+                        <i class="fas fa-file-excel me-2"></i> Import Excel
+                    </button>
+                @endif
+                @if (auth()->user()->hasPermissionTo('item-export-excel'))
+                    <button onclick="exportExcel()" class="btn btn-success btn-md">
+                        <i class="fa-solid fa-file-excel me-2"></i>Export Excel
+                    </button>
+                @endif
+                @if (auth()->user()->hasPermissionTo('item-create'))
+                    <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                        <i class="fas fa-plus me-2"></i> Tambah
+                    </button>
+                @endif
+                @if (auth()->user()->hasPermissionTo('item-request'))
+                    <button type="button" class="btn btn-warning btn-md" onclick="editStock()">
+                        <i class="fas fa-box me-2"></i> Request Stock
+                    </button>
+                @endif
             @endif
-            @if (auth()->user()->hasPermissionTo('item-export-excel'))
-                <button onclick="exportExcel()" class="btn btn-success btn-md">
-                    <i class="fa-solid fa-file-excel me-2"></i>Export Excel
-                </button>
-            @endif
-            @if (auth()->user()->hasPermissionTo('item-request'))
-                <button type="button" class="btn btn-warning btn-md" onclick="editStock()">
-                    <i class="fas fa-box me-2"></i> Request Stock
-                </button>
-            @endif
-            @if (auth()->user()->hasPermissionTo('item-create'))
-                <button type="button" class="btn btn-primary btn-md" onclick="createData()">
-                    <i class="fas fa-plus me-2"></i> Tambah
-                </button>
-            @endif
-            <!-- Tombol Tambah -->
         </div>
         <!-- Product List Table -->
         <div class="card">

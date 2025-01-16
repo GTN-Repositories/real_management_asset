@@ -122,26 +122,32 @@
                             <td>{{ $item->status ?? '-' }}</td>
                             <td>{{ $item->approvedBy->name ?? '-' }}</td>
                             <td>{{ $item->created_at->format('d-m-Y H:i') ?? '-' }}</td>
-                            @if (auth()->user()->hasPermissionTo('item-approve'))
-                                <td>
-                                    @if ($item->status == 'approved')
-                                        {{-- BUTTON REJECT --}}
-                                        <button type="button" onclick="approveStock('{{ $item->id }}', 'rejected')"
-                                            class="btn btn-sm btn-danger m-1"><i class="fas fa-close"></i></button>
-                                    @elseif($item->status == 'rejected')
-                                        {{-- BUTTON APPROVE --}}
-                                        <button type="button" onclick="approveStock('{{ $item->id }}', 'approved')"
-                                            class="btn btn-sm btn-primary m-1"><i class="fas fa-check"></i></button>
-                                    @elseif($item->status == 'pending')
-                                        {{-- BUTTON APPROVE --}}
-                                        <button type="button" onclick="approveStock('{{ $item->id }}', 'approved')"
-                                            class="btn btn-sm btn-primary m-1"><i class="fas fa-check"></i></button>
+                            @if (!auth()->user()->hasRole('Read only'))
+                                @if (auth()->user()->hasPermissionTo('item-approve'))
+                                    <td>
+                                        @if ($item->status == 'approved')
+                                            {{-- BUTTON REJECT --}}
+                                            <button type="button"
+                                                onclick="approveStock('{{ $item->id }}', 'rejected')"
+                                                class="btn btn-sm btn-danger m-1"><i class="fas fa-close"></i></button>
+                                        @elseif($item->status == 'rejected')
+                                            {{-- BUTTON APPROVE --}}
+                                            <button type="button"
+                                                onclick="approveStock('{{ $item->id }}', 'approved')"
+                                                class="btn btn-sm btn-primary m-1"><i class="fas fa-check"></i></button>
+                                        @elseif($item->status == 'pending')
+                                            {{-- BUTTON APPROVE --}}
+                                            <button type="button"
+                                                onclick="approveStock('{{ $item->id }}', 'approved')"
+                                                class="btn btn-sm btn-primary m-1"><i class="fas fa-check"></i></button>
 
-                                        {{-- BUTTON REJECT --}}
-                                        <button type="button" onclick="approveStock('{{ $item->id }}', 'rejected')"
-                                            class="btn btn-sm btn-danger m-1"><i class="fas fa-close"></i></button>
-                                    @endif
-                                </td>
+                                            {{-- BUTTON REJECT --}}
+                                            <button type="button"
+                                                onclick="approveStock('{{ $item->id }}', 'rejected')"
+                                                class="btn btn-sm btn-danger m-1"><i class="fas fa-close"></i></button>
+                                        @endif
+                                    </td>
+                                @endif
                             @endif
                         </tr>
                     @empty
