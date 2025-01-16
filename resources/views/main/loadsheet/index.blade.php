@@ -10,7 +10,7 @@
         <div class="d-flex justify-content-end gap-3 mb-4">
             <!-- Tombol Hapus Masal -->
             <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
-                <i class="fas fa-trash-alt"></i> Hapus Masal
+                <i class="fas fa-trash-alt me-2"></i> Hapus Masal
             </button>
             @if (auth()->user()->hasPermissionTo('loadsheet-import-excel'))
                 <button onclick="importExcel()" class="btn btn-success btn-md">

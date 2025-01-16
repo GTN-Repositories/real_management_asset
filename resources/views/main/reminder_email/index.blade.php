@@ -1,31 +1,24 @@
 @extends('layouts.global')
 
 @section('title', 'Reminder Email')
+@section('title_page', 'Reminder Email List')
 
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
-        <h4 class="mb-4">Reminder Email List</h4>
-
-        <p class="mb-4">
-            A user is granted access based on their User, which allows an administrator to manage user-specific functionalities and permissions.
-        </p>
+        <div class="d-flex justify-content-end gap-3 mb-4">
+            <!-- Tombol Hapus Masal -->
+            <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
+                <i class="fas fa-trash-alt me-2"></i> Hapus Masal
+            </button>
+            <!-- Tombol Tambah -->
+            @if (auth()->user()->hasPermissionTo('user-create'))
+            <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                <i class="fas fa-plus me-2"></i> Tambah
+            </button>
+            @endif
+        </div>
         <!-- User cards -->
         <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <h5 class="card-title mb-0">Reminder Email</h5>
-                <div class="d-flex justify-content-end gap-2">
-                    <!-- Tombol Hapus Masal -->
-                    <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
-                        <i class="fas fa-trash-alt"></i> Hapus Masal
-                    </button>
-                    <!-- Tombol Tambah -->
-                    @if (auth()->user()->hasPermissionTo('user-create'))
-                    <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                        <i class="fas fa-plus"></i> Tambah
-                    </button>
-                    @endif
-                </div>
-            </div>
             <div class="card-datatable table-responsive">
                 <table class="datatables table table-striped table-poppins  border-top" id="data-table">
                     <thead>
