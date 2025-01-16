@@ -86,6 +86,7 @@ class InspectionScheduleController extends Controller
             })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
+                $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow me-2" title="Edit Data" onclick="showData(\'' . $data->id . '\')"><i class="ti ti-edit"></i></a>';
                 if (auth()->user()->hasPermissionTo('inspection-schedule-show')) {
                     $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
                 }
@@ -186,6 +187,7 @@ class InspectionScheduleController extends Controller
                 $itemStocks = [];
                 $kanibalStocks = [];
                 $assetKanibalIds = [];
+                // dd($data['selected_items']);
                 if (isset($data['selected_items'])) {
                     foreach ($data['selected_items'] as $encryptedItemId) {
                         try {
@@ -200,8 +202,8 @@ class InspectionScheduleController extends Controller
                                 $kanibalStocks[$decryptedItemId] = $encryptedItemId['kanibal_stock'];
                             }
 
-                            if (isset($encryptedItemId['asset_kanibal_id'])) {
-                                $assetKanibalIds[$decryptedItemId] = Crypt::decrypt($encryptedItemId['asset_kanibal_id']);
+                            if (isset($encryptedItemId['asset_kanibal_id']) && $encryptedItemId['asset_kanibal_id'] !== 'null') {
+                                $assetKanibalIds[$decryptedItemId] = str_replace('AST - ', '', $encryptedItemId['asset_kanibal_id']);
                             }
                         } catch (\Exception $e) {
                             continue;
@@ -209,10 +211,6 @@ class InspectionScheduleController extends Controller
                     }
                     sort($decryptedItemIds);
                 }
-
-                // Asset::where('id', $asset_id)->update([
-                //     'status' => 'UnderMaintenance'
-                // ]);
 
                 $schedule = InspectionSchedule::create([
                     'name' => $data['name'],
@@ -222,12 +220,10 @@ class InspectionScheduleController extends Controller
                     'asset_id' => $asset_id,
                     'werehouse_id' => $werehouse_id,
                     'note' => $data['note'],
-                    // 'workshop' => $data['workshop'],
-                    // 'mechanic_name' => $data['mechanic_name'],
                     'item_id' => json_encode($decryptedItemIds) ?? null,
                     'item_stock' => json_encode($itemStocks) ?? null,
                     'kanibal_stock' => json_encode($kanibalStocks) ?? null,
-                    'asset_kanibal_id' => json_encode($assetKanibalIds) ?? null,
+                    'asset_kanibal_id' => json_encode(array_filter($assetKanibalIds)) ?? null,
                 ]);
 
                 foreach ($decryptedItemIds as $itemId) {
@@ -276,7 +272,6 @@ class InspectionScheduleController extends Controller
             $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemStocks, $kanibalStocks, $assetKanibalIds) {
                 $itemId = (string) Crypt::decrypt($item->id);
 
-
                 $asset_id = $assetKanibalIds[$itemId] ?? 0;
                 $item->stock_in_schedule = $itemStocks[$itemId] ?? 0;
                 $item->kanibal_stock_in_schedule = $kanibalStocks[$itemId] ?? 0;
@@ -300,13 +295,74 @@ class InspectionScheduleController extends Controller
         }
     }
 
+    public function show(string $id)
+    {
+        try {
+            $data = InspectionSchedule::findByEncryptedId($id);
+
+            $itemIds = is_array(json_decode($data->item_id, true))
+                ? json_decode($data->item_id, true)
+                : [];
+
+            $itemStocks = is_array(json_decode($data->item_stock, true))
+                ? json_decode($data->item_stock, true)
+                : [];
+
+            $kanibalStocks = is_array(json_decode($data->kanibal_stock, true))
+                ? json_decode($data->kanibal_stock, true)
+                : [];
+
+            $assetKanibalIds = is_array(json_decode($data->asset_kanibal_id, true))
+                ? json_decode($data->asset_kanibal_id, true)
+                : [];
+
+            $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemIds, $itemStocks, $kanibalStocks, $assetKanibalIds) {
+                $itemId = (string) Crypt::decrypt($item->id);
+                $entries = [];
+
+                // Jika item memiliki stock biasa
+                if (isset($itemStocks[$itemId]) && $itemStocks[$itemId] > 0) {
+                    $stockEntry = clone $item;
+                    $stockEntry->stock_in_schedule = $itemStocks[$itemId];
+                    $stockEntry->kanibal_stock_in_schedule = 0;
+                    $stockEntry->assetKanibalName = '-';
+                    $stockEntry->assetKanibalId = 0;
+                    $entries[] = $stockEntry;
+                }
+
+                // Jika item memiliki kanibal stock
+                if (isset($kanibalStocks[$itemId]) && $kanibalStocks[$itemId] > 0) {
+                    $kanibalEntry = clone $item;
+                    $kanibalEntry->stock_in_schedule = 0;
+                    $kanibalEntry->kanibal_stock_in_schedule = $kanibalStocks[$itemId];
+                    $asset_id = $assetKanibalIds[$itemId] ?? 0;
+                    $kanibalEntry->assetKanibalName = isset($assetKanibalIds[$itemId])
+                        ? $asset_id . ' - ' . Asset::find($assetKanibalIds[$itemId])->name . ' - ' . Asset::find($assetKanibalIds[$itemId])->license_plate
+                        : '-';
+                    $kanibalEntry->assetKanibalId = $asset_id;
+                    $entries[] = $kanibalEntry;
+                }
+
+                return $entries;
+            })->flatten(1);
+
+            $comments = InspectionComment::where('inspection_schedule_id', $data->id)->get();
+
+            return view('main.inspection_schedule.show', compact('data', 'items', 'comments'));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error loading data: ' . $e->getMessage());
+        }
+    }
+
     public function update(Request $request, string $id)
     {
         try {
             return $this->atomic(function () use ($request, $id) {
                 $schedule = InspectionSchedule::findByEncryptedId($id);
 
-                $data = $request->only(['status', 'comment', 'asset_id']);
+                $data = $request->all();
+
+                // dd($data);
 
                 try {
                     $assst_id = Crypt::encrypt($data['asset_id']);
@@ -315,11 +371,47 @@ class InspectionScheduleController extends Controller
                 }
 
                 $asset = Asset::where('id', Crypt::decrypt($assst_id))->first();
-                
+
                 $asset->update([
-                    'status' => $data['status']
+                    'status' => $data['status'] ?? $asset->status,
                 ]);
 
+                $decryptedItemIds = [];
+                $itemStocks = [];
+                $kanibalStocks = [];
+                $assetKanibalIds = [];
+
+                if (isset($data['selected_items'])) {
+                    foreach ($data['selected_items'] as $encryptedItemId) {
+                        try {
+                            $decryptedItemId = Crypt::decrypt($encryptedItemId['id']);
+                            $decryptedItemIds[] = $decryptedItemId;
+
+                            // Hanya simpan item stock yang tidak kosong
+                            if (!empty($encryptedItemId['item_stock'])) {
+                                $itemStocks[$decryptedItemId] = $encryptedItemId['item_stock'];
+                            }
+
+                            // Hanya simpan kanibal stock yang tidak kosong
+                            if (!empty($encryptedItemId['kanibal_stock'])) {
+                                $kanibalStocks[$decryptedItemId] = $encryptedItemId['kanibal_stock'];
+                                if (isset($encryptedItemId['asset_kanibal_id']) && $encryptedItemId['asset_kanibal_id'] !== 'null') {
+                                    $assetKanibalIds[$decryptedItemId] = str_replace('AST - ', '', $encryptedItemId['asset_kanibal_id']);
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            continue;
+                        }
+                    }
+                    sort($decryptedItemIds);
+                }
+
+                $data['item_id'] = json_encode($decryptedItemIds) ?? null;
+                $data['item_stock'] = json_encode($itemStocks) ?? null;
+                $data['kanibal_stock'] = json_encode($kanibalStocks) ?? null;
+                $data['asset_kanibal_id'] = json_encode($assetKanibalIds) ?? null;
+
+                // dd($data);
                 $schedule->update($data);
 
                 // SEND EMAIL

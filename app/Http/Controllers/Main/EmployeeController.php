@@ -116,7 +116,7 @@ class EmployeeController extends Controller
                     }
                 }
             });
-        
+
         if (session('selected_project_id')) {
             $data->whereHas('managementProject', function ($q) {
                 $q->where('id', Crypt::decrypt(session('selected_project_id')));
@@ -142,7 +142,9 @@ class EmployeeController extends Controller
         try {
             return $this->atomic(function () use ($data) {
                 $data['job_title_id'] = Crypt::decrypt($data['job_title_id']);
-                $data['management_project_id'] = Crypt::decrypt($data['management_project_id']);
+                if (isset($data['management_project_id'])) {
+                    $data['management_project_id'] = Crypt::decrypt($data['management_project_id']);
+                }
                 $data = Employee::create($data);
 
                 return response()->json([

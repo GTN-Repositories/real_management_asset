@@ -337,6 +337,22 @@
                 });
         }
 
+        function showData(id) {
+
+            $.ajax({
+                    url: "{{ route('inspection-schedule.show', ':id') }}".replace(':id', id),
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
+                });
+        }
+
         function createDataMaintenance() {
             $.ajax({
                     url: "{{ route('maintenances.create') }}",
