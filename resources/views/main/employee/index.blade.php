@@ -19,8 +19,8 @@
                     data-allow-clear="true" multiple required>
                 </select>
             </div>
-            <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
-                <i class="fas fa-trash-alt"></i> Hapus Masal
+            <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
+                <i class="fas fa-trash-alt me-2"></i> Hapus Masal
             </button>
             <!-- Tombol Tambah -->
             @if (auth()->user()->hasPermissionTo('employee-create'))

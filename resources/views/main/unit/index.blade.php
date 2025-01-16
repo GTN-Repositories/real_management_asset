@@ -34,7 +34,7 @@
             </div>
             <!-- Tombol Hapus Masal -->
             <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
-                <i class="fas fa-trash-alt"></i> Hapus Masal
+                <i class="fas fa-trash-alt me-2"></i> Hapus Masal
             </button>
             <!-- Tombol Tambah -->
             @if (auth()->user()->hasPermissionTo('asset-import-excel'))
@@ -44,12 +44,12 @@
             @endif
             @if (auth()->user()->hasPermissionTo('asset-export-excel'))
                 <button onclick="exportExcel()" class="btn btn-success btn-md">
-                    <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                    <i class="fa-solid fa-file-excel me-2"></i>Export Excel
                 </button>
             @endif
             @if (auth()->user()->hasPermissionTo('asset-create'))
                 <button type="button" class="btn btn-primary" onclick="createData()"><i
-                        class="fas fa-plus me-1"></i>Tambah</button>
+                        class="fas fa-plus me-2"></i>Tambah</button>
             @endif
         </div>
         <!-- Product List Table -->
