@@ -3,46 +3,50 @@
 @section('title', 'Dashboard')
 @section('title_page', 'Dashboard')
 
+@push('css')
+    <style>
+        .background-card {
+            background-image: url("{{ asset('images/backgorund_spedometer.png') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+@endpush
+
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="mx-5 flex-grow-1 container-p-y">
         <!-- Card Border Shadow -->
         <div class="row">
             <div class="col-sm-6 col-lg-12 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center pb-1">
-                            <div class="d-flex justify-content-center align-items-end my-1 gap-3">
-                                <div>
-                                    <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
-                                    <input type="text" id="date-range-picker" class="form-control"
-                                        placeholder="Select Date Range">
-                                </div>
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        filter tanggal
-                                    </button>
-                                    <ul class="dropdown-menu" style="">
-                                        <li><a class="dropdown-item" id="hari ini" href="javascript:void(0);">hari ini</a>
-                                        </li>
-                                        <li><a class="dropdown-item" id="minggu ini" href="javascript:void(0);">minggu
-                                                ini</a></li>
-                                        <li><a class="dropdown-item" id="bulan ini" href="javascript:void(0);">bulan ini</a>
-                                        </li>
-                                        <li><a class="dropdown-item" id="bulan kemarin" href="javascript:void(0);">bulan
-                                                kemarin</a></li>
-                                        <li><a class="dropdown-item" id="tahun ini" href="javascript:void(0);">tahun ini</a>
-                                        </li>
-                                        <li><a class="dropdown-item" id="tahun kemarin" href="javascript:void(0);">tahun
-                                                kemarin</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                <div class="d-flex justify-content-end align-items-end my-1 gap-3">
+                    <div>
+                        <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
+                        <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            filter tanggal
+                        </button>
+                        <ul class="dropdown-menu" style="">
+                            <li><a class="dropdown-item" id="hari ini" href="javascript:void(0);">hari ini</a>
+                            </li>
+                            <li><a class="dropdown-item" id="minggu ini" href="javascript:void(0);">minggu
+                                    ini</a></li>
+                            <li><a class="dropdown-item" id="bulan ini" href="javascript:void(0);">bulan ini</a>
+                            </li>
+                            <li><a class="dropdown-item" id="bulan kemarin" href="javascript:void(0);">bulan
+                                    kemarin</a></li>
+                            <li><a class="dropdown-item" id="tahun ini" href="javascript:void(0);">tahun ini</a>
+                            </li>
+                            <li><a class="dropdown-item" id="tahun kemarin" href="javascript:void(0);">tahun
+                                    kemarin</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-2 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
@@ -55,11 +59,11 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-3 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
-                            <div class="avatar me-2">
+                            <div class="avatar me-1">
                                 <img src="{{ asset('images/fuel.png') }}" alt="">
                             </div>
                             <strong class="mb-0 text-primary">Fuel Consumption</strong>
@@ -68,7 +72,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-2 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
@@ -81,7 +85,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-2 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
@@ -94,7 +98,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-3 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
@@ -111,7 +115,7 @@
         <!-- Status Donut Charts -->
         <div class="row">
             <!-- Operational Status -->
-            <div class="col-md-3 col-lg-3 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Operational Status</h5>
@@ -128,12 +132,14 @@
             </div>
 
             <!-- Maintenance Status -->
-            <div class="col-md-3 col-lg-3 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Maintenance Status</h5>
                         <div class="btn-group">
-                            <i class="ti ti-download" id="maintenance-download"></i>
+                            <button class="btn btn-sm btn-outline-secondary" id="maintenance-download">
+                                <i class="ti ti-download"></i>
+                            </button>
                         </div>
                     </div>
                     <div class="card-body">
@@ -143,7 +149,7 @@
             </div>
 
             <!-- Asset Status -->
-            <div class="col-md-6 col-lg-6 mb-4">
+            <div class="col mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Asset Status</h5>
@@ -158,44 +164,94 @@
                     </div>
                 </div>
             </div>
-
-            <div class="col-md-6 col-lg-6 mb-4 d-flex flex-column justify-content-between">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center"><h5 class="m-0 text-primary fw-bold">Open Issue</h5></div>
+        </div>
+        <div class="row mt-2">
+            <div class="col d-flex flex-column justify-content-between">
+                <div class="card" style="height: 300px;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 text-primary fw-bold">Open Issue</h5>
+                    </div>
                     <div class="card-body d-flex justify-content-center">
                         <div class="row gap-4">
                             <div class="col d-flex flex-column align-items-center">
-                                <h1 class="text-primary fw-bold" style="font-size: 50px;" id="total-maintenance">Loading...</h1>
+                                <h1 class="text-primary fw-bold" style="font-size: 50px;" id="total-maintenance">
+                                    Loading...</h1>
                                 <h3 class="text-muted">Open</h3>
                             </div>
                             <div class="col d-flex flex-column align-items-center">
-                                <h1 class="text-muted fw-bold" style="font-size: 50px;" id="total-overdue">Loading...</h1>
+                                <h1 class="text-muted fw-bold" style="font-size: 50px;" id="total-overdue">Loading...
+                                </h1>
                                 <h3 class="text-muted">Overdue</h3>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-6 mb-4 d-flex flex-column justify-content-between">
-                <div class="col-12 col-md-12" id="managementProject">
+            <div class="col d-flex flex-column justify-content-between">
+                {{-- <div class="col-12 col-md-12" id="managementProject">
                     <div class="select2-primary">
                         <div class="position-relative">
                             <select id="management_project_id" name="management_project_id" class="select2 form-select"
                                 required>
-                                <!-- Options will be populated dynamically -->
                             </select>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
+                <div class="card background-card" style="height: 300px;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="m-0 text-white">Speedometer</h4>
+                    </div>
+                    <div class="card-body row">
+                        <div class="col-6" id="speedometerChart"></div>
+                        <div class="col-6 d-flex flex-column">
+                            <div class="mb-2">
+                                <h5 class="text-white fw-bold mb-0">Project Value</h5>
+                                <h2 class="text-white fw-bold" id="max-value-speedometer"></h2>
+                            </div>
+                            <div class="mb-3">
+                                <h5 class="text-white fw-bold mb-0">Actual Sales</h5>
+                                <h2 class="text-white fw-bold" id="current-value-speedometer"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="m-0">Speedometer</h5>
+                        <h5 class="m-0">Total Asset By Kategori</h5>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-secondary" id="group-asset-by-category-download">
+                                <i class="ti ti-download"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <div id="speedometerChart"></div>
+                        <div id="groupAssetByCategoryChart"></div>
                     </div>
                 </div>
+            </div>
+            {{-- <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="m-0 text-primary fw-bold">Total Asset By Kategori</h5>
+                        <div class="card-datatable table-responsive">
+                            <table class="datatables table border-top" id="data-table-by-category-asset">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Kategori</th>
+                                        <th>Total Aset</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -337,6 +393,8 @@
 
             fetchFuelData();
             fetchLoadsheetData();
+            init_table_category_asset();
+            updateSpeedometerWithDateRange();
         });
 
         function fetchFuelData(startDate = null, endDate = null, filterType = null) {
@@ -412,7 +470,7 @@
                     management_project_id: managementProjectIdValue,
                     start_date: startDate,
                     end_date: endDate,
-                    filterType: filterType, // Ensure filterType is sent
+                    filterType: filterType,
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -433,18 +491,24 @@
         let speedometerChart;
 
         function init_speedometer_chart(data) {
+            const maxValue = data.maxValue;
+            const currentValue = Math.min(data.totalPrice, maxValue) || 0;
+            document.getElementById('max-value-speedometer').innerText = maxValue;
+            document.getElementById('current-value-speedometer').innerText = currentValue;
+
             const options = {
                 chart: {
                     type: 'radialBar',
-                    height: 350,
+                    height: 200,
+                    colors: ['#426B80'],
                     sparkline: {
                         enabled: true
                     },
                     animations: {
-                        enabled: false
-                    }
+                        enabled: true
+                    },
                 },
-                series: [parseFloat(data.performance)], // Ubah ke format number
+                series: [currentValue],
                 labels: ['Performance'],
                 plotOptions: {
                     radialBar: {
@@ -454,27 +518,28 @@
                             size: '60%'
                         },
                         track: {
-                            background: '#e7e7e7',
+                            background: '#FFFFFF',
                             strokeWidth: '97%',
                             margin: 5
                         },
                         dataLabels: {
                             name: {
                                 fontSize: '22px',
-                                color: '#212529'
+                                color: '#426B80'
                             },
                             value: {
                                 fontSize: '36px',
-                                color: '#343a40',
+                                color: '#FFFFFF',
                                 formatter: function(val) {
-                                    return val.toFixed(2) + '%';
+                                    return val.toFixed(2);
                                 }
                             },
                             total: {
                                 show: true,
-                                label: 'Actual Sales',
+                                label: '',
+                                color: '#FFFFFF',
                                 formatter: function(w) {
-                                    return data.totalPrice;
+                                    return w.globals.seriesTotals.reduce((a, b) => a + b, 0)
                                 }
                             }
                         }
@@ -486,22 +551,12 @@
                 stroke: {
                     lineCap: 'round'
                 },
-                title: {
-                    text: `Project Value: ${data.maxValue}`,
-                    align: 'right',
-                    offsetX: 10,
-                    style: {
-                        color: '#212529',
-                        fontSize: '18px'
-                    }
-                }
             };
 
-
-            speedometerChart = new ApexCharts(document.querySelector("#speedometerChart"),
-                options);
+            const speedometerChart = new ApexCharts(document.querySelector("#speedometerChart"), options);
             speedometerChart.render();
         }
+
 
 
         function fetchStatusData() {
@@ -621,23 +676,23 @@
                 ...baseOptions,
                 colors: ['#FFAC82', '#000BE1', '#FABE29', '#134B70'],
                 series: [data.idle || 0, data.standby || 0, data.underMaintenance || 0, data.active || 0],
-                labels: ['Idle', 'StandBy', 'Under Maintenance', 'Active']
+                labels: ['Idle', 'StandBy', 'Maintenance', 'Active']
             });
             operationalChart.render();
 
             // Maintenance Status Chart
             const maintenanceChart = new ApexCharts(document.querySelector("#maintenanceStatusChart"), {
                 ...baseOptions,
-                colors: ['#FF9F40', '#4BC0C0', '#9966FF', '#FF6384'],
+                colors: ['#FFAC82', '#000BE1', '#FABE29', '#134B70'],
                 series: [data.onHold || 0, data.finish || 0, data.scheduled || 0, data.inProgress || 0],
-                labels: ['On Hold', 'Finish', 'Scheduled', 'In Progress'],
+                labels: ['Hold', 'Finish', 'Scheduled', 'Progress'],
             });
             maintenanceChart.render();
 
             // Asset Status Chart
             const assetChart = new ApexCharts(document.querySelector("#assetStatusChart"), {
                 ...baseOptions,
-                colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                colors: ['#FFAC82', '#000BE1', '#FABE29', '#134B70'],
                 series: [data.damaged || 0, data.fair || 0, data.needsRepair || 0, data.good || 0],
                 labels: ['Damaged', 'Fair', 'Needs Repair', 'Good']
             });
@@ -669,10 +724,195 @@
                     window.chartInstances.asset.exportToSVG();
                 }
             });
+
+            document.getElementById('group-asset-by-category-download').addEventListener('click', function() {
+                if (window.chartInstances?.asset) {
+                    window.chartInstances.asset.exportToSVG();
+                }
+            });
         }
 
         function showErrorMessage(message) {
             console.error(message);
         }
+
+        function init_table_category_asset(keyword = '') {
+            // var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+            // var table = $('#data-table-by-category-asset').DataTable({
+            //     processing: true,
+            //     serverSide: true,
+            //     destroy: true,
+            //     columnDefs: [{
+            //         target: 0,
+            //         visible: true,
+            //         searchable: false
+            //     }, ],
+
+            //     ajax: {
+            //         type: "GET",
+            //         url: "{{ route('asset.getDataGroupedByCategory') }}",
+            //         data: {
+            //             'keyword': keyword
+            //         }
+            //     },
+            //     columns: [
+            //         {
+            //             data: 'DT_RowIndex',
+            //             name: 'DT_RowIndex',
+            //         },
+            //         {
+            //             data: 'category',
+            //             name: 'category'
+            //         },
+            //         {
+            //             data: 'total_asset',
+            //             name: 'total_asset'
+            //         },
+            //     ]
+            // });
+
+            var postForm = {
+                'keyword': keyword,
+            };
+            $.ajax({
+                url: '{{ route("asset.getDataGroupedByCategory") }}', 
+                type: 'GET', 
+                data : postForm,
+                dataType  : 'json',
+            })
+            .done(function(data) {
+                initializeChartsCategoryAsset(data);
+            })
+            .fail(function() {
+                alert('Load data failed.');
+            });
+        }
+
+        function initializeChartsCategoryAsset(data) {
+            // Base options for all donut charts
+            const baseOptions = {
+                chart: {
+                    type: 'donut',
+                    height: 350,
+                    toolbar: {
+                        show: true
+                    },
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 800,
+                        animateGradually: {
+                            enabled: true,
+                            delay: 150
+                        },
+                        dynamicAnimation: {
+                            enabled: true,
+                            speed: 350
+                        }
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '70%',
+                            labels: {
+                                show: true,
+                                name: {
+                                    show: true,
+                                    fontSize: '22px',
+                                    fontFamily: 'Helvetica, Arial, sans-serif',
+                                    color: undefined,
+                                    offsetY: -10
+                                },
+                                value: {
+                                    show: true,
+                                    fontSize: '16px',
+                                    fontFamily: 'Helvetica, Arial, sans-serif',
+                                    color: undefined,
+                                    offsetY: 16,
+                                    formatter: function(val) {
+                                        return val
+                                    }
+                                },
+                                total: {
+                                    show: true,
+                                    label: 'Total',
+                                    color: '#373d3f',
+                                    formatter: function(w) {
+                                        return w.globals.seriesTotals.reduce((a, b) => a + b, 0)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: function(val, opts) {
+                        return Math.round(val) + '%'
+                    }
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 320
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }],
+                legend: {
+                    position: 'bottom',
+                    horizontalAlign: 'center',
+                    floating: false,
+                    fontSize: '14px',
+                    offsetY: 7
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['transparent']
+                },
+                tooltip: {
+                    enabled: true,
+                    y: {
+                        formatter: function(val) {
+                            return val + " units"
+                        }
+                    }
+                }
+            };
+
+            const labels = data.map(item => item.category); // Ambil semua kategori
+            const series = data.map(item => item.total_asset); // Ambil semua total_asset
+            const randomColors = data.map(() => getRandomColor());
+
+            // Operational Status Chart
+            const operationalChart = new ApexCharts(document.querySelector("#groupAssetByCategoryChart"), {
+                ...baseOptions,
+                colors: randomColors,
+                series: series,
+                labels: labels
+            });
+            operationalChart.render();
+
+            // Store chart instances for download functionality
+            window.chartInstances = {
+                operational: operationalChart,
+            };
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
     </script>
 @endpush

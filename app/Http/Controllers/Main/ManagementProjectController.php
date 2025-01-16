@@ -79,13 +79,13 @@ class ManagementProjectController extends Controller
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
                 if (auth()->user()->hasPermissionTo('management-project-show')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn btn-info btn-sm me-1" title="Detail Data" onclick="detailData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
+                    $btn .= '<a href="javascript:void(0);" class="btn-info-data btn-sm me-2 shadow" title="Detail Data" onclick="detailData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
                 }
                 if (auth()->user()->hasPermissionTo('management-project-edit')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                    $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
                 }
                 if (auth()->user()->hasPermissionTo('management-project-delete')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                    $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
                 }
                 $btn .= '</div>';
 
@@ -486,12 +486,25 @@ class ManagementProjectController extends Controller
 
     public function spedometer(Request $request)
     {
-        $managementProject = ManagementProject::findByEncryptedId($request->management_project_id);
+        $projectId = [];
+        $value_project = 0;
+        if (session('selected_project_id') == null) {
+            $managementProject = ManagementProject::get();
+            foreach ($managementProject as $key => $value) {
+                $projectId[] = Crypt::decrypt($value->id);
+                $value_project += $value->value_project;
+            }
+        } else {
+            $projectId[] = Crypt::decrypt(session('selected_project_id'));
+            $managementProject = ManagementProject::findByEncryptedId(session('selected_project_id'));
+            $value_project = $managementProject->value_project;
+        }
+
 
         $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date) : null;
         $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date) : null;
 
-        $loadsheet = Loadsheet::where('management_project_id', Crypt::decrypt($managementProject->id));
+        $loadsheet = Loadsheet::whereIn('management_project_id', $projectId);
 
         if ($startDate && $endDate) {
             $loadsheet->whereBetween('date', [$startDate, $endDate]);
@@ -522,8 +535,8 @@ class ManagementProjectController extends Controller
 
         $totalPrice = $loadsheet->sum('price');
 
-        $performance = ($totalPrice > 0 && $managementProject->value_project > 0) ?
-            ($totalPrice / $managementProject->value_project) * 100 : 0;
+        $performance = ($totalPrice > 0 && $value_project > 0) ?
+            ($totalPrice / $value_project) * 100 : 0;
 
         if ($performance > 100) {
             $performance = 100;
@@ -533,7 +546,7 @@ class ManagementProjectController extends Controller
             'success' => true,
             'data' => [
                 'totalPrice' => number_format($totalPrice, 0),
-                'maxValue' => number_format($managementProject->value_project, 0),
+                'maxValue' => number_format($value_project, 0),
                 'performance' => number_format($performance, 2)
             ]
         ]);

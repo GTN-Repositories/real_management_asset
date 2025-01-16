@@ -1,30 +1,27 @@
 @extends('layouts.global')
 
 @section('title', 'Kategori Barang')
+@section('title_page', 'Sparepart Management / Kategori Barang')
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Kategori Barang</h4>
+    <div class="mx-5 flex-grow-1 container-p-y">
 
         <!-- Product List Table -->
+        <div class="d-flex justify-content-end gap-3 mb-4">
+            <!-- Tombol Hapus Masal -->
+            <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
+                <i class="fas fa-trash-alt me-2"></i> Hapus Masal
+            </button>
+            <!-- Tombol Tambah -->
+            @if (auth()->user()->hasPermissionTo('category-item-create'))
+                <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                    <i class="fas fa-plus me-2"></i> Tambah
+                </button>
+            @endif
+        </div>
         <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Kategori Barang</h5>
-                <div class="d-flex justify-content-end gap-2">
-                    <!-- Tombol Hapus Masal -->
-                    <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
-                        <i class="fas fa-trash-alt"></i> Hapus Masal
-                    </button>
-                    <!-- Tombol Tambah -->
-                    @if (auth()->user()->hasPermissionTo('category-item-create'))
-                        <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                            <i class="fas fa-plus"></i> Tambah
-                        </button>
-                    @endif
-                </div>
-            </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
+                <table class="datatables table table-striped table-poppins " id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>

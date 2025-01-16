@@ -1,13 +1,14 @@
 @extends('layouts.global')
 
 @section('title', 'Maintenance')
+@section('title_page', 'Tracking and Monitoring / Inspection Schedule')
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/@form-validation/form-validation.css') }}" />
-
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/fullcalendar/fullcalendar.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/app-calendar.css') }}" />
 
     <style>
@@ -18,26 +19,22 @@
 @endpush
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="mx-5 flex-grow-1 container-p-y">
+        <div class="d-flex justify-content-end mb-3 gap-2">
+            <!-- Tombol Hapus Masal -->
+            {{-- <button type="button" class="btn btn-danger btn-sm" id="delete-btn"
+                style="display: none !important;">
+                <i class="fas fa-trash-alt"></i> Hapus Masal
+            </button> --}}
+            @if (auth()->user()->hasPermissionTo('inspection-schedule-create'))
+                <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                    <i class="fas fa-plus"></i> Tambah
+                </button>
+            @endif
+        </div>
         <div class="card my-3 mb-3">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Inspection</h5>
-                <div class="d-flex justify-content-end gap-2">
-                    <!-- Tombol Hapus Masal -->
-                    {{-- <button type="button" class="btn btn-danger btn-sm" id="delete-btn"
-                        style="display: none !important;">
-                        <i class="fas fa-trash-alt"></i> Hapus Masal
-                    </button> --}}
-                    @if (auth()->user()->hasPermissionTo('inspection-schedule-create'))
-                        <button type="button" class="btn btn-primary btn-sm" onclick="createData()">
-                            <i class="fas fa-plus"></i> Tambah
-                        </button>
-                    @endif
-                </div>
-            </div>
-
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
+                <table class="datatables table table-striped table-poppins " id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>

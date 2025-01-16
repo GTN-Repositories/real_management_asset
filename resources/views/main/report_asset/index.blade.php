@@ -1,10 +1,10 @@
 @extends('layouts.global')
 
 @section('title', 'Laporan asset Project')
+@section('title_page', 'Report / Asset Project')
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Assets Report</h4>
+    <div class="mx-5 flex-grow-1 container-p-y">
         <div class="d-flex justify-content-end align-items-end mb-3 gap-3">
             <div class="btn-group">
                 <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect" data-bs-toggle="dropdown"
@@ -50,7 +50,7 @@
                 <h5 class="card-title mb-0">Assets</h5>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
+                <table class="datatables table table-striped table-poppins " id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>#</th>

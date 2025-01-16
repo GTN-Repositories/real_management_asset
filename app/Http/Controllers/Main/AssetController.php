@@ -128,13 +128,13 @@ class AssetController extends Controller
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
                 if (auth()->user()->hasPermissionTo('asset-show')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn btn-info btn-sm me-1" title="Detail Data" onclick="detailData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
+                    $btn .= '<a href="javascript:void(0);" class="btn-info-data btn-sm me-2 shadow" title="Detail Data" onclick="detailData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
                 }
                 if (auth()->user()->hasPermissionTo('asset-edit')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                    $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
                 }
                 if (auth()->user()->hasPermissionTo('asset-delete')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                    $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
                 }
                 $btn .= '</div>';
 
@@ -213,6 +213,52 @@ class AssetController extends Controller
 
         return $data;
     }
+
+    public function getDataGroupedByCategory(Request $request)
+    {
+        $keyword = $request->search['value'] ?? '';
+
+        $data = Asset::selectRaw('category, COUNT(id) as total_asset')
+            ->when($keyword, function ($query) use ($keyword) {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('category', 'LIKE', '%' . $keyword . '%');
+                });
+            })
+            ->when($request->status, function ($query) use ($request) {
+                $query->whereIn('status', $request->status);
+            })
+            ->when($request->assets_location, function ($query) use ($request) {
+                $query->whereIn('assets_location', $request->assets_location);
+            })
+            ->when($request->category, function ($query) use ($request) {
+                $query->whereIn('category', $request->category);
+            })
+            ->when($request->pic, function ($query) use ($request) {
+                $query->whereIn('manager', $request->pic);
+            })
+            ->when(session('selected_project_id'), function ($query) {
+                $query->whereHas('management_project', function ($q) {
+                    $q->where('id', Crypt::decrypt(session('selected_project_id')));
+                });
+            })
+            ->groupBy('category')
+            ->orderBy('category', 'asc')
+            ->get();
+
+        return response()->json($data);
+            // return datatables()
+            //     ->of($data)
+            //     ->addIndexColumn()
+            //     ->addColumn('category', function ($data) {
+            //         return $data->category;
+            //     })
+            //     ->addColumn('total_asset', function ($data) {
+            //         return $data->total_asset;
+            //     })
+            //     ->escapeColumns([])
+            //     ->make(true);
+    }
+
 
 
     public function create()

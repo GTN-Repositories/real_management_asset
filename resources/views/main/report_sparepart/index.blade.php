@@ -1,10 +1,10 @@
 @extends('layouts.global')
 
 @section('title', 'Laporan Sparepart')
+@section('title_page', 'Report / Sparepart Report')
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Sparepart Report</h4>
+    <div class="mx-5 flex-grow-1 container-p-y">
         <div class="d-flex justify-content-end align-items-end mb-3 gap-3">
             <div class="btn-group">
                 <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect" data-bs-toggle="dropdown"
@@ -28,40 +28,33 @@
 
         <div class="row g-3 text-center mb-4">
             <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Vehicle </h5>
+                <div class="card" style="height: 450px;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 text-primary fw-bold">Vihacle</h5>
+                    </div>
+                    <div class="card-body d-flex justify-content-center">
                         <div id="asset-status-chart" class="chart-container"></div>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Overdue and Due Soon</h5>
-                        <div class="row">
-                            <div class="col">
-                                <p class="card-text" id="overdue">Loading...</p>
-                            </div>
-                            <div class="col">
-                                <p class="card-text" id="underMaintenanceSecondDay">Loading...</p>
-                            </div>
-                        </div>
+                <div class="card" style="height: 450px;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 text-primary fw-bold">Overdue and Due Soon</h5>
                     </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Percentage</h5>
-                        <div class="row">
-                            <div class="col">
-                                <p class="card-text">This year: <span id="percentageItemsYear">Loading...</span>%</p>
+                    <div class="card-body d-flex justify-content-center align-items-center" style="height: 100%">
+                        <div class="d-flex gap-4">
+                            <div class="d-flex flex-column align-items-center">
+                                <h1 class="text-primary fw-bold" style="font-size: 30px;" id="overdue">
+                                    Loading...</h1>
+                                <h3 class="text-muted">Overdue</h3>
                             </div>
-                            <div class="col">
-                                <p class="card-text">This week: <span id="percentageItemsWeek">Loading...</span>%</p>
+                            <div class="d-flex flex-column align-items-center">
+                                <h1 class="text-muted fw-bold" style="font-size: 30px;" id="underMaintenanceSecondDay">
+                                    Loading...
+                                </h1>
+                                <h3 class="text-muted">Due Soon</h3>
                             </div>
                         </div>
                     </div>
@@ -69,35 +62,60 @@
             </div>
 
             <div class="col-md-4">
-                <div class="card bg-light">
-                    <div class="card-body">
-                        <h5 class="card-title">Scheduled</h5>
-                        <p class="card-text" id="scheduled">Loading...</p>
+                <div class="card" style="height: 450px;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 text-primary fw-bold">Percentage</h5>
+                    </div>
+                    <div class="card-body d-flex justify-content-center align-items-center" style="height: 100%">
+                        <div class="d-flex gap-4">
+                            <div class="d-flex flex-column align-items-center">
+                                <h1 class="text-primary fw-bold" style="font-size: 30px;">
+                                    <span id="percentageItemsYear">Loading...</span>%
+                                </h1>
+                                <h3 class="text-muted">This Year</h3>
+                            </div>
+                            <div class="d-flex flex-column align-items-center">
+                                <h1 class="text-primary fw-bold" style="font-size: 30px;">
+                                    <span id="percentageItemsWeek">Loading...</span>%
+                                </h1>
+                                <h3 class="text-muted">This Week</h3>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card bg-warning text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">In Progress</h5>
-                        <p class="card-text" id="inProgress">Loading...</p>
-                    </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-6 col-lg-3" style="">
+                <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #D59A01;">
+                    <h4 class="text-white card-title m-0 fw-bold">Scheduled</h4>
+                </div>
+                <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(213, 153, 1, 0.35); text-align: end;">
+                    <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="scheduled">Loading...</h5>
+                </div>
+            </div>            
+            <div class="col-12 col-md-6 col-lg-3" style="">
+                <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #7F2DE8;">
+                    <h4 class="text-white card-title m-0 fw-bold">In Progress</h4>
+                </div>
+                <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(127, 45, 232, 0.35); text-align: end;">
+                    <h5 class="text-white card-title p-1 p-lg-4 m-0 fw-bold" id="inProgress">Loading...</h5>
+                </div>
+            </div>            
+            <div class="col-12 col-md-6 col-lg-3" style="">
+                <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #01A5DB;">
+                    <h4 class="text-white card-title m-0 fw-bold">On Hold</h4>
+                </div>
+                <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(1, 165, 219, 0.35); text-align: end;">
+                    <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="onHold">Loading...</h5>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card bg-secondary text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">On Hold</h5>
-                        <p class="card-text" id="onHold">Loading...</p>
-                    </div>
+            <div class="col-12 col-md-6 col-lg-3" style="">
+                <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #3BBF56;">
+                    <h4 class="text-white card-title m-0 fw-bold">Finished</h4>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card bg-success text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">Finished</h5>
-                        <p class="card-text" id="finish">Loading...</p>
-                    </div>
+                <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(59, 191, 86, 0.35); text-align: end;">
+                    <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="finish">Loading...</h5>
                 </div>
             </div>
         </div>
@@ -108,7 +126,7 @@
                 <h5 class="card-title mb-0">Project Item</h5>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table-project">
+                <table class="datatables table table-striped table-poppins " id="data-table-project">
                     <thead class="border-top">
                         <tr>
                             <th>#</th>
@@ -125,7 +143,7 @@
                 <h5 class="card-title mb-0">Asset Item</h5>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table-asset">
+                <table class="datatables table table-striped table-poppins " id="data-table-asset">
                     <thead class="border-top">
                         <tr>
                             <th>#</th>
@@ -154,7 +172,7 @@
                 <h5 class="card-title mb-0">Sparepart</h5>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
+                <table class="datatables table table-striped table-poppins " id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>#</th>
@@ -413,7 +431,8 @@
                             text: 'Asset Status',
                             align: 'center'
                         },
-                        labels: ['Asset Maintenance', 'Asset Other']
+                        colors: ['#FABE29', '#134B70'],
+                        labels: ['Asset Maintenance', 'Asset Other', ]
                     };
 
                     var assetStatusChart = new ApexCharts(

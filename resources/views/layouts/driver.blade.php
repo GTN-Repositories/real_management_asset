@@ -50,6 +50,7 @@
         href="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     @stack('css')
     <!-- Page CSS -->
@@ -58,6 +59,14 @@
         .swal2-container {
             z-index: 1100 !important;
             /* Pastikan lebih tinggi dari modal Bootstrap (biasanya 1050) */
+        }
+        .btn-edit-data{
+            background-color: #000BE1;
+            color: #FFFFFF;
+        }
+        .btn-delete-data{
+            background-color: #FFFFFF;
+            color: #252525;
         }
     </style>
 
@@ -158,6 +167,7 @@
     <script src="{{ asset('assets/js/app-logistics-dashboard.js') }}"></script>
     <script src="{{ asset('assets/js/forms-selects.js') }}"></script>
     <script src="{{ asset('assets/js/pages-profile.js') }}"></script>
+    <script src="{{ asset('assets/js/extended-ui-perfect-scrollbar.js') }}"></script>
 
     @stack('js')
 </body>

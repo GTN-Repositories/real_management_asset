@@ -3,7 +3,7 @@
 @section('title', 'Laporan Loadsheet')
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="mx-5 flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Maintenance Report</h4>
         
         <!-- Product List Table -->
@@ -12,7 +12,7 @@
                 <h5 class="card-title mb-0">Maintenance</h5>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
+                <table class="datatables table table-striped table-poppins " id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>#</th>

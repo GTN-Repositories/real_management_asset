@@ -3,7 +3,7 @@
 @section('title', 'Report Summary')
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="mx-5 flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Report Summary</h4>
 
         <!-- Product List Table -->
@@ -22,7 +22,7 @@
                 </div>
             </div>
             <div class="card-datatable table-responsive">
-                <table class="datatables table" id="data-table">
+                <table class="datatables table table-striped table-poppins " id="data-table">
                     <thead class="border-top">
                         <tr>
                             <th>#</th>
@@ -39,8 +39,38 @@
             <div class="card-header">
                 <h5 class="card-title">Chart Expenses</h5>
             </div>
-            <div class="card-body">
-                <div id="chart" style="width: 100%; height: 300px;"></div>
+            <div class="card-body row">
+                <div class="col-12 col-md-6">
+                    <div id="chart" style="width: 100%; height: 300px;"></div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="row">
+                        <div class="col-6 mb-3" style="border-left: 6px solid #000000;">
+                            <h4 class="fw-bold mb-0">Fuel</h4>
+                            <span>Fuel</span>
+                        </div>
+                        <div class="col-6 mb-3" style="border-left: 6px solid #000BE1;">
+                            <h4 class="fw-bold mb-0">Taxes</h4>
+                            <span>Taxes</span>
+                        </div>
+                        <div class="col-6 mb-3" style="border-left: 6px solid #FF0004;">
+                            <h4 class="fw-bold mb-0">Maintanance</h4>
+                            <span>Maintanance</span>
+                        </div>
+                        <div class="col-6 mb-3" style="border-left: 6px solid #00BD2C;">
+                            <h4 class="fw-bold mb-0">Rent</h4>
+                            <span>Rent</span>
+                        </div>
+                        <div class="col-6 mb-3" style="border-left: 6px solid #FABE29;">
+                            <h4 class="fw-bold mb-0">Inserance</h4>
+                            <span>Incurance</span>
+                        </div>
+                        <div class="col-6 mb-3" style="border-left: 6px solid #76CADA;">
+                            <h4 class="fw-bold mb-0">Depreciate</h4>
+                            <span>Depreciate</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -104,7 +134,7 @@
                         },
                         series: data.series,
                         labels: data.labels,
-                        colors: ['#FFD700', '#33CC33', '#2E865F'],
+                        colors: ['#000BE1', '#000000', '#FF0004'],
                         legend: {
                             show: true,
                             position: 'bottom',

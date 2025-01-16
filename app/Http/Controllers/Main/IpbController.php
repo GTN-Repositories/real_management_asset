@@ -87,10 +87,10 @@ class IpbController extends Controller
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
                 if (auth()->user()->hasPermissionTo('fuel-ipb-edit')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm me-1" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                    $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
                 }
                 if (auth()->user()->hasPermissionTo('fuel-ipb-delete')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn btn-danger btn-sm" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                    $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
                 }
                 $btn .= '</div>';
 
@@ -183,7 +183,7 @@ class IpbController extends Controller
         try {
             return $this->atomic(function () use ($data) {
                 $data["management_project_id"] = Crypt::decrypt($data["management_project_id"]);
-                $data["employee_id"] = Crypt::decrypt($data["employee_id"]);
+                $data["employee_id"] = isset($data["employee_id"]) ? Crypt::decrypt($data["employee_id"]) : null;
                 $data["user_id"] = Auth::user()->id;
 
                 $data['issued_liter'] = isset($data['issued_liter']) && $data['issued_liter'] != '-' ? str_replace('.', '', $data['issued_liter']) : null;

@@ -3,7 +3,7 @@
 @section('title', 'Management Project')
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="mx-5 flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Detail Project {{ $data->name }}</h4>
 
         <!-- Product List Table -->
@@ -51,7 +51,7 @@
 
                 </div>
             </div>
-            <table class="datatables table" id="data-table">
+            <table class="datatables table table-striped table-poppins " id="data-table">
                 <thead class="border-top">
                     <tr>
                         <th>No</th>

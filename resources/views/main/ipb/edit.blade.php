@@ -16,8 +16,7 @@
     </div>
     <div class="col-12 col-md-6" id="driverRelation">
         <label class="form-label" for="employee_id">Karyawan<span class="text-danger">*</span></label>
-        <select id="employee_id" name="employee_id" class="select2 form-select select2-primary" data-allow-clear="true"
-            required></select>
+        <select id="employee_id" name="employee_id" class="select2 form-select select2-primary" data-allow-clear="true"></select>
     </div>
     <div class="col-12 col-md-6">
         <label class="form-label" for="date">Tanggal<span class="text-danger">*</span></label>

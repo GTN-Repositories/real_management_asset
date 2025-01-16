@@ -3,7 +3,7 @@
 @section('title', 'Supplier')
 
 @section('content')
-<div class="container-xxl flex-grow-1 container-p-y">
+<div class="mx-5 flex-grow-1 container-p-y">
     <h4 class="py-3 mb-4"><span class="text-muted fw-light">Master Data /</span> Supplier</h4>
 
     <!-- Product List Table -->
@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="card-datatable table-responsive">
-            <table class="datatables table" id="data-table">
+            <table class="datatables table table-striped table-poppins " id="data-table">
                 <thead class="border-top">
                     <tr>
                         <th>
