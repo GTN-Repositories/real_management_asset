@@ -197,13 +197,16 @@ class WerehouseController extends Controller
         $keyword = $request->search['value'] ?? null;
         $werehouseId = $request->werehouse_id ? Crypt::decrypt($request->werehouse_id) : null;
 
-        $data = Item::select($columns) // Mengambil data langsung dari tabel `items`
-            ->when($keyword, function ($query) use ($keyword, $columns) {
-                if ($keyword != '') {
-                    foreach ($columns as $column) {
-                        $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
-                    }
-                }
+        $data = Item::select($columns)
+            // ->when($keyword, function ($query) use ($keyword, $columns) {
+            //     if ($keyword != '') {
+            //         foreach ($columns as $column) {
+            //             $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
+            //         }
+            //     }
+            // })
+            ->when($keyword, function ($query) use ($keyword) {
+                $query->where('items.name', 'LIKE', '%' . $keyword . '%');
             });
 
         // $data = InspectionSchedule::join('items', function ($join) {

@@ -122,7 +122,7 @@ class InspectionScheduleController extends Controller
             'werehouse_id',
         ];
 
-        $keyword = $request->search;
+        $keyword = $request->search['value'];
         // $start_date = ($request->start_date != '') ? $request->start_date . ' 00:00:00' : now()->startOfMonth()->format('Y-m-d') . ' 00:00:00';
         // $end_date = ($request->end_date != '') ? $request->end_date . ' 23:59:59' : now()->endOfMonth()->format('Y-m-d') . ' 23:59:59';
         $type = $request->type;
@@ -132,14 +132,14 @@ class InspectionScheduleController extends Controller
             // ->whereBetween('date', [$start_date, $end_date])
             ->where(function ($query) use ($type, $keyword, $columns) {
                 if ($type != '') {
-                    $query->where('type', $type);
+                    $query->where('type', $type);   
                 }
 
-                // if ($keyword != '') {
-                //     foreach ($columns as $column) {
-                //         $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
-                //     }
-                // }
+                if ($keyword != '') {
+                    foreach ($columns as $column) {
+                        $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
+                    }
+                }
             });
 
         if (session('selected_project_id')) {
