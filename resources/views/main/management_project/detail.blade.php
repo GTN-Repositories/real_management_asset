@@ -74,26 +74,28 @@
                             <td>{{ \App\Helpers\Helper::statusPettyCash($item->status) ?? null }} </td>
                             <td>{{ $item->approvedBy->name ?? null }}</td>
                             <td>{{ $item->created_at->format('d-m-Y H:i') ?? null }}</td>
-                            @if (auth()->user()->hasPermissionTo('management-project-approve'))
-                                <td>
-                                    @if ($item->status == 2)
-                                        {{-- BUTTON REJECT --}}
-                                        <button type="button" onclick="approvePettyCash('{{ $item->id }}', '3')"
-                                            class="btn btn-sm btn-danger m-1"><i class="fas fa-close"></i></button>
-                                    @elseif($item->status == 3)
-                                        {{-- BUTTON APPROVE --}}
-                                        <button type="button" onclick="approvePettyCash('{{ $item->id }}', '2')"
-                                            class="btn btn-sm btn-primary m-1"><i class="fas fa-check"></i></button>
-                                    @elseif($item->status == 1)
-                                        {{-- BUTTON APPROVE --}}
-                                        <button type="button" onclick="approvePettyCash('{{ $item->id }}', '2')"
-                                            class="btn btn-sm btn-primary m-1"><i class="fas fa-check"></i></button>
+                            @if (!auth()->user()->hasRole('Read only'))
+                                @if (auth()->user()->hasPermissionTo('management-project-approve'))
+                                    <td>
+                                        @if ($item->status == 2)
+                                            {{-- BUTTON REJECT --}}
+                                            <button type="button" onclick="approvePettyCash('{{ $item->id }}', '3')"
+                                                class="btn btn-sm btn-danger m-1"><i class="fas fa-close"></i></button>
+                                        @elseif($item->status == 3)
+                                            {{-- BUTTON APPROVE --}}
+                                            <button type="button" onclick="approvePettyCash('{{ $item->id }}', '2')"
+                                                class="btn btn-sm btn-primary m-1"><i class="fas fa-check"></i></button>
+                                        @elseif($item->status == 1)
+                                            {{-- BUTTON APPROVE --}}
+                                            <button type="button" onclick="approvePettyCash('{{ $item->id }}', '2')"
+                                                class="btn btn-sm btn-primary m-1"><i class="fas fa-check"></i></button>
 
-                                        {{-- BUTTON REJECT --}}
-                                        <button type="button" onclick="approvePettyCash('{{ $item->id }}', '3')"
-                                            class="btn btn-sm btn-danger m-1"><i class="fas fa-close"></i></button>
-                                    @endif
-                                </td>
+                                            {{-- BUTTON REJECT --}}
+                                            <button type="button" onclick="approvePettyCash('{{ $item->id }}', '3')"
+                                                class="btn btn-sm btn-danger m-1"><i class="fas fa-close"></i></button>
+                                        @endif
+                                    </td>
+                                @endif
                             @endif
                         </tr>
                     @endforeach

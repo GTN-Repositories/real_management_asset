@@ -8,8 +8,8 @@
         <div class="d-flex justify-content-end align-items-end gap-3 mb-4">
             <div id="categoryParent" style="max-width: 200px; width: 100%;">
                 <label class="form-label" for="category">Kategori</label>
-                <select name="category[]" id="category_id" class="select2 form-select" data-allow-clear="true"
-                    multiple required>
+                <select name="category[]" id="category_id" class="select2 form-select" data-allow-clear="true" multiple
+                    required>
                 </select>
             </div>
 
@@ -28,28 +28,35 @@
 
             <div id="statusParent" style="max-width: 200px; width: 100%;">
                 <label class="form-label" for="status">Status</label>
-                <select name="status[]" id="asset_status_id" class="select2 form-select" data-allow-clear="true"
-                    multiple>
+                <select name="status[]" id="asset_status_id" class="select2 form-select" data-allow-clear="true" multiple>
                 </select>
             </div>
             <!-- Tombol Hapus Masal -->
-            <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
-                <i class="fas fa-trash-alt"></i> Hapus Masal
-            </button>
+            @if (!auth()->user()->hasRole('Read only'))
+                <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
+                    <i class="fas fa-trash-alt"></i> Hapus Masal
+                </button>
+            @endif
             <!-- Tombol Tambah -->
             @if (auth()->user()->hasPermissionTo('asset-import-excel'))
-                <button type="button" class="btn btn-success btn-md d-flex align-items-center" onclick="importExcel()">
-                    <i class="fas fa-file-excel me-2"></i> Import Excel
-                </button>
+                @if (!auth()->user()->hasRole('Read only'))
+                    <button type="button" class="btn btn-success btn-md d-flex align-items-center" onclick="importExcel()">
+                        <i class="fas fa-file-excel me-2"></i> Import Excel
+                    </button>
+                @endif
             @endif
             @if (auth()->user()->hasPermissionTo('asset-export-excel'))
-                <button onclick="exportExcel()" class="btn btn-success btn-md">
-                    <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-                </button>
+                @if (!auth()->user()->hasRole('Read only'))
+                    <button onclick="exportExcel()" class="btn btn-success btn-md">
+                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                    </button>
+                @endif
             @endif
             @if (auth()->user()->hasPermissionTo('asset-create'))
-                <button type="button" class="btn btn-primary" onclick="createData()"><i
-                        class="fas fa-plus me-1"></i>Tambah</button>
+                @if (!auth()->user()->hasRole('Read only'))
+                    <button type="button" class="btn btn-primary" onclick="createData()"><i
+                            class="fas fa-plus me-1"></i>Tambah</button>
+                @endif
             @endif
         </div>
         <!-- Product List Table -->
@@ -92,7 +99,7 @@
             <div class="modal-dialog modal-xl modal-dialog-centered modal-simple modal-upgrade-plan">
                 <div class="modal-content">
                     <div class="modal-body" id="content-modal-create">
-                        
+
                     </div>
                 </div>
             </div>

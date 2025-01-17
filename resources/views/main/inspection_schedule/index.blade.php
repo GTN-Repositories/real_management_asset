@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/app-calendar.css') }}" />
 
     <style>
-        .cke_notifications_area{
+        .cke_notifications_area {
             display: none !important;
         }
     </style>
@@ -26,10 +26,12 @@
                 style="display: none !important;">
                 <i class="fas fa-trash-alt"></i> Hapus Masal
             </button> --}}
-            @if (auth()->user()->hasPermissionTo('inspection-schedule-create'))
-                <button type="button" class="btn btn-primary btn-md" onclick="createData()">
-                    <i class="fas fa-plus"></i> Tambah
-                </button>
+            @if (!auth()->user()->hasRole('Read only'))
+                @if (auth()->user()->hasPermissionTo('inspection-schedule-create'))
+                    <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                        <i class="fas fa-plus"></i> Tambah
+                    </button>
+                @endif
             @endif
         </div>
         <div class="card my-3 mb-3">
@@ -65,11 +67,13 @@
                 <div class="col app-calendar-sidebar" id="app-calendar-sidebar">
                     <div class="border-bottom p-4 my-sm-0 mb-3">
                         <div class="d-grid">
-                            @if (auth()->user()->hasPermissionTo('inspection-schedule-create-maintenance'))
-                                <button class="btn btn-primary btn-toggle-sidebar" onclick="createDataMaintenance()">
-                                    <i class="ti ti-plus me-1"></i>
-                                    <span class="align-middle">Tambah Maintenance</span>
-                                </button>
+                            @if (!auth()->user()->hasRole('Read only'))
+                                @if (auth()->user()->hasPermissionTo('inspection-schedule-create-maintenance'))
+                                    <button class="btn btn-primary btn-toggle-sidebar" onclick="createDataMaintenance()">
+                                        <i class="ti ti-plus me-1"></i>
+                                        <span class="align-middle">Tambah Maintenance</span>
+                                    </button>
+                                @endif
                             @endif
                         </div>
                     </div>
@@ -325,6 +329,22 @@
 
             $.ajax({
                     url: "{{ route('inspection-schedule.edit', ':id') }}".replace(':id', id),
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
+                });
+        }
+
+        function showData(id) {
+
+            $.ajax({
+                    url: "{{ route('inspection-schedule.show', ':id') }}".replace(':id', id),
                     type: 'GET',
                 })
                 .done(function(data) {
