@@ -9,24 +9,26 @@
         <!-- Product List Table -->
         <div class="d-flex justify-content-end gap-3 mb-4">
             <!-- Tombol Hapus Masal -->
-            <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
-                <i class="fas fa-trash-alt"></i> Hapus Masal
-            </button>
-            @if (auth()->user()->hasPermissionTo('loadsheet-import-excel'))
-                <button onclick="importExcel()" class="btn btn-success btn-md">
-                    <i class="fa-solid fa-file-excel me-2"></i>Import Excel
+            @if (!auth()->user()->hasRole('Read only'))
+                <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
+                    <i class="fas fa-trash-alt"></i> Hapus Masal
                 </button>
-            @endif
-            @if (auth()->user()->hasPermissionTo('loadsheet-export-excel'))
-                <button onclick="exportExcel()" class="btn btn-success btn-md">
-                    <i class="fa-solid fa-file-excel me-2"></i>Export Excel
-                </button>
-            @endif
-            <!-- Tombol Tambah -->
-            @if (auth()->user()->hasPermissionTo('loadsheet-create'))
-                <button type="button" class="btn btn-primary btn-md" onclick="createData()">
-                    <i class="fas fa-plus me-2"></i> Tambah
-                </button>
+                @if (auth()->user()->hasPermissionTo('loadsheet-import-excel'))
+                    <button onclick="importExcel()" class="btn btn-success btn-md">
+                        <i class="fa-solid fa-file-excel me-2"></i>Import Excel
+                    </button>
+                @endif
+                @if (auth()->user()->hasPermissionTo('loadsheet-export-excel'))
+                    <button onclick="exportExcel()" class="btn btn-success btn-md">
+                        <i class="fa-solid fa-file-excel me-2"></i>Export Excel
+                    </button>
+                @endif
+                <!-- Tombol Tambah -->
+                @if (auth()->user()->hasPermissionTo('loadsheet-create'))
+                    <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                        <i class="fas fa-plus me-2"></i> Tambah
+                    </button>
+                @endif
             @endif
         </div>
         <div class="card">

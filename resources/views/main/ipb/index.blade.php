@@ -6,22 +6,24 @@
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
         {{-- Tombol Filter --}}
-        <div class="d-flex justify-content-end align-items-end mb-3 gap-3">
+        <div class="d-flex justify-content-end align-items-end mb-3 mb-4 gap-3">
             <div>
                 <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
                 <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
             </div>
-            <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
-                <i class="fas fa-trash-alt"></i> Hapus Masal
-            </button>
-            <!-- Tombol Tambah -->
-            <button type="button" class="btn btn-primary btn-md" onclick="synchronize()">
-                <i class="ti ti-refresh me-2"></i> Synchronize
-            </button>
-            @if (auth()->user()->hasPermissionTo('fuel-ipb-create'))
-                <button type="button" class="btn btn-primary btn-md" onclick="createData()">
-                    <i class="fas fa-plus me-2"></i> Tambah
+            @if (!auth()->user()->hasRole('Read only'))
+                <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
+                    <i class="fas fa-trash-alt"></i> Hapus Masal
                 </button>
+                <!-- Tombol Tambah -->
+                <button type="button" class="btn btn-primary btn-md" onclick="synchronize()">
+                    <i class="ti ti-refresh me-2"></i> Synchronize
+                </button>
+                @if (auth()->user()->hasPermissionTo('fuel-ipb-create'))
+                    <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                        <i class="fas fa-plus me-2"></i> Tambah
+                    </button>
+                @endif
             @endif
         </div>
         <!-- Product List Table -->

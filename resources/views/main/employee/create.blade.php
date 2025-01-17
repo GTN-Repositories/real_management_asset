@@ -20,9 +20,9 @@
     </div>
 
     <div class="col-12 col-md-6" id="projectRelation">
-        <label class="form-label" for="management_project_id">Nama Project<span class="text-danger">*</span></label>
+        <label class="form-label" for="management_project_id">Nama Project</label>
         <select id="management_project_id" name="management_project_id"
-            class="select2 form-select select2-primary"data-allow-clear="true" required>
+            class="select2 form-select select2-primary"data-allow-clear="true" >
         </select>
     </div>
 
