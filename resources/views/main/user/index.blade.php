@@ -6,15 +6,17 @@
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
         <div class="d-flex justify-content-end gap-3 mb-4">
-            <!-- Tombol Hapus Masal -->
-            <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
-                <i class="fas fa-trash-alt me-2"></i> Hapus Masal
-            </button>
-            <!-- Tombol Tambah -->
-            @if (auth()->user()->hasPermissionTo('user-create'))
-            <button type="button" class="btn btn-primary btn-md" onclick="createData()">
-                <i class="fas fa-plus me-2"></i> Tambah
-            </button>
+            @if (!auth()->user()->hasRole('Read only'))
+                <!-- Tombol Hapus Masal -->
+                <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
+                    <i class="fas fa-trash-alt me-2"></i> Hapus Masal
+                </button>
+                <!-- Tombol Tambah -->
+                @if (auth()->user()->hasPermissionTo('user-create'))
+                    <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                        <i class="fas fa-plus me-2"></i> Tambah
+                    </button>
+                @endif
             @endif
         </div>
         <!-- User cards -->

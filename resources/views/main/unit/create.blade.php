@@ -183,8 +183,7 @@
                         </select>
                     </div>
                     <div class="col-6" id="management_project_idRelation">
-                        <label class="form-label" for="management_project_id">Assign Project<span
-                                class="text-danger">*</span></label>
+                        <label class="form-label" for="management_project_id">Assign Project</label>
                         <select id="management_project_id" name="management_project_id"
                             class="select2 form-select select2-primary"data-allow-clear="true">
                         </select>

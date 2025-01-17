@@ -56,10 +56,14 @@ class EmployeeController extends Controller
                 $btn = '<div class="d-flex">';
                 if (auth()->user()->hasPermissionTo('employee-edit')) {
                     # code...
-                    $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                    if (!auth()->user()->hasRole('Read only')) {
+                        $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                    }
                 }
                 if (auth()->user()->hasPermissionTo('employee-delete')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                    if (!auth()->user()->hasRole('Read only')) {
+                        $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                    }
                 }
                 $btn .= '</div>';
 
@@ -116,7 +120,7 @@ class EmployeeController extends Controller
                     }
                 }
             });
-        
+
         if (session('selected_project_id')) {
             $data->whereHas('managementProject', function ($q) {
                 $q->where('id', Crypt::decrypt(session('selected_project_id')));
@@ -142,7 +146,9 @@ class EmployeeController extends Controller
         try {
             return $this->atomic(function () use ($data) {
                 $data['job_title_id'] = Crypt::decrypt($data['job_title_id']);
-                $data['management_project_id'] = Crypt::decrypt($data['management_project_id']);
+                if (isset($data['management_project_id'])) {
+                    $data['management_project_id'] = Crypt::decrypt($data['management_project_id']);
+                }
                 $data = Employee::create($data);
 
                 return response()->json([

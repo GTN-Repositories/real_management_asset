@@ -82,10 +82,14 @@ class ManagementProjectController extends Controller
                     $btn .= '<a href="javascript:void(0);" class="btn-info-data btn-sm me-2 shadow" title="Detail Data" onclick="detailData(\'' . $data->id . '\')"><i class="ti ti-eye"></i></a>';
                 }
                 if (auth()->user()->hasPermissionTo('management-project-edit')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                    if (!auth()->user()->hasRole('Read only')) {
+                        $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" onclick="editData(\'' . $data->id . '\')"><i class="ti ti-pencil"></i></a>';
+                    }
                 }
                 if (auth()->user()->hasPermissionTo('management-project-delete')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                    if (!auth()->user()->hasRole('Read only')) {
+                        $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" onclick="deleteData(\'' . $data->id . '\')"><i class="ti ti-trash"></i></a>';
+                    }
                 }
                 $btn .= '</div>';
 

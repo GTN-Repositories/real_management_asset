@@ -55,11 +55,13 @@ class RoleController extends Controller implements HasMiddleware
             ->addColumn('action', function ($data) {
                 $encryptedId = Crypt::encrypt($data->id);
                 $btn = '<div class="d-flex">';
-                if (auth()->user()->hasPermissionTo('role-edit')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" data-id="' . $encryptedId . '" onclick="editData(this)"><i class="ti ti-pencil"></i></a>';
-                }
-                if (auth()->user()->hasPermissionTo('role-delete')) {
-                    $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" data-id="' . $encryptedId . '" onclick="deleteData(this)"><i class="ti ti-trash"></i></a>';
+                if (!auth()->user()->hasRole('Read only')) {
+                    if (auth()->user()->hasPermissionTo('role-edit')) {
+                        $btn .= '<a href="javascript:void(0);" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data" data-id="' . $encryptedId . '" onclick="editData(this)"><i class="ti ti-pencil"></i></a>';
+                    }
+                    if (auth()->user()->hasPermissionTo('role-delete')) {
+                        $btn .= '<a href="javascript:void(0);" class="btn-delete-data btn-sm shadow" title="Hapus Data" data-id="' . $encryptedId . '" onclick="deleteData(this)"><i class="ti ti-trash"></i></a>';
+                    }
                 }
                 $btn .= '</div>';
 

@@ -27,10 +27,12 @@
             {{-- <button id="exportPdfBtn" class="btn btn-primary" onclick="exportPDF()">
                 <i class="fa-solid fa-file-pdf me-1"></i>Export PDF
             </button> --}}
-            @if (auth()->user()->hasPermissionTo('report-asset-export-excel'))
-                <button onclick="exportExcel()" class="btn btn-success">
-                    <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-                </button>
+            @if (!auth()->user()->hasRole('Read only'))
+                @if (auth()->user()->hasPermissionTo('report-asset-export-excel'))
+                    <button onclick="exportExcel()" class="btn btn-success">
+                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                    </button>
+                @endif
             @endif
 
         </div>

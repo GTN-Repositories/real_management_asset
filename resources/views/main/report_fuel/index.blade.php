@@ -56,15 +56,17 @@
                     @endfor
                 </select>
             </div>
-            @if (auth()->user()->hasPermissionTo('report-fuel-export-excel'))
-                <button onclick="exportExcel()" class="btn btn-success">
-                    <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-                </button>
-            @endif
-            @if (auth()->user()->hasPermissionTo('report-fuel-export-excel-month'))
-                <button onclick="exportExcelMonth()" class="btn btn-success">
-                    <i class="fa-solid fa-file-excel me-1"></i>Excel Fuel Monthly
-                </button>
+            @if (!auth()->user()->hasRole('Read only'))
+                @if (auth()->user()->hasPermissionTo('report-fuel-export-excel'))
+                    <button onclick="exportExcel()" class="btn btn-success">
+                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                    </button>
+                @endif
+                @if (auth()->user()->hasPermissionTo('report-fuel-export-excel-month'))
+                    <button onclick="exportExcelMonth()" class="btn btn-success">
+                        <i class="fa-solid fa-file-excel me-1"></i>Excel Fuel Monthly
+                    </button>
+                @endif
             @endif
         </div>
         <!-- Chart Container -->

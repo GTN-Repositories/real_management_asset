@@ -60,6 +60,10 @@
             /* Pastikan lebih tinggi dari modal Bootstrap (biasanya 1050) */
         }
 
+        body{
+            font-family: 'Poppins', sans-serif;
+        }
+
         #preloader {
             position: fixed;
             top: 0;
@@ -82,9 +86,6 @@
             display: none;
             pointer-events: none;
             opacity: 0;
-        }
-        .table-poppins{
-            font-family: 'Poppins', sans-serif;
         }
 
 

@@ -7,9 +7,11 @@
     <div class="mx-5 flex-grow-1 container-p-y">
         <!-- Product List Table -->
         <div class="d-flex justify-content-end mb-4">
-            <button onclick="exportExcelByProject()" class="btn btn-success btn-md">
-                <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-            </button>
+            @if (!auth()->user()->hasRole('Read only'))
+                <button onclick="exportExcelByProject()" class="btn btn-success btn-md">
+                    <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                </button>
+            @endif
         </div>
         <div class="card mb-4">
             <div class="card-header">
@@ -29,9 +31,11 @@
         </div>
         <br>
         <div class="d-flex justify-content-end mt-3">
-            <button onclick="exportExcelByAsset()" class="btn btn-success btn-md">
-                <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-            </button>
+            @if (!auth()->user()->hasRole('Read only'))
+                <button onclick="exportExcelByAsset()" class="btn btn-success btn-md">
+                    <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                </button>
+            @endif
         </div>
         <div class="card mt-4">
             <div class="card-header">
