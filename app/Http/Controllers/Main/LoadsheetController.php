@@ -76,7 +76,11 @@ class LoadsheetController extends Controller
                 return $data->cubication ? number_format($data->cubication, 0, ',', '.') : '-';
             })
             ->addColumn('price', function ($data) {
-                return number_format($data->cubication * $data->soilType->value, 0, ',', '.');
+                if (['calculation_method'] == 'Tonase') {
+                    return number_format($data->cubication * $data->soilType->value, 0, ',', '.');
+                } else {
+                    return number_format($data->cubication * $data->soilType->value, 0, ',', '.');
+                }
             })
             ->addColumn('billing_status', function ($data) {
                 return $data->billing_status ?? '-';
