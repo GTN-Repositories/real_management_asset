@@ -365,9 +365,7 @@ class InspectionScheduleController extends Controller
                 $schedule = InspectionSchedule::findByEncryptedId($id);
 
                 $data = $request->all();
-
                 // dd($data);
-
                 try {
                     $assst_id = Crypt::encrypt($data['asset_id']);
                 } catch (\Exception $e) {
@@ -380,6 +378,7 @@ class InspectionScheduleController extends Controller
                     'status' => $data['status'] ?? $asset->status,
                 ]);
 
+                // Handle Selected Items
                 $decryptedItemIds = [];
                 $itemStocks = [];
                 $kanibalStocks = [];
@@ -415,7 +414,7 @@ class InspectionScheduleController extends Controller
                 $data['kanibal_stock'] = json_encode($kanibalStocks) ?? null;
                 $data['asset_kanibal_id'] = json_encode($assetKanibalIds) ?? null;
 
-                // dd($data);
+                // dd($data);  
                 $schedule->update($data);
 
                 // SEND EMAIL
@@ -448,6 +447,7 @@ class InspectionScheduleController extends Controller
             ], 500);
         }
     }
+
 
     public function destroy($id)
     {
