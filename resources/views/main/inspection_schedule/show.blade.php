@@ -1,14 +1,13 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Edit Jadwal Inspeksi</h3>
-    <p class="text-muted">Edit Data Sesuai Dengan Informasi Yang Tersedia</p>
+    <h3 class="mb-2">Edit Inspeksi</h3>
+    <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
 
-<form method="POST" class="row g-3" id="formUpdate" action="{{ route('inspection-schedule.update', $data->id) }}"
-    enctype="multipart/form-data">
+<form method="POST" class="row g-3" id="formUpdateInspection"
+    action="{{ route('inspection-schedule.update', $data->id) }}" enctype="multipart/form-data">
     @csrf
     @method('PUT')
-
     <div class="col-12 col-md-12">
         <label class="form-label">Judul Inspeksi</label>
         <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
@@ -29,16 +28,18 @@
         </select>
     </div>
 
-    <div class="col-12" id="selectAsset">
-        <label for="asset_id" class="form-label">Plat Nomor</label>
-        <select id="asset_id" class="form-select" name="asset_id" disabled>
-            @if ($data->asset)
-                <option value="{{ encrypt($data->asset_id) }}" selected>
-                    {{ $data->asset->license_plate . ' - ' . $data->asset->name . ' - ' . $data->asset->asset_number }}
-                </option>
-            @endif
+    <div class="col-12 col-md-6" id="managementRelation">
+        <label class="form-label" for="management_project_id">Nama Management Project<span
+                class="text-danger">*</span></label>
+        <select id="management_project_id" name="management_project_id"
+            class="select2 form-select select2-primary"data-allow-clear="true" required>
         </select>
-        <input type="hidden" name="asset_id" value="{{ $data->asset_id }}">
+    </div>
+    <div class="col-12 col-md-6" id="assetRelation">
+        <label class="form-label" for="asset_id">Nama Asset<span class="text-danger">*</span></label>
+        <select id="asset_id" name="asset_id" class="select2 form-select select2-primary"data-allow-clear="true"
+            required>
+        </select>
     </div>
 
     <div class="col-12 col-md-12">
@@ -51,17 +52,17 @@
     <div class="col-12" id="selectWerehouse">
         <label for="werehouse_id" class="form-label">Gudang</label>
         <select id="werehouse_id" class="form-select" name="werehouse_id" disabled>
-            @if ($data->werehouse)
+            {{-- @if ($data->werehouse)
                 <option value="{{ $data->werehouse_id }}" selected>
                     {{ $data->werehouse->name }}
                 </option>
-            @endif
+            @endif --}}
         </select>
         <input type="hidden" name="asset_id" value="{{ $data->asset_id }}">
     </div>
 
     <div class="col-12 col-md-12" id="selectItem">
-        <label for="item_id" class="form-label">Tambah Sparepart</label>
+        <label for="item_id" class="form-label">Sparepart</label>
         <select id="item_id" class="form-select form-select-lg" name="item_id">
         </select>
     </div>
@@ -69,72 +70,24 @@
     <div class="col-12 mt-3" id="selectedItemsContainer">
         <label class="form-label">Item yang Dipilih:</label>
         <table class="table" id="selectedItemsTable">
-            <thead>
-                <tr>
-                    <th>Kode</th>
-                    <th>Nama</th>
-                    <th>Jumlah</th>
-                    <th>Jenis Metode</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
             <tbody>
-                @foreach ($items as $item)
-                    <tr>
-                        <td>{{ $item->code }}</td>
-                        <td>{{ $item->name }}</td>
-                        <td>
-                            <input type="number" class="form-control item-stock" data-item-id="{{ $item->id }}"
-                                value="{{ $item->stock_in_schedule > 0 ? $item->stock_in_schedule : $item->kanibal_stock_in_schedule }}">
-                        </td>
-                        <td>
-                            <select class="form-select jenis-metode" data-item-id="{{ $item->id }}">
-                                <option value="stock" {{ $item->stock_in_schedule > 0 ? 'selected' : '' }}>
-                                    Pengurangan Stock</option>
-                                <option value="kanibal" {{ $item->kanibal_stock_in_schedule > 0 ? 'selected' : '' }}>
-                                    Kanibal Asset Lain</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-danger btn-sm remove-item"
-                                data-item-id="{{ $item->id }}">Hapus</button>
-                        </td>
-                    </tr>
-                    <tr id="kanibal-row-{{ $item->id }}"
-                        style="{{ $item->kanibal_stock_in_schedule > 0 ? '' : 'display: none;' }}">
-                        <td colspan="5">
-                            <div class="col-12" id="selectAssetKanibal-{{ $item->id }}">
-                                <label for="asset_kanibal_id_{{ $item->id }}" class="form-label">Asset Yang
-                                    Dipilih</label>
-                                <select id="asset_kanibal_id_{{ $item->id }}"
-                                    class="form-select asset-kanibal-select">
-                                    @if($item->kanibal_stock_in_schedule > 0 && $item->assetKanibalId)
-                                        <option value="{{ $item->assetKanibalId }}" selected>
-                                            {{ $item->assetKanibalName }}
-                                        </option>
-                                    @endif
-                                </select>
-                            </div>
-                        </td>
-                    </tr>
-                @endforeach
             </tbody>
         </table>
+        <button id="clearAllButton" class="btn btn-warning btn-sm mt-2">Clear All</button>
     </div>
 
     <div class="col-12 text-center">
-        <button type="submit" class="btn btn-primary me-2">Simpan</button>
-        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
-            aria-label="Close">Cancel</button>
+        <button type="submit" class="btn btn-primary me-sm-3 me-1">Simpan</button>
     </div>
 </form>
 
 @include('components.select2_js')
-<script>
-    CKEDITOR.replace('comment');
-</script>
 <script type="text/javascript">
+    let selectedItems = @json($items);
+
     $(document).ready(function() {
+        // Inisialisasi Select2 untuk item
+
         $('#management_project_id').select2({
             dropdownParent: $('#managementRelation'),
             placeholder: 'Pilih projek',
@@ -177,7 +130,7 @@
                             ]) {
                                 return {
                                     id: id,
-                                    text: name
+                                    text: nameWithNumber
                                 };
                             });
 
@@ -205,6 +158,25 @@
                 });
             }
         });
+
+        var management_project_id = '{{ $data->management_project_id }}';
+        var management_project_name = '{{ $data->managementProject->name }}';
+
+        if (management_project_id) {
+            var projectOption = new Option(management_project_name, management_project_id, true, true);
+            $('#management_project_id').append(projectOption).trigger('change');
+        }
+
+        var asset_id = '{{ $data->asset_id }}';
+        var asset_name = '{{ $data->asset->name }}';
+        var asset_number = '{{ $data->asset->license_plate }}';
+        var asset_license_plate = '{{ Crypt::decrypt($data->asset->id) }}';
+
+        if (asset_id) {
+            var assetOption = new Option(`${asset_license_plate} - ${asset_name} - ${asset_number}`, asset_id,
+                true, true);
+            $('#asset_id').append(assetOption).trigger('change');
+        }
 
         $('#employee_id').select2({
             dropdownParent: $('#employeeId'),
@@ -236,34 +208,6 @@
             }
         });
 
-        $('#item_id').select2({
-            dropdownParent: $('#selectItem'),
-            placeholder: 'Pilih Sparepart',
-            ajax: {
-                url: "{{ route('item.data') }}",
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        'search[value]': params.term,
-                        start: 0,
-                        length: 10
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.data.map(item => ({
-                            text: item.name,
-                            id: item.id,
-                            code: item.code,
-                            available_stock: item.stock || 0
-                        }))
-                    };
-                },
-                cache: true
-            }
-        });
-
         $('#werehouse_id').select2({
             dropdownParent: $('#werehouseParent'),
             placeholder: 'Pilih Gudang',
@@ -289,10 +233,35 @@
                 cache: true
             }
         });
-    });
 
-    let selectedItems = [];
-    $(document).ready(function() {
+        $('#item_id').select2({
+            dropdownParent: $('#selectItem'),
+            placeholder: 'Pilih Sparepart',
+            ajax: {
+                url: "{{ route('item.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.data.map(item => ({
+                            text: item.name,
+                            id: item.id,
+                            code: item.code,
+                        }))
+                    };
+                },
+                cache: true
+            }
+        });
+
+        // Menambahkan item ke daftar
         $('#item_id').on('change', function() {
             const itemId = $(this).val();
             const selectedOption = $(this).select2('data')[0];
@@ -304,7 +273,7 @@
                     name: selectedOption.text,
                     code: selectedOption.code,
                     stock: stockInput,
-                    availableStock: selectedOption.available_stock,
+                    kanibalStock: null,
                     jenisMetode: 'stock',
                     assetKanibalId: null
                 });
@@ -314,70 +283,69 @@
             $('#stock').val('');
         });
 
+        // Memperbarui tabel item yang dipilih
         function updateSelectedItemsTable() {
             const tableBody = $('#selectedItemsTable tbody');
+            tableBody.empty();
 
             selectedItems.forEach(function(item) {
-                if (!tableBody.find(`tr[data-item-id="${item.id}"]`).length) {
-                    tableBody.append(`
-                    <tr data-item-id="${item.id}">
-                        <td>${item.code}</td>
-                        <td>${item.name}</td>
-                        <td>
-                            <input type="number"
-                                   class="form-control item-stock"
-                                   data-item-id="${item.id}"
-                                   value="${item.stock}"
-                            >
-                        </td>
-                        <td>
-                            <select class="form-select jenis-metode" data-item-id="${item.id}">
-                                <option value="stock" ${item.jenisMetode === 'stock' ? 'selected' : ''}>Pengurangan Stock</option>
-                                <option value="kanibal" ${item.jenisMetode === 'kanibal' ? 'selected' : ''}>Kanibal Asset Lain</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-danger btn-sm remove-item" data-item-id="${item.id}">Hapus</button>
-                        </td>
-                    </tr>
-                    <tr id="kanibal-row-${item.id}" style="${item.jenisMetode === 'kanibal' ? '' : 'display: none;'}">
-                        <td colspan="5">
-                            <div class="col-12" id="selectAssetKanibal-${item.id}">
-                                <label for="asset_kanibal_id_${item.id}" class="form-label">Asset Yang Dipilih</label>
-                                <select id="asset_kanibal_id_${item.id}" class="form-select asset-kanibal-select" name="asset_kanibal_id"></select>
-                            </div>
-                        </td>
-                    </tr>
+                tableBody.append(`
+                <tr>
+                    <td>${item.code}</td>
+                    <td>${item.name}</td>
+                    <td>
+                        <input type="number" class="form-control item-stock" data-item-id="${item.id}" value="${item.stock_in_schedule || item.kanibal_stock_in_schedule || 1}">
+                    </td>
+                    <td>
+                        <select class="form-select jenis-metode" data-item-id="${item.id}">
+                            <option value="stock" ${item.stock_in_schedule > 0 ? 'selected' : ''}>Pengurangan Stock</option>
+                            <option value="kanibal" ${item.kanibal_stock_in_schedule > 0 ? 'selected' : ''}>Kanibal Asset Lain</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm remove-item" data-item-id="${item.id}">Hapus</button>
+                    </td>
+                </tr>
+                <tr id="kanibal-row-${item.id}" style="${item.kanibal_stock_in_schedule > 0 ? '' : 'display: none;'}">
+                    <td colspan="5">
+                        <label for="kanibal_stock_${item.id}" class="form-label">Kanibal Stock</label>
+                        <input type="number" class="form-control kanibal-stock" data-item-id="${item.id}" value="${item.kanibal_stock_in_schedule || 1}">
+                        <select id="asset_kanibal_id_${item.id}" class="form-select asset-kanibal-select" name="asset_kanibal_id">
+                            ${item.assetKanibalId ? `<option value="${item.assetKanibalId}" selected>${item.assetKanibalId}</option>` : ''}
+                        </select>
+                    </td>
+                </tr>
                 `);
 
-                    const assetKanibalSelect = $(`#asset_kanibal_id_${item.id}`);
-                    assetKanibalSelect.select2({
-                        dropdownParent: $(`#selectAssetKanibal-${item.id}`),
-                        placeholder: 'Pilih Asset',
-                        ajax: {
-                            url: "{{ route('asset.data') }}",
-                            dataType: 'json',
-                            delay: 250,
-                            data: function(params) {
-                                return {
-                                    keyword: params.term,
-                                    limit: 10
-                                };
-                            },
-                            processResults: function(data) {
-                                return {
-                                    results: data.data.map(asset => ({
-                                        text: asset.nameWithNumber,
-                                        id: asset.noDecryptId
-                                    }))
-                                };
-                            },
-                            cache: true
-                        }
-                    });
-                }
+                // Inisialisasi Select2 untuk asset kanibal
+                const assetKanibalSelect = $(`#asset_kanibal_id_${item.id}`);
+                assetKanibalSelect.select2({
+                    dropdownParent: $(`#kanibal-row-${item.id}`),
+                    placeholder: 'Pilih Asset',
+                    ajax: {
+                        url: "{{ route('asset.data') }}",
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                keyword: params.term,
+                                limit: 10
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.data.map(asset => ({
+                                    text: asset.nameWithNumber,
+                                    id: asset.noDecryptId
+                                }))
+                            };
+                        },
+                        cache: true
+                    }
+                });
             });
 
+            // Event handler untuk perubahan metode (stock/kanibal)
             $('.jenis-metode').off('change').on('change', function() {
                 const itemId = $(this).data('item-id');
                 const value = $(this).val();
@@ -386,8 +354,8 @@
                     item.id === itemId ? {
                         ...item,
                         jenisMetode: value,
-                        stock: value === 'stock' ? (item.stock || 1) : null,
-                        kanibalStock: value === 'kanibal' ? (item.kanibalStock || 1) : null
+                        stock: value === 'stock' ? item.stock : null,
+                        kanibalStock: value === 'kanibal' ? item.kanibalStock : null
                     } : item
                 );
 
@@ -398,6 +366,7 @@
                 }
             });
 
+            // Event handler untuk perubahan stok
             $('.item-stock').off('change').on('change', function() {
                 const itemId = $(this).data('item-id');
                 const newStock = $(this).val();
@@ -405,121 +374,130 @@
                 selectedItems = selectedItems.map(item =>
                     item.id === itemId ? {
                         ...item,
-                        stock: item.jenisMetode === 'stock' ? newStock : null,
-                        kanibalStock: item.jenisMetode === 'kanibal' ? newStock : null
+                        stock: newStock
                     } : item
                 );
             });
 
-            // Remove item
+            // Event handler untuk perubahan kanibal stok
+            $('.kanibal-stock').off('change').on('change', function() {
+                const itemId = $(this).data('item-id');
+                const newKanibalStock = $(this).val();
+
+                selectedItems = selectedItems.map(item =>
+                    item.id === itemId ? {
+                        ...item,
+                        kanibalStock: newKanibalStock
+                    } : item
+                );
+            });
+
+            // Event handler untuk penghapusan item
             $('.remove-item').off('click').on('click', function() {
                 const itemId = $(this).data('item-id');
                 selectedItems = selectedItems.filter(item => item.id !== itemId);
                 updateSelectedItemsTable();
             });
 
-            // Update asset kanibal selection
             $('.asset-kanibal-select').off('change').on('change', function() {
-                const itemId = $(this).attr('id').split('_')[2];
-                const selectedAssetId = $(this).val();
+                const itemId = $(this).attr('id').split('_')[2]; // Dapatkan ID item dari atribut elemen
+                const selectedAssetId = $(this).val(); // Ambil nilai yang dipilih
+                // Cari dan perbarui item di selectedItems
+                selectedItems = selectedItems.map(item => {
+                    console.log('item.id', item.id, 'itemId', itemId);
 
-                selectedItems = selectedItems.map(item =>
-                    item.id === itemId ? {
-                        ...item,
-                        assetKanibalId: selectedAssetId
-                    } : item
-                );
+                    if (item.id === itemId) {
+                        item.assetKanibalId = selectedAssetId || null;
+                    }
+                    return item;
+                });
             });
         }
 
+        // Menghapus semua item
         $('#clearAllButton').on('click', function() {
             selectedItems = [];
             updateSelectedItemsTable();
         });
-    });
 
-    document.getElementById('formUpdate').addEventListener('submit', function(event) {
-        event.preventDefault();
+        // Submit form dengan data yang diperbarui
+        $('#formUpdateInspection').on('submit', function(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
 
-        for (let instance in CKEDITOR.instances) {
-            CKEDITOR.instances[instance].updateElement();
-        }
+            selectedItems.forEach((item, index) => {
+                console.log('item', item);
 
-        const form = event.target;
-        const formData = new FormData(form);
+                // Pastikan data yang dikirim lengkap
+                const stockInput = $(`.item-stock[data-item-id="${item.id}"]`).val();
+                const kanibalStockInput = $(`.kanibal-stock[data-item-id="${item.id}"]`).val();
+                const assetKanibalIdInput = $(`#asset_kanibal_id_${item.id}`).val();
 
-        // Data yang sudah ada (data yang di-foreach)
-        @foreach ($items as $item)
-            formData.append('selected_items[{{ $loop->index }}][id]', '{{ $item->id }}');
-            formData.append('selected_items[{{ $loop->index }}][item_stock]',
-                '{{ $item->stock_in_schedule }}');
-            formData.append('selected_items[{{ $loop->index }}][kanibal_stock]',
-                '{{ $item->kanibal_stock_in_schedule }}');
-            formData.append('selected_items[{{ $loop->index }}][asset_kanibal_id]',
-                '{{ $item->assetKanibalId }}');
-        @endforeach
+                // Pengecekan apakah item_stock adalah kanibal atau tidak
+                if (item.jenisMetode === 'kanibal' || item.kanibal_stock_in_schedule > 0) {
+                    formData.append(`selected_items[${index}][id]`, item.id);
+                    formData.append(`selected_items[${index}][name]`, item.name);
+                    formData.append(`selected_items[${index}][code]`, item.code);
+                    formData.append(`selected_items[${index}][kanibal_stock]`,
+                        kanibalStockInput);
+                    formData.append(`selected_items[${index}][asset_kanibal_id]`,
+                        assetKanibalIdInput);
+                } else {
+                    formData.append(`selected_items[${index}][id]`, item.id);
+                    formData.append(`selected_items[${index}][name]`, item.name);
+                    formData.append(`selected_items[${index}][code]`, item.code);
+                    formData.append(`selected_items[${index}][item_stock]`, stockInput);
+                }
+            });
 
-        // Data yang baru ditambahkan
-        selectedItems.forEach((item, index) => {
-            const adjustedIndex = index +
-            {{ count($items) }}; // Menyesuaikan index agar tidak bertabrakan
-            formData.append(`selected_items[${adjustedIndex}][id]`, item.id);
-            const assetKanibalId = $(`#asset_kanibal_id_${item.id}`).val();
-            formData.append(`selected_items[${adjustedIndex}][asset_kanibal_id]`, assetKanibalId);
-            if (item.jenisMetode === 'stock') {
-                formData.append(`selected_items[${adjustedIndex}][item_stock]`, item.stock);
-            } else if (item.jenisMetode === 'kanibal') {
-                formData.append(`selected_items[${adjustedIndex}][kanibal_stock]`, item.kanibalStock);
-            }
+            fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.errors) {
+                        let errorMessages = '';
+                        for (const [field, messages] of Object.entries(data.errors)) {
+                            errorMessages += messages.join('<br>') + '<br>';
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            html: errorMessages
+                        });
+                    } else if (!data.status) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.message
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: data.message
+                        }).then(() => {
+                            $("#modal-ce").modal("hide");
+                            location.reload();
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!'
+                    });
+                });
         });
 
-        const url = form.action;
-
-        fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.errors) {
-                    let errorMessages = '';
-                    for (const [field, messages] of Object.entries(data.errors)) {
-                        errorMessages += messages.join('<br>') + '<br>';
-                    }
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        html: errorMessages
-                    });
-                } else if (!data.status) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: data.message
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: data.message
-                    }).then(() => {
-                        $("#modal-ce").modal("hide");
-                        // REDIRECT TO ROUTE INDEX
-                        window.location.href = "{{ route('inspection-schedule.index') }}";
-                    });
-                }
-            })
-            .catch(error => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Something went wrong!'
-                });
-            });
+        updateSelectedItemsTable();
     });
 </script>

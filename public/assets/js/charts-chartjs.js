@@ -848,211 +848,37 @@
       data: {
         datasets: [
           {
-            label: 'iPhone',
+            label: 'United States',
             data: [
-              {
-                x: 72,
-                y: 225
-              },
-              {
-                x: 81,
-                y: 270
-              },
-              {
-                x: 90,
-                y: 230
-              },
-              {
-                x: 103,
-                y: 305
-              },
-              {
-                x: 103,
-                y: 245
-              },
-              {
-                x: 108,
-                y: 275
-              },
-              {
-                x: 110,
-                y: 290
-              },
-              {
-                x: 111,
-                y: 315
-              },
-              {
-                x: 109,
-                y: 350
-              },
-              {
-                x: 116,
-                y: 340
-              },
-              {
-                x: 113,
-                y: 260
-              },
-              {
-                x: 117,
-                y: 275
-              },
-              {
-                x: 117,
-                y: 295
-              },
-              {
-                x: 126,
-                y: 280
-              },
-              {
-                x: 127,
-                y: 340
-              },
-              {
-                x: 133,
-                y: 330
-              }
+              { x: 40, y: 45 }, // T. Halmkin
+              { x: 20, y: 15 }, // A. Cabbell
+              { x: 25, y: 10 }, // S. Anstey
+              { x: 15, y: 10 }  // B. Byrom
             ],
-            backgroundColor: config.colors.primary,
-            borderColor: 'transparent',
-            pointBorderWidth: 2,
-            pointHoverBorderWidth: 2,
-            pointRadius: 5
-          },
-          {
-            label: 'Samsung Note',
-            data: [
-              {
-                x: 13,
-                y: 95
-              },
-              {
-                x: 22,
-                y: 105
-              },
-              {
-                x: 17,
-                y: 115
-              },
-              {
-                x: 19,
-                y: 130
-              },
-              {
-                x: 21,
-                y: 125
-              },
-              {
-                x: 35,
-                y: 125
-              },
-              {
-                x: 13,
-                y: 155
-              },
-              {
-                x: 21,
-                y: 165
-              },
-              {
-                x: 25,
-                y: 155
-              },
-              {
-                x: 18,
-                y: 190
-              },
-              {
-                x: 26,
-                y: 180
-              },
-              {
-                x: 43,
-                y: 180
-              },
-              {
-                x: 53,
-                y: 202
-              },
-              {
-                x: 61,
-                y: 165
-              },
-              {
-                x: 67,
-                y: 225
-              }
-            ],
-            backgroundColor: yellowColor,
+            backgroundColor: 'blue',
             borderColor: 'transparent',
             pointRadius: 5
           },
           {
-            label: 'OnePlus',
+            label: 'Japan',
             data: [
-              {
-                x: 70,
-                y: 195
-              },
-              {
-                x: 72,
-                y: 270
-              },
-              {
-                x: 98,
-                y: 255
-              },
-              {
-                x: 100,
-                y: 215
-              },
-              {
-                x: 87,
-                y: 240
-              },
-              {
-                x: 94,
-                y: 280
-              },
-              {
-                x: 99,
-                y: 300
-              },
-              {
-                x: 102,
-                y: 290
-              },
-              {
-                x: 110,
-                y: 275
-              },
-              {
-                x: 111,
-                y: 250
-              },
-              {
-                x: 94,
-                y: 280
-              },
-              {
-                x: 92,
-                y: 340
-              },
-              {
-                x: 100,
-                y: 335
-              },
-              {
-                x: 108,
-                y: 330
-              }
+              { x: 45, y: 50 }, // J. Panner
+              { x: 35, y: 40 }, // A. Duckerin
+              { x: 30, y: 25 }, // C. Spires
+              { x: 30, y: 20 }  // L. Sprull
             ],
-            backgroundColor: cyanColor,
+            backgroundColor: 'red',
             borderColor: 'transparent',
-            pointBorderWidth: 2,
-            pointHoverBorderWidth: 2,
+            pointRadius: 5
+          },
+          {
+            label: 'Canada',
+            data: [
+              { x: 35, y: 10 }, // F. Arend
+              { x: 40, y: 5 }   // M. Butson
+            ],
+            backgroundColor: 'yellow',
+            borderColor: 'transparent',
             pointRadius: 5
           }
         ]
@@ -1066,57 +892,48 @@
         plugins: {
           legend: {
             position: 'top',
-            rtl: isRtl,
-            align: 'start',
             labels: {
               usePointStyle: true,
-              padding: 25,
-              boxWidth: 6,
-              boxHeight: 6,
-              color: legendColor
+              padding: 20,
+              boxWidth: 10,
+              boxHeight: 10,
+              color: 'black'
             }
           },
           tooltip: {
-            // Updated default tooltip UI
-            rtl: isRtl,
-            backgroundColor: cardColor,
-            titleColor: headingColor,
-            bodyColor: legendColor,
+            backgroundColor: '#f8f9fa',
+            titleColor: '#212529',
+            bodyColor: '#495057',
             borderWidth: 1,
-            borderColor: borderColor
+            borderColor: '#ced4da'
           }
         },
         scales: {
           x: {
-            min: 0,
-            max: 140,
-            grid: {
-              color: borderColor,
-              drawTicks: false,
-              drawBorder: false,
-              borderColor: borderColor
+            title: {
+              display: true,
+              text: 'Months of Employment'
             },
+            min: 0,
+            max: 50,
             ticks: {
-              stepSize: 10,
-              color: labelColor
+              stepSize: 10
             }
           },
           y: {
-            min: 0,
-            max: 400,
-            grid: {
-              color: borderColor,
-              drawTicks: false,
-              drawBorder: false,
-              borderColor: borderColor
+            title: {
+              display: true,
+              text: 'Months with Above Average Performance'
             },
+            min: 0,
+            max: 50,
             ticks: {
-              stepSize: 100,
-              color: labelColor
+              stepSize: 10
             }
           }
         }
       }
     });
   }
+
 })();

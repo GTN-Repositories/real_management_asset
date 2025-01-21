@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Main;
 use App\Exports\LoadsheetExport;
 use App\Http\Controllers\Controller;
 use App\Imports\ImportLoadsheet;
+use App\Models\Currency;
 use App\Models\Loadsheet;
+use App\Models\ManagementProject;
 use App\Models\SoilType;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -76,11 +78,19 @@ class LoadsheetController extends Controller
                 return $data->cubication ? number_format($data->cubication, 0, ',', '.') : '-';
             })
             ->addColumn('price', function ($data) {
-                return number_format($data->cubication * $data->soilType->value, 0, ',', '.');
+                $calculation_method = $data->management_project->calculation_method;
+
+                if (isset($calculation_method) && $calculation_method == 'Tonase') {
+                    $exchange_rate = Currency::where('code', 'USD')->first()->exchange;
+                    $result = $data->loadsheet * $data->kilometer * (0.117 * $exchange_rate);
+                    return number_format($result, 2, ',', '.');
+                } else if (isset($calculation_method) && $calculation_method == 'Kubic') {
+                    return number_format($data->cubication * $data->soilType->value, 2, ',', '.');
+                }
             })
             ->addColumn('billing_status', function ($data) {
                 return $data->billing_status ?? '-';
-            })
+            })  
             ->addColumn('remarks', function ($data) {
                 return $data->remarks ?? '-';
             })
@@ -206,7 +216,13 @@ class LoadsheetController extends Controller
 
                 $data['hours'] = isset($data['hours']) && $data['hours'] != '-' ? str_replace('.', '', $data['hours']) : null;
                 $data['kilometer'] = isset($data['kilometer']) && $data['kilometer'] != '-' ? str_replace('.', '', $data['kilometer']) : null;
-                $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
+                // $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' ? str_replace('.', '', $data['loadsheet']) : null;
+                $data['loadsheet'] = isset($data['loadsheet']) && $data['loadsheet'] != '-' 
+                                    ? (strpos($data['loadsheet'], ',') !== false 
+                                        ? str_replace(',', '.', $data['loadsheet']) 
+                                        : str_replace('.', '', $data['loadsheet'])) 
+                                    : null;
+
                 $data['perload'] = isset($data['perload']) && $data['perload'] != '-' ? str_replace('.', '', $data['perload']) : null;
 
                 $data['lose_factor'] = (float)str_replace(',', '.', $data['lose_factor']);

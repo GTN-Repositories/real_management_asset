@@ -508,33 +508,34 @@ class ManagementProjectController extends Controller
         $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date) : null;
         $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date) : null;
 
-        $loadsheet = Loadsheet::whereIn('management_project_id', $projectId);
+        $loadsheet = Loadsheet::select('id', 'price', 'date', 'kilometer', 'management_project_id')->whereIn('management_project_id', $projectId);
 
         if ($startDate && $endDate) {
             $loadsheet->whereBetween('date', [$startDate, $endDate]);
         }
 
-        if ($request->filled('filterType')) {
-            switch ($request->filterType) {
-                case 'hari ini':
-                    $loadsheet->whereDate('date', Carbon::today());
-                    break;
-                case 'minggu ini':
-                    $loadsheet->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                    break;
-                case 'bulan ini':
-                    $loadsheet->whereRaw('MONTH(date) = MONTH(CURDATE()) AND YEAR(date) = YEAR(CURDATE())');
-                    break;
-                case 'bulan kemarin':
-                    $loadsheet->whereRaw('MONTH(date) = MONTH(CURDATE()) - 1 AND YEAR(date) = YEAR(CURDATE())');
-                    break;
-                case 'tahun ini':
-                    $loadsheet->whereYear('date', Carbon::now()->year);
-                    break;
-                case 'tahun kemarin':
-                    $loadsheet->whereYear('date', Carbon::now()->subYear()->year);
-                    break;
-            }
+
+        $filterType = $request->filled('filterType') ? $request->filterType : 'tahun kemarin';
+
+        switch ($filterType) {
+            case 'hari ini':
+                $loadsheet->whereDate('date', Carbon::today());
+                break;
+            case 'minggu ini':
+                $loadsheet->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                break;
+            case 'bulan ini':
+                $loadsheet->whereRaw('MONTH(date) = MONTH(CURDATE()) AND YEAR(date) = YEAR(CURDATE())');
+                break;
+            case 'bulan kemarin':
+                $loadsheet->whereRaw('MONTH(date) = MONTH(CURDATE()) - 1 AND YEAR(date) = YEAR(CURDATE())');
+                break;
+            case 'tahun ini':
+                $loadsheet->whereYear('date', Carbon::now()->year);
+                break;
+            case 'tahun kemarin':
+                $loadsheet->whereYear('date', Carbon::now()->subYear()->year);
+                break;
         }
 
         $totalPrice = $loadsheet->sum('price');

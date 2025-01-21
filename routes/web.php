@@ -221,6 +221,8 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/asset-reminder/destroy-all', [AssetReminderController::class, 'destroyAll'])->name('asset-reminder.destroyAll');
     Route::resource('asset-reminder', AssetReminderController::class);
 
+
+    Route::get('/report-asset-performance/chart-project', [AssetPerformance::class, 'chartProject'])->name('report-loadsheet.chart-project');
     Route::get('/report-asset-performance/chart', [AssetPerformance::class, 'expanses'])->name('report-asset-performance.chart');
     Route::get('/report-asset-performance/data', [AssetPerformance::class, 'data'])->name('report-asset-performance.data');
     Route::delete('/report-asset-performance/destroy-all', [AssetPerformance::class, 'destroyAll'])->name('report-asset-performance.destroyAll');
