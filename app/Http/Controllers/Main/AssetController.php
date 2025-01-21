@@ -358,7 +358,8 @@ class AssetController extends Controller
 
                 return response()->json([
                     'status' => true,
-                    'message' => 'Data berhasil ditambahkan!',
+                    'message' => 'Data berhasil ditambahkan dengan ID AST - '.Crypt::decrypt($asset->id).'!',
+
                 ]);
             });
         } catch (\Throwable $th) {

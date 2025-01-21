@@ -240,7 +240,7 @@ class InspectionScheduleController extends Controller
 
                 return response()->json([
                     'status' => true,
-                    'message' => 'Data berhasil ditambahkan!',
+                    'message' => 'Data berhasil ditambahkan dengan ID INS - '.Crypt::decrypt($schedule->id).'!',
                     'schedule_id' => $schedule->id,
                 ]);
             });

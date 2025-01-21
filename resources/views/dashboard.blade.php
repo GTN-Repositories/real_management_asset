@@ -493,6 +493,8 @@
         function init_speedometer_chart(data) {
             const maxValue = data.maxValue;
             const currentValue = Math.min(data.totalPrice, maxValue) || 0;
+            const percentage = Math.ceil((parseInt(data.totalPrice) / parseInt(data.maxValue)) * 100);
+
             document.getElementById('max-value-speedometer').innerText = maxValue;
             document.getElementById('current-value-speedometer').innerText = data.totalPrice;
 
@@ -508,7 +510,7 @@
                         enabled: true
                     },
                 },
-                series: [currentValue],
+                series: [percentage],
                 labels: ['Performance'],
                 plotOptions: {
                     radialBar: {

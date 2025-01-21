@@ -107,7 +107,7 @@ class MaintenanceController extends Controller
 
                 return response()->json([
                     'status' => true,
-                    'message' => 'Data berhasil ditambahkan!',
+                    'message' => 'Data berhasil ditambahkan dengan ID MNTS-'.Crypt::decrypt($schedule->id).'!',
                     'schedule_id' => $schedule->id,
                 ]);
             });
@@ -143,7 +143,6 @@ class MaintenanceController extends Controller
 
             $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemStocks, $kanibalStocks, $assetKanibalIds) {
                 $itemId = (string) Crypt::decrypt($item->id);
-
 
                 $asset_id = $assetKanibalIds[$itemId] ?? 0;
                 $item->stock_in_schedule = $itemStocks[$itemId] ?? 0;
