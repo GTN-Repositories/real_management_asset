@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Models\Asset;
 use App\Models\AssetReminder;
+use App\Models\FuelConsumption;
 use App\Models\InspectionSchedule;
 use App\Models\Ipb;
 use App\Models\Item;
@@ -13,6 +15,7 @@ use App\Models\ManagementProject;
 use App\Models\RecordInsurance;
 use App\Models\RecordRent;
 use App\Models\RecordTax;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
@@ -175,6 +178,79 @@ class AssetPerformance extends Controller
             'series' => [$other, $fuel, $totalHarga],
         ];
 
+        return response()->json($data);
+    }
+
+    public function chartProject(Request $request)
+    {
+        $currentMonth = Carbon::now()->format('Y-m');
+
+        $loadsheet = Loadsheet::select('date', 'loadsheet')->get();
+        $fuel = FuelConsumption::select('date', 'liter')->get();
+        $sparepart = InspectionSchedule::select('id', 'date', 'item_stock')->get();
+        $total_asset = Asset::count();
+
+        foreach ($sparepart as $key => $value) {
+            $usage = 0;
+            foreach (json_decode($value->item_stock) as $ckey => $cvalue) {
+                $usage += $cvalue;
+            }
+            $value['usage'] = $usage;
+        }
+        
+        // Dapatkan tanggal bulan berjalan
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now();
+        $dates = collect();
+        
+        // Buat array tanggal dari awal bulan hingga akhir bulan
+        for ($date = $startOfMonth; $date <= $endOfMonth; $date->addDay()) {
+            $dates->push($date->format('Y-m-d'));
+        }
+        
+        // Buat struktur data untuk chart
+        $data = [
+            'labels' => $dates,
+            'datasets' => [
+                [
+                    'label' => 'Fuel',
+                    'data' => $dates->map(function ($date) use ($fuel) {
+                        return $fuel->firstWhere('date', $date)->liter ?? 0;
+                    }),
+                    'backgroundColor' => 'rgba(54, 162, 235, 0.7)',
+                    'borderColor' => 'rgba(54, 162, 235, 1)',
+                    'borderWidth' => 1,
+                ],
+                [
+                    'label' => 'Sparepart',
+                    'data' => $dates->map(function ($date) use ($sparepart) {
+                        return $sparepart->firstWhere('date', $date)->usage ?? 0;
+                    }),
+                    'backgroundColor' => 'rgba(75, 192, 192, 0.7)',
+                    'borderColor' => 'rgba(75, 192, 192, 1)',
+                    'borderWidth' => 1,
+                ],
+                [
+                    'label' => 'Production',
+                    'data' => $dates->map(function ($date) use ($loadsheet) {
+                        return $loadsheet->firstWhere('date', $date)->loadsheet ?? 0;
+                    }),
+                    'backgroundColor' => 'rgba(255, 206, 86, 0.7)',
+                    'borderColor' => 'rgba(255, 206, 86, 1)',
+                    'borderWidth' => 1,
+                ],
+                // [
+                //     'label' => 'Total Asset',
+                //     'data' => $dates->map(function ($date) use ($total_asset) {
+                //         return $total_asset;
+                //     }),
+                //     'backgroundColor' => 'rgba(255, 99, 132, 0.7)',
+                //     'borderColor' => 'rgba(255, 99, 132, 1)',
+                //     'borderWidth' => 1,
+                // ]
+            ]
+        ];
+        
         return response()->json($data);
     }
 }

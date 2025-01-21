@@ -105,4 +105,74 @@ class ReportLoadsheetController extends Controller
         return Excel::download(new ExportLoadsheedByAsset($data), $fileName);
     }
 
+
+    // public function chartProject()
+    // {
+    //     // Ambil bulan berjalan
+    //     $currentMonth = Carbon::now()->format('Y-m');
+        
+    //     // Query data berdasarkan bulan berjalan
+    //     $loadsheetData = Loadsheet::selectRaw('DATE(date) as date, SUM(hours) as total_hours')
+    //         ->where('date', 'like', "$currentMonth%")
+    //         ->groupBy('date')
+    //         ->orderBy('date', 'asc')
+    //         ->get();
+
+    //     // Format data untuk chart.js
+    //     $chartData = [
+    //         'labels' => $loadsheetData->pluck('date'), // Label (tanggal)
+    //         'datasets' => [
+    //             [
+    //                 'label' => 'Total Hours',
+    //                 'data' => $loadsheetData->pluck('total_hours'), // Total hours
+    //                 'backgroundColor' => 'rgba(75, 192, 192, 0.2)',
+    //                 'borderColor' => 'rgba(75, 192, 192, 1)',
+    //                 'borderWidth' => 1
+    //             ]
+    //         ]
+    //     ];
+
+    //     // Kirim response JSON
+    //     return response()->json($chartData);
+    // }
+
+    public function chartProject()
+    {
+        // Ambil bulan berjalan
+        $currentMonth = Carbon::now()->format('Y-m');
+
+        // Query data dari tabel loadsheet
+        $scatterData = Loadsheet::select('date', 'hours')
+            ->where('date', 'like', "$currentMonth%")
+            ->orderBy('date', 'asc');
+            
+        if (session('selected_project_id')) {
+            $scatterData->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
+        
+        $scatterData = $scatterData->get();
+        
+        // Format data untuk scatter chart
+        $formattedData = $scatterData->map(function ($item) {
+            return [
+                'x' => $item->date,
+                'y' => $item->hours,
+            ];
+        });
+
+        return response()->json([
+            'datasets' => [
+                [
+                    'label' => 'Loadsheet Data',
+                    'data' => $formattedData,
+                    'backgroundColor' => 'blue',
+                    'borderColor' => 'transparent',
+                    'pointRadius' => 5
+                ]
+            ]
+        ]);
+    }
+
 }
