@@ -494,7 +494,7 @@
             const maxValue = data.maxValue;
             const currentValue = Math.min(data.totalPrice, maxValue) || 0;
             document.getElementById('max-value-speedometer').innerText = maxValue;
-            document.getElementById('current-value-speedometer').innerText = currentValue;
+            document.getElementById('current-value-speedometer').innerText = data.totalPrice;
 
             const options = {
                 chart: {
@@ -556,8 +556,6 @@
             const speedometerChart = new ApexCharts(document.querySelector("#speedometerChart"), options);
             speedometerChart.render();
         }
-
-
 
         function fetchStatusData() {
             $.ajax({

@@ -5,6 +5,17 @@
 
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
+        <div class="card mb-4">
+            <div class="card-header flex-nowrap header-elements">
+                <h5 class="card-title mb-0">Compare Production VS Expenses by Period</h5>
+                <div class="card-header-elements ms-auto py-0 d-none d-sm-block">
+                </div>
+            </div>
+            <div class="card-body pt-2">
+                <canvas id="myBarChart"></canvas>
+            </div>
+        </div>
+
         <div class="d-flex justify-content-end gap-3 mb-4">
             <!-- Tombol Hapus Masal -->
             <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
@@ -83,6 +94,8 @@
 @endsection
 
 @push('js')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script type="text/javascript">
         $(document).ready(function() {
             init_table();
@@ -291,5 +304,50 @@
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
                 });
         }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fungsi untuk memuat data dan membuat chart
+            function loadChartData() {
+                fetch('/report-asset-performance/chart-project')
+                    .then(response => response.json())
+                    .then(chartData => {
+                        // Buat chart
+                        const ctx = document.getElementById('myBarChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: chartData,
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                    },
+                                },
+                                scales: {
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Date'
+                                        }
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Values'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error fetching chart data:', error));
+            }
+
+            // Panggil fungsi untuk memuat data
+            loadChartData();
+        });
     </script>
 @endpush
