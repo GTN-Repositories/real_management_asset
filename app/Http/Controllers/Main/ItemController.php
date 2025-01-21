@@ -204,7 +204,7 @@ class ItemController extends Controller
 
                 return response()->json([
                     'status' => true,
-                    'message' => 'Data berhasil ditambahkan!',
+                    'message' => 'Data berhasil ditambahkan dengan ID SPR-'.Crypt::decrypt($data->id).'!',
                 ]);
             });
         } catch (\Throwable $th) {
