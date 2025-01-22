@@ -29,33 +29,6 @@
                     <i class="fa-solid fa-file-pdf me-1"></i>Export PDF
                 </button>
             @endif --}}
-            <div class="me-2">
-                <label for="month" class="form-label">Bulan</label>
-                <select id="month" class="form-select select2">
-                    <option value="">Pilih Bulan</option>
-                    <option value="01">Januari</option>
-                    <option value="02">Februari</option>
-                    <option value="03">Maret</option>
-                    <option value="04">April</option>
-                    <option value="05">Mei</option>
-                    <option value="06">Juni</option>
-                    <option value="07">Juli</option>
-                    <option value="08">Agustus</option>
-                    <option value="09">September</option>
-                    <option value="10">Oktober</option>
-                    <option value="11">November</option>
-                    <option value="12">Desember</option>
-                </select>
-            </div>
-            <div class="me-2">
-                <label for="year" class="form-label">Tahun</label>
-                <select id="year" class="form-select select2">
-                    <option value="">Pilih Tahun</option>
-                    @for ($i = date('Y'); $i >= 1985; $i--)
-                        <option value="{{ $i }}">{{ $i }}</option>
-                    @endfor
-                </select>
-            </div>
             @if (!auth()->user()->hasRole('Read only'))
                 @if (auth()->user()->hasPermissionTo('report-fuel-export-excel'))
                     <button onclick="exportExcel()" class="btn btn-success">
@@ -63,7 +36,11 @@
                     </button>
                 @endif
                 @if (auth()->user()->hasPermissionTo('report-fuel-export-excel-month'))
-                    <button onclick="exportExcelMonth()" class="btn btn-success">
+                    {{-- <button onclick="exportExcelMonth()" class="btn btn-success">
+                        <i class="fa-solid fa-file-excel me-1"></i>Excel Fuel Monthly
+                    </button> --}}
+
+                    <button onclick="exportExcelMonthModal()" class="btn btn-success">
                         <i class="fa-solid fa-file-excel me-1"></i>Excel Fuel Monthly
                     </button>
                 @endif
@@ -161,6 +138,62 @@
             </div>
         </div>
     </div>
+
+    {{-- MODAL FILTER --}}
+    <div class="modal fade" id="modal-export-excel-month" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-simple">
+            <div class="modal-content p-3 p-md-5">
+                <div class="modal-body" id="content-modal-export-excel-month">
+                    <button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    <div class="text-center mb-4">
+                        <h3 class="role-title mb-2">Excel Fuel Monthly</h3>
+                        <p class="text-muted">Export data to excel</p>
+                    </div>
+
+                    <div class="row">
+                        <div class="me-2 mb-2">
+                            <label for="month" class="form-label">Bulan</label>
+                            <select id="month" class="form-select select2">
+                                <option value="">Pilih Bulan</option>
+                                <option value="01">Januari</option>
+                                <option value="02">Februari</option>
+                                <option value="03">Maret</option>
+                                <option value="04">April</option>
+                                <option value="05">Mei</option>
+                                <option value="06">Juni</option>
+                                <option value="07">Juli</option>
+                                <option value="08">Agustus</option>
+                                <option value="09">September</option>
+                                <option value="10">Oktober</option>
+                                <option value="11">November</option>
+                                <option value="12">Desember</option>
+                            </select>
+                        </div>
+                        <div class="me-2 mb-2">
+                            <label for="year" class="form-label">Tahun</label>
+                            <select id="year" class="form-select select2">
+                                <option value="">Pilih Tahun</option>
+                                @for ($i = date('Y'); $i >= 1985; $i--)
+                                    <option value="{{ $i }}">{{ $i }}</option>
+                                @endfor
+                            </select>
+                        </div>
+    
+                        <div class="col-12 text-center mt-4">
+                            <button onclick="exportExcelMonth()" class="btn btn-success">
+                                <i class="fa-solid fa-file-excel me-1"></i> Export
+                            </button>
+
+                            <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('js')
@@ -197,6 +230,7 @@
 
                 reloadTableWithFilters(startDate, endDate);
                 reloadExpanseChartWithFilters(startDate, endDate);
+                init_table_project(startDate, endDate);
             });
 
             $('#date-range-picker').on('cancel.daterangepicker', function() {
@@ -219,6 +253,7 @@
             if (litersChartSection) litersChartSection.destroy();
             if (priceChartSection) priceChartSection.destroy();
             init_expanse_chart(startDate, endDate, predefinedFilter);
+            init_table_project(startDate, endDate, predefinedFilter);
         }
 
         let litersChartSection;
@@ -601,6 +636,10 @@
                     }
                 });
             }
+        }
+
+        function exportExcelMonthModal() {
+            $("#modal-export-excel-month").modal("show");
         }
 
         function exportExcelMonth() {

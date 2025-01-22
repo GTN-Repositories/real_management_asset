@@ -386,10 +386,54 @@ class ReportFuelController extends Controller implements HasMiddleware
 
     public function getDataProjectFuel(Request $request)
     {
-        $query = FuelConsumption::join('management_projects', 'fuel_consumptions.management_project_id', '=', 'management_projects.id')
-            ->selectRaw('management_projects.id, management_projects.name, SUM(fuel_consumptions.liter) as total_liter')
-            ->groupBy('management_projects.id', 'management_projects.name');
+        $startDate = $request->startDate;
+        $endDate = $request->endDate;
 
+        $query = FuelConsumption::join('management_projects', 'fuel_consumptions.management_project_id', '=', 'management_projects.id')
+            ->selectRaw('management_projects.id, management_projects.name, SUM(fuel_consumptions.liter) as total_liter');
+
+        if ($request->filled('predefinedFilter')) {
+            switch ($request->predefinedFilter) {
+                case 'hari ini':
+                    $query->whereDate('fuel_consumptions.date', Carbon::today());
+                    break;
+                case 'minggu ini':
+                    $query->whereBetween('fuel_consumptions.date', [
+                        Carbon::now()->startOfWeek(),
+                        Carbon::now()->endOfWeek()
+                    ]);
+                    break;
+                case 'bulan ini':
+                    $query->whereBetween('fuel_consumptions.date', [
+                        Carbon::now()->startOfMonth(),
+                        Carbon::now()->endOfMonth()
+                    ]);
+                    break;
+                case 'bulan kemarin':
+                    $query->whereBetween('fuel_consumptions.date', [
+                        Carbon::now()->subMonth()->startOfMonth(),
+                        Carbon::now()->subMonth()->endOfMonth()
+                    ]);
+                    break;
+                case 'tahun ini':
+                    $query->whereBetween('fuel_consumptions.date', [
+                        Carbon::now()->startOfYear(),
+                        Carbon::now()->endOfYear()
+                    ]);
+                    break;
+                case 'tahun kemarin':
+                    $query->whereBetween('fuel_consumptions.date', [
+                        Carbon::now()->subYear()->startOfYear(),
+                        Carbon::now()->subYear()->endOfYear()
+                    ]);
+                    break;
+            }
+        } else if ($startDate && $endDate) {
+            $query->whereBetween('fuel_consumptions.date', [$startDate, $endDate]);
+        }
+
+        $query->groupBy('management_projects.id', 'management_projects.name');
+        
         if (session('selected_project_id')) {
             $query->where('management_projects.id', Crypt::decrypt(session('selected_project_id')));
         }

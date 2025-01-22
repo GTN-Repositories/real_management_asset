@@ -195,7 +195,7 @@
                         <i class="ti ti-arrow-left ti-xs me-sm-1 me-0"></i>
                         <span class="align-middle d-sm-inline-block d-none">Previous</span>
                     </button>
-                    <button class="btn btn-primary btn-next">
+                    <button class="btn btn-primary btn-next" type="button">
                         <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
                         <i class="ti ti-arrow-right ti-xs"></i>
                     </button>
@@ -254,7 +254,7 @@
                         <i class="ti ti-arrow-left ti-xs me-sm-1 me-0"></i>
                         <span class="align-middle d-sm-inline-block d-none">Previous</span>
                     </button>
-                    <button class="btn btn-primary btn-next">
+                    <button class="btn btn-primary btn-next" type="button">
                         <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
                         <i class="ti ti-arrow-right ti-xs"></i>
                     </button>
@@ -298,7 +298,7 @@
                         <i class="ti ti-arrow-left ti-xs me-sm-1 me-0"></i>
                         <span class="align-middle d-sm-inline-block d-none">Previous</span>
                     </button>
-                    <button class="btn btn-primary btn-next">
+                    <button class="btn btn-primary btn-next" type="button">
                         <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
                         <i class="ti ti-arrow-right ti-xs"></i>
                     </button>
@@ -323,7 +323,7 @@
                             <i class="ti ti-arrow-left ti-xs me-sm-1 me-0"></i>
                             <span class="align-middle d-sm-inline-block d-none">Previous</span>
                         </button>
-                        <button class="btn btn-primary btn-next">
+                        <button class="btn btn-primary btn-next" type="button">
                             <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
                             <i class="ti ti-arrow-right ti-xs"></i>
                         </button>
@@ -367,7 +367,7 @@
                             <i class="ti ti-arrow-left ti-xs me-sm-1 me-0"></i>
                             <span class="align-middle d-sm-inline-block d-none">Previous</span>
                         </button>
-                        <button class="btn btn-primary btn-next">
+                        <button class="btn btn-primary btn-next" type="button">
                             <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
                             <i class="ti ti-arrow-right ti-xs"></i>
                         </button>
