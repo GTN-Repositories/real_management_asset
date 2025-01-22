@@ -78,7 +78,7 @@
             class="form-control mb-3 mb-lg-0" placeholder="Masukan Code Delay" />
     </div>
 
-    <div class="col-12 col-md-6" id="delay_reason_form" hidden>
+    <div class="col-12 col-md-6" id="delay_reason_form">
         <label class="form-label">Delay Reason</label>
         <input type="text" name="delay_reason" value="{{ $maintenance->delay_reason }}" id="delay_reason"
             class="form-control mb-3 mb-lg-0" placeholder="Masukan Delay Reason" />
@@ -345,7 +345,7 @@
     function changeStatus(status) {
         if (status == 'OnHold') {
             $('#code_delay_form').attr('hidden', false);
-            $('#delay_reason_form').attr('hidden', false);
+            // $('#delay_reason_form').attr('hidden', false);
             $('#estimate_finish_form').attr('hidden', false);
             $('#delay_hours_form').attr('hidden', false);
             $('#start_maintenace_form').attr('hidden', false);
@@ -361,7 +361,7 @@
             $('#urgention_form').attr('hidden', true);
         } else if (status == 'Finish') {
             $('#code_delay_form').attr('hidden', true);
-            $('#delay_reason_form').attr('hidden', true);
+            // $('#delay_reason_form').attr('hidden', true);
             $('#estimate_finish_form').attr('hidden', true);
             $('#delay_hours_form').attr('hidden', true);
             $('#start_maintenace_form').attr('hidden', true);
@@ -377,7 +377,7 @@
             $('#urgention_form').attr('hidden', false);
         } else {
             $('#code_delay_form').attr('hidden', true);
-            $('#delay_reason_form').attr('hidden', true);
+            // $('#delay_reason_form').attr('hidden', true);
             $('#estimate_finish_form').attr('hidden', true);
             $('#delay_hours_form').attr('hidden', true);
             $('#start_maintenace_form').attr('hidden', true);

@@ -28,16 +28,18 @@ class Overdue extends Command
      */
     public function handle()
     {
-        //
+        $overdue = 3;
+        $onhold = 3;
+
         Asset::where('status', 'UnderMaintenance')
-            ->whereRaw('DATE_SUB(NOW(), INTERVAL 3 DAY) <= updated_at')
+            ->whereRaw('DATE_SUB(NOW(), INTERVAL  ' . $overdue . ' DAY) <= updated_at')
             ->get()
             ->each(function ($asset) {
                 $asset->update(['status' => 'Overdue']);
             });
 
         InspectionSchedule::where('status', 'UnderMaintenance')
-            ->whereRaw('DATE_SUB(NOW(), INTERVAL 3 DAY) <= updated_at')
+            ->whereRaw('DATE_SUB(NOW(), INTERVAL  ' . $overdue . ' DAY) <= updated_at')
             ->get()
             ->each(function ($inspection) {
                 $inspection->update(['status' => 'Overdue']);
@@ -46,7 +48,7 @@ class Overdue extends Command
         Loadsheet::select('asset_id')
             ->groupBy('asset_id')
             ->havingRaw('COUNT(*) = 1')
-            ->whereRaw('DATE_SUB(NOW(), INTERVAL 7 DAY) >= MAX(updated_at)')
+            ->whereRaw('DATE_SUB(NOW(), INTERVAL ' . $onhold . ' DAY) >= MAX(updated_at)')
             ->get()
             ->each(function ($loadsheet) {
                 Asset::where('id', $loadsheet->asset_id)->update(['status' => 'OnHold']);

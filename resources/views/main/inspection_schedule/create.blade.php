@@ -27,7 +27,7 @@
         </select>
     </div>
 
-    <div class="col-12 col-md-12" id="employeeId">
+    <div class="col-12 col-md-6" id="employeeId">
         <label for="employee_id" class="form-label">PIC<span class="text-danger">*</span></label>
         <div class="select2-primary">
             <div class="position-relative">
@@ -36,6 +36,14 @@
                 </select>
             </div>
         </div>
+    </div>
+
+    <div class="col-12 col-md-6" id="urgention_form">
+        <label class="form-label">Jenis Kerusakan</label>
+        <select name="urgention" id="urgention" class="form-select select2">
+            <option value="Major">Major</option>
+            <option value="Minor">Minor</option>
+        </select>
     </div>
 
     <div class="col-12 col-md-6" id="managementRelation">

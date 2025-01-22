@@ -127,7 +127,7 @@ class InspectionScheduleController extends Controller
             'werehouse_id',
         ];
 
-        $keyword = $request->search['value'];
+        $keyword = $request->search['value'] ?? '';
         // $start_date = ($request->start_date != '') ? $request->start_date . ' 00:00:00' : now()->startOfMonth()->format('Y-m-d') . ' 00:00:00';
         // $end_date = ($request->end_date != '') ? $request->end_date . ' 23:59:59' : now()->endOfMonth()->format('Y-m-d') . ' 23:59:59';
         $type = $request->type;
@@ -220,6 +220,7 @@ class InspectionScheduleController extends Controller
                     'name' => $data['name'],
                     'date' => $data['date'],
                     'type' => $data['type'],
+                    'urgention' => $data['urgention'],
                     'management_project_id' => $management_project_id,
                     'asset_id' => $asset_id,
                     'werehouse_id' => $werehouse_id,
