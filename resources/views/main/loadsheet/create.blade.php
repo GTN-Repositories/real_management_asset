@@ -31,7 +31,7 @@
         </select>
     </div>
     <div class="col-12 col-md-12">
-        <label class="form-label" for="hours">Jam Kerja <span class="text-danger">*</span></label>
+        <label class="form-label" for="hours">Jam Operasional <span class="text-danger">*</span></label>
         <input type="text" id="hours" name="hours" class="form-control" required />
     </div>
     <div class="col-12">
@@ -66,7 +66,7 @@
                             <textarea id="location" name="location" class="form-control"></textarea>
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="bpit">BPIT <span class="text-danger">*</span></label>
+                            <label class="form-label" for="bpit">Loading Area <span class="text-danger">*</span></label>
                             <input type="text" id="bpit" name="bpit" class="form-control" />
                         </div>
                         <div class="col-12 col-md-6">
@@ -75,18 +75,25 @@
                             <input type="text" id="kilometer" name="kilometer" class="form-control" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="loadsheet">Total Loadsheet <span
+                            <label class="form-label" for="loadsheet">Load/Ritase <span
                                     class="text-danger">*</span></label>
                             <input type="text" id="loadsheet" name="loadsheet" class="form-control" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="perload">Per Load <span
+                            <label class="form-label" for="perload">Tonase/Kubikasi <span
                                     class="text-danger">*</span></label>
                             <input type="text" id="perload" name="perload" class="form-control" />
                         </div>
                         <div class="col-12 col-md-6">
-                            <label class="form-label" for="lose_factor">Lose Factor <span
-                                    class="text-danger">*</span></label>
+                            @if (session('selected_project_id'))
+                                @if (\App\Helpers\Helper::projectSelected()->calculation_method == 'Kubic')
+                                    <th>Lose Factor</th>
+                                @elseif (\App\Helpers\Helper::projectSelected()->calculation_method == 'Tonase')
+                                    <th>RF</th>
+                                @endif
+                            @else
+                                <th>Lose Factor/RF</th>
+                            @endif
                             <input type="text" id="lose_factor" name="lose_factor" class="form-control" value="0.75"/>
                         </div>
                         <div class="col-12 col-md-6">

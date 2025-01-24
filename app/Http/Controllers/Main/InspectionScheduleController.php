@@ -45,6 +45,15 @@ class InspectionScheduleController extends Controller
             ->addColumn('type', function ($data) {
                 return $data->type ?? '-';
             })
+            ->addColumn('location', function ($data) {
+                return $data->location ?? '-';
+            })
+            ->addColumn('estimate_finish', function ($data) {
+                return $data->estimate_finish ?? '-';
+            })
+            ->addColumn('urgention', function ($data) {
+                return $data->urgention ?? '-';
+            })
             ->addColumn('note', function ($data) {
                 return $data->note ?? '-';
             })
@@ -110,6 +119,7 @@ class InspectionScheduleController extends Controller
         $columns = [
             'id',
             'name',
+            'location',
             'type',
             'asset_id',
             'management_project_id',
@@ -125,12 +135,14 @@ class InspectionScheduleController extends Controller
             'workshop',
             'employee_id',
             'werehouse_id',
+            'estimate_finish',
+            'urgention',
         ];
 
         $keyword = $request->search['value'] ?? '';
         // $start_date = ($request->start_date != '') ? $request->start_date . ' 00:00:00' : now()->startOfMonth()->format('Y-m-d') . ' 00:00:00';
         // $end_date = ($request->end_date != '') ? $request->end_date . ' 23:59:59' : now()->endOfMonth()->format('Y-m-d') . ' 23:59:59';
-        $type = $request->type;
+        $type = $request->type ?? '';
 
         $data = InspectionSchedule::orderBy('id', 'desc')
             ->select($columns)
@@ -225,6 +237,7 @@ class InspectionScheduleController extends Controller
                     'asset_id' => $asset_id,
                     'werehouse_id' => $werehouse_id,
                     'note' => $data['note'],
+                    'location' => $data['location'],
                     'item_id' => json_encode($decryptedItemIds) ?? null,
                     'item_stock' => json_encode($itemStocks) ?? null,
                     'kanibal_stock' => json_encode($kanibalStocks) ?? null,
@@ -414,6 +427,7 @@ class InspectionScheduleController extends Controller
                 $data['item_stock'] = json_encode($itemStocks) ?? null;
                 $data['kanibal_stock'] = json_encode($kanibalStocks) ?? null;
                 $data['asset_kanibal_id'] = json_encode($assetKanibalIds) ?? null;
+                $data['location'] = $data['location'] ?? null;
 
                 // dd($data);  
                 $schedule->update($data);

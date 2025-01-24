@@ -22,6 +22,14 @@
                 <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
                     <i class="fas fa-trash-alt"></i> Hapus Masal
                 </button>
+
+                <button type="button" class="btn btn-success btn-md d-flex align-items-center" onclick="importExcel()">
+                    <i class="fas fa-file-excel me-2"></i> Import Excel
+                </button>
+
+                <button onclick="exportExcel()" class="btn btn-success btn-md">
+                    <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                </button>
                 <!-- Tombol Tambah -->
                 @if (auth()->user()->hasPermissionTo('employee-create'))
                     <button type="button" class="btn btn-primary btn-md" onclick="createData()">
@@ -320,6 +328,27 @@
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
                 });
+        }
+
+        function importExcel() {
+            $.ajax({
+                    url: "{{ route('employee.import.form') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+                });
+        }
+
+        function exportExcel() {
+            var url = "{{ route('employee.export-excel') }}";
+
+            window.open(url);
         }
     </script>
 @endpush

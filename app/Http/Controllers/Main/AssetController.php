@@ -247,6 +247,7 @@ class AssetController extends Controller
             })
             ->groupBy('category')
             ->orderBy('category', 'asc')
+            ->limit(5)
             ->get();
 
         return response()->json($data);
@@ -509,6 +510,8 @@ class AssetController extends Controller
                     } catch (\Exception $e) {
                         $data['pic'] = $data['pic'];
                     }
+                }else{
+                    $data['pic'] = null;
                 }
 
                 $data['manager'] = $data['manager'] ?? null;
@@ -711,28 +714,25 @@ class AssetController extends Controller
 
             // Clone queries for each count to avoid interference
             $operationalStatus = (clone $baseQuery)->select(
-                DB::raw('COUNT(CASE WHEN status = "Idle" THEN 1 END) as idle'),
-                DB::raw('COUNT(CASE WHEN status = "StandBy" THEN 1 END) as standby'),
-                DB::raw('COUNT(CASE WHEN status = "UnderMaintenance" THEN 1 END) as underMaintenance'),
                 DB::raw('COUNT(CASE WHEN status = "Active" THEN 1 END) as active'),
-                DB::raw('COUNT(CASE WHEN status = "Finish" THEN 1 END) as finish')
+                DB::raw('COUNT(CASE WHEN status = "Inactive" THEN 1 END) as inactive'),
+                DB::raw('COUNT(CASE WHEN status = "Scrap" THEN 1 END) as scrap'),
             )->first();
 
-            $active = $operationalStatus->active + $operationalStatus->finish;
+            $active = $operationalStatus->active;
 
             $maintenanceStatus = (clone $baseQuery)->select(
-                DB::raw('COUNT(CASE WHEN status = "OnHold" THEN 1 END) as onHold'),
-                DB::raw('COUNT(CASE WHEN status = "Finish" THEN 1 END) as finish'),
-                DB::raw('COUNT(CASE WHEN status = "Scheduled" THEN 1 END) as scheduled'),
-                DB::raw('COUNT(CASE WHEN status = "InProgress" THEN 1 END) as inProgress')
+                DB::raw('COUNT(CASE WHEN status = "UnderMaintenance" THEN 1 END) as underMaintenance'),
+                DB::raw('COUNT(CASE WHEN status = "UnderRepair" THEN 1 END) as underRepair'),
+                DB::raw('COUNT(CASE WHEN status = "Waiting" THEN 1 END) as waiting'),
             )->first();
 
-            $assetStatus = (clone $baseQuery)->select(
-                DB::raw('COUNT(CASE WHEN status = "Damaged" THEN 1 END) as damaged'),
-                DB::raw('COUNT(CASE WHEN status = "Fair" THEN 1 END) as fair'),
-                DB::raw('COUNT(CASE WHEN status = "NeedsRepair" THEN 1 END) as needsRepair'),
-                DB::raw('COUNT(CASE WHEN status = "Good" THEN 1 END) as good')
-            )->first();
+            // $assetStatus = (clone $baseQuery)->select(
+            //     DB::raw('COUNT(CASE WHEN status = "Damaged" THEN 1 END) as damaged'),
+            //     DB::raw('COUNT(CASE WHEN status = "Fair" THEN 1 END) as fair'),
+            //     DB::raw('COUNT(CASE WHEN status = "NeedsRepair" THEN 1 END) as needsRepair'),
+            //     DB::raw('COUNT(CASE WHEN status = "Good" THEN 1 END) as good')
+            // )->first();
 
             $totalAssets = $baseQuery->count();
 
@@ -740,44 +740,43 @@ class AssetController extends Controller
 
             $response = [
                 // Operational Status
-                'idle' => (int) $operationalStatus->idle,
-                'standby' => (int) $operationalStatus->standby,
-                'underMaintenance' => (int) $operationalStatus->underMaintenance,
+                'active' => (int) $operationalStatus->active,
+                'inactive' => (int) $operationalStatus->inactive,
+                'scrap' => (int) $operationalStatus->scrap,
                 'active' => $active,
 
                 // Maintenance Status
-                'onHold' => (int) $maintenanceStatus->onHold,
-                'finish' => (int) $maintenanceStatus->finish,
-                'scheduled' => (int) $maintenanceStatus->scheduled,
-                'inProgress' => (int) $maintenanceStatus->inProgress,
+                'underMaintenance' => (int) $maintenanceStatus->underMaintenance,
+                'underRepair' => (int) $maintenanceStatus->underRepair,
+                'waiting' => (int) $maintenanceStatus->waiting,
 
                 // Asset Condition Status
-                'damaged' => (int) $assetStatus->damaged,
-                'fair' => (int) $assetStatus->fair,
-                'needsRepair' => (int) $assetStatus->needsRepair,
-                'good' => (int) $assetStatus->good,
+                // 'damaged' => (int) $assetStatus->damaged,
+                // 'fair' => (int) $assetStatus->fair,
+                // 'needsRepair' => (int) $assetStatus->needsRepair,
+                // 'good' => (int) $assetStatus->good,
 
                 // Additional Statistics
                 'total_assets' => $totalAssets,
                 'percentages' => [
-                    'operational' => [
-                        'idle' => $totalAssets > 0 ? round(($operationalStatus->idle / $totalAssets) * 100, 1) : 0,
-                        'standby' => $totalAssets > 0 ? round(($operationalStatus->standby / $totalAssets) * 100, 1) : 0,
-                        'underMaintenance' => $totalAssets > 0 ? round(($operationalStatus->underMaintenance / $totalAssets) * 100, 1) : 0,
-                        'active' => $totalAssets > 0 ? round(($active / $totalAssets) * 100, 1) : 0
-                    ],
-                    'maintenance' => [
-                        'onHold' => $totalAssets > 0 ? round(($maintenanceStatus->onHold / $totalAssets) * 100, 1) : 0,
-                        'finish' => $totalAssets > 0 ? round(($maintenanceStatus->finish / $totalAssets) * 100, 1) : 0,
-                        'scheduled' => $totalAssets > 0 ? round(($maintenanceStatus->scheduled / $totalAssets) * 100, 1) : 0,
-                        'inProgress' => $totalAssets > 0 ? round(($maintenanceStatus->inProgress / $totalAssets) * 100, 1) : 0
-                    ],
-                    'condition' => [
-                        'damaged' => $totalAssets > 0 ? round(($assetStatus->damaged / $totalAssets) * 100, 1) : 0,
-                        'fair' => $totalAssets > 0 ? round(($assetStatus->fair / $totalAssets) * 100, 1) : 0,
-                        'needsRepair' => $totalAssets > 0 ? round(($assetStatus->needsRepair / $totalAssets) * 100, 1) : 0,
-                        'good' => $totalAssets > 0 ? round(($assetStatus->good / $totalAssets) * 100, 1) : 0
-                    ]
+                    // 'operational' => [
+                    //     'idle' => $totalAssets > 0 ? round(($operationalStatus->idle / $totalAssets) * 100, 1) : 0,
+                    //     'standby' => $totalAssets > 0 ? round(($operationalStatus->standby / $totalAssets) * 100, 1) : 0,
+                    //     'underMaintenance' => $totalAssets > 0 ? round(($operationalStatus->underMaintenance / $totalAssets) * 100, 1) : 0,
+                    //     'active' => $totalAssets > 0 ? round(($active / $totalAssets) * 100, 1) : 0
+                    // ],
+                    // 'maintenance' => [
+                    //     'onHold' => $totalAssets > 0 ? round(($maintenanceStatus->onHold / $totalAssets) * 100, 1) : 0,
+                    //     'finish' => $totalAssets > 0 ? round(($maintenanceStatus->finish / $totalAssets) * 100, 1) : 0,
+                    //     'scheduled' => $totalAssets > 0 ? round(($maintenanceStatus->scheduled / $totalAssets) * 100, 1) : 0,
+                    //     'inProgress' => $totalAssets > 0 ? round(($maintenanceStatus->inProgress / $totalAssets) * 100, 1) : 0
+                    // ],
+                    // 'condition' => [
+                    //     'damaged' => $totalAssets > 0 ? round(($assetStatus->damaged / $totalAssets) * 100, 1) : 0,
+                    //     'fair' => $totalAssets > 0 ? round(($assetStatus->fair / $totalAssets) * 100, 1) : 0,
+                    //     'needsRepair' => $totalAssets > 0 ? round(($assetStatus->needsRepair / $totalAssets) * 100, 1) : 0,
+                    //     'good' => $totalAssets > 0 ? round(($assetStatus->good / $totalAssets) * 100, 1) : 0
+                    // ]
                 ],
                 'timestamp' => now()->toDateTimeString()
             ];

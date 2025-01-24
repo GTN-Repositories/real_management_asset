@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('assets', function (Blueprint $table) {
-            $table->enum(
-                'status',
-                ['Active', 'Inactive', 'Scrap', 'UnderMaintenance', 'UnderRepair', 'Waiting', 'Open', 'Overdue', 'RFU']
-            )->nullable()->after('color')->change();
+        Schema::table('inspection_schedules', function (Blueprint $table) {
+            $table->datetime('estimate_finish')->nullable();
+        });
+
+        Schema::table('maintenances', function (Blueprint $table) {
+            $table->datetime('estimate_finish')->nullable()->change();
         });
     }
 
@@ -24,7 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('assets', function (Blueprint $table) {
-        });
+        //
     }
 };

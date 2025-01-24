@@ -42,6 +42,18 @@
         </select>
     </div>
 
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="location">Lokasi<span class="text-danger">*</span></label>
+        <input type="text" id="location" name="location" class="form-control" value="{{ $data->location }}" placeholder="Masukkan Lokasi" />
+    </div>
+
+    <div class="col-12 col-md-6" id="estimate_finish_form" hidden>
+        <label class="form-label">DateTime Estimate Finish/RFU</label>
+        <input type="datetime-local" value="{{ date('Y-m-d') }}" name="estimate_finish"
+            value="{{ $data->estimate_finish }}" id="estimate_finish" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan DateTime Estimate Finish/RFU" />
+    </div>
+
     <div class="col-12 col-md-12">
         <label class="form-label" for="alias">Catatan</label>
         <div>
@@ -299,7 +311,7 @@
                     <td>
                         <select class="form-select jenis-metode" data-item-id="${item.id}">
                             <option value="stock" ${item.stock_in_schedule > 0 ? 'selected' : ''}>Pengurangan Stock</option>
-                            <option value="kanibal" ${item.kanibal_stock_in_schedule > 0 ? 'selected' : ''}>Kanibal Asset Lain</option>
+                            <option value="kanibal" ${item.kanibal_stock_in_schedule > 0 ? 'selected' : ''}>Replacing From</option>
                         </select>
                     </td>
                     <td>
