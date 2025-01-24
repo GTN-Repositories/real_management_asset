@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Models\ManagementProject;
 use App\Models\Menu;
 use App\Models\Notification;
 use Illuminate\Support\Facades\Crypt;
@@ -93,4 +94,15 @@ class Helper
         return $body ? $dom->saveHTML($body) : '';
     }
 
+
+    public static function projectSelected()
+    {
+        if (session('selected_project_id')) {
+            $data = ManagementProject::find(Crypt::decrypt(session('selected_project_id')));
+    
+            return $data;
+        } else {
+            return '-';
+        }
+    }
 }

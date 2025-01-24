@@ -44,16 +44,19 @@
                             </th>
                             <th>ID</th>
                             <th>Nama</th>
-                            <th>Type</th>
-                            <th>Catatan</th>
-                            <th>Management Project</th>
                             <th>Asset</th>
+                            <th>Type</th>
+                            <th>Problem</th>
+                            <th>Management Project</th>
+                            <th>Lokasi</th>
                             <th>Tanggal</th>
-                            <th>Gudang</th>
+                            <th>DATE ESTIMATE RFU</th>
+                            <th>Kategori</th>
+                            {{-- <th>Gudang</th>
                             <th>Item</th>
                             <th>Stok</th>
                             <th>Stok Kanibal</th>
-                            <th>Asset Kanibal</th>
+                            <th>Asset Kanibal</th> --}}
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -263,6 +266,10 @@
                         name: 'name'
                     },
                     {
+                        data: 'asset_id',
+                        name: 'asset_id',
+                    },
+                    {
                         data: 'type',
                         name: 'type'
                     },
@@ -275,33 +282,41 @@
                         name: 'managementProject',
                     },
                     {
-                        data: 'asset_id',
-                        name: 'asset_id',
+                        data: 'location',
+                        name: 'location'
                     },
                     {
                         data: 'date',
                         name: 'date'
                     },
                     {
-                        data: 'werehouse_id',
-                        name: 'werehouse_id'
+                        data: 'estimate_finish',
+                        name: 'estimate_finish'
                     },
                     {
-                        data: 'item_name',
-                        name: 'item_name'
+                        data: 'urgention',
+                        name: 'urgention'
                     },
-                    {
-                        data: 'item_stock',
-                        name: 'item_stock'
-                    },
-                    {
-                        data: 'kanibal_stock',
-                        name: 'kanibal_stock'
-                    },
-                    {
-                        data: 'asset_kanibal_name',
-                        name: 'asset_kanibal_name'
-                    },
+                    // {
+                    //     data: 'werehouse_id',
+                    //     name: 'werehouse_id'
+                    // },
+                    // {
+                    //     data: 'item_name',
+                    //     name: 'item_name'
+                    // },
+                    // {
+                    //     data: 'item_stock',
+                    //     name: 'item_stock'
+                    // },
+                    // {
+                    //     data: 'kanibal_stock',
+                    //     name: 'kanibal_stock'
+                    // },
+                    // {
+                    //     data: 'asset_kanibal_name',
+                    //     name: 'asset_kanibal_name'
+                    // },
                     {
                         data: 'action',
                         name: 'action'

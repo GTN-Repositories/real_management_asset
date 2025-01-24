@@ -15,7 +15,7 @@
 
     <div class="col-12 col-md-6">
         <label class="form-label">Tanggal</label>
-        <input type="date" name="date" id="date" class="form-control mb-3 mb-lg-0"
+        <input type="datetime-local" name="date" id="date" class="form-control mb-3 mb-lg-0"
             placeholder="Masukan Nama Item" value="{{ old('date', date('Y-m-d')) }}" required />
     </div>
 
@@ -39,10 +39,11 @@
     </div>
 
     <div class="col-12 col-md-6" id="urgention_form">
-        <label class="form-label">Jenis Kerusakan</label>
+        <label class="form-label">Kategori</label>
         <select name="urgention" id="urgention" class="form-select select2">
-            <option value="Major">Major</option>
-            <option value="Minor">Minor</option>
+            <option value="Ringan">Ringan</option>
+            <option value="Sedang">Sedang</option>
+            <option value="Berat">Berat</option>
         </select>
     </div>
 
@@ -52,6 +53,18 @@
             class="select2 form-select select2-primary"data-allow-clear="true" required>
         </select>
     </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="location">Lokasi<span class="text-danger">*</span></label>
+        <input type="text" id="location" name="location" class="form-control" placeholder="Masukkan Lokasi" />
+    </div>
+
+    <div class="col-12 col-md-6" id="estimate_finish_form">
+        <label class="form-label">DateTime Estimate Finish/RFU</label>
+        <input type="datetime-local" value="{{ date('Y-m-d') }}" name="estimate_finish" id="estimate_finish" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan DateTime Estimate Finish/RFU" />
+    </div>
+
     <div class="col-12 col-md-6" id="assetRelation">
         <label class="form-label" for="asset_id">Nama Asset<span class="text-danger">*</span></label>
         <select id="asset_id" name="asset_id" class="select2 form-select select2-primary"data-allow-clear="true"
@@ -60,9 +73,9 @@
     </div>
 
     <div class="col-12 col-md-12">
-        <label class="form-label" for="alias">Deskripsi</label>
+        <label class="form-label" for="alias">Problem</label>
         <textarea name="note" id="note" cols="30" rows="10" class="form-control"
-            placeholder="Masukkan Deskripsi"></textarea>
+            placeholder="Masukkan Problem"></textarea>
     </div>
 
     <div class="col-12 col-md-12" id="werehouseParent">
@@ -295,7 +308,7 @@
                     <td>
                         <select class="form-select jenis-metode" data-item-id="${item.id}">
                             <option value="stock" ${item.jenisMetode === 'stock' ? 'selected' : ''}>Pengurangan Stock</option>
-                            <option value="kanibal" ${item.jenisMetode === 'kanibal' ? 'selected' : ''}>Kanibal Asset Lain</option>
+                            <option value="kanibal" ${item.jenisMetode === 'kanibal' ? 'selected' : ''}>Replacing From</option>
                         </select>
                     </td>
                     <td>

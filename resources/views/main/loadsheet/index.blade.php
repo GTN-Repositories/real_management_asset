@@ -46,11 +46,19 @@
                             <th>Date</th>
                             <th>Location</th>
                             <th>Soil Type</th>
-                            <th>BPIT</th>
+                            <th>Loading Area</th>
                             <th>Kilometer</th>
-                            <th>Loadsheet</th>
-                            <th>Per Load</th>
-                            <th>Factor Lose</th>
+                            <th>Load/Ritase</th>
+                            <th>Tonase/Kubikasi</th>
+                            @if (session('selected_project_id'))
+                                @if (\App\Helpers\Helper::projectSelected()->calculation_method == 'Kubic')
+                                    <th>Lose Factor</th>
+                                @elseif (\App\Helpers\Helper::projectSelected()->calculation_method == 'Tonase')
+                                    <th>RF</th>
+                                @endif
+                            @else
+                                <th>Lose Factor/RF</th>
+                            @endif
                             <th>Cubication</th>
                             <th>Price</th>
                             <th>Billing Status</th>

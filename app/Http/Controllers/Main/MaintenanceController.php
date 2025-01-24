@@ -11,6 +11,7 @@ use App\Models\InspectionSchedule;
 use App\Models\Item;
 use App\Models\Maintenance;
 use App\Models\ManagementProject;
+use App\Models\StatusAsset;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -92,9 +93,18 @@ class MaintenanceController extends Controller
 
                 
                 $asset = Asset::where('id', $inspection_schedule->asset_id)->first();
+                $statusBefore = $asset->status;
                 $asset->update([
                     'status' => 'UnderMaintenance'
                 ]);
+
+                if ($statusBefore !== $asset->status) {
+                    StatusAsset::create([
+                        'asset_id' => Crypt::decrypt($asset->id),
+                        'status_before' => $statusBefore,
+                        'status_after' => $asset->status,
+                    ]);
+                }
 
                 // SEND EMAIL
                 $general = GeneralSetting::where('group', 'reminder')->where('key', 'reminder_change_status_asset')->orderBy('id', 'desc')->first();
@@ -182,9 +192,26 @@ class MaintenanceController extends Controller
                     $assst_id = $data['asset_id'];
                 }
 
-                Asset::where('id', Crypt::decrypt($assst_id))->update([
+                $asset = Asset::where('id', Crypt::decrypt($assst_id))->first();
+                $statusBefore = $asset->status;
+                $asset->update([
                     'status' => $data['status']
                 ]);
+
+                if ($statusBefore !== $asset->status) {
+                    StatusAsset::create([
+                        'asset_id' => Crypt::decrypt($asset->id),
+                        'status_before' => $statusBefore,
+                        'status_after' => $asset->status,
+                    ]);
+
+                    // SEND EMAIL
+                    $general = GeneralSetting::where('group', 'reminder')->where('key', 'reminder_change_status_asset')->orderBy('id', 'desc')->first();
+                    if ($general && $general->status == 'active') {
+                        $generalEmailSmtp = GeneralSetting::orderBy('value', 'asc')->where('group', 'email_reminder')->where('key', 'email_sender_smtp')->pluck('value');
+                        Mail::to($generalEmailSmtp)->send(new ChangeStatusAssetEmail($asset));
+                    }
+                }
 
                 $schedule->update($data);
 
