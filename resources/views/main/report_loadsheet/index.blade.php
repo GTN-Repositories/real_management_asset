@@ -1,7 +1,7 @@
 @extends('layouts.global')
 
 @section('title', 'Laporan Loadsheet')
-@section('title_page', 'Report / Asset Report')
+@section('title_page', 'Report / Laporan Loadsheet')
 
 @push('css')
     <style>

@@ -92,20 +92,13 @@
     <div class="col-12 col-md-6">
         <label for="status" class="form-label">Status</label>
         <select class="form-select select2" id="status" name="status" aria-label="Select status">
-            <option value="Idle" {{ $data->status == 'Idle' ? 'selected' : '' }}>Idle</option>
-            <option value="StandBy" {{ $data->status == 'StandBy' ? 'selected' : '' }}>Stand By</option>
-            <option value="OnHold" {{ $data->status == 'OnHold' ? 'selected' : '' }}>On Hold</option>
-            <option value="Finish" {{ $data->status == 'Finish' ? 'selected' : '' }}>Finish</option>
-            <option value="Damaged" {{ $data->status == 'Damaged' ? 'selected' : '' }}>Damaged</option>
-            <option value="Fair" {{ $data->status == 'Fair' ? 'selected' : '' }}>Fair</option>
-            <option value="UnderMaintenance" {{ $data->status == 'UnderMaintenance' ? 'selected' : '' }}>
-                Under Maintenance</option>
             <option value="Active" {{ $data->status == 'Active' ? 'selected' : '' }}>Active</option>
-            <option value="Scheduled" {{ $data->status == 'Scheduled' ? 'selected' : '' }}>Scheduled</option>
-            <option value="InProgress" {{ $data->status == 'InProgress' ? 'selected' : '' }}>In Progress</option>
-            <option value="NeedsRepair" {{ $data->status == 'NeedsRepair' ? 'selected' : '' }}>Needs Repair</option>
-            <option value="Good" {{ $data->status == 'Good' ? 'selected' : '' }}>Good</option>
-            <option value="Overdue" {{ $data->status == 'Overdue' ? 'selected' : '' }}>Overdue</option>
+            <option value="Inactive" {{ $data->status == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+            {{-- <option value="UnderMaintenance" {{ $data->status == 'UnderMaintenance' ? 'selected' : '' }}>Under Maintenance</option>
+            <option value="UnderRepair" {{ $data->status == 'UnderRepair' ? 'selected' : '' }}>Under Repair</option>
+            <option value="Waiting" {{ $data->status == 'Waiting' ? 'selected' : '' }}>Waiting</option> --}}
+            <option value="Scrap" {{ $data->status == 'Scrap' ? 'selected' : '' }}>Scrap</option>
+            {{-- <option value="RFU" {{ $data->status == 'RFU' ? 'selected' : '' }}>RFU</option> --}}
         </select>
     </div>
     <div class="col-12 col-md-6">

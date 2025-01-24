@@ -298,18 +298,54 @@
                     </table>
                 </div>
                 <div class="tab-pane fade" id="navs-justified-history" role="tabpanel">
-                    <table class="datatables table table-striped table-poppins " id="data-table">
-                        <thead class="border-top">
-                            <tr>
-                                <th>
-                                    #
-                                </th>
-                                <th>date</th>
-                                <th>perubahan dari</th>
-                                <th>perubahan menjadi</th>
-                            </tr>
-                        </thead>
-                    </table>
+                    <div class="mb-3">
+                        <h5>History Perubahan Status Asset</h5>
+                        <table class="datatables table table-striped table-poppins " id="data-table">
+                            <thead class="border-top">
+                                <tr>
+                                    <th>
+                                        #
+                                    </th>
+                                    <th>Tanggal</th>
+                                    <th>Perubahan Dari</th>
+                                    <th>Perubahan Menjadi</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5>History Pergantian Sparepart</h5>
+                        <table class="datatables table table-striped table-poppins " id="data-table-sparepart-history">
+                            <thead class="border-top">
+                                <tr>
+                                    <th>
+                                        #
+                                    </th>
+                                    <th>Inspeksi ID</th>
+                                    <th>Tanggal</th>
+                                    <th>Sparepart</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5>History Job Order</h5>
+                        <table class="datatables table table-striped table-poppins " id="data-table-inspection-comment">
+                            <thead class="border-top">
+                                <tr>
+                                    <th>
+                                        #
+                                    </th>
+                                    <th>Tanggal</th>
+                                    <th>ID Inspeksi</th>
+                                    <th>Problem</th>
+                                    <th>Dibuat Oleh</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="navs-justified-files" role="tabpanel">
                     <table class="table">
@@ -561,6 +597,8 @@
             init_table_attachment();
             loadAppreciationChart();
             loadDepreciationChart();
+            init_table_sparepart_history();
+            init_table_inspection_comment();
         })
 
         document.getElementById('download-btn').addEventListener('mouseover', function() {
@@ -570,6 +608,8 @@
 
         $(document).on('input', '#searchData', function() {
             init_table($(this).val());
+            init_table_sparepart_history($(this).val());
+            init_table_inspection_comment($(this).val());
         })
 
         function init_table(keyword = '') {
@@ -612,6 +652,100 @@
                     {
                         data: 'status_after',
                         name: 'status_after'
+                    },
+                ]
+            });
+        }
+
+        function init_table_sparepart_history(keyword = '') {
+            var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+            if ($.fn.DataTable.isDataTable('#data-table-sparepart-history')) {
+                $('#data-table-sparepart-history').DataTable().clear().destroy();
+            }
+
+            var table = $('#data-table-sparepart-history').DataTable({
+                processing: true,
+                serverSide: true,
+                columnDefs: [{
+                    target: 0,
+                    visible: true,
+                    searchable: false
+                }],
+                ajax: {
+                    type: "GET",
+                    url: "{{ route('status-asset.dataSparepartHistory') }}",
+                    data: {
+                        'keyword': keyword,
+                        'asset_id': asset_id,
+                    }
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'id',
+                        name: 'id'
+                    },
+                    {
+                        data: 'date',
+                        name: 'date'
+                    },
+                    {
+                        data: 'item_stock',
+                        name: 'item_stock'
+                    },
+                ]
+            });
+        }
+
+        function init_table_inspection_comment(keyword = '') {
+            var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+            if ($.fn.DataTable.isDataTable('#data-table-inspection-comment')) {
+                $('#data-table-inspection-comment').DataTable().clear().destroy();
+            }
+
+            var table = $('#data-table-inspection-comment').DataTable({
+                processing: true,
+                serverSide: true,
+                columnDefs: [{
+                    target: 0,
+                    visible: true,
+                    searchable: false
+                }],
+                ajax: {
+                    type: "GET",
+                    url: "{{ route('status-asset.dataInspectionComment') }}",
+                    data: {
+                        'keyword': keyword,
+                        'asset_id': asset_id,
+                    }
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'created_at'
+                    },
+                    {
+                        data: 'inspection_schedule_id',
+                        name: 'inspection_schedule_id'
+                    },
+                    {
+                        data: 'comment',
+                        name: 'comment'
+                    },
+                    {
+                        data: 'user_id',
+                        name: 'user_id'
                     },
                 ]
             });

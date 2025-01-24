@@ -118,7 +118,7 @@
             <div class="col mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="m-0">Operational Status</h5>
+                        <h5 class="m-0">Equipment Status</h5>
                         <div class="btn-group">
                             <button class="btn btn-sm btn-outline-secondary" id="operational-download">
                                 <i class="ti ti-download"></i>
@@ -149,7 +149,7 @@
             </div>
 
             <!-- Asset Status -->
-            <div class="col mb-4">
+            {{-- <div class="col mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Asset Status</h5>
@@ -163,8 +163,81 @@
                         <div id="assetStatusChart"></div>
                     </div>
                 </div>
+            </div> --}}
+        </div>
+
+        <div class="row mt-4">
+            <div class="col mb-4">
+                <div class='card'>
+                    <div class='card-header'>
+                        <h5 class="m-0" style="font-weight: 900;">Equipment Status Count</h5>
+                    </div>
+                    <div class='card-body'>
+                        <table class="table table-borderless">
+                            <thead>
+                                <tr>
+                                    <th><span class="fas fa-circle" style="color: green;"></span> Active</th>
+                                    <td style="float: right;"><span class="badge bg-primary" style="background-color: green !important; color: white; border-radius: 35%;">30</span></td>
+                                </tr>
+                                <tr>
+                                    <th><span class="fas fa-circle" style="color: blue;"></span> Inactive</th>
+                                    <td style="float: right;"><span class="badge bg-primary" style="background-color: blue !important; color: white; border-radius: 35%;">20</span></td>
+                                </tr>
+                                <tr>
+                                    <th><span class="fas fa-circle" style="color: red;"></span> Scrap</th>
+                                    <td style="float: right;"><span class="badge bg-primary" style="background-color: red !important; color: white; border-radius: 35%;">78</span></td>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col mb-4">
+                <div class='card'>
+                    <div class='card-header'>
+                        <h5 class="m-0" style="font-weight: 900;">Maintenance Status</h5>
+                    </div>
+                    <div class='card-body'>
+                        <table class="table table-borderless">
+                            <thead>
+                                <td>Asset</td>
+                                <td>Status</td>
+                                <td class="text-center">Jumlah</td>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>AST - 141</td>
+                                    <td>Under Maintenance</td>
+                                    <td class="text-center">13</td>
+                                </tr>
+                                <tr>
+                                    <td>AST - 142</td>
+                                    <td>Waiting</td>
+                                    <td class="text-center">10</td>
+                                </tr>
+                                <tr>
+                                    <td>AST - 143</td>
+                                    <td>Under Repair</td>
+                                    <td class="text-center">7</td>
+                                </tr>
+                                <tr>
+                                    <td>AST - 144</td>
+                                    <td>Under Maintenance</td>
+                                    <td class="text-center">5</td>
+                                </tr>
+                                <tr>
+                                    <td>AST - 146</td>
+                                    <td>Under Maintenance</td>
+                                    <td class="text-center">1</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
+
         <div class="row mt-2">
             <div class="col d-flex flex-column justify-content-between">
                 <div class="card" style="height: 300px;">
@@ -175,18 +248,24 @@
                         <div class="row gap-4">
                             <div class="col d-flex flex-column align-items-center">
                                 <h1 class="text-primary fw-bold" style="font-size: 50px;" id="total-maintenance">
-                                    Loading...</h1>
+                                    0</h1>
                                 <h3 class="text-muted">Open</h3>
                             </div>
                             <div class="col d-flex flex-column align-items-center">
-                                <h1 class="text-muted fw-bold" style="font-size: 50px;" id="total-overdue">Loading...
+                                <h1 class="text-muted fw-bold" style="font-size: 50px;" id="total-overdue">0
                                 </h1>
                                 <h3 class="text-muted">Overdue</h3>
+                            </div>
+                            <div class="col d-flex flex-column align-items-center">
+                                <h1 class="text-muted fw-bold" style="font-size: 50px;" id="total-rfu">27
+                                </h1>
+                                <h3 class="text-muted">RFU</h3>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            
             <div class="col d-flex flex-column justify-content-between">
                 {{-- <div class="col-12 col-md-12" id="managementProject">
                     <div class="select2-primary">
@@ -220,7 +299,7 @@
         </div>
 
         <div class="row mt-4">
-            <div class="col-12">
+            <div class="col">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Total Asset By Kategori</h5>
@@ -235,7 +314,7 @@
                     </div>
                 </div>
             </div>
-            {{-- <div class="col-12">
+            <div class="col">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="m-0 text-primary fw-bold">Total Asset By Kategori</h5>
@@ -248,10 +327,37 @@
                                         <th>Total Aset</th>
                                     </tr>
                                 </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>ADT 40 Ton</td>
+                                        <td>24</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Bulldozer</td>
+                                        <td>14</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Breaker</td>
+                                        <td>7</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>Asphalt Truck</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>Backhoeloader</td>
+                                        <td>2</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
-                </div> --}}
+                </div>
             </div>
         </div>
     </div>
@@ -674,35 +780,35 @@
             // Operational Status Chart
             const operationalChart = new ApexCharts(document.querySelector("#operationalStatusChart"), {
                 ...baseOptions,
-                colors: ['#FFAC82', '#000BE1', '#FABE29', '#134B70'],
-                series: [data.idle || 0, data.standby || 0, data.underMaintenance || 0, data.active || 0],
-                labels: ['Idle', 'StandBy', 'Maintenance', 'Active']
+                colors: ['#FFAC82', '#000BE1', '#FABE29'],
+                series: [data.active || 0, data.inactive || 0, data.scrap || 0],
+                labels: ['Active', 'Inactive', 'Scrap']
             });
             operationalChart.render();
 
             // Maintenance Status Chart
             const maintenanceChart = new ApexCharts(document.querySelector("#maintenanceStatusChart"), {
                 ...baseOptions,
-                colors: ['#FFAC82', '#000BE1', '#FABE29', '#134B70'],
-                series: [data.onHold || 0, data.finish || 0, data.scheduled || 0, data.inProgress || 0],
-                labels: ['Hold', 'Finish', 'Scheduled', 'Progress'],
+                colors: ['#FFAC82', '#000BE1', '#FABE29'],
+                series: [data.underMaintenance || 0, data.underRepair || 0, data.waiting || 0],
+                labels: ['Under Maintenance', 'Under Repair', 'Waiting'],
             });
             maintenanceChart.render();
 
             // Asset Status Chart
-            const assetChart = new ApexCharts(document.querySelector("#assetStatusChart"), {
-                ...baseOptions,
-                colors: ['#FFAC82', '#000BE1', '#FABE29', '#134B70'],
-                series: [data.damaged || 0, data.fair || 0, data.needsRepair || 0, data.good || 0],
-                labels: ['Damaged', 'Fair', 'Needs Repair', 'Good']
-            });
-            assetChart.render();
+            // const assetChart = new ApexCharts(document.querySelector("#assetStatusChart"), {
+            //     ...baseOptions,
+            //     colors: ['#FFAC82', '#000BE1', '#FABE29', '#134B70'],
+            //     series: [data.damaged || 0, data.fair || 0, data.needsRepair || 0, data.good || 0],
+            //     labels: ['Damaged', 'Fair', 'Needs Repair', 'Good']
+            // });
+            // assetChart.render();
 
             // Store chart instances for download functionality
             window.chartInstances = {
                 operational: operationalChart,
                 maintenance: maintenanceChart,
-                asset: assetChart
+                // asset: assetChart
             };
         }
 

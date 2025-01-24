@@ -42,6 +42,12 @@
     </div>
 
     <div class="col-12 col-md-6" id="employeeId">
+        <label for="pic" class="form-label">PIC<span class="text-danger">*</span></label>
+        <input type="text" name="pic" id="pic" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan PIC" value="{{ old('pic') }}" required />
+    </div>
+    
+    <div class="col-12 col-md-6" id="employeeId">
         <label for="employee_id" class="form-label">Nama Mekanik<span class="text-danger">*</span></label>
         <input type="text" name="employee_id[]" id="employee_id" class="form-control mb-3 mb-lg-0"
             placeholder="Masukan Nama Mekanik" value="{{ old('employee_id') }}" required />

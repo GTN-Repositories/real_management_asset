@@ -210,6 +210,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/report-loadsheet/export-excel-by-assete', [ReportLoadsheetController::class, 'exportExcelByAsset'])->name('report-loadsheet.exportExcelByAsset');
     Route::resource('report-loadsheet', ReportLoadsheetController::class);
 
+    Route::get('/report-maintenance/chart', [ReportMaintenanceController::class, 'chart'])->name('report-maintenance.chart');
     Route::get('/report-maintenance/data', [ReportMaintenanceController::class, 'data'])->name('report-maintenance.data');
     Route::resource('report-maintenance', ReportMaintenanceController::class);
 
@@ -228,6 +229,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/report-asset-performance/destroy-all', [AssetPerformance::class, 'destroyAll'])->name('report-asset-performance.destroyAll');
     Route::resource('report-asset-performance', AssetPerformance::class);
 
+    Route::get('/employee/import', [EmployeeController::class, 'importForm'])->name('employee.import.form');
+    Route::get('/employee/export-excel', [EmployeeController::class, 'exportExcel'])->name('employee.export-excel');
+    Route::post('/employee/import', [EmployeeController::class, 'importExcel'])->name('employee.import');
     Route::get('/employee/data', [EmployeeController::class, 'data'])->name('employee.data');
     Route::delete('/employee/destroy-all', [EmployeeController::class, 'destroyAll'])->name('employee.destroyAll');
     Route::resource('employee', EmployeeController::class);
@@ -253,6 +257,8 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/job-title/data', [JobTitleController::class, 'data'])->name('job-title.data');
 
     Route::get('/status-asset/data', [StatusAssetController::class, 'data'])->name('status-asset.data');
+    Route::get('/status-asset/sparepart-history', [StatusAssetController::class, 'dataSparepartHistory'])->name('status-asset.dataSparepartHistory');
+    Route::get('/status-asset/inspection-comment', [StatusAssetController::class, 'dataInspectionComment'])->name('status-asset.dataInspectionComment');
 
     Route::get('/log-activity/data', [LogActivityController::class, 'data'])->name('log-activity.data');
 

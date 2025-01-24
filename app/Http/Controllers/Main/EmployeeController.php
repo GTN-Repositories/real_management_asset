@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\EmployeeExport;
 use App\Http\Controllers\Controller;
+use App\Imports\ImportEmployee;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EmployeeController extends Controller
 {
@@ -267,5 +270,43 @@ class EmployeeController extends Controller
                 'message' => 'Data Gagal Dihapus!',
             ]);
         }
+    }
+
+    public function importForm()
+    {
+        return view('main.employee.import');
+    }
+
+    public function importExcel(Request $request)
+    {
+        try {
+            if (!$request->hasFile('excel_file')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No file uploaded!'
+                ], 400);
+            }
+
+            $file = $request->file('excel_file');
+            Excel::import(new ImportEmployee, $file);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data imported successfully!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error processing file: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function exportExcel()
+    {
+        $fileName = 'Employee' . now()->format('Ymd_His') . '.xlsx';
+        $data = Employee::all();
+
+        return Excel::download(new EmployeeExport($data), $fileName);
     }
 }

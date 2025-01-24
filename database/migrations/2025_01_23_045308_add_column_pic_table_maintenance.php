@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('assets', function (Blueprint $table) {
-            $table->enum(
-                'status',
-                ['Active', 'Inactive', 'Scrap', 'UnderMaintenance', 'UnderRepair', 'Waiting', 'Open', 'Overdue', 'RFU']
-            )->nullable()->after('color')->change();
+        Schema::table('maintenances', function (Blueprint $table) {
+            $table->string('pic')->nullable();
         });
     }
 
@@ -24,7 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('assets', function (Blueprint $table) {
-        });
+        //
     }
 };

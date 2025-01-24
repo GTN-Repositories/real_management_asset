@@ -29,6 +29,11 @@
         </select>
     </div>
 
+    <div class="col-12 col-md-6">
+        <label class="form-label" for="location">Lokasi<span class="text-danger">*</span></label>
+        <input type="text" id="location" name="location" class="form-control" value="{{ $data->location }}" placeholder="Masukkan Lokasi" />
+    </div>
+
     <div class="col-12" id="selectAsset">
         <label for="asset_id" class="form-label">Plat Nomor</label>
         <select id="asset_id" class="form-select" name="asset_id" disabled>

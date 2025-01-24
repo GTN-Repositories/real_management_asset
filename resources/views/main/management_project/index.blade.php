@@ -23,11 +23,11 @@
                     </button>
                 @endif
                 <!-- Tombol Tambah -->
-                @if (auth()->user()->hasPermissionTo('management-project-create'))
+                {{-- @if (auth()->user()->hasPermissionTo('management-project-create'))
                     <button type="button" class="btn btn-primary btn-md" onclick="createData()">
                         <i class="fas fa-plus"></i> Tambah
                     </button>
-                @endif
+                @endif --}}
                 @if (auth()->user()->hasPermissionTo('management-project-request'))
                     <button type="button" class="btn btn-warning btn-md" onclick="requestPettyCash()">
                         <i class="fas fa-dollar"></i> Request Petty Cash
