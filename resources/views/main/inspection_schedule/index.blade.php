@@ -177,6 +177,16 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="modal-ce-maintenance" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-simple">
+                <div class="modal-content p-3 p-md-5">
+                    <div class="modal-body" id="content-modal-ce-maintenance">
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -378,9 +388,11 @@
                     type: 'GET',
                 })
                 .done(function(data) {
-                    $('#content-modal-ce').html(data);
+                    $('#content-modal-ce-maintenance').html(data);
+                    console.log(data);
+                    
 
-                    $("#modal-ce").modal("show");
+                    $("#modal-ce-maintenance").modal("show");
                 })
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
@@ -393,9 +405,9 @@
                     type: 'GET',
                 })
                 .done(function(data) {
-                    $('#content-modal-ce').html(data);
+                    $('#content-modal-ce-maintenance').html(data);
 
-                    $("#modal-ce").modal("show");
+                    $("#modal-ce-maintenance").modal("show");
                 })
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');

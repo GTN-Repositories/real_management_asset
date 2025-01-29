@@ -86,83 +86,9 @@
 </form>
 
 @include('components.select2_js')
-<script>
-    CKEDITOR.replace('note');
-</script>
 <script type="text/javascript">
     let selectedItems = [];
     $(document).ready(function() {
-        $('#management_project_id').select2({
-            dropdownParent: $('#managementRelation'),
-            placeholder: 'Pilih projek',
-            ajax: {
-                url: "{{ route('management-project.data') }}",
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        keyword: params.term
-                    };
-                },
-                processResults: function(data) {
-                    let apiResults = data.data.map(item => ({
-                        text: item.name,
-                        id: item.managementRelationId,
-                    }));
-                    return {
-                        results: apiResults
-                    };
-                },
-                cache: true
-            }
-        }).on('change', function() {
-            var projectId = $(this).val();
-
-            $('#asset_id').empty().trigger('change');
-            if (projectId) {
-                $.ajax({
-                    url: "{{ route('management-project.by_project') }}",
-                    dataType: 'json',
-                    delay: 250,
-                    data: {
-                        projectId: projectId
-                    },
-                    success: function(data) {
-                        if (data && typeof data === 'object' && Object.keys(data).length) {
-                            var assetOptions = Object.entries(data).map(function([id,
-                                name
-                            ]) {
-                                return {
-                                    id: id,
-                                    text: name
-                                };
-                            });
-
-                            $('#asset_id').select2({
-                                dropdownParent: $('#assetRelation'),
-                                data: assetOptions,
-                                allowClear: true
-                            }).trigger('change');
-                        } else {
-                            $('#asset_id').select2({
-                                dropdownParent: $('#assetRelation'),
-                                data: [],
-                                allowClear: true
-                            }).trigger('change');
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error('Error fetching assets:', xhr);
-                        $('#asset_id').select2({
-                            dropdownParent: $('#assetRelation'),
-                            data: [],
-                            allowClear: true
-                        }).trigger('change');
-                    }
-                });
-            }
-        });
-
         $('#inspection_schedule_id').select2({
             dropdownParent: $('#inspectionScheduleId'),
             placeholder: 'Pilih Inspeksi',
@@ -244,35 +170,6 @@
                 }
             });
         });
-
-        // $('#employee_id').select2({
-        //     dropdownParent: $('#employeeId'),
-        //     placeholder: 'Pilih Mekanik',
-        //     ajax: {
-        //         url: "{{ route('employee.data') }}",
-        //         dataType: 'json',
-        //         delay: 250,
-        //         data: function(params) {
-        //             return {
-        //                 keyword: params.term,
-        //                 limit: 10
-        //             };
-        //         },
-        //         processResults: function(data) {
-        //             apiResults = data.data.map(function(item) {
-        //                 return {
-        //                     text: item.nameTitle,
-        //                     id: item.relationId,
-        //                 };
-        //             });
-
-        //             return {
-        //                 results: apiResults
-        //             };
-        //         },
-        //         cache: true
-        //     }
-        // });
 
         $('#item_id').select2({
             dropdownParent: $('#selectItem'),
@@ -471,10 +368,7 @@
                 cache: true
             }
         });
-    });
 
-    let selectedItems = [];
-    $(document).ready(function() {
         $('#item_id').on('change', function() {
             const itemId = $(this).val();
             const selectedOption = $(this).select2('data')[0];
@@ -511,13 +405,12 @@
                                data-item-id="${item.id}"
                                value="${item.stock}"
                                min="1"
-                               max="${item.availableStock}"
                         >
                     </td>
                     <td>
                         <select class="form-select jenis-metode" data-item-id="${item.id}">
                             <option value="stock" ${item.jenisMetode === 'stock' ? 'selected' : ''}>Pengurangan Stock</option>
-                            <option value="kanibal" ${item.jenisMetode === 'kanibal' ? 'selected' : ''}>Kanibal Asset Lain</option>
+                            <option value="kanibal" ${item.jenisMetode === 'kanibal' ? 'selected' : ''}>Replacing From Lain</option>
                         </select>
                     </td>
                     <td>

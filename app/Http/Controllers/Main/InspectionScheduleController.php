@@ -193,40 +193,40 @@ class InspectionScheduleController extends Controller
                 } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
                     $management_project_id = $data['management_project_id'];
                 }
-                try {
-                    $werehouse_id = Crypt::decrypt($data['werehouse_id']);
-                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-                    $werehouse_id = $data['werehouse_id'];
-                }
+                // try {
+                //     $werehouse_id = Crypt::decrypt($data['werehouse_id']);
+                // } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                //     $werehouse_id = $data['werehouse_id'];
+                // }
 
-                $decryptedItemIds = [];
-                $itemStocks = [];
-                $kanibalStocks = [];
-                $assetKanibalIds = [];
-                // dd($data['selected_items']);
-                if (isset($data['selected_items'])) {
-                    foreach ($data['selected_items'] as $encryptedItemId) {
-                        try {
-                            $decryptedItemId = Crypt::decrypt($encryptedItemId['id']);
-                            $decryptedItemIds[] = $decryptedItemId;
+                // $decryptedItemIds = [];
+                // $itemStocks = [];
+                // $kanibalStocks = [];
+                // $assetKanibalIds = [];
+                // // dd($data['selected_items']);
+                // if (isset($data['selected_items'])) {
+                //     foreach ($data['selected_items'] as $encryptedItemId) {
+                //         try {
+                //             $decryptedItemId = Crypt::decrypt($encryptedItemId['id']);
+                //             $decryptedItemIds[] = $decryptedItemId;
 
-                            if (isset($encryptedItemId['item_stock'])) {
-                                $itemStocks[$decryptedItemId] = $encryptedItemId['item_stock'];
-                            }
+                //             if (isset($encryptedItemId['item_stock'])) {
+                //                 $itemStocks[$decryptedItemId] = $encryptedItemId['item_stock'];
+                //             }
 
-                            if (isset($encryptedItemId['kanibal_stock'])) {
-                                $kanibalStocks[$decryptedItemId] = $encryptedItemId['kanibal_stock'];
-                            }
+                //             if (isset($encryptedItemId['kanibal_stock'])) {
+                //                 $kanibalStocks[$decryptedItemId] = $encryptedItemId['kanibal_stock'];
+                //             }
 
-                            if (isset($encryptedItemId['asset_kanibal_id']) && $encryptedItemId['asset_kanibal_id'] !== 'null') {
-                                $assetKanibalIds[$decryptedItemId] = str_replace('AST - ', '', $encryptedItemId['asset_kanibal_id']);
-                            }
-                        } catch (\Exception $e) {
-                            continue;
-                        }
-                    }
-                    sort($decryptedItemIds);
-                }
+                //             if (isset($encryptedItemId['asset_kanibal_id']) && $encryptedItemId['asset_kanibal_id'] !== 'null') {
+                //                 $assetKanibalIds[$decryptedItemId] = str_replace('AST - ', '', $encryptedItemId['asset_kanibal_id']);
+                //             }
+                //         } catch (\Exception $e) {
+                //             continue;
+                //         }
+                //     }
+                //     sort($decryptedItemIds);
+                // }
 
                 $schedule = InspectionSchedule::create([
                     'name' => $data['name'],
@@ -235,22 +235,22 @@ class InspectionScheduleController extends Controller
                     'urgention' => $data['urgention'],
                     'management_project_id' => $management_project_id,
                     'asset_id' => $asset_id,
-                    'werehouse_id' => $werehouse_id,
+                    // 'werehouse_id' => $werehouse_id,
                     'note' => $data['note'],
                     'location' => $data['location'],
-                    'item_id' => json_encode($decryptedItemIds) ?? null,
-                    'item_stock' => json_encode($itemStocks) ?? null,
-                    'kanibal_stock' => json_encode($kanibalStocks) ?? null,
-                    'asset_kanibal_id' => json_encode(array_filter($assetKanibalIds)) ?? null,
+                    // 'item_id' => json_encode($decryptedItemIds) ?? null,
+                    // 'item_stock' => json_encode($itemStocks) ?? null,
+                    // 'kanibal_stock' => json_encode($kanibalStocks) ?? null,
+                    // 'asset_kanibal_id' => json_encode(array_filter($assetKanibalIds)) ?? null,
                 ]);
 
-                foreach ($decryptedItemIds as $itemId) {
-                    $item = Item::findOrFail($itemId);
+                // foreach ($decryptedItemIds as $itemId) {
+                //     $item = Item::findOrFail($itemId);
 
-                    if (isset($itemStocks[$itemId])) {
-                        $item->decrement('stock', $itemStocks[$itemId]);
-                    }
-                };
+                //     if (isset($itemStocks[$itemId])) {
+                //         $item->decrement('stock', $itemStocks[$itemId]);
+                //     }
+                // };
 
                 return response()->json([
                     'status' => true,

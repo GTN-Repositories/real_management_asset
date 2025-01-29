@@ -40,4 +40,9 @@ class Item extends Model
     {
         return $query->where('stock', '<=', 'minimum_stock');
     }
+
+    public function itemStocks()
+    {
+        return $this->hasMany(ItemStock::class, 'item_id', 'id');
+    }
 }

@@ -10,6 +10,7 @@ use App\Models\InspectionComment;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
 use App\Models\Maintenance;
+use App\Models\MaintenanceSparepart;
 use App\Models\ManagementProject;
 use App\Models\StatusAsset;
 use Carbon\Carbon;
@@ -78,7 +79,6 @@ class MaintenanceController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-        // dd($data['selected_items']);
         try {
             return $this->atomic(function () use ($data, $request) {
                 $inspection_schedule = InspectionSchedule::findByEncryptedId($data['inspection_schedule_id']);
@@ -114,22 +114,38 @@ class MaintenanceController extends Controller
                     Mail::to($generalEmailSmtp)->send(new ChangeStatusAssetEmail($asset));
                 }
 
-                $schedule = Maintenance::create($data);
+                $maintenance = Maintenance::create($data);
 
                 if (isset($data['selected_items'])) {
                     foreach ($data['selected_items'] as $key => $value) {
-                        dd($value);
                         $item_id = Crypt::decrypt($value['id']);
+                        $asset_kanibal_id = null;
                         if ($value['asset_kanibal_id'] != "null") {
                             $asset_kanibal_id = str_replace('AST - ', '', $value['asset_kanibal_id']);
+                        }
+                        $quantity = $value['item_stock'] ?? $value['kanibal_stock'];
+
+                        MaintenanceSparepart::create([
+                            'maintenance_id' => Crypt::decrypt($maintenance->id),
+                            'warehouse_id' => Crypt::decrypt($data['werehouse_id']),
+                            'item_id' => $item_id,
+                            'asset_id' => $asset_kanibal_id,
+                            'quantity' => $quantity,
+                            'type' => ($asset_kanibal_id != null) ? 'Replacing' : 'Stock',
+                        ]);
+
+                        $item = Item::findOrFail($item_id);
+        
+                        if (isset($value['item_stock'])) {
+                            $item->decrement('stock', $value['item_stock']);
                         }
                     }
                 }
 
                 return response()->json([
                     'status' => true,
-                    'message' => 'Data berhasil ditambahkan dengan ID MNTS-'.Crypt::decrypt($schedule->id).'!',
-                    'schedule_id' => $schedule->id,
+                    'message' => 'Data berhasil ditambahkan dengan ID MNTS-'.Crypt::decrypt($maintenance->id).'!',
+                    'schedule_id' => $maintenance->id,
                 ]);
             });
         } catch (\Exception $e) {
