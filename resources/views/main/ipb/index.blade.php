@@ -5,6 +5,48 @@
 
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
+        <div class="row">
+            <div class="col mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar me-2">
+                                <img src="{{ asset('images/truck.png') }}" alt="">
+                            </div>
+                            <strong class="mb-0 text-primary">Issued (Liter)</strong>
+                        </div>
+                        <h4 class="ms-1 mb-0 text-muted" id="total-asset">{{ number_format($data['issued_liter']) }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar me-1">
+                                <img src="{{ asset('images/fuel.png') }}" alt="">
+                            </div>
+                            <strong class="mb-0 text-primary">Usage (Liter)</strong>
+                        </div>
+                        <h4 class="ms-1 mb-0 text-muted" id="total-fuel">{{ number_format($data['usage_liter']) }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar me-2">
+                                <img src="{{ asset('images/productivity.png') }}" alt="">
+                            </div>
+                            <strong class="mb-0 text-primary">Balance</strong>
+                        </div>
+                        <h4 class="ms-1 mb-0 text-muted">{{ number_format($data['balance']) }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- Tombol Filter --}}
         <div class="d-flex justify-content-end align-items-end mb-3 mb-4 gap-3">
             <div>

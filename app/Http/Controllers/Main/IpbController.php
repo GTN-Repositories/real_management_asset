@@ -7,6 +7,7 @@ use App\Mail\FuelStockAddedEmail;
 use App\Models\FuelConsumption;
 use App\Models\GeneralSetting;
 use App\Models\Ipb;
+use App\Models\ManagementProject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -17,7 +18,23 @@ class IpbController extends Controller
     //
     public function index()
     {
-        return view('main.ipb.index');
+        $managementProjectId = session('selected_project_id');
+
+        $data['issued_liter'] = Ipb::orderBy('id', 'desc')
+        ->when($managementProjectId, function ($query) use ($managementProjectId) {
+            $query->where('management_project_id', Crypt::decrypt($managementProjectId));
+        })
+        ->sum('issued_liter');
+
+        $data['usage_liter'] = Ipb::orderBy('id', 'desc')
+        ->when($managementProjectId, function ($query) use ($managementProjectId) {
+            $query->where('management_project_id', Crypt::decrypt($managementProjectId));
+        })
+        ->sum('usage_liter');
+        
+        $data['balance'] = $data['issued_liter'] - $data['usage_liter'];
+
+        return view('main.ipb.index', compact('data'));
     }
 
     public function data(Request $request)
@@ -370,6 +387,20 @@ class IpbController extends Controller
             return $this->atomic(function () {
                 $records = Ipb::orderBy('date', 'asc')->get();
                 $lastBalances = [];
+
+                $project = ManagementProject::get();
+                foreach ($project as $key => $value) {
+                    $project_id = Crypt::decrypt($value->id);
+
+                    $fuel = FuelConsumption::where('management_project_id', $project_id)->pluck('id');
+
+                    $fuel_ids = [];
+                    foreach ($fuel as $key => $id) {
+                        $fuel_ids[] = Crypt::decrypt($id);
+                    }
+
+                    Ipb::where('management_project_id', $project_id)->where('issued_liter', 0)->whereNotIn('fuel_id', $fuel_ids)->delete();
+                }
 
                 foreach ($records as $row) {
                     $managementProjectId = $row->management_project_id;
