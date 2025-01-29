@@ -78,7 +78,7 @@
             placeholder="Masukkan Problem"></textarea>
     </div>
 
-    <div class="col-12 col-md-12" id="werehouseParent">
+    {{-- <div class="col-12 col-md-12" id="werehouseParent">
         <label for="werehouse_id" class="form-label">Gudang</label>
         <select id="werehouse_id" class="form-select form-select-lg" name="werehouse_id">
         </select>
@@ -96,7 +96,7 @@
             <tbody></tbody>
         </table>
         <button id="clearAllButton" class="btn btn-warning btn-sm mt-2">Clear All</button>
-    </div>
+    </div> --}}
 
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Simpan</button>

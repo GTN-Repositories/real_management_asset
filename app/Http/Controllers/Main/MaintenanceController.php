@@ -78,6 +78,7 @@ class MaintenanceController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
+        // dd($data['selected_items']);
         try {
             return $this->atomic(function () use ($data, $request) {
                 $inspection_schedule = InspectionSchedule::findByEncryptedId($data['inspection_schedule_id']);
@@ -114,6 +115,16 @@ class MaintenanceController extends Controller
                 }
 
                 $schedule = Maintenance::create($data);
+
+                if (isset($data['selected_items'])) {
+                    foreach ($data['selected_items'] as $key => $value) {
+                        dd($value);
+                        $item_id = Crypt::decrypt($value['id']);
+                        if ($value['asset_kanibal_id'] != "null") {
+                            $asset_kanibal_id = str_replace('AST - ', '', $value['asset_kanibal_id']);
+                        }
+                    }
+                }
 
                 return response()->json([
                     'status' => true,
