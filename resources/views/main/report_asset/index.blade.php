@@ -3,10 +3,61 @@
 @section('title', 'Laporan asset Project')
 @section('title_page', 'Report / Asset Project')
 
+@push('css')
+    <style>
+        .input-filter {
+            max-width: 180px;
+            width: 100%;
+        }
+
+        .btn-asset {
+            width: 100%;
+            max-width: 160px;
+        }
+
+        .btn-add {
+            width: 100%;
+            max-width: 130px;
+        }
+
+        .btn-req {
+            width: fit-content;
+            max-width: 210px;
+        }
+
+        .btn-del-all {
+            width: 100%;
+            max-width: 180px;
+        }
+
+        @media (max-width: 768px) {
+            .input-filter {
+                max-width: 100%;
+            }
+
+            .btn-asset {
+                max-width: 100%;
+            }
+
+            .btn-add {
+                max-width: 100%;
+            }
+
+            .btn-req {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .btn-del-all {
+                max-width: 100%;
+            }
+        }
+    </style>
+@endpush
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
-        <div class="d-flex justify-content-end align-items-end mb-3 gap-3">
-            <div class="btn-group">
+        <div class="d-flex flex-wrap justify-content-end align-items-end mb-3 gap-3">
+            <div class="btn-group input-filter">
                 <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect" data-bs-toggle="dropdown"
                     aria-expanded="false">
                     filter tanggal
@@ -20,7 +71,7 @@
                     <li><a class="dropdown-item" id="tahun kemarin" href="javascript:void(0);">tahun kemarin</a></li>
                 </ul>
             </div>
-            <div>
+            <div class="input-filter">
                 <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
                 <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
             </div>

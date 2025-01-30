@@ -11,99 +11,143 @@
             background-position: center;
             background-repeat: no-repeat;
         }
+
+        .input-filter {
+            max-width: 180px;
+            width: 100%;
+        }
+
+        .btn-asset {
+            width: 100%;
+            max-width: 160px;
+        }
+
+        .btn-add {
+            width: 100%;
+            max-width: 130px;
+        }
+
+        .btn-req {
+            width: fit-content;
+            max-width: 210px;
+        }
+
+        .btn-del-all {
+            width: 100%;
+            max-width: 180px;
+        }
+
+        @media (max-width: 768px) {
+            .input-filter {
+                max-width: 100%;
+            }
+
+            .btn-asset {
+                max-width: 100%;
+            }
+
+            .btn-add {
+                max-width: 100%;
+            }
+            .btn-req {
+                max-width: 100%;
+                width: 100%;
+            }
+            .btn-del-all {
+                max-width: 100%;
+            }
+        }
     </style>
 @endpush
-
 @section('content')
-<div class="mx-5 flex-grow-1 container-p-y">
-    <!-- Scatter Chart -->
-    <div class="col-lg-12 col-12 mb-4">
-        <div class="card">
-            <div class="card-header flex-nowrap header-elements">
-                <h5 class="card-title mb-0">Target vs Actual</h5>
-                <div class="card-header-elements ms-auto py-0 d-none d-sm-block">
+    <div class="mx-5 flex-grow-1 container-p-y">
+        <div class="col-lg-12 col-12 mb-4">
+            <div class="card">
+                <div class="card-header flex-nowrap header-elements">
+                    <h5 class="card-title mb-0">Target vs Actual</h5>
+                    <div class="card-header-elements ms-auto py-0 d-none d-sm-block">
+                    </div>
                 </div>
-            </div>
-            <div class="card-body pt-2">
-                <canvas id="targetVsActual"></canvas>
-            </div>
-        </div>
-    </div>
-    <!-- /Scatter Chart -->
-
-    <div class="col d-flex flex-column justify-content-between">
-        <div class="card background-card" style="height: 300px;">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="m-0 text-white">Speedometer</h4>
-            </div>
-            <div class="card-body row">
-                <div class="col-6" id="speedometerChart"></div>
-                <div class="col-6 d-flex flex-column">
-                    <div class="mb-2">
-                        <h5 class="text-white fw-bold mb-0">Project Value</h5>
-                        <h2 class="text-white fw-bold" id="max-value-speedometer"></h2>
-                    </div>
-                    <div class="mb-3">
-                        <h5 class="text-white fw-bold mb-0">Actual Sales</h5>
-                        <h2 class="text-white fw-bold" id="current-value-speedometer"></h2>
-                    </div>
+                <div class="card-body pt-2">
+                    <canvas id="targetVsActual"></canvas>
                 </div>
             </div>
         </div>
-    </div>
+        <!-- /Scatter Chart -->
+    
+        <div class="col d-flex flex-column justify-content-between">
+            <div class="card background-card" style="height: 300px;">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="m-0 text-white">Speedometer</h4>
+                </div>
+                <div class="card-body row">
+                    <div class="col-6" id="speedometerChart"></div>
+                    <div class="col-6 d-flex flex-column">
+                        <div class="mb-2">
+                            <h5 class="text-white fw-bold mb-0">Project Value</h5>
+                            <h2 class="text-white fw-bold" id="max-value-speedometer"></h2>
+                        </div>
+                        <div class="mb-3">
+                            <h5 class="text-white fw-bold mb-0">Actual Sales</h5>
+                            <h2 class="text-white fw-bold" id="current-value-speedometer"></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <!-- Product List Table -->
-    <div class="d-flex justify-content-end mb-4">
-        @if (!auth()->user()->hasRole('Read only'))
-        <button onclick="exportExcelByProject()" class="btn btn-success btn-md">
-            <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-        </button>
-        @endif
-    </div>
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="card-title mb-0">Project Loadsheet</h5>
+        <!-- Product List Table -->
+        <div class="d-flex justify-content-end mb-4">
+            @if (!auth()->user()->hasRole('Read only'))
+            <button onclick="exportExcelByProject()" class="btn btn-success btn-md btn-asset">
+                <i class="fa-solid fa-file-excel me-2"></i>Export Excel
+            </button>
+            @endif
         </div>
-        <div class="card-datatable table-responsive">
-            <table class="datatables table table-striped table-poppins " id="data-table">
-                <thead class="border-top">
-                    <tr>
-                        <th>#</th>
-                        <th>Nama Project</th>
-                        <th>Total Loadsheet</th>
-                    </tr>
-                </thead>
-            </table>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Project Loadsheet</h5>
+            </div>
+            <div class="card-datatable table-responsive">
+                <table class="datatables table table-striped table-poppins " id="data-table">
+                    <thead class="border-top">
+                        <tr>
+                            <th>#</th>
+                            <th>Nama Project</th>
+                            <th>Total Loadsheet</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <br>
+        <div class="d-flex justify-content-end mt-3">
+            @if (!auth()->user()->hasRole('Read only'))
+            <button onclick="exportExcelByAsset()" class="btn btn-success btn-md btn-asset">
+                <i class="fa-solid fa-file-excel me-2"></i>Export Excel
+            </button>
+            @endif
+        </div>
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Asset Loadsheet</h5>
+            </div>
+            <div class="card-datatable table-responsive">
+                <table class="datatables table table-striped table-poppins " id="data-table-asset">
+                    <thead class="border-top">
+                        <tr>
+                            <th>#</th>
+                            <th>ID Asset</th>
+                            <th>name</th>
+                            <th>asset number</th>
+                            <th>Total Loadsheet</th>
+                            <th>liter</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
-    <br>
-    <div class="d-flex justify-content-end mt-3">
-        @if (!auth()->user()->hasRole('Read only'))
-        <button onclick="exportExcelByAsset()" class="btn btn-success btn-md">
-            <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-        </button>
-        @endif
-    </div>
-    <div class="card mt-4">
-        <div class="card-header">
-            <h5 class="card-title mb-0">Asset Loadsheet</h5>
-        </div>
-        <div class="card-datatable table-responsive">
-            <table class="datatables table table-striped table-poppins " id="data-table-asset">
-                <thead class="border-top">
-                    <tr>
-                        <th>#</th>
-                        <th>ID Asset</th>
-                        <th>name</th>
-                        <th>asset number</th>
-                        <th>Total Loadsheet</th>
-                        <th>liter</th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-    </div>
-</div>
 @endsection
 
 @push('js')

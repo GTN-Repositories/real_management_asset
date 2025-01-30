@@ -1,11 +1,10 @@
 @extends('layouts.global')
 
-@section('title', 'Gudang')
+@section('title', 'Detail Gudang')
+@section('title_page', 'Management Project / Detail Gudang')
 
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Master Data /</span> Gudang Detail</h4>
-
         <!-- Product List Table -->
         <div class="card">
             <div class="card-header">
@@ -26,6 +25,9 @@
                     </thead>
                 </table>
             </div>
+        </div>
+        <div class="d-flex justify-content-end my-3">
+            <a href="{{ route('werehouse.index') }}" class="btn btn-primary btn-md">Kembali</a>
         </div>
     </div>
 @endsection

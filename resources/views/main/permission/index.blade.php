@@ -3,6 +3,57 @@
 @section('title', 'Permission')
 @section('title_page', 'Setting / Permission')
 
+@push('css')
+    <style>
+        .input-filter {
+            max-width: 180px;
+            width: 100%;
+        }
+
+        .btn-asset {
+            width: 100%;
+            max-width: 160px;
+        }
+
+        .btn-add {
+            width: 100%;
+            max-width: 130px;
+        }
+
+        .btn-req {
+            width: fit-content;
+            max-width: 210px;
+        }
+
+        .btn-del-all {
+            width: 100%;
+            max-width: 180px;
+        }
+
+        @media (max-width: 768px) {
+            .input-filter {
+                max-width: 100%;
+            }
+
+            .btn-asset {
+                max-width: 100%;
+            }
+
+            .btn-add {
+                max-width: 100%;
+            }
+
+            .btn-req {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .btn-del-all {
+                max-width: 100%;
+            }
+        }
+    </style>
+@endpush
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
 

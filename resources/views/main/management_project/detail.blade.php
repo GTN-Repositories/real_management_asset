@@ -1,11 +1,10 @@
 @extends('layouts.global')
 
 @section('title', 'Management Project')
+@section('title_page', 'Master Data / Detail Project')
 
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Home /</span> Detail Project {{ $data->name }}</h4>
-
         <!-- Product List Table -->
         <div class="card mb-3">
             <div class="card-header">
@@ -14,34 +13,36 @@
 
                 </div>
             </div>
-            <table class="datatables table mb-3" id="data-table">
-                <thead class="border-top">
-                    <tr>
-                        <th>Nama Project</th>
-                        <td>{{ $data->name }}</td>
-                    </tr>
-                    <tr>
-                        <th>Nama Asset</th>
-                        <td>{{ $data->asset ?? null }}</td>
-                    </tr>
-                    <tr>
-                        <th>Tanggal Awal</th>
-                        <td>{{ $data->start_date ?? null }}</td>
-                    </tr>
-                    <tr>
-                        <th>Tanggal Akhir</th>
-                        <td>{{ $data->end_date ?? null }}</td>
-                    </tr>
-                    <tr>
-                        <th>Petty Cash</th>
-                        <td>{{ number_format($data->petty_cash) ?? null }}</td>
-                    </tr>
-                    <tr>
-                        <th>Metode</th>
-                        <td>{{ $data->calculation_method ?? null }}</td>
-                    </tr>
-                </thead>
-            </table>
+            <div class="table-responsive">
+                <table class="datatables table mb-3" id="data-table">
+                    <thead class="border-top">
+                        <tr>
+                            <th>Nama Project</th>
+                            <td>{{ $data->name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nama Asset</th>
+                            <td>{{ $data->asset ?? null }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tanggal Awal</th>
+                            <td>{{ $data->start_date ?? null }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tanggal Akhir</th>
+                            <td>{{ $data->end_date ?? null }}</td>
+                        </tr>
+                        <tr>
+                            <th>Petty Cash</th>
+                            <td>{{ number_format($data->petty_cash) ?? null }}</td>
+                        </tr>
+                        <tr>
+                            <th>Metode</th>
+                            <td>{{ $data->calculation_method ?? null }}</td>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
 
         <div class="card">

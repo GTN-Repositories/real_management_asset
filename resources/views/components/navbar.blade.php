@@ -8,7 +8,13 @@
         font-size: 20px;
         color: #FFFFFF;
         margin: 0px;
-        white-space: nowrap;
+        width: 1000px;
+    }
+    @media (max-width: 768px){
+        .title{
+            font-size: 12px;
+            width: 100px;
+        }
     }
 
 </style>

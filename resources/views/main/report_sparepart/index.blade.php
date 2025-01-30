@@ -3,15 +3,72 @@
 @section('title', 'Laporan Sparepart')
 @section('title_page', 'Report / Sparepart Report')
 
+@push('css')
+    <style>
+        .input-filter {
+            max-width: 180px;
+            width: 100%;
+        }
+
+        .btn-asset {
+            width: 100%;
+            max-width: 160px;
+        }
+
+        .btn-add {
+            width: 100%;
+            max-width: 130px;
+        }
+
+        .btn-req {
+            width: fit-content;
+            max-width: 210px;
+        }
+
+        .btn-del-all {
+            width: 100%;
+            max-width: 180px;
+        }
+
+        .row-rgb {
+            gap: 0px;
+        }
+
+        @media (max-width: 768px) {
+            .input-filter {
+                max-width: 100%;
+            }
+
+            .btn-asset {
+                max-width: 100%;
+            }
+
+            .btn-add {
+                max-width: 100%;
+            }
+            .btn-req {
+                max-width: 100%;
+                width: 100%;
+            }
+            .btn-del-all {
+                max-width: 100%;
+            }
+
+            .row-rgb {
+                gap: 15px;
+            }
+        }
+    </style>
+@endpush
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
-        <div class="d-flex justify-content-end align-items-end mb-3 gap-3">
-            <div class="btn-group">
+        <div class="d-flex flex-wrap justify-content-end align-items-end mb-3 gap-3">
+            <div class="btn-group input-filter">
                 <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect" data-bs-toggle="dropdown"
                     aria-expanded="false">
                     filter tanggal
                 </button>
-                <ul class="dropdown-menu" style="">
+                <ul class="dropdown-menu input-filter" style="">
                     <li><a class="dropdown-item" id="hari ini" href="javascript:void(0);">hari ini</a></li>
                     <li><a class="dropdown-item" id="minggu ini" href="javascript:void(0);">minggu ini</a></li>
                     <li><a class="dropdown-item" id="bulan ini" href="javascript:void(0);">bulan ini</a></li>
@@ -20,7 +77,7 @@
                     <li><a class="dropdown-item" id="tahun kemarin" href="javascript:void(0);">tahun kemarin</a></li>
                 </ul>
             </div>
-            <div>
+            <div class="input-filter">
                 <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
                 <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
             </div>
@@ -85,7 +142,7 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row row-rgb">
             <div class="col-12 col-md-6 col-lg-3" style="">
                 <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #D59A01;">
                     <h4 class="text-white card-title m-0 fw-bold">Scheduled</h4>

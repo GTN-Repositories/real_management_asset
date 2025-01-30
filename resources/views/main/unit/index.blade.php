@@ -3,59 +3,102 @@
 @section('title', 'Asset')
 @section('title_page', 'Master Data / Asset')
 
+@push('css')
+    <style>
+        .input-filter {
+            max-width: 150px;
+            width: 100%;
+        }
+
+        .btn-asset {
+            width: 100%;
+            max-width: 160px;
+        }
+
+        .btn-add {
+            width: 100%;
+            max-width: 130px;
+        }
+
+        .btn-del-all {
+            width: 100%;
+            max-width: 180px;
+        }
+
+        @media (max-width: 768px) {
+            .input-filter {
+                max-width: 100%;
+            }
+
+            .btn-asset {
+                max-width: 100%;
+            }
+
+            .btn-add {
+                max-width: 100%;
+            }
+
+            .btn-del-all {
+                max-width: 100%;
+            }
+        }
+    </style>
+@endpush
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
-        <div class="d-flex justify-content-end align-items-end gap-3 mb-4">
-            <div id="categoryParent" style="max-width: 200px; width: 100%;">
+        <div class="d-flex flex-wrap justify-content-end align-items-end gap-3 mb-4">
+            <div id="categoryParent" class="input-filter">
                 <label class="form-label" for="category">Kategori</label>
                 <select name="category[]" id="category_id" class="select2 form-select" data-allow-clear="true" multiple
                     required>
                 </select>
             </div>
 
-            <div id="assets_locationParent" style="max-width: 200px; width: 100%;">
+            <div id="assets_locationParent" class="input-filter">
                 <label class="form-label" for="assets_location">Lokasi Aset</label>
                 <select name="assets_location[]" id="assets_location_id" class="form-select select2" multiple>
                 </select>
             </div>
 
-            <div id="picParent" style="max-width: 200px; width: 100%;">
+            <div id="picParent" class="input-filter">
                 <label class="form-label" for="pic">Asset Manager</label>
                 <select id="pic_id" name="manager[]" class="select2 form-select" data-allow-clear="true" multiple
                     required>
                 </select>
             </div>
 
-            <div id="statusParent" style="max-width: 200px; width: 100%;">
+            <div id="statusParent" class="input-filter">
                 <label class="form-label" for="status">Status</label>
                 <select name="status[]" id="asset_status_id" class="select2 form-select" data-allow-clear="true" multiple>
                 </select>
             </div>
             <!-- Tombol Hapus Masal -->
             @if (!auth()->user()->hasRole('Read only'))
-                <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
-                    <i class="fas fa-trash-alt"></i> Hapus Masal
+                <button type="button" class="btn btn-danger btn-md btn-del-all" id="delete-btn"
+                    style="display: none !important;">
+                    <i class="fas fa-trash-alt me-2"></i> Hapus Masal
                 </button>
             @endif
             <!-- Tombol Tambah -->
             @if (auth()->user()->hasPermissionTo('asset-import-excel'))
                 @if (!auth()->user()->hasRole('Read only'))
-                    <button type="button" class="btn btn-success btn-md d-flex align-items-center" onclick="importExcel()">
+                    <button type="button" class="btn btn-success btn-md d-flex align-items-center btn-asset"
+                        onclick="importExcel()">
                         <i class="fas fa-file-excel me-2"></i> Import Excel
                     </button>
                 @endif
             @endif
             @if (auth()->user()->hasPermissionTo('asset-export-excel'))
                 @if (!auth()->user()->hasRole('Read only'))
-                    <button onclick="exportExcel()" class="btn btn-success btn-md">
-                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                    <button onclick="exportExcel()" class="btn btn-success btn-md btn-asset">
+                        <i class="fa-solid fa-file-excel me-2"></i>Export Excel
                     </button>
                 @endif
             @endif
             @if (auth()->user()->hasPermissionTo('asset-create'))
                 @if (!auth()->user()->hasRole('Read only'))
-                    <button type="button" class="btn btn-primary" onclick="createData()"><i
-                            class="fas fa-plus me-1"></i>Tambah</button>
+                    <button type="button" class="btn btn-primary btn-md btn-add" onclick="createData()"><i
+                            class="fas fa-plus me-2"></i>Tambah</button>
                 @endif
             @endif
         </div>

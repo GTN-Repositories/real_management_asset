@@ -3,36 +3,87 @@
 @section('title', 'Karyawan')
 @section('title_page', 'Master Data / Data Karyawan')
 
+@push('css')
+    <style>
+        .input-filter {
+            max-width: 180px;
+            width: 100%;
+        }
+
+        .btn-asset {
+            width: 100%;
+            max-width: 160px;
+        }
+
+        .btn-add {
+            width: 100%;
+            max-width: 130px;
+        }
+
+        .btn-req {
+            width: 100%;
+            max-width: 210px;
+        }
+
+        .btn-del-all {
+            width: 100%;
+            max-width: 180px;
+        }
+
+        @media (max-width: 768px) {
+            .input-filter {
+                max-width: 100%;
+            }
+
+            .btn-asset {
+                max-width: 100%;
+            }
+
+            .btn-add {
+                max-width: 100%;
+            }
+
+            .btn-req {
+                max-width: 100%;
+            }
+
+            .btn-del-all {
+                max-width: 100%;
+            }
+        }
+    </style>
+@endpush
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
 
-        <div class="d-flex justify-content-end align-items-end gap-3 mb-4">
-            <div id="job_titleParent" style="max-width: 200px; width: 100%;">
+        <div class="d-flex flex-wrap justify-content-end align-items-end gap-3 mb-4">
+            <div class="input-filter" id="job_titleParent">
                 <label class="form-label" for="job_title">Jabatan</label>
                 <select name="job_title[]" id="job_title" class="select2 form-select" data-allow-clear="true" multiple required>
                 </select>
             </div>
-            <div id="management_projectParent" style="max-width: 200px; width: 100%;">
+            <div class="input-filter" id="management_projectParent">
                 <label class="form-label" for="management_project_title">Management Project</label>
                 <select name="management_project_title[]" id="management_project_title" class="select2 form-select"
                     data-allow-clear="true" multiple required>
                 </select>
             </div>
             @if (!auth()->user()->hasRole('Read only'))
-                <button type="button" class="btn btn-danger btn-sm" id="delete-btn" style="display: none !important;">
-                    <i class="fas fa-trash-alt"></i> Hapus Masal
+                <button type="button" class="btn btn-danger btn-md btn-del-all" id="delete-btn" style="display: none !important;">
+                    <i class="fas fa-trash-alt me-2"></i> Hapus Masal
                 </button>
 
-                <button type="button" class="btn btn-success btn-md d-flex align-items-center" onclick="importExcel()">
+                <button type="button" class="btn btn-success btn-md d-flex align-items-center btn-asset"
+                    onclick="importExcel()">
                     <i class="fas fa-file-excel me-2"></i> Import Excel
                 </button>
 
-                <button onclick="exportExcel()" class="btn btn-success btn-md">
+                <button onclick="exportExcel()" class="btn btn-success btn-md btn-asset">
                     <i class="fa-solid fa-file-excel me-1"></i>Export Excel
                 </button>
                 <!-- Tombol Tambah -->
                 @if (auth()->user()->hasPermissionTo('employee-create'))
-                    <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                    <button type="button" class="btn btn-primary btn-md btn-add" onclick="createData()">
                         <i class="fas fa-plus me-2"></i> Tambah
                     </button>
                 @endif

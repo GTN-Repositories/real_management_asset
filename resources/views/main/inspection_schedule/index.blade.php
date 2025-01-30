@@ -4,22 +4,27 @@
 @section('title_page', 'Tracking and Monitoring / Inspection Schedule')
 
 @push('css')
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/@form-validation/form-validation.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/fullcalendar/fullcalendar.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/app-calendar.css') }}" />
 
     <style>
-        .cke_notifications_area {
-            display: none !important;
+        .btn-add {
+            width: 100%;
+            max-width: 130px;
+        }
+
+        @media (max-width: 768px) {
+            .btn-add {
+                max-width: 100%;
+            }
         }
     </style>
 @endpush
 
 @section('content')
-    <div class="mx-5 flex-grow-1 container-p-y">
+    <div class="container-xxl flex-grow-1 container-p-y">
         <div class="d-flex justify-content-end mb-3 gap-2">
             <!-- Tombol Hapus Masal -->
             {{-- <button type="button" class="btn btn-danger btn-sm" id="delete-btn"
@@ -28,8 +33,8 @@
             </button> --}}
             @if (!auth()->user()->hasRole('Read only'))
                 @if (auth()->user()->hasPermissionTo('inspection-schedule-create'))
-                    <button type="button" class="btn btn-primary btn-md" onclick="createData()">
-                        <i class="fas fa-plus"></i> Tambah
+                    <button type="button" class="btn btn-primary btn-md btn-add" onclick="createData()">
+                        <i class="fas fa-plus me-2"></i> Tambah
                     </button>
                 @endif
             @endif
@@ -63,20 +68,17 @@
                 </table>
             </div>
         </div>
-
         <div class="card app-calendar-wrapper">
             <div class="row g-0">
                 <!-- Calendar Sidebar -->
                 <div class="col app-calendar-sidebar" id="app-calendar-sidebar">
                     <div class="border-bottom p-4 my-sm-0 mb-3">
                         <div class="d-grid">
-                            @if (!auth()->user()->hasRole('Read only'))
-                                @if (auth()->user()->hasPermissionTo('inspection-schedule-create-maintenance'))
-                                    <button class="btn btn-primary btn-toggle-sidebar" onclick="createDataMaintenance()">
-                                        <i class="ti ti-plus me-1"></i>
-                                        <span class="align-middle">Tambah Maintenance</span>
-                                    </button>
-                                @endif
+                            @if (auth()->user()->hasPermissionTo('inspection-schedule-create-maintenance'))
+                                <button class="btn btn-primary btn-toggle-sidebar" onclick="createDataMaintenance()">
+                                    <i class="ti ti-plus me-2"></i>
+                                    <span class="align-middle">Tambah Maintenance</span>
+                                </button>
                             @endif
                         </div>
                     </div>
@@ -158,7 +160,8 @@
                                             Cancel
                                         </button>
                                     </div>
-                                    <div><button class="btn btn-label-danger btn-delete-event d-none">Delete</button></div>
+                                    <div><button class="btn btn-label-danger btn-delete-event d-none">Delete</button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -182,9 +185,6 @@
 
 @push('js')
     <script src="{{ asset('assets/vendor/libs/fullcalendar/fullcalendar.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/@form-validation/popular.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/moment/moment.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>

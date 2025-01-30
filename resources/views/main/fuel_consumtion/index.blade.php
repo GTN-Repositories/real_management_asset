@@ -3,72 +3,124 @@
 @section('title', 'Fuel Consumtion')
 @section('title_page', 'Tracking and Monitoring / Fuel Consumtion')
 
+@push('css')
+    <style>
+        .input-filter {
+            max-width: 180px;
+            width: 100%;
+        }
+
+        .btn-asset {
+            width: 100%;
+            max-width: 160px;
+        }
+
+        .btn-add {
+            width: 100%;
+            max-width: 130px;
+        }
+
+        .btn-req {
+            width: fit-content;
+            max-width: 210px;
+        }
+
+        .btn-del-all {
+            width: 100%;
+            max-width: 180px;
+        }
+
+        @media (max-width: 768px) {
+            .input-filter {
+                max-width: 100%;
+            }
+
+            .btn-asset {
+                max-width: 100%;
+            }
+
+            .btn-add {
+                max-width: 100%;
+            }
+
+            .btn-req {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .btn-del-all {
+                max-width: 100%;
+            }
+        }
+    </style>
+@endpush
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
-        <div class="d-flex justify-content-end gap-3 mb-3">
-            @if (!auth()->user()->hasRole('Read only'))
+        @if (!auth()->user()->hasRole('Read only'))
+            <div class="d-flex flex-wrap justify-content-end align-items-end gap-3 mb-4">
                 <!-- Tombol Hapus Masal -->
-                <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
-                    <i class="fas fa-trash-alt"></i> Hapus Masal
+                <button type="button" class="btn btn-danger btn-md btn-del-all" id="delete-btn"
+                    style="display: none !important;">
+                    <i class="fas fa-trash-alt me-2"></i> Hapus Masal
                 </button>
                 @if (auth()->user()->hasPermissionTo('fuel-import-excel'))
-                    <button onclick="importExcel()" class="btn btn-success btn-md">
+                    <button onclick="importExcel()" class="btn btn-success btn-md btn-asset">
                         <i class="fa-solid fa-file-excel me-2"></i>Import Excel
                     </button>
                 @endif
                 @if (auth()->user()->hasPermissionTo('fuel-export-excel'))
-                    <button onclick="exportExcel()" class="btn btn-success btn-md">
+                    <button onclick="exportExcel()" class="btn btn-success btn-md btn-asset">
                         <i class="fa-solid fa-file-excel me-2"></i>Export Excel
                     </button>
                 @endif
                 @if (auth()->user()->hasPermissionTo('fuel-request'))
-                    <button type="button" class="btn btn-warning btn-md" onclick="createDataRequest()">
+                    <button type="button" class="btn btn-warning btn-md btn-req" onclick="createDataRequest()">
                         <i class="fas fa-plus me-2"></i> Request Fuel
                     </button>
                 @endif
                 <!-- Tombol Tambah -->
                 @if (auth()->user()->hasPermissionTo('fuel-create'))
-                    <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                    <button type="button" class="btn btn-primary btn-md btn-add" onclick="createData()">
                         <i class="fas fa-plus me-2"></i> Tambah
                     </button>
                 @endif
-            @endif
+        @endif
+    </div>
+    <div class="card">
+        <div class="card-datatable table-responsive">
+            <table class="datatables table table-striped table-poppins " id="data-table">
+                <thead class="border-top">
+                    <tr>
+                        <th>
+                            <div class="form-check form-check-sm form-check-custom form-check-solid">
+                                <input class="form-check-input" type="checkbox" id="checkAll" />
+                            </div>
+                        </th>
+                        <th>Nama Project</th>
+                        <th>Nama Aset</th>
+                        <th>Pengemudi</th>
+                        <th>Tanggal</th>
+                        <th>Banyak Penggunaan</th>
+                        <th>HM</th>
+                        {{-- <th>Loadsheet</th> --}}
+                        {{-- <th>Harga/Liter</th> --}}
+                        <th>Kategori</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
-        <div class="card">
-            <div class="card-datatable table-responsive">
-                <table class="datatables table table-striped table-poppins " id="data-table">
-                    <thead class="border-top">
-                        <tr>
-                            <th>
-                                <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                    <input class="form-check-input" type="checkbox" id="checkAll" />
-                                </div>
-                            </th>
-                            <th>Nama Project</th>
-                            <th>Nama Aset</th>
-                            <th>Pengemudi</th>
-                            <th>Tanggal</th>
-                            <th>Banyak Penggunaan</th>
-                            <th>HM</th>
-                            {{-- <th>Loadsheet</th> --}}
-                            {{-- <th>Harga/Liter</th> --}}
-                            <th>Kategori</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-        </div>
+    </div>
 
-        <div class="modal fade" id="modal-ce" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-simple">
-                <div class="modal-content p-3 p-md-5">
-                    <div class="modal-body" id="content-modal-ce">
+    <div class="modal fade" id="modal-ce" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-simple">
+            <div class="modal-content p-3 p-md-5">
+                <div class="modal-body" id="content-modal-ce">
 
-                    </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 @endsection
 

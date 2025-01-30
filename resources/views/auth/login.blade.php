@@ -3,10 +3,11 @@
 @push('css')
     <style>
         .card-wrapper {
-            height: 507px;
+            min-height: 480px;
             width: 874px;
             border-radius: 30px;
             padding: 0px 8px;
+            display: block;
         }
 
         .logo {
@@ -64,6 +65,11 @@
             z-index: 20;
             padding: 18px;
         }
+        @media (max-width: 767.98px) {
+            .logo-lg {
+                display: none;
+            }
+        }
     </style>
 @endpush
 @section('content')
@@ -84,7 +90,7 @@
                     </div>
                     {{-- col right --}}
                     <div class="col d-flex flex-column justify-content-center">
-                        <img src="{{ asset('assets/img/logo_real.png') }}" class="mb-2 logo" alt="">
+                        <img src="{{ asset('assets/img/logo_real.png') }}" class="mb-2 logo logo-lg" alt="">
                         <h5 class="login-text mb-2">Please sign-in to your account.</h5>
                         <form class="mb-3" action="{{ route('login') }}" method="POST">
                             @csrf
