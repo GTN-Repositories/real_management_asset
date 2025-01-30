@@ -11,7 +11,7 @@
         <input type="file" class="form-control" id="excel_file" name="excel_file" accept=".xlsx, .xls" required>
     </div>
     <div class="col-12 text-center">
-        <a href="{{ asset('assets/import/Format Import Employee.xlsx') }}" class="btn btn-info me-sm-3 me-1" download="Format Import Asset">
+        <a href="{{ asset('assets/import/Format Import Employee.xlsx') }}" class="btn btn-info me-sm-3 me-1" download="Format Import Karyawan">
             Download Template
         </a>
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>

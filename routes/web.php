@@ -156,6 +156,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/werehouse/destroy-all', [WerehouseController::class, 'destroyAll'])->name('werehouse.destroyAll');
     Route::resource('werehouse', WerehouseController::class);
 
+    Route::get('/inspection-schedule/import', [InspectionScheduleController::class, 'importForm'])->name('inspection-schedule.import.form');
+    Route::get('/inspection-schedule/export-excel', [InspectionScheduleController::class, 'exportExcel'])->name('inspection-schedule.export-excel');
+    Route::post('/inspection-schedule/import', [InspectionScheduleController::class, 'importExcel'])->name('inspection-schedule.import');
     Route::get('/inspection-schedule/get-status-last', [InspectionScheduleController::class, 'getStatusLast'])->name('inspection-schedule.get_status_last');
     Route::get('/inspection-schedule/get-selected-items', [InspectionScheduleController::class, 'getSelectedItems'])->name('get.selected.items');
     Route::post('/inspection-schedule/remove-item-session', [InspectionScheduleController::class, 'removeItemFromSession'])->name('remove.item.session');
@@ -168,6 +171,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     })->name('quiz');
     Route::delete('/inspection-schedule/destroy-all', [InspectionScheduleController::class, 'destroyAll'])->name('inspection-schedule.destroyAll');
 
+    Route::get('/maintenances/import', [MaintenanceController::class, 'importForm'])->name('maintenances.import.form');
+    Route::get('/maintenances/export-excel', [MaintenanceController::class, 'exportExcel'])->name('maintenances.export-excel');
+    Route::post('/maintenances/import', [MaintenanceController::class, 'importExcel'])->name('maintenances.import');
     Route::get('/maintenances/status-data', [MaintenanceController::class, 'maintenanceStatus'])->name('maintenances.maintenanceStatus');
     Route::get('/maintenances/data', [MaintenanceController::class, 'data'])->name('maintenances.data');
     Route::delete('/maintenances/destroy-all', [MaintenanceController::class, 'destroyAll'])->name('maintenances.destroyAll');

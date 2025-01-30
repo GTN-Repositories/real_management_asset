@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\ExportMaintenance;
 use App\Http\Controllers\Controller;
+use App\Imports\ImportMaintenance;
 use App\Mail\ChangeStatusAssetEmail;
 use App\Models\Asset;
 use App\Models\GeneralSetting;
@@ -19,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class MaintenanceController extends Controller
 {
@@ -261,6 +264,7 @@ class MaintenanceController extends Controller
                 $maintenance->finish_at = $request->get('finish_at');
                 $maintenance->hm = $request->get('hm');
                 $maintenance->km = $request->get('km');
+                $maintenance->status = $data['status'];
                 $maintenance->location = $request->get('location');
                 $maintenance->detail_problem = $request->get('detail_problem');
                 $maintenance->action_to_do = $request->get('action_to_do');
@@ -321,5 +325,46 @@ class MaintenanceController extends Controller
             })
             ->escapeColumns([])
             ->make(true);
+    }
+
+    public function importForm()
+    {
+        return view('main.inspection_schedule.maintenance.import');
+    }
+
+    public function importExcel(Request $request)
+    {
+        try {
+            if (!$request->hasFile('excel_file')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No file uploaded!'
+                ], 400);
+            }
+
+            $file = $request->file('excel_file');
+            Excel::import(new ImportMaintenance, $file);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data imported successfully!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error processing file: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function exportExcel()
+    {
+        $fileName = 'Maintenance ' . now()->format('Ymd_His') . '.xlsx';
+        $data = Maintenance::when(session('selected_project_id'), function ($query) {
+            $query->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+        })
+        ->get();
+
+        return Excel::download(new ExportMaintenance($data), $fileName);
     }
 }
