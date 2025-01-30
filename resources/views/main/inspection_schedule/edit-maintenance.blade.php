@@ -345,55 +345,55 @@
         // changeStatus(status);
     })
 
-    function changeStatus(status) {
-        if (status == 'OnHold') {
-            $('#code_delay_form').attr('hidden', false);
-            // $('#delay_reason_form').attr('hidden', false);
-            $('#estimate_finish_form').attr('hidden', false);
-            $('#delay_hours_form').attr('hidden', false);
-            $('#start_maintenace_form').attr('hidden', false);
-            $('#end_maintenace_form').attr('hidden', false);
-            $('#deviasi_form').attr('hidden', false);
+    // function changeStatus(status) {
+    //     if (status == 'OnHold') {
+    //         $('#code_delay_form').attr('hidden', false);
+    //         // $('#delay_reason_form').attr('hidden', false);
+    //         $('#estimate_finish_form').attr('hidden', false);
+    //         $('#delay_hours_form').attr('hidden', false);
+    //         $('#start_maintenace_form').attr('hidden', false);
+    //         $('#end_maintenace_form').attr('hidden', false);
+    //         $('#deviasi_form').attr('hidden', false);
 
-            $('#finish_at_form').attr('hidden', true);
-            $('#hm_form').attr('hidden', true);
-            $('#km_form').attr('hidden', true);
-            $('#location_form').attr('hidden', true);
-            $('#detail_problem_form').attr('hidden', true);
-            $('#action_to_do_form').attr('hidden', true);
-            $('#urgention_form').attr('hidden', true);
-        } else if (status == 'Finish') {
-            $('#code_delay_form').attr('hidden', true);
-            // $('#delay_reason_form').attr('hidden', true);
-            $('#estimate_finish_form').attr('hidden', true);
-            $('#delay_hours_form').attr('hidden', true);
-            $('#start_maintenace_form').attr('hidden', true);
-            $('#end_maintenace_form').attr('hidden', true);
-            $('#deviasi_form').attr('hidden', true);
+    //         $('#finish_at_form').attr('hidden', true);
+    //         $('#hm_form').attr('hidden', true);
+    //         $('#km_form').attr('hidden', true);
+    //         $('#location_form').attr('hidden', true);
+    //         $('#detail_problem_form').attr('hidden', true);
+    //         $('#action_to_do_form').attr('hidden', true);
+    //         $('#urgention_form').attr('hidden', true);
+    //     } else if (status == 'Finish') {
+    //         $('#code_delay_form').attr('hidden', true);
+    //         // $('#delay_reason_form').attr('hidden', true);
+    //         $('#estimate_finish_form').attr('hidden', true);
+    //         $('#delay_hours_form').attr('hidden', true);
+    //         $('#start_maintenace_form').attr('hidden', true);
+    //         $('#end_maintenace_form').attr('hidden', true);
+    //         $('#deviasi_form').attr('hidden', true);
 
-            $('#finish_at_form').attr('hidden', false);
-            $('#hm_form').attr('hidden', false);
-            $('#km_form').attr('hidden', false);
-            $('#location_form').attr('hidden', false);
-            $('#detail_problem_form').attr('hidden', false);
-            $('#action_to_do_form').attr('hidden', false);
-            $('#urgention_form').attr('hidden', false);
-        } else {
-            $('#code_delay_form').attr('hidden', true);
-            // $('#delay_reason_form').attr('hidden', true);
-            $('#estimate_finish_form').attr('hidden', true);
-            $('#delay_hours_form').attr('hidden', true);
-            $('#start_maintenace_form').attr('hidden', true);
-            $('#end_maintenace_form').attr('hidden', true);
-            $('#deviasi_form').attr('hidden', true);
+    //         $('#finish_at_form').attr('hidden', false);
+    //         $('#hm_form').attr('hidden', false);
+    //         $('#km_form').attr('hidden', false);
+    //         $('#location_form').attr('hidden', false);
+    //         $('#detail_problem_form').attr('hidden', false);
+    //         $('#action_to_do_form').attr('hidden', false);
+    //         $('#urgention_form').attr('hidden', false);
+    //     } else {
+    //         $('#code_delay_form').attr('hidden', true);
+    //         // $('#delay_reason_form').attr('hidden', true);
+    //         $('#estimate_finish_form').attr('hidden', true);
+    //         $('#delay_hours_form').attr('hidden', true);
+    //         $('#start_maintenace_form').attr('hidden', true);
+    //         $('#end_maintenace_form').attr('hidden', true);
+    //         $('#deviasi_form').attr('hidden', true);
 
-            $('#finish_at_form').attr('hidden', true);
-            $('#hm_form').attr('hidden', true);
-            $('#km_form').attr('hidden', true);
-            $('#location_form').attr('hidden', true);
-            $('#detail_problem_form').attr('hidden', true);
-            $('#action_to_do_form').attr('hidden', true);
-            $('#urgention_form').attr('hidden', true);
-        }
-    }
+    //         $('#finish_at_form').attr('hidden', true);
+    //         $('#hm_form').attr('hidden', true);
+    //         $('#km_form').attr('hidden', true);
+    //         $('#location_form').attr('hidden', true);
+    //         $('#detail_problem_form').attr('hidden', true);
+    //         $('#action_to_do_form').attr('hidden', true);
+    //         $('#urgention_form').attr('hidden', true);
+    //     }
+    // }
 </script>
