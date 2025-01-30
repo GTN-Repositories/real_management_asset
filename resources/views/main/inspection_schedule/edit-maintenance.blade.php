@@ -170,24 +170,24 @@
                 <tr>
                     <th>Kode</th>
                     <th>Nama</th>
-                    <th>Stok Normal</th>
-                    <th>Stok Kanibal</th>
-                    <th>Asset Kanibal</th>
+                    <th>Jenis</th>
+                    <th>Jumlah</th>
+                    <th>Replacing From</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($items as $key => $item)
+                @foreach ($maintenanceSparepart as $key => $item)
                     <tr>
-                        <td>{{ $item->code }}</td>
-                        <td>{{ $item->name }}</td>
+                        <td>{{ $item->item->code ?? null }}</td>
+                        <td>{{ $item->item->name ?? null }}</td>
                         <td>
-                            {{ $item->stock_in_schedule }}
+                            {{ $item->type }}
                         </td>
                         <td>
-                            {{ $item->kanibal_stock_in_schedule }}
+                            {{ $item->quantity }}
                         </td>
                         <td>
-                            {{ $item->assetKanibalName ?? '-' }}
+                            {{ ($item->asset_id == null) ? '-' :  'AST - '.$item->asset_id. ' - '. $item->asset->name . ' - '. ($item->asset->serial_number ?? '') }}
                         </td>
                     </tr>
                 @endforeach

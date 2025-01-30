@@ -200,8 +200,9 @@ class MaintenanceController extends Controller
             // }
 
             $comments = InspectionComment::where('inspection_schedule_id', Crypt::decrypt($data->id))->get();
+            $maintenanceSparepart = MaintenanceSparepart::where('maintenance_id', Crypt::decrypt($id))->get();
 
-            return view('main.inspection_schedule.edit-maintenance', compact('data', 'maintenance', 'items', 'comments', 'assetKanibalIds'));
+            return view('main.inspection_schedule.edit-maintenance', compact('data', 'maintenance', 'items', 'comments', 'assetKanibalIds', 'maintenanceSparepart'));
         } catch (\Exception $e) {
             return back()->with('error', 'Error loading data: ' . $e->getMessage());
         }
