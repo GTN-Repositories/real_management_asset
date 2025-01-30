@@ -11,7 +11,7 @@
     <div class="col-12 col-md-12">
         <label class="form-label">Nama Maintenance</label>
         <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Bengkel" value="{{ old('name') }}" required />
+            placeholder="Masukan Nama Maintenance" value="{{ old('name') }}" required />
     </div>
 
     <div class="col-12 col-md-12" id="alertText">

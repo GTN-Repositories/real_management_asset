@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\ExportInspectionSchedule;
+use App\Exports\ExportMaintenance;
 use App\Http\Controllers\Controller;
+use App\Imports\ImportInspectionSchedule;
+use App\Imports\ImportMaintenance;
 use App\Mail\ChangeStatusAssetEmail;
 use App\Models\Asset;
 use App\Models\GeneralSetting;
@@ -15,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InspectionScheduleController extends Controller
 {
@@ -206,6 +211,7 @@ class InspectionScheduleController extends Controller
                     // 'werehouse_id' => $werehouse_id,
                     'note' => $data['note'],
                     'location' => $data['location'],
+                    'estimate_finish' => $data['estimate_finish'],
                     // 'item_id' => json_encode($decryptedItemIds) ?? null,
                     // 'item_stock' => json_encode($itemStocks) ?? null,
                     // 'kanibal_stock' => json_encode($kanibalStocks) ?? null,
@@ -494,5 +500,46 @@ class InspectionScheduleController extends Controller
             'status' => $before->status ?? null,
             'maintenance' => $maintenance,
         ]);
+    }
+
+    public function importForm()
+    {
+        return view('main.inspection_schedule.inspection.import');
+    }
+
+    public function importExcel(Request $request)
+    {
+        try {
+            if (!$request->hasFile('excel_file')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No file uploaded!'
+                ], 400);
+            }
+
+            $file = $request->file('excel_file');
+            Excel::import(new ImportInspectionSchedule, $file);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data imported successfully!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error processing file: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function exportExcel()
+    {
+        $fileName = 'Inspection Schedule' . now()->format('Ymd_His') . '.xlsx';
+        $data = InspectionSchedule::when(session('selected_project_id'), function ($query) {
+            $query->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+        })
+        ->get();
+
+        return Excel::download(new ExportInspectionSchedule($data), $fileName);
     }
 }
