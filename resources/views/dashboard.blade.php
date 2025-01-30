@@ -81,7 +81,7 @@
                             </div>
                             <strong class="mb-0 text-primary">Productivity</strong>
                         </div>
-                        <h4 class="ms-1 mb-0 text-muted">On Progress</h4>
+                        <h4 class="ms-1 mb-0 text-muted" id="total-productivity">On Progress</h4>
                     </div>
                 </div>
             </div>
@@ -177,15 +177,15 @@
                             <thead>
                                 <tr>
                                     <th><span class="fas fa-circle" style="color: green;"></span> Active</th>
-                                    <td style="float: right;"><span class="badge bg-primary" style="background-color: green !important; color: white; border-radius: 35%;">30</span></td>
+                                    <td style="float: right;"><span class="badge bg-primary" style="background-color: green !important; color: white; border-radius: 35%;" id="asset-active">0</span></td>
                                 </tr>
                                 <tr>
                                     <th><span class="fas fa-circle" style="color: blue;"></span> Inactive</th>
-                                    <td style="float: right;"><span class="badge bg-primary" style="background-color: blue !important; color: white; border-radius: 35%;">20</span></td>
+                                    <td style="float: right;"><span class="badge bg-primary" style="background-color: blue !important; color: white; border-radius: 35%;" id="asset-inactive">0</span></td>
                                 </tr>
                                 <tr>
                                     <th><span class="fas fa-circle" style="color: red;"></span> Scrap</th>
-                                    <td style="float: right;"><span class="badge bg-primary" style="background-color: red !important; color: white; border-radius: 35%;">78</span></td>
+                                    <td style="float: right;"><span class="badge bg-primary" style="background-color: red !important; color: white; border-radius: 35%;" id="asset-scrap">0</span></td>
                                 </tr>
                             </thead>
                         </table>
@@ -199,39 +199,14 @@
                         <h5 class="m-0" style="font-weight: 900;">Maintenance Status</h5>
                     </div>
                     <div class='card-body'>
-                        <table class="table table-borderless">
+                        <table class="datatables table table-striped table-poppins  border-top" id="data-table-maintenance-status">
                             <thead>
-                                <td>Asset</td>
-                                <td>Status</td>
-                                <td class="text-center">Jumlah</td>
+                                <tr>
+                                    <td>Asset</td>
+                                    <td>Status</td>
+                                    <td class="text-center">Jumlah</td>
+                                </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>AST - 141</td>
-                                    <td>Under Maintenance</td>
-                                    <td class="text-center">13</td>
-                                </tr>
-                                <tr>
-                                    <td>AST - 142</td>
-                                    <td>Waiting</td>
-                                    <td class="text-center">10</td>
-                                </tr>
-                                <tr>
-                                    <td>AST - 143</td>
-                                    <td>Under Repair</td>
-                                    <td class="text-center">7</td>
-                                </tr>
-                                <tr>
-                                    <td>AST - 144</td>
-                                    <td>Under Maintenance</td>
-                                    <td class="text-center">5</td>
-                                </tr>
-                                <tr>
-                                    <td>AST - 146</td>
-                                    <td>Under Maintenance</td>
-                                    <td class="text-center">1</td>
-                                </tr>
-                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -374,6 +349,9 @@
         });
 
         $(document).ready(function() {
+            init_table_maintenance_status();
+            init_table_grouped_by_category();
+
             $.ajax({
                 url: "{{ route('asset.data') }}",
                 type: 'GET',
@@ -471,6 +449,7 @@
                 filterBtn.text(filterType);
                 updateSpeedometerWithDateRange(null, null, filterType);
                 fetchFuelData(null, null, filterType);
+                fetchProductivity();
                 fetchLoadsheetData(null, null, filterType);
             });
 
@@ -487,6 +466,7 @@
                 $(this).val(startDate + ' - ' + endDate);
                 updateSpeedometerWithDateRange(startDate, endDate, null);
                 fetchFuelData(startDate, endDate, null);
+                fetchProductivity();
                 fetchLoadsheetData(startDate, endDate, null);
             });
 
@@ -494,10 +474,12 @@
                 $(this).val('');
                 updateSpeedometerWithDateRange(null, null, null);
                 fetchFuelData(null, null, null); // Fetch default data
+                fetchProductivity();
                 fetchLoadsheetData(null, null, null);
             });
 
             fetchFuelData();
+            fetchProductivity();
             fetchLoadsheetData();
             init_table_category_asset();
             updateSpeedometerWithDateRange();
@@ -505,7 +487,7 @@
 
         function fetchFuelData(startDate = null, endDate = null, filterType = null) {
             $.ajax({
-                url: "{{ route('fuel.data') }}",
+                url: "{{ route('fuel.sumFuelConsumption') }}",
                 type: 'GET',
                 data: {
                     start_date: startDate,
@@ -514,10 +496,7 @@
                 },
                 dataType: 'json',
                 success: function(response) {
-                    let literDashboard = response.data.map(item => item.literDashboard);
-                    let totalLiter = literDashboard.length ?
-                        literDashboard.reduce((total, num) => total + num) :
-                        0;
+                    let totalLiter = response.data;
                     $('#total-fuel').text(totalLiter ? totalLiter + ' liter' : '0 liter');
                 },
                 error: function(xhr, status, error) {
@@ -527,10 +506,9 @@
             });
         }
 
-        // Fetch Loadsheet Data
-        function fetchLoadsheetData(startDate = null, endDate = null, filterType = null) {
+        function fetchProductivity(startDate = null, endDate = null, filterType = null) {
             $.ajax({
-                url: "{{ route('loadsheet.data') }}",
+                url: "{{ route('loadsheet.productivityByHours') }}",
                 type: 'GET',
                 data: {
                     start_date: startDate,
@@ -539,11 +517,29 @@
                 },
                 dataType: 'json',
                 success: function(response) {
-                    let loadsheetDashboard = response.data.map(item => item.loadsheetDashboard);
-                    let totalLoadsheet = loadsheetDashboard.length ?
-                        loadsheetDashboard.reduce((total, num) => total + num) :
-                        0;
-                    $('#total-loadsheet').text(totalLoadsheet ? totalLoadsheet + ' Kubik' : '0 Kubik');
+                    let total = response.data;
+                    $('#total-productivity').text(total ? total + ' Hours' : '0 Hours');
+                },
+                error: function(xhr, status, error) {
+                    $('#total-productivity').text('Error');
+                    console.error('Error fetching loadsheet data:', error);
+                }
+            });
+        }
+
+        function fetchLoadsheetData(startDate = null, endDate = null, filterType = null) {
+            $.ajax({
+                url: "{{ route('loadsheet.sumTotalLoadsheet') }}",
+                type: 'GET',
+                data: {
+                    start_date: startDate,
+                    end_date: endDate,
+                    filterType: filterType,
+                },
+                dataType: 'json',
+                success: function(response) {
+                    let totalLoadsheet = response.data;
+                    $('#total-loadsheet').text(totalLoadsheet ? totalLoadsheet + ' Loadsheet' : '0 Loadsheet');
                 },
                 error: function(xhr, status, error) {
                     $('#total-loadsheet').text('Error');
@@ -672,6 +668,10 @@
                 dataType: 'json',
                 success: function(response) {
                     initializeCharts(response);
+                    
+                    $('#asset-active').text(response.active || 0);
+                    $('#asset-inactive').text(response.inactive || 0);
+                    $('#asset-scrap').text(response.scrap || 0);
                 },
                 error: function(xhr, status, error) {
                     console.error('Error fetching status data:', error);
@@ -843,41 +843,6 @@
         }
 
         function init_table_category_asset(keyword = '') {
-            // var csrf_token = $('meta[name="csrf-token"]').attr('content');
-
-            // var table = $('#data-table-by-category-asset').DataTable({
-            //     processing: true,
-            //     serverSide: true,
-            //     destroy: true,
-            //     columnDefs: [{
-            //         target: 0,
-            //         visible: true,
-            //         searchable: false
-            //     }, ],
-
-            //     ajax: {
-            //         type: "GET",
-            //         url: "{{ route('asset.getDataGroupedByCategory') }}",
-            //         data: {
-            //             'keyword': keyword
-            //         }
-            //     },
-            //     columns: [
-            //         {
-            //             data: 'DT_RowIndex',
-            //             name: 'DT_RowIndex',
-            //         },
-            //         {
-            //             data: 'category',
-            //             name: 'category'
-            //         },
-            //         {
-            //             data: 'total_asset',
-            //             name: 'total_asset'
-            //         },
-            //     ]
-            // });
-
             var postForm = {
                 'keyword': keyword,
             };
@@ -1018,6 +983,64 @@
                 color += letters[Math.floor(Math.random() * 16)];
             }
             return color;
+        }
+
+        function init_table_maintenance_status() {
+            var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+            var table = $('#data-table-maintenance-status').DataTable({
+                processing: true,
+                serverSide: true,
+                destroy: true,
+
+                ajax: {
+                    type: "GET",
+                    url: "{{ route('maintenances.maintenanceStatus') }}",
+                },
+                columns: [
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
+                    },
+                    {
+                        data: 'total',
+                        name: 'total'
+                    },
+                ]
+            });
+        }
+
+        function init_table_grouped_by_category() {
+            var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+            var table = $('#data-table-by-category-asset').DataTable({
+                processing: true,
+                serverSide: true,
+                destroy: true,
+
+                ajax: {
+                    type: "GET",
+                    url: "{{ route('asset.dataGroupedByCategory') }}",
+                },
+                columns: [
+                    {
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                    },
+                    {
+                        data: 'category',
+                        name: 'category'
+                    },
+                    {
+                        data: 'total_asset',
+                        name: 'total_asset'
+                    },
+                ]
+            });
         }
 
     </script>

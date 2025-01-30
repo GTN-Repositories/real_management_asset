@@ -411,4 +411,40 @@ class LoadsheetController extends Controller
 
         return Excel::download(new LoadsheetExport($data), $fileName);
     }
+
+    public function sumTotalLoadsheet(Request $request)
+    {
+        $data = Loadsheet::query();
+
+        if (session('selected_project_id')) {
+            $data->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
+
+        $total = number_format($data->sum('loadsheet'));
+
+        return response()->json([
+            'status' => true,
+            'data' => $total,
+        ]);
+    }
+
+    public function productivityByHours(Request $request)
+    {
+        $data = Loadsheet::query();
+
+        if (session('selected_project_id')) {
+            $data->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
+
+        $total = number_format($data->sum('hours'));
+
+        return response()->json([
+            'status' => true,
+            'data' => $total,
+        ]);
+    }
 }

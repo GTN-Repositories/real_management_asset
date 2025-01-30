@@ -281,4 +281,45 @@ class MaintenanceController extends Controller
             ], 500);
         }
     }
+
+    public function maintenanceStatus()
+    {
+        $asset = Asset::get();
+
+        $data = [];
+        foreach ($asset as $key => $value) {
+            $maintenance = Maintenance::whereHas('inspection_schedule', function ($q) use ($value) {
+                $q->where('asset_id', Crypt::decrypt($value->id));
+            });
+            if (session('selected_project_id')) {
+                $maintenance->whereHas('inspection_schedule', function ($q) {
+                    $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                });
+            }
+
+            $total = $maintenance->count();
+
+
+            $data[] = [
+                'name' => 'AST - '. Crypt::decrypt($value->id) . ' - ' . $value->name,
+                'status' => $value->status,
+                'total' => $total,
+            ];
+        }
+
+        $dataSorting = collect($data)->sortByDesc('total')->where('total', '>', 0)->values()->all();
+        
+        return datatables()->of($dataSorting)
+            ->addColumn('name', function ($data) {
+                return $data['name'];
+            })
+            ->addColumn('status', function ($data) {
+                return $data['status'];
+            })
+            ->addColumn('total', function ($data) {
+                return $data['total'];
+            })
+            ->escapeColumns([])
+            ->make(true);
+    }
 }
