@@ -66,33 +66,6 @@ class InspectionScheduleController extends Controller
             ->addColumn('date', function ($data) {
                 return $data->date ?? '-';
             })
-            ->addColumn('werehouse_id', function ($data) {
-                return $data->werehouse->name ?? '-';
-            })
-            ->addColumn('item_name', function ($data) {
-                $itemIds = is_array(json_decode($data->item_id, true)) ? json_decode($data->item_id, true) : [];
-                $items = Item::whereIn('id', $itemIds)->get()->pluck('name')->implode(', ');
-                return $items;
-            })
-            ->addColumn('item_stock', function ($data) {
-                $itemStocks = is_array(json_decode($data->item_stock, true)) ? json_decode($data->item_stock, true) : [];
-                return array_sum($itemStocks);
-            })
-            ->addColumn('kanibal_stock', function ($data) {
-                $kanibalStocks = is_array(json_decode($data->kanibal_stock, true)) ? json_decode($data->kanibal_stock, true) : [];
-                return array_sum($kanibalStocks);
-            })
-            ->addColumn('asset_kanibal_name', function ($data) {
-                $assetKanibalIds = is_array(json_decode($data->asset_kanibal_id, true)) ? json_decode($data->asset_kanibal_id, true) : [];
-                $items = Item::whereIn('id', array_keys($assetKanibalIds))->get()->map(function ($item) use ($assetKanibalIds) {
-                    $itemId = (string) Crypt::decrypt($item->id);
-                    $item->assetKanibalName = isset($assetKanibalIds[$itemId])
-                        ? $assetKanibalIds[$itemId] . ' - ' . Asset::find($assetKanibalIds[$itemId] ?? 0)->name . ' - ' . Asset::find($assetKanibalIds[$itemId] ?? 0)->license_plate
-                        : '-';
-                    return $item;
-                });
-                return $items->pluck('assetKanibalName')->implode(', ');
-            })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
                 if (!auth()->user()->hasRole('Read only')) {
@@ -124,17 +97,12 @@ class InspectionScheduleController extends Controller
             'asset_id',
             'management_project_id',
             'note',
-            'item_id',
-            'asset_kanibal_id',
             'status',
-            'item_stock',
-            'kanibal_stock',
             'created_at',
             'updated_at',
             'date',
             'workshop',
             'employee_id',
-            'werehouse_id',
             'estimate_finish',
             'urgention',
         ];
