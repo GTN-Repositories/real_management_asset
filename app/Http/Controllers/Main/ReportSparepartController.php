@@ -291,12 +291,22 @@ class ReportSparepartController extends Controller
             ->count();
         $totalItems = Item::count();
         $currentYear = Carbon::now()->year;
-        $totalInspectionItemsYear = $query->whereYear('created_at', $currentYear)
+        $totalInspectionItemsYear = MaintenanceSparepart::whereYear('created_at', $currentYear)
+            ->when(session('selected_project_id'), function ($querys) {
+                $querys->whereHas('maintenance.inspectionSchedule', function ($q) {
+                    $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                });
+            })
             ->pluck('item_id')
             ->flatten()
             ->unique()
             ->count();
-        $totalInspectionItemsWeek = $query->whereYear('created_at', $currentYear)
+        $totalInspectionItemsWeek = MaintenanceSparepart::whereYear('created_at', $currentYear)
+            ->when(session('selected_project_id'), function ($querys) {
+                $querys->whereHas('maintenance.inspectionSchedule', function ($q) {
+                    $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                });
+            })
             ->whereBetween('created_at', [
                 Carbon::now()->startOfWeek(),
                 Carbon::now()->endOfWeek(),
@@ -307,12 +317,58 @@ class ReportSparepartController extends Controller
             ->count();
         $percentageItemsYear = ($totalInspectionItemsYear / $totalItems) * 100;
         $percentageItemsWeek = ($totalInspectionItemsWeek / $totalItems) * 100;
+
         return response()->json([
-            'scheduled' => $query->where('status', 'Scheduled')->count(),
-            'inProgress' => $query->where('status', 'InProgress')->count(),
-            'onHold' => $query->where('status', 'OnHold')->count(),
-            'finish' => $query->where('status', 'Finish')->count(),
-            'overdue' => $query->where('status', 'Overdue')->count(),
+            'scheduled' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'Scheduled')->count(),
+            'inProgress' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'InProgress')->count(),
+            'onHold' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'OnHold')->count(),
+            'finish' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'Finish')->count(),
+            'overdue' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'Overdue')->count(),
+            
+            'active' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'Active')->count() ?? 0,
+            'inactive' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'Inactive')->count() ?? 0,
+            'underMaintenance' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'UnderMaintenance')->count() ?? 0,
+            'underRepair' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'UnderRepair')->count() ?? 0,
+            'waiting' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'Waiting')->count() ?? 0,
+            'scrap' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'Scrap')->count() ?? 0,
+            'rfu' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'RFU')->count() ?? 0,
+
             'underMaintenanceSecondDay' => $underMaintenanceSecondDayCount,
             'percentageItemsYear' => $percentageItemsYear,
             'percentageItemsWeek' => $percentageItemsWeek,

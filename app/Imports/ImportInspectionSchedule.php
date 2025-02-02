@@ -25,13 +25,14 @@ class ImportInspectionSchedule implements ToModel, WithHeadingRow
                 $project = ManagementProject::where('name', $row['nama_project'] ?? '')->first();
 
                 if ($employee && $project && $asset_id) {
+                    dd($row);
                     $data = [
                         'name' => $row['name'],
                         'type' => $row['type'],
-                        'asset_id' => $asset_id,
+                        'asset_id' => (int)$asset_id,
                         'management_project_id' => Crypt::decrypt($project->id),
                         'note' => $row['note'],
-                        'status' => 'UnderInspection',
+                        'status' => 'UnderMaintenance',
                         'date' => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['date'] ?? ''),
                         'employee_id' => Crypt::decrypt($employee->id),
                         'urgention' => $row['urgention'],
