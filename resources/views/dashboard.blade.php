@@ -11,6 +11,17 @@
             background-position: center;
             background-repeat: no-repeat;
         }
+
+        .input-filter {
+            max-width: 180px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .input-filter {
+                max-width: 100%;
+            }
+        }
     </style>
 @endpush
 
@@ -19,12 +30,12 @@
         <!-- Card Border Shadow -->
         <div class="row">
             <div class="col-sm-6 col-lg-12 mb-4">
-                <div class="d-flex justify-content-end align-items-end my-1 gap-3">
-                    <div>
+                <div class="d-flex flex-wrap justify-content-end align-items-end my-1 gap-3">
+                    <div class="input-filter">
                         <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
                         <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
                     </div>
-                    <div class="btn-group">
+                    <div class="btn-group input-filter">
                         <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             filter tanggal

@@ -75,7 +75,7 @@
         </div>
         <!-- /Scatter Chart -->
     
-        <div class="col d-flex flex-column justify-content-between">
+        <div class="col d-flex flex-column justify-content-between mb-3">
             <div class="card background-card" style="height: 300px;">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="m-0 text-white">Speedometer</h4>
@@ -104,7 +104,7 @@
             </button>
             @endif
         </div>
-        <div class="card mb-4">
+        <div class="card mb-3">
             <div class="card-header">
                 <h5 class="card-title mb-0">Project Loadsheet</h5>
             </div>
@@ -121,14 +121,14 @@
             </div>
         </div>
         <br>
-        <div class="d-flex justify-content-end mt-3">
+        <div class="d-flex justify-content-end">
             @if (!auth()->user()->hasRole('Read only'))
             <button onclick="exportExcelByAsset()" class="btn btn-success btn-md btn-asset">
                 <i class="fa-solid fa-file-excel me-2"></i>Export Excel
             </button>
             @endif
         </div>
-        <div class="card mt-4">
+        <div class="card mt-3">
             <div class="card-header">
                 <h5 class="card-title mb-0">Asset Loadsheet</h5>
             </div>

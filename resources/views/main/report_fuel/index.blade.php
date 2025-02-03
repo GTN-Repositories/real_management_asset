@@ -15,7 +15,7 @@
             max-width: 200px;
         }
 
-        .card-w{
+        .card-w {
             width: 49%;
         }
 
@@ -27,9 +27,9 @@
 
             .btn-asset {
                 max-width: 100%;
-            } 
-            
-            .card-w{
+            }
+
+            .card-w {
                 width: 100%;
             }
         }
@@ -63,8 +63,8 @@
             @endif --}}
             @if (!auth()->user()->hasRole('Read only'))
                 @if (auth()->user()->hasPermissionTo('report-fuel-export-excel'))
-                    <button onclick="exportExcel()" class="btn btn-success">
-                        <i class="fa-solid fa-file-excel me-2 btn-asset"></i>Export Excel
+                    <button onclick="exportExcel()" class="btn btn-success btn-asset">
+                        <i class="fa-solid fa-file-excel me-2"></i>Export Excel
                     </button>
                 @endif
                 @if (auth()->user()->hasPermissionTo('report-fuel-export-excel-month'))
@@ -72,8 +72,8 @@
                         <i class="fa-solid fa-file-excel me-1"></i>Excel Fuel Monthly
                     </button> --}}
 
-                    <button onclick="exportExcelMonthModal()" class="btn btn-success">
-                        <i class="fa-solid fa-file-excel me-2 btn-asset"></i>Excel Fuel Monthly
+                    <button onclick="exportExcelMonthModal()" class="btn btn-success btn-asset">
+                        <i class="fa-solid fa-file-excel me-2"></i>Excel Fuel Monthly
                     </button>
                 @endif
             @endif
@@ -110,41 +110,37 @@
                 </div>
             </div>
         </div>
-
-        <!-- Product List Table -->
-        <div class="d-flex flex-wrap gap-4 mx-1 mb-2">
-            <div class="card my-3 card-w">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Grouping by project</h5>
-                </div>
-                <div class="card-datatable table-responsive">
-                    <table class="datatables table table-striped table-poppins " id="data-table-project">
-                        <thead class="border-top">
-                            <tr>
-                                <th>#</th>
-                                <th>Management Project</th>
-                                <th>Total Liter</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+        <div class="card my-3 p-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Grouping by project</h5>
             </div>
+            <div class="card-datatable table-responsive">
+                <table class="datatables table table-striped table-poppins " id="data-table-project">
+                    <thead class="border-top">
+                        <tr>
+                            <th>#</th>
+                            <th>Management Project</th>
+                            <th>Total Liter</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
 
-            <div class="card my-3 card-w">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Grouping by asset</h5>
-                </div>
-                <div class="card-datatable table-responsive">
-                    <table class="datatables table table-striped table-poppins " id="data-table-asset">
-                        <thead class="border-top">
-                            <tr>
-                                <th>#</th>
-                                <th>Asset</th>
-                                <th>Total Liter</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+        <div class="card my-3 p-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Grouping by asset</h5>
+            </div>
+            <div class="card-datatable table-responsive">
+                <table class="datatables table table-striped table-poppins " id="data-table-asset">
+                    <thead class="border-top">
+                        <tr>
+                            <th>#</th>
+                            <th>Asset</th>
+                            <th>Total Liter</th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
         </div>
 
@@ -211,13 +207,14 @@
                                 @endfor
                             </select>
                         </div>
-    
+
                         <div class="col-12 text-center mt-4">
                             <button onclick="exportExcelMonth()" class="btn btn-success">
                                 <i class="fa-solid fa-file-excel me-1"></i> Export
                             </button>
 
-                            <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">
+                            <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal"
+                                aria-label="Close">
                                 Cancel
                             </button>
                         </div>
@@ -303,8 +300,7 @@
                 success: function(response) {
                     // Render the scorecard
                     const scorecard = `
-                    <div class="row g-3">
-    <div class="row g-3">
+    <div class="row justify-content-center mt-3">
         <div class="col-12 col-md-3">
             <div class="card h-100">
                 <div class="card-body">
@@ -365,7 +361,6 @@
             </div>
         </div>
     </div>
-</div>
                     `;
 
                     document.querySelector("#scorecard-section").innerHTML = scorecard;

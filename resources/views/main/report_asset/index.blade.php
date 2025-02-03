@@ -80,8 +80,8 @@
             </button> --}}
             @if (!auth()->user()->hasRole('Read only'))
                 @if (auth()->user()->hasPermissionTo('report-asset-export-excel'))
-                    <button onclick="exportExcel()" class="btn btn-success">
-                        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                    <button onclick="exportExcel()" class="btn btn-success btn-asset">
+                        <i class="fa-solid fa-file-excel me-2"></i>Export Excel
                     </button>
                 @endif
             @endif

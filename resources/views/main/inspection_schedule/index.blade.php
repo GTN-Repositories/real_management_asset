@@ -10,13 +10,48 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/app-calendar.css') }}" />
 
     <style>
+        .input-filter {
+            max-width: 180px;
+            width: 100%;
+        }
+
+        .btn-asset {
+            width: 100%;
+            max-width: 250px;
+        }
+
         .btn-add {
             width: 100%;
             max-width: 130px;
         }
 
+        .btn-req {
+            width: fit-content;
+            max-width: 210px;
+        }
+
+        .btn-del-all {
+            width: 100%;
+            max-width: 180px;
+        }
+
         @media (max-width: 768px) {
+            .input-filter {
+                max-width: 100%;
+            }
+
+            .btn-asset {
+                max-width: 100%;
+            }
+
             .btn-add {
+                max-width: 100%;
+            }
+            .btn-req {
+                max-width: 100%;
+                width: 100%;
+            }
+            .btn-del-all {
                 max-width: 100%;
             }
         }
@@ -24,8 +59,8 @@
 @endpush
 
 @section('content')
-    <div class="mx-5 flex-grow-1 container-p-y">
-        <div class="d-flex justify-content-end mb-3 gap-3">
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <div class="d-flex flex-wrap justify-content-end mb-3 gap-3">
             <!-- Tombol Hapus Masal -->
             {{-- <button type="button" class="btn btn-danger btn-sm" id="delete-btn"
                 style="display: none !important;">
@@ -40,7 +75,7 @@
                 <button onclick="exportInspectionExcel()" class="btn btn-success btn-md btn-asset">
                     <i class="fa-solid fa-file-excel me-2"></i>Export Inspeksi
                 </button>
-                    <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                    <button type="button" class="btn btn-primary btn-md btn-add" onclick="createData()">
                         <i class="fas fa-plus"></i> Tambah
                     </button>
                 @endif
@@ -75,7 +110,7 @@
                 </table>
             </div>
         </div>
-        <div class="d-flex justify-content-end mb-3 gap-3">
+        <div class="d-flex flex-wrap justify-content-end mb-3 gap-3">
             <button type="button" class="btn btn-success btn-md d-flex align-items-center btn-asset" onclick="importMaintenanceExcel()">
                 <i class="fas fa-file-excel me-2"></i> Import Maintenance
             </button>
