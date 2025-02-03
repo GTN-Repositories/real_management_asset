@@ -5,19 +5,21 @@ namespace App\Http\Controllers\Main;
 use App\Http\Controllers\Controller;
 use App\Models\InspectionSchedule;
 use App\Models\Maintenance;
+use App\Models\StatusAsset;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 
 class ReportMaintenanceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $month = $request->month ?? now()->month;
         $year = $request->year ?? now()->year;
         $daysInMonth = Carbon::createFromDate($year, $month)->daysInMonth;
 
         $dataByDate = $this->dataByDate($daysInMonth, $month, $year);
-
+        
         return view('main.report_maintenance.index', compact('daysInMonth', 'month', 'year', 'dataByDate'));
     }
 
@@ -59,30 +61,52 @@ class ReportMaintenanceController extends Controller
         return response()->json($data);
     }
 
+    // public function dataByDate($daysInMonth, $month, $year)
+    // {
+    //     $schedules = InspectionSchedule::get()->groupBy('asset_id')->sortDesc();
+
+    //     $data = [];
+    //     $color = [
+    //         'Ringan' => '#00BD2C',
+    //         'Sedang' => '#FABE29',
+    //         'Berat' => '#FF0004',
+    //         'Aktif' => '#248FD6',
+    //         'RFU' => '#7F2DE8',
+    //         'Scrap' => '#666666',
+    //         'Uncertain' => '#FFFFFF'
+    //     ];
+        
+    //     foreach ($schedules as $key => $value) {
+    //         $inspection = InspectionSchedule::where('asset_id', $key);
+
+    //         $data_date = [];
+    //         foreach (range(1, $daysInMonth) as $day) {
+    //             $date = $year.'-'.$month.'-'.$day;
+    //             $data_date[] = $inspection->whereDate('date', $date)->orderBy('created_at', 'desc')->first()->urgention ?? 'Uncertain';
+    //         }
+
+    //         $data[] = [
+    //             'asset_id' => $key,
+    //             'data' => $data_date,
+    //         ];
+    //     }
+
+    //     return $data;
+    // }
+
     public function dataByDate($daysInMonth, $month, $year)
     {
-        $schedules = InspectionSchedule::get()->groupBy('asset_id')->sortDesc();
+        $schedules = StatusAsset::get()->groupBy('asset_id')->sortDesc();
 
         $data = [];
-        $color = [
-            'Ringan' => '#00BD2C',
-            'Sedang' => '#FABE29',
-            'Berat' => '#FF0004',
-            'Aktif' => '#248FD6',
-            'RFU' => '#7F2DE8',
-            'Scrap' => '#666666',
-            'Uncertain' => '#FFFFFF'
-        ];
         
         foreach ($schedules as $key => $value) {
-            $inspection = InspectionSchedule::where('asset_id', $key);
-
             $data_date = [];
             foreach (range(1, $daysInMonth) as $day) {
-                $date = $year.'-'.$month.'-'.$day;
-                $data_date[] = $inspection->whereDate('date', $date)->orderBy('created_at', 'desc')->first()->urgention ?? 'Uncertain';
+                $date = Carbon::parse($year.'-'.$month.'-'.$day)->format('Y-m-d');
+                $data_date[] = StatusAsset::where('asset_id', $key)->whereDate('created_at', $date)->where('type', 'maintenance')->orderBy('created_at', 'desc')->first()->status_after ?? 'Uncertain';
             }
-
+            
             $data[] = [
                 'asset_id' => $key,
                 'data' => $data_date,
@@ -100,7 +124,7 @@ class ReportMaintenanceController extends Controller
             ->of($data)
             ->addIndexColumn()
             ->addColumn('asset', function ($data) {
-                return $data->first()->asset->name ?? null;
+                return 'AST-' . Crypt::decrypt($data->first()->asset->id) . ' - ' . ($data->first()->asset->name ?? null). ' - ' . ($data->first()->asset->serial_number ?? null);
             })
             ->addColumn('date', function ($data) {
                 return $data->first()->date ?? null;

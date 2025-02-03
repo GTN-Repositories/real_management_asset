@@ -81,7 +81,9 @@ class ItemController extends Controller
                 return $data->color ? $color : null;
             })
             ->addColumn('stock', function ($data) {
-                return $data->stock ?? null;
+                $stock_warehouse = new WerehouseController();
+                $stock = $stock_warehouse->getStock(Crypt::decrypt($data->id));
+                return $stock ?? 0;
             })
             ->addColumn('minimum_stock', function ($data) {
                 return $data->minimum_stock ?? 0;

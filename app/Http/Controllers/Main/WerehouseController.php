@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Main;
 use App\Http\Controllers\Controller;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
+use App\Models\ItemStock;
+use App\Models\MaintenanceSparepart;
 use App\Models\Site;
 use App\Models\Werehouse;
 use Illuminate\Http\Request;
@@ -167,23 +169,20 @@ class WerehouseController extends Controller
                 return $data->name ?? null;
             })
             ->addColumn('stock', function ($data) use ($request) {
-                $usedStock = $this->getUsedStock($data->item_id);
-                return ((int)$data->stock ?? 0) + ($usedStock ?? 0);
+                $stock = $this->getStock($data->item_id, Crypt::decrypt($request->werehouse_id));
+                return $stock;
             })
             ->addColumn('used_stock', function ($data) use ($request) {
                 $usedStock = $this->getUsedStock($data->item_id, $request->werehouse_id);
                 return $usedStock ?? 0;
             })
             ->addColumn('balance', function ($data) use ($request) {
-                // return $data->stock ?? null;
-
-                $stock = $this->getUsedStock($data->item_id);
-                $summary_stock = ($data->stock ?? 0) + ($stock ?? 0);
+                $stock = $this->getStock($data->item_id, Crypt::decrypt($request->werehouse_id));
 
                 $used_stock = $this->getUsedStock($data->item_id, $request->werehouse_id);
                 $summary_used_stock = $used_stock ?? 0;
 
-                return $summary_stock - $summary_used_stock;
+                return $stock - $summary_used_stock;
             })
             ->escapeColumns([])
             ->make(true);
@@ -199,33 +198,11 @@ class WerehouseController extends Controller
         ];
 
         $keyword = $request->search['value'] ?? null;
-        $werehouseId = $request->werehouse_id ? Crypt::decrypt($request->werehouse_id) : null;
 
         $data = Item::select($columns)
-            // ->when($keyword, function ($query) use ($keyword, $columns) {
-            //     if ($keyword != '') {
-            //         foreach ($columns as $column) {
-            //             $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
-            //         }
-            //     }
-            // })
             ->when($keyword, function ($query) use ($keyword) {
                 $query->where('items.name', 'LIKE', '%' . $keyword . '%');
             });
-
-        // $data = InspectionSchedule::join('items', function ($join) {
-        //     $join->on('inspection_schedules.item_stock', 'LIKE', DB::raw("CONCAT('%', items.id, '%')"));
-        // })
-        //     ->select($columns)
-        //     ->where('inspection_schedules.werehouse_id', $werehouseId)
-        //     ->where(function ($query) use ($keyword, $columns) {
-        //         if ($keyword != '') {
-        //             foreach ($columns as $column) {
-        //                 $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
-        //             }
-        //         }
-        //     })
-        //     ->groupBy('items.id', 'items.name', 'items.stock');
 
         return $data;
     }
@@ -234,24 +211,55 @@ class WerehouseController extends Controller
     {
         if ($werehouseId) {
             $werehouseId = Crypt::decrypt($werehouseId);
-            $schedules = InspectionSchedule::where('werehouse_id', $werehouseId)
-                ->where('item_stock', 'LIKE', '%"' . $itemId . '"%')
-                ->get();
+
+            $schedules = MaintenanceSparepart::where('warehouse_id', $werehouseId)->where('item_id', $itemId)->where('type', 'Stock')->get();
         } else {
             $schedules = InspectionSchedule::where('item_stock', 'LIKE', '%"' . $itemId . '"%')
                 ->get();
         }
 
-        $usedStock = 0;
-
-        foreach ($schedules as $schedule) {
-            $itemStock = json_decode($schedule->item_stock, true);
-            if (isset($itemStock[$itemId])) {
-                $usedStock += $itemStock[$itemId];
-            }
-        }
+        $usedStock = $schedules->sum('quantity');
 
         return $usedStock;
+    }
+
+    public function getStock($item_id, $warehouse_id = null)
+    {
+        $management_project_id = (session('selected_project_id') != null) ? Crypt::decrypt(session('selected_project_id')) : null;
+
+        $stock_increase = ItemStock::where('item_id', $item_id)
+            ->where('metode', 'increase')
+            ->where('status', 'approved')
+            ->when($management_project_id, function ($query) use ($management_project_id) {
+                if ($management_project_id) {
+                    $query->where('management_project_id', $management_project_id);
+                }
+            })
+            ->when($warehouse_id, function ($query) use ($warehouse_id) {
+                if ($warehouse_id) {
+                    $query->where('warehouse_id', $warehouse_id);
+                }
+            })
+            ->sum('stock');
+
+        $stock_decrease = ItemStock::where('item_id', $item_id)
+            ->where('metode', 'decrease')
+            ->where('status', 'approved')
+            ->when($management_project_id, function ($query) use ($management_project_id) {
+                if ($management_project_id) {
+                    $query->where('management_project_id', $management_project_id);
+                }
+            })
+            ->when($warehouse_id, function ($query) use ($warehouse_id) {
+                if ($warehouse_id) {
+                    $query->where('warehouse_id', $warehouse_id);
+                }
+            })
+            ->sum('stock');
+
+        $stock = $stock_increase - $stock_decrease;
+
+        return $stock;
     }
 
 

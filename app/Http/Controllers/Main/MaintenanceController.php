@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\ExportMaintenance;
 use App\Http\Controllers\Controller;
+use App\Imports\ImportMaintenance;
 use App\Mail\ChangeStatusAssetEmail;
 use App\Models\Asset;
 use App\Models\GeneralSetting;
@@ -10,6 +12,7 @@ use App\Models\InspectionComment;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
 use App\Models\Maintenance;
+use App\Models\MaintenanceSparepart;
 use App\Models\ManagementProject;
 use App\Models\StatusAsset;
 use Carbon\Carbon;
@@ -18,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class MaintenanceController extends Controller
 {
@@ -113,12 +117,38 @@ class MaintenanceController extends Controller
                     Mail::to($generalEmailSmtp)->send(new ChangeStatusAssetEmail($asset));
                 }
 
-                $schedule = Maintenance::create($data);
+                $maintenance = Maintenance::create($data);
+
+                if (isset($data['selected_items'])) {
+                    foreach ($data['selected_items'] as $key => $value) {
+                        $item_id = Crypt::decrypt($value['id']);
+                        $asset_kanibal_id = null;
+                        if ($value['asset_kanibal_id'] != "null") {
+                            $asset_kanibal_id = str_replace('AST - ', '', $value['asset_kanibal_id']);
+                        }
+                        $quantity = $value['item_stock'] ?? $value['kanibal_stock'];
+
+                        MaintenanceSparepart::create([
+                            'maintenance_id' => Crypt::decrypt($maintenance->id),
+                            'warehouse_id' => Crypt::decrypt($data['werehouse_id']),
+                            'item_id' => $item_id,
+                            'asset_id' => $asset_kanibal_id,
+                            'quantity' => $quantity,
+                            'type' => ($asset_kanibal_id != null) ? 'Replacing' : 'Stock',
+                        ]);
+
+                        $item = Item::findOrFail($item_id);
+        
+                        if (isset($value['item_stock'])) {
+                            $item->decrement('stock', $value['item_stock']);
+                        }
+                    }
+                }
 
                 return response()->json([
                     'status' => true,
-                    'message' => 'Data berhasil ditambahkan dengan ID MNTS-'.Crypt::decrypt($schedule->id).'!',
-                    'schedule_id' => $schedule->id,
+                    'message' => 'Data berhasil ditambahkan dengan ID MNTS-'.Crypt::decrypt($maintenance->id).'!',
+                    'schedule_id' => $maintenance->id,
                 ]);
             });
         } catch (\Exception $e) {
@@ -170,8 +200,9 @@ class MaintenanceController extends Controller
             // }
 
             $comments = InspectionComment::where('inspection_schedule_id', Crypt::decrypt($data->id))->get();
+            $maintenanceSparepart = MaintenanceSparepart::where('maintenance_id', Crypt::decrypt($id))->get();
 
-            return view('main.inspection_schedule.edit-maintenance', compact('data', 'maintenance', 'items', 'comments', 'assetKanibalIds'));
+            return view('main.inspection_schedule.edit-maintenance', compact('data', 'maintenance', 'items', 'comments', 'assetKanibalIds', 'maintenanceSparepart'));
         } catch (\Exception $e) {
             return back()->with('error', 'Error loading data: ' . $e->getMessage());
         }
@@ -234,6 +265,7 @@ class MaintenanceController extends Controller
                 $maintenance->finish_at = $request->get('finish_at');
                 $maintenance->hm = $request->get('hm');
                 $maintenance->km = $request->get('km');
+                $maintenance->status = $data['status'];
                 $maintenance->location = $request->get('location');
                 $maintenance->detail_problem = $request->get('detail_problem');
                 $maintenance->action_to_do = $request->get('action_to_do');
@@ -253,5 +285,87 @@ class MaintenanceController extends Controller
                 'message' => 'Data gagal diperbarui! ' . $th->getMessage(),
             ], 500);
         }
+    }
+
+    public function maintenanceStatus()
+    {
+        $asset = Asset::get();
+
+        $data = [];
+        foreach ($asset as $key => $value) {
+            $maintenance = Maintenance::whereHas('inspection_schedule', function ($q) use ($value) {
+                $q->where('asset_id', Crypt::decrypt($value->id));
+            });
+            if (session('selected_project_id')) {
+                $maintenance->whereHas('inspection_schedule', function ($q) {
+                    $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                });
+            }
+
+            $total = $maintenance->count();
+
+
+            $data[] = [
+                'name' => 'AST - '. Crypt::decrypt($value->id) . ' - ' . $value->name,
+                'status' => $value->status,
+                'total' => $total,
+            ];
+        }
+
+        $dataSorting = collect($data)->sortByDesc('total')->where('total', '>', 0)->values()->all();
+        
+        return datatables()->of($dataSorting)
+            ->addColumn('name', function ($data) {
+                return $data['name'];
+            })
+            ->addColumn('status', function ($data) {
+                return $data['status'];
+            })
+            ->addColumn('total', function ($data) {
+                return $data['total'];
+            })
+            ->escapeColumns([])
+            ->make(true);
+    }
+
+    public function importForm()
+    {
+        return view('main.inspection_schedule.maintenance.import');
+    }
+
+    public function importExcel(Request $request)
+    {
+        try {
+            if (!$request->hasFile('excel_file')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No file uploaded!'
+                ], 400);
+            }
+
+            $file = $request->file('excel_file');
+            Excel::import(new ImportMaintenance, $file);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data imported successfully!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error processing file: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function exportExcel()
+    {
+        $fileName = 'Maintenance ' . now()->format('Ymd_His') . '.xlsx';
+        $data = Maintenance::when(session('selected_project_id'), function ($query) {
+            $query->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+        })
+        ->get();
+
+        return Excel::download(new ExportMaintenance($data), $fileName);
     }
 }

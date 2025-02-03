@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Exports\ExportInspectionSchedule;
+use App\Exports\ExportMaintenance;
 use App\Http\Controllers\Controller;
+use App\Imports\ImportInspectionSchedule;
+use App\Imports\ImportMaintenance;
 use App\Mail\ChangeStatusAssetEmail;
 use App\Models\Asset;
 use App\Models\GeneralSetting;
@@ -15,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InspectionScheduleController extends Controller
 {
@@ -66,33 +71,6 @@ class InspectionScheduleController extends Controller
             ->addColumn('date', function ($data) {
                 return $data->date ?? '-';
             })
-            ->addColumn('werehouse_id', function ($data) {
-                return $data->werehouse->name ?? '-';
-            })
-            ->addColumn('item_name', function ($data) {
-                $itemIds = is_array(json_decode($data->item_id, true)) ? json_decode($data->item_id, true) : [];
-                $items = Item::whereIn('id', $itemIds)->get()->pluck('name')->implode(', ');
-                return $items;
-            })
-            ->addColumn('item_stock', function ($data) {
-                $itemStocks = is_array(json_decode($data->item_stock, true)) ? json_decode($data->item_stock, true) : [];
-                return array_sum($itemStocks);
-            })
-            ->addColumn('kanibal_stock', function ($data) {
-                $kanibalStocks = is_array(json_decode($data->kanibal_stock, true)) ? json_decode($data->kanibal_stock, true) : [];
-                return array_sum($kanibalStocks);
-            })
-            ->addColumn('asset_kanibal_name', function ($data) {
-                $assetKanibalIds = is_array(json_decode($data->asset_kanibal_id, true)) ? json_decode($data->asset_kanibal_id, true) : [];
-                $items = Item::whereIn('id', array_keys($assetKanibalIds))->get()->map(function ($item) use ($assetKanibalIds) {
-                    $itemId = (string) Crypt::decrypt($item->id);
-                    $item->assetKanibalName = isset($assetKanibalIds[$itemId])
-                        ? $assetKanibalIds[$itemId] . ' - ' . Asset::find($assetKanibalIds[$itemId] ?? 0)->name . ' - ' . Asset::find($assetKanibalIds[$itemId] ?? 0)->license_plate
-                        : '-';
-                    return $item;
-                });
-                return $items->pluck('assetKanibalName')->implode(', ');
-            })
             ->addColumn('action', function ($data) {
                 $btn = '<div class="d-flex">';
                 if (!auth()->user()->hasRole('Read only')) {
@@ -124,17 +102,12 @@ class InspectionScheduleController extends Controller
             'asset_id',
             'management_project_id',
             'note',
-            'item_id',
-            'asset_kanibal_id',
             'status',
-            'item_stock',
-            'kanibal_stock',
             'created_at',
             'updated_at',
             'date',
             'workshop',
             'employee_id',
-            'werehouse_id',
             'estimate_finish',
             'urgention',
         ];
@@ -193,40 +166,40 @@ class InspectionScheduleController extends Controller
                 } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
                     $management_project_id = $data['management_project_id'];
                 }
-                try {
-                    $werehouse_id = Crypt::decrypt($data['werehouse_id']);
-                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-                    $werehouse_id = $data['werehouse_id'];
-                }
+                // try {
+                //     $werehouse_id = Crypt::decrypt($data['werehouse_id']);
+                // } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                //     $werehouse_id = $data['werehouse_id'];
+                // }
 
-                $decryptedItemIds = [];
-                $itemStocks = [];
-                $kanibalStocks = [];
-                $assetKanibalIds = [];
-                // dd($data['selected_items']);
-                if (isset($data['selected_items'])) {
-                    foreach ($data['selected_items'] as $encryptedItemId) {
-                        try {
-                            $decryptedItemId = Crypt::decrypt($encryptedItemId['id']);
-                            $decryptedItemIds[] = $decryptedItemId;
+                // $decryptedItemIds = [];
+                // $itemStocks = [];
+                // $kanibalStocks = [];
+                // $assetKanibalIds = [];
+                // // dd($data['selected_items']);
+                // if (isset($data['selected_items'])) {
+                //     foreach ($data['selected_items'] as $encryptedItemId) {
+                //         try {
+                //             $decryptedItemId = Crypt::decrypt($encryptedItemId['id']);
+                //             $decryptedItemIds[] = $decryptedItemId;
 
-                            if (isset($encryptedItemId['item_stock'])) {
-                                $itemStocks[$decryptedItemId] = $encryptedItemId['item_stock'];
-                            }
+                //             if (isset($encryptedItemId['item_stock'])) {
+                //                 $itemStocks[$decryptedItemId] = $encryptedItemId['item_stock'];
+                //             }
 
-                            if (isset($encryptedItemId['kanibal_stock'])) {
-                                $kanibalStocks[$decryptedItemId] = $encryptedItemId['kanibal_stock'];
-                            }
+                //             if (isset($encryptedItemId['kanibal_stock'])) {
+                //                 $kanibalStocks[$decryptedItemId] = $encryptedItemId['kanibal_stock'];
+                //             }
 
-                            if (isset($encryptedItemId['asset_kanibal_id']) && $encryptedItemId['asset_kanibal_id'] !== 'null') {
-                                $assetKanibalIds[$decryptedItemId] = str_replace('AST - ', '', $encryptedItemId['asset_kanibal_id']);
-                            }
-                        } catch (\Exception $e) {
-                            continue;
-                        }
-                    }
-                    sort($decryptedItemIds);
-                }
+                //             if (isset($encryptedItemId['asset_kanibal_id']) && $encryptedItemId['asset_kanibal_id'] !== 'null') {
+                //                 $assetKanibalIds[$decryptedItemId] = str_replace('AST - ', '', $encryptedItemId['asset_kanibal_id']);
+                //             }
+                //         } catch (\Exception $e) {
+                //             continue;
+                //         }
+                //     }
+                //     sort($decryptedItemIds);
+                // }
 
                 $schedule = InspectionSchedule::create([
                     'name' => $data['name'],
@@ -235,22 +208,23 @@ class InspectionScheduleController extends Controller
                     'urgention' => $data['urgention'],
                     'management_project_id' => $management_project_id,
                     'asset_id' => $asset_id,
-                    'werehouse_id' => $werehouse_id,
+                    // 'werehouse_id' => $werehouse_id,
                     'note' => $data['note'],
                     'location' => $data['location'],
-                    'item_id' => json_encode($decryptedItemIds) ?? null,
-                    'item_stock' => json_encode($itemStocks) ?? null,
-                    'kanibal_stock' => json_encode($kanibalStocks) ?? null,
-                    'asset_kanibal_id' => json_encode(array_filter($assetKanibalIds)) ?? null,
+                    'estimate_finish' => $data['estimate_finish'],
+                    // 'item_id' => json_encode($decryptedItemIds) ?? null,
+                    // 'item_stock' => json_encode($itemStocks) ?? null,
+                    // 'kanibal_stock' => json_encode($kanibalStocks) ?? null,
+                    // 'asset_kanibal_id' => json_encode(array_filter($assetKanibalIds)) ?? null,
                 ]);
 
-                foreach ($decryptedItemIds as $itemId) {
-                    $item = Item::findOrFail($itemId);
+                // foreach ($decryptedItemIds as $itemId) {
+                //     $item = Item::findOrFail($itemId);
 
-                    if (isset($itemStocks[$itemId])) {
-                        $item->decrement('stock', $itemStocks[$itemId]);
-                    }
-                };
+                //     if (isset($itemStocks[$itemId])) {
+                //         $item->decrement('stock', $itemStocks[$itemId]);
+                //     }
+                // };
 
                 return response()->json([
                     'status' => true,
@@ -526,5 +500,46 @@ class InspectionScheduleController extends Controller
             'status' => $before->status ?? null,
             'maintenance' => $maintenance,
         ]);
+    }
+
+    public function importForm()
+    {
+        return view('main.inspection_schedule.inspection.import');
+    }
+
+    public function importExcel(Request $request)
+    {
+        try {
+            if (!$request->hasFile('excel_file')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No file uploaded!'
+                ], 400);
+            }
+
+            $file = $request->file('excel_file');
+            Excel::import(new ImportInspectionSchedule, $file);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data imported successfully!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error processing file: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function exportExcel()
+    {
+        $fileName = 'Inspection Schedule' . now()->format('Ymd_His') . '.xlsx';
+        $data = InspectionSchedule::when(session('selected_project_id'), function ($query) {
+            $query->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+        })
+        ->get();
+
+        return Excel::download(new ExportInspectionSchedule($data), $fileName);
     }
 }

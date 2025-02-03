@@ -24,8 +24,8 @@
 @endpush
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y">
-        <div class="d-flex justify-content-end mb-3 gap-2">
+    <div class="mx-5 flex-grow-1 container-p-y">
+        <div class="d-flex justify-content-end mb-3 gap-3">
             <!-- Tombol Hapus Masal -->
             {{-- <button type="button" class="btn btn-danger btn-sm" id="delete-btn"
                 style="display: none !important;">
@@ -33,8 +33,15 @@
             </button> --}}
             @if (!auth()->user()->hasRole('Read only'))
                 @if (auth()->user()->hasPermissionTo('inspection-schedule-create'))
-                    <button type="button" class="btn btn-primary btn-md btn-add" onclick="createData()">
-                        <i class="fas fa-plus me-2"></i> Tambah
+                <button type="button" class="btn btn-success btn-md d-flex align-items-center btn-asset" onclick="importInspectionExcel()">
+                    <i class="fas fa-file-excel me-2"></i> Import Inspeksi
+                </button>
+
+                <button onclick="exportInspectionExcel()" class="btn btn-success btn-md btn-asset">
+                    <i class="fa-solid fa-file-excel me-2"></i>Export Inspeksi
+                </button>
+                    <button type="button" class="btn btn-primary btn-md" onclick="createData()">
+                        <i class="fas fa-plus"></i> Tambah
                     </button>
                 @endif
             @endif
@@ -67,6 +74,15 @@
                     </thead>
                 </table>
             </div>
+        </div>
+        <div class="d-flex justify-content-end mb-3 gap-3">
+            <button type="button" class="btn btn-success btn-md d-flex align-items-center btn-asset" onclick="importMaintenanceExcel()">
+                <i class="fas fa-file-excel me-2"></i> Import Maintenance
+            </button>
+
+            <button onclick="exportMaintenanceExcel()" class="btn btn-success btn-md btn-asset">
+                <i class="fa-solid fa-file-excel me-2"></i>Export Maintenance
+            </button>
         </div>
         <div class="card app-calendar-wrapper">
             <div class="row g-0">
@@ -175,6 +191,16 @@
             <div class="modal-dialog modal-xl modal-simple">
                 <div class="modal-content p-3 p-md-5">
                     <div class="modal-body" id="content-modal-ce">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modal-ce-maintenance" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-simple">
+                <div class="modal-content p-3 p-md-5">
+                    <div class="modal-body" id="content-modal-ce-maintenance">
 
                     </div>
                 </div>
@@ -378,9 +404,11 @@
                     type: 'GET',
                 })
                 .done(function(data) {
-                    $('#content-modal-ce').html(data);
+                    $('#content-modal-ce-maintenance').html(data);
+                    console.log(data);
+                    
 
-                    $("#modal-ce").modal("show");
+                    $("#modal-ce-maintenance").modal("show");
                 })
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
@@ -393,9 +421,9 @@
                     type: 'GET',
                 })
                 .done(function(data) {
-                    $('#content-modal-ce').html(data);
+                    $('#content-modal-ce-maintenance').html(data);
 
-                    $("#modal-ce").modal("show");
+                    $("#modal-ce-maintenance").modal("show");
                 })
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
@@ -466,6 +494,48 @@
                         });
                 }
             });
+        }
+
+        function importInspectionExcel() {
+            $.ajax({
+                    url: "{{ route('inspection-schedule.import.form') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+                });
+        }
+
+        function importMaintenanceExcel() {
+            $.ajax({
+                    url: "{{ route('maintenances.import.form') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+                });
+        }
+
+        function exportInspectionExcel() {
+            var url = "{{ route('inspection-schedule.export-excel') }}";
+
+            window.open(url);
+        }
+
+        function exportMaintenanceExcel() {
+            var url = "{{ route('maintenances.export-excel') }}";
+
+            window.open(url);
         }
     </script>
     <script>

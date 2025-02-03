@@ -100,6 +100,7 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::get('/asset/depreciation-data', [AssetController::class, 'getDepreciationData'])->name('asset.depreciation-data');
     Route::get('/asset/status-data', [AssetController::class, 'getStatusData'])->name('asset.statusData');
     Route::get('/asset/data', [AssetController::class, 'data'])->name('asset.data');
+    Route::get('/asset/by-category/data', [AssetController::class, 'dataGroupedByCategory'])->name('asset.dataGroupedByCategory');
     Route::get('/asset/by-category', [AssetController::class, 'getDataGroupedByCategory'])->name('asset.getDataGroupedByCategory');
     Route::delete('/asset/destroy-all', [AssetController::class, 'destroyAll'])->name('asset.destroyAll');
     Route::resource('asset', AssetController::class);
@@ -155,6 +156,9 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/werehouse/destroy-all', [WerehouseController::class, 'destroyAll'])->name('werehouse.destroyAll');
     Route::resource('werehouse', WerehouseController::class);
 
+    Route::get('/inspection-schedule/import', [InspectionScheduleController::class, 'importForm'])->name('inspection-schedule.import.form');
+    Route::get('/inspection-schedule/export-excel', [InspectionScheduleController::class, 'exportExcel'])->name('inspection-schedule.export-excel');
+    Route::post('/inspection-schedule/import', [InspectionScheduleController::class, 'importExcel'])->name('inspection-schedule.import');
     Route::get('/inspection-schedule/get-status-last', [InspectionScheduleController::class, 'getStatusLast'])->name('inspection-schedule.get_status_last');
     Route::get('/inspection-schedule/get-selected-items', [InspectionScheduleController::class, 'getSelectedItems'])->name('get.selected.items');
     Route::post('/inspection-schedule/remove-item-session', [InspectionScheduleController::class, 'removeItemFromSession'])->name('remove.item.session');
@@ -167,11 +171,16 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     })->name('quiz');
     Route::delete('/inspection-schedule/destroy-all', [InspectionScheduleController::class, 'destroyAll'])->name('inspection-schedule.destroyAll');
 
+    Route::get('/maintenances/import', [MaintenanceController::class, 'importForm'])->name('maintenances.import.form');
+    Route::get('/maintenances/export-excel', [MaintenanceController::class, 'exportExcel'])->name('maintenances.export-excel');
+    Route::post('/maintenances/import', [MaintenanceController::class, 'importExcel'])->name('maintenances.import');
+    Route::get('/maintenances/status-data', [MaintenanceController::class, 'maintenanceStatus'])->name('maintenances.maintenanceStatus');
     Route::get('/maintenances/data', [MaintenanceController::class, 'data'])->name('maintenances.data');
     Route::delete('/maintenances/destroy-all', [MaintenanceController::class, 'destroyAll'])->name('maintenances.destroyAll');
     Route::resource('maintenances', MaintenanceController::class);
 
     Route::get('/fuel/export-excel', [FuelConsumptionController::class, 'exportExcel'])->name('fuel.export-excel');
+    Route::get('/fuel/sum-fuel', [FuelConsumptionController::class, 'sumFuelConsumption'])->name('fuel.sumFuelConsumption');
     Route::post('/fuel/import-excel', [FuelConsumptionController::class, 'importExcel'])->name('fuel.import-excel');
     Route::get('/fuel/import', [FuelConsumptionController::class, 'import'])->name('fuel.import');
     Route::get('/fuel/data', [FuelConsumptionController::class, 'data'])->name('fuel.data');
@@ -236,6 +245,8 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::delete('/employee/destroy-all', [EmployeeController::class, 'destroyAll'])->name('employee.destroyAll');
     Route::resource('employee', EmployeeController::class);
 
+    Route::get('/loadsheet/sum-total-loadsheet', [LoadsheetController::class, 'sumTotalLoadsheet'])->name('loadsheet.sumTotalLoadsheet');
+    Route::get('/loadsheet/productivity-by-hours', [LoadsheetController::class, 'productivityByHours'])->name('loadsheet.productivityByHours');
     Route::get('/loadsheet/import', [LoadsheetController::class, 'import'])->name('loadsheet.import');
     Route::get('/loadsheet/export-excel', [LoadsheetController::class, 'exportExcel'])->name('loadsheet.export-excel');
     Route::post('/loadsheet/import-excel', [LoadsheetController::class, 'importExcel'])->name('loadsheet.import-excel');

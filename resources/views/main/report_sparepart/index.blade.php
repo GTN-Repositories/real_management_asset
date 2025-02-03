@@ -83,100 +83,6 @@
             </div>
         </div>
 
-        <div class="row g-3 text-center mb-4">
-            <div class="col-md-4">
-                <div class="card" style="height: 450px;">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="m-0 text-primary fw-bold">Vihacle</h5>
-                    </div>
-                    <div class="card-body d-flex justify-content-center">
-                        <div id="asset-status-chart" class="chart-container"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card" style="height: 450px;">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="m-0 text-primary fw-bold">Overdue and Due Soon</h5>
-                    </div>
-                    <div class="card-body d-flex justify-content-center align-items-center" style="height: 100%">
-                        <div class="d-flex gap-4">
-                            <div class="d-flex flex-column align-items-center">
-                                <h1 class="text-primary fw-bold" style="font-size: 30px;" id="overdue">
-                                    Loading...</h1>
-                                <h3 class="text-muted">Overdue</h3>
-                            </div>
-                            <div class="d-flex flex-column align-items-center">
-                                <h1 class="text-muted fw-bold" style="font-size: 30px;" id="underMaintenanceSecondDay">
-                                    Loading...
-                                </h1>
-                                <h3 class="text-muted">Due Soon</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card" style="height: 450px;">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="m-0 text-primary fw-bold">Percentage</h5>
-                    </div>
-                    <div class="card-body d-flex justify-content-center align-items-center" style="height: 100%">
-                        <div class="d-flex gap-4">
-                            <div class="d-flex flex-column align-items-center">
-                                <h1 class="text-primary fw-bold" style="font-size: 30px;">
-                                    <span id="percentageItemsYear">Loading...</span>%
-                                </h1>
-                                <h3 class="text-muted">This Year</h3>
-                            </div>
-                            <div class="d-flex flex-column align-items-center">
-                                <h1 class="text-primary fw-bold" style="font-size: 30px;">
-                                    <span id="percentageItemsWeek">Loading...</span>%
-                                </h1>
-                                <h3 class="text-muted">This Week</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row row-rgb">
-            <div class="col-12 col-md-6 col-lg-3" style="">
-                <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #D59A01;">
-                    <h4 class="text-white card-title m-0 fw-bold">Scheduled</h4>
-                </div>
-                <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(213, 153, 1, 0.35); text-align: end;">
-                    <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="scheduled">Loading...</h5>
-                </div>
-            </div>            
-            <div class="col-12 col-md-6 col-lg-3" style="">
-                <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #7F2DE8;">
-                    <h4 class="text-white card-title m-0 fw-bold">In Progress</h4>
-                </div>
-                <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(127, 45, 232, 0.35); text-align: end;">
-                    <h5 class="text-white card-title p-1 p-lg-4 m-0 fw-bold" id="inProgress">Loading...</h5>
-                </div>
-            </div>            
-            <div class="col-12 col-md-6 col-lg-3" style="">
-                <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #01A5DB;">
-                    <h4 class="text-white card-title m-0 fw-bold">On Hold</h4>
-                </div>
-                <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(1, 165, 219, 0.35); text-align: end;">
-                    <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="onHold">Loading...</h5>
-                </div>
-            </div>
-            <div class="col-12 col-md-6 col-lg-3" style="">
-                <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #3BBF56;">
-                    <h4 class="text-white card-title m-0 fw-bold">Finished</h4>
-                </div>
-                <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(59, 191, 86, 0.35); text-align: end;">
-                    <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="finish">Loading...</h5>
-                </div>
-            </div>
-        </div>
-
         <!-- Product List Table -->
         <div class="card my-3">
             <div class="card-header">
@@ -256,7 +162,6 @@
             init_table_asset();
             init_table_project();
             init_stock_category_chart();
-            initAssetStatusChart();
 
             $('.dropdown-item').on('click', function(e) {
                 e.preventDefault();
@@ -290,25 +195,6 @@
                 $(this).val('');
                 reloadTableWithFilters(); // Reload without date range
                 reloadSparepartChart();
-            });
-
-            $.ajax({
-                url: "{{ route('report-sparepart.maintenance-status') }}",
-                type: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    $('#scheduled').text(data.scheduled);
-                    $('#inProgress').text(data.inProgress);
-                    $('#onHold').text(data.onHold);
-                    $('#finish').text(data.finish);
-                    $('#overdue').text(data.overdue);
-                    $('#underMaintenanceSecondDay').text(data.underMaintenanceSecondDay);
-                    $('#percentageItemsYear').text(data.percentageItemsYear);
-                    $('#percentageItemsWeek').text(data.percentageItemsWeek);
-                },
-                error: function(xhr, status, error) {
-                    console.log(xhr.responseText);
-                }
             });
         });
 
@@ -448,63 +334,6 @@
                     },
                 ]
             });
-        }
-
-        function initAssetStatusChart() {
-            $.ajax({
-                url: "{{ route('report-sparepart.asset-status') }}",
-                method: 'GET',
-                success: function(response) {
-                    var options = {
-                        series: response.series,
-                        chart: {
-                            type: 'donut',
-                            height: 350,
-                        },
-                        plotOptions: {
-                            pie: {
-                                donut: {
-                                    labels: {
-                                        show: true,
-                                        total: {
-                                            show: true,
-                                            label: 'Total',
-                                            formatter: function(w) {
-                                                return w.globals.seriesTotals.reduce((a, b) => a + b,
-                                                    0);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        dataLabels: {
-                            enabled: false
-                        },
-                        legend: {
-                            position: 'bottom'
-                        },
-                        title: {
-                            text: 'Asset Status',
-                            align: 'center'
-                        },
-                        colors: ['#FABE29', '#134B70'],
-                        labels: ['Asset Maintenance', 'Asset Other', ]
-                    };
-
-                    var assetStatusChart = new ApexCharts(
-                        document.querySelector("#asset-status-chart"),
-                        options
-                    );
-                    assetStatusChart.render();
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching asset status data:', error);
-                    document.querySelector("#asset-status-chart").innerHTML =
-                        '<div class="alert alert-danger">Failed to load asset status chart data. Please try again later.</div>';
-                }
-            });
-
         }
 
         let stockCategoryChart;
