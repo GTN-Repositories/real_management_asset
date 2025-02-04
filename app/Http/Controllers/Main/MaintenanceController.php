@@ -210,7 +210,7 @@ class MaintenanceController extends Controller
 
     public function update(Request $request, string $id)
     {
-        try {
+        // try {
             return $this->atomic(function () use ($request, $id) {
                 $maintenance = Maintenance::findByEncryptedId($id);
                 $schedule = InspectionSchedule::find($maintenance->inspection_schedule_id);
@@ -272,6 +272,37 @@ class MaintenanceController extends Controller
                 $maintenance->urgention = $request->get('urgention');
                 $maintenance->save();
 
+                MaintenanceSparepart::where('maintenance_id', Crypt::decrypt($maintenance->id))->update([
+                    'warehouse_id' => Crypt::decrypt($request['werehouse_id']),
+                ]);
+
+                if (isset($request['selected_items'])) {
+                    foreach ($request['selected_items'] as $key => $value) {
+                        $item_id = Crypt::decrypt($value['id']);
+                        $asset_kanibal_id = null;
+                        if ($value['asset_kanibal_id'] != "null") {
+                            $asset_kanibal_id = str_replace('AST - ', '', $value['asset_kanibal_id']);
+                        }
+                        $quantity = $value['item_stock'] ?? $value['kanibal_stock'];
+
+                        // dd($item_id, $asset_kanibal_id, $quantity);
+                        MaintenanceSparepart::create([
+                            'maintenance_id' => Crypt::decrypt($maintenance->id),
+                            'warehouse_id' => Crypt::decrypt($request['werehouse_id']),
+                            'item_id' => $item_id,
+                            'asset_id' => $asset_kanibal_id,
+                            'quantity' => (int)$quantity,
+                            'type' => ($asset_kanibal_id != null) ? 'Replacing' : 'Stock',
+                        ]);
+
+                        $item = Item::findOrFail($item_id);
+        
+                        if (isset($value['item_stock'])) {
+                            $item->decrement('stock', $value['item_stock']);
+                        }
+                    }
+                }
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Status berhasil diperbarui!',
@@ -279,12 +310,12 @@ class MaintenanceController extends Controller
 
                 return redirect()->back()->with('success', 'Status berhasil diperbarui!');
             });
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data gagal diperbarui! ' . $th->getMessage(),
-            ], 500);
-        }
+        // } catch (\Throwable $th) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'Data gagal diperbarui! ' . $th->getMessage(),
+        //     ], 500);
+        // }
     }
 
     public function maintenanceStatus()
@@ -306,7 +337,7 @@ class MaintenanceController extends Controller
 
 
             $data[] = [
-                'name' => 'AST - '. Crypt::decrypt($value->id) . ' - ' . $value->name,
+                'name' => 'AST - '. Crypt::decrypt($value->id) . ' - ' . $value->name. ' - ' . $value->serial_number,
                 'status' => $value->status,
                 'total' => $total,
             ];
