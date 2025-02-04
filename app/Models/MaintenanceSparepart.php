@@ -17,4 +17,9 @@ class MaintenanceSparepart extends Model
     {
         return $this->belongsTo(Item::class, 'item_id', 'id');
     }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Werehouse::class, 'warehouse_id', 'id');
+    }
 }

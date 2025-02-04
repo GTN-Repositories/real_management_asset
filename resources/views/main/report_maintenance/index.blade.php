@@ -174,7 +174,10 @@
                     @endphp
                     @foreach ($dataByDate as $item)
                         <tr>
-                            <td>{{ 'AST - '.$item['asset_id'] }}</td>
+                            @php
+                                $asset = \App\Models\Asset::find($item['asset_id']);
+                            @endphp
+                            <td>{{ 'AST - '.$item['asset_id']. ' - ' . ($asset->name ?? null) . ' - ' . ($asset->serial_number ?? '-') }}</td>
                             @foreach ($item['data'] as $value)
                                 <td style="background-color: {{ $color[$value] ?? '#FFFFFF' }}; color: {{ ($value == 'Uncertain') ? '#000000' : '#FFFFFF' }};" class="text-center">{{ $value }}</td>
                             @endforeach

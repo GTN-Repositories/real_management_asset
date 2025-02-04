@@ -25,7 +25,6 @@ class ImportInspectionSchedule implements ToModel, WithHeadingRow
                 $project = ManagementProject::where('name', $row['nama_project'] ?? '')->first();
 
                 if ($employee && $project && $asset_id) {
-                    dd($row);
                     $data = [
                         'name' => $row['name'],
                         'type' => $row['type'],

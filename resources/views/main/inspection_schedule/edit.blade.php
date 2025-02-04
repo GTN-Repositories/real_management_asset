@@ -53,7 +53,7 @@
         </div>
     </div>
 
-    <div class="col-12" id="selectWerehouse">
+    {{-- <div class="col-12" id="selectWerehouse">
         <label for="werehouse_id" class="form-label">Gudang</label>
         <select id="werehouse_id" class="form-select" name="werehouse_id" disabled>
             @if ($data->werehouse)
@@ -95,7 +95,7 @@
                 @endforeach
             </tbody>
         </table>
-    </div>
+    </div> --}}
 
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-2">Simpan</button>
