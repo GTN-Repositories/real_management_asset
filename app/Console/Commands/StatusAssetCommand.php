@@ -46,7 +46,7 @@ class StatusAssetCommand extends Command
 
         foreach ($asset as $key => $asset_id) {
             $maintenance = InspectionSchedule::where('asset_id', Crypt::decrypt($asset_id))->where('status', '!=', 'RFU')->orderBy('date', 'desc')->first();
-            $daysDiff = Carbon::now()->diffInDays(Carbon::parse($maintenance->date));
+            $daysDiff = round(Carbon::parse($maintenance->date)->diffInDays(now()));
 
             // CONDITION RINGAN, SEDANG, BERAT
             if ($daysDiff <= $ringan['max']) {
