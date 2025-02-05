@@ -449,7 +449,7 @@
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
             // Ekspor workbook ke file Excel
-            XLSX.writeFile(workbook, 'data-export.xlsx');
+            XLSX.writeFile(workbook, 'Asset Maintenance History by Category {{ \Carbon\Carbon::parse((int)$year."-".(int)$month."-01")->format("F Y") }}.xlsx');
         }
 
         function init_table() {
