@@ -12,18 +12,21 @@
     <div class="col-12 col-md-12">
         <label class="form-label">Judul Maintenance</label>
         <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" value="{{ old('name', $maintenance->name) }}" required disabled />
+            placeholder="Masukan Nama Item" value="{{ old('name', $maintenance->name) }}" required  />
+            {{-- DISABLED --}}
     </div>
 
     <div class="col-12 col-md-6">
         <label class="form-label">Tanggal</label>
-        <input type="date" name="date" id="date" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Tanggal" value="{{ old('date', $maintenance->date) }}" required disabled />
+        <input type="datetime-local" name="date" id="date" class="form-control mb-3 mb-lg-0"
+            placeholder="Masukan Tanggal" value="{{ old('date', $maintenance->date) }}" required  />
+            {{-- DISABLED --}}
     </div>
 
     <div class="col-12 col-md-6">
         <label for="exampleFormControlSelect1" class="form-label">Jenis Maintenance</label>
-        <select class="form-select" id="exampleFormControlSelect1" name="type" aria-label="Select Type" disabled>
+        <select class="form-select" id="exampleFormControlSelect1" name="type" aria-label="Select Type" >
+            {{-- DISABLED --}}
             <option value="p2h" {{ $data->type == 'p2h' ? 'selected' : '' }}>P2H</option>
             <option value="pm" {{ $data->type == 'pm' ? 'selected' : '' }}>PM</option>
         </select>
@@ -31,7 +34,8 @@
 
     <div class="col-12" id="selectAsset">
         <label for="asset_id" class="form-label">Plat Nomor</label>
-        <select id="asset_id" class="form-select" name="asset_id" disabled>
+        <select id="asset_id" class="form-select" name="asset_id" >
+            {{-- DISABLED --}}
             @if ($data->asset)
                 <option value="{{ encrypt($data->asset_id) }}" selected>
                     {{ $data->asset->license_plate . ' - ' . $data->asset->name . ' - ' . $data->asset->asset_number }}
@@ -45,14 +49,16 @@
         <label class="form-label">Workshop</label>
         <input type="text" name="workshop" id="workshop" class="form-control mb-3 mb-lg-0"
             placeholder="Masukan Nama Workshop" value="{{ old('workshop', $maintenance->workshop) }}" required
-            disabled />
+             />
+             {{-- DISABLED --}}
     </div>
 
     <div class="col-12 col-md-6">
         <label class="form-label">Mekanik</label>
         <input type="text" name="employee_id" id="employee_id" class="form-control mb-3 mb-lg-0"
             placeholder="Masukan Nama Mekanik" value="{{ old('employee_id', $maintenance->employee_id) }}" required
-            disabled />
+             />
+             {{-- DISABLED --}}
     </div>
 
     <div class="col-12 col-md-12">
@@ -97,7 +103,7 @@
     <div class="col-12 col-md-6" id="delay_hours_form">
         <label class="form-label">Delay (Strt-Bd) (hrs)</label>
         <input type="number" name="delay_hours" value="{{ $maintenance->delay_hours }}" id="delay_hours"
-            class="form-control mb-3 mb-lg-0" placeholder="Masukan Delay (Strt-Bd) (hrs)" />
+            class="form-control mb-3 mb-lg-0" placeholder="Masukan Delay (Strt-Bd) (hrs)" disabled/>
     </div>
 
     <div class="col-12 col-md-6" id="start_maintenace_form">
@@ -115,8 +121,8 @@
 
     <div class="col-12 col-md-6" id="deviasi_form">
         <label class="form-label">Deviasi</label>
-        <input type="datetime-local" name="deviasi" value="{{ $maintenance->deviasi }}" id="deviasi"
-            class="form-control mb-3 mb-lg-0" placeholder="Masukan Deviasi" />
+        <input type="number" name="deviasi" value="{{ $maintenance->deviasi }}" id="deviasi"
+            class="form-control mb-3 mb-lg-0" placeholder="Masukan Deviasi" disabled/>
     </div>
 
     <div class="col-12 col-md-6" id="finish_at_form">
@@ -127,13 +133,13 @@
 
     <div class="col-12 col-md-6" id="hm_form">
         <label class="form-label">HM</label>
-        <input type="text" name="hm" value="{{ $maintenance->hm }}" id="hm"
+        <input type="number" name="hm" value="{{ $maintenance->hm }}" id="hm"
             class="form-control mb-3 mb-lg-0" placeholder="Masukan HM" />
     </div>
 
     <div class="col-12 col-md-6" id="km_form">
         <label class="form-label">KM</label>
-        <input type="text" name="km" value="{{ $maintenance->km }}" id="km"
+        <input type="number" name="km" value="{{ $maintenance->km }}" id="km"
             class="form-control mb-3 mb-lg-0" placeholder="Masukan KM" />
     </div>
 
@@ -157,9 +163,10 @@
 
     <div class="col-12 col-md-6" id="urgention_form">
         <label class="form-label">Jenis Kerusakan</label>
-        <select name="urgention" id="urgention" class="form-select select2">
-            <option value="Major">Major</option>
-            <option value="Minor">Minor</option>
+        <select name="urgention" id="urgention" class="form-select select2" required>
+            <option value="" selected disabled>Pilih Jenis Kerusakan</option>
+            <option value="Minor" {{ $maintenance->urgention == 'Minor' ? 'selected' : '' }}>Minor</option>
+            <option value="Major" {{ $maintenance->urgention == 'Major' ? 'selected' : '' }}>Major</option>
         </select>
     </div>
 
