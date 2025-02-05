@@ -165,44 +165,10 @@ class MaintenanceController extends Controller
             $maintenance = Maintenance::findByEncryptedId($id);
             $data = InspectionSchedule::find($maintenance->inspection_schedule_id);
 
-            $itemIds = is_array(json_decode($data->item_id, true))
-                ? json_decode($data->item_id, true)
-                : [];
-
-            $itemStocks = is_array(json_decode($data->item_stock, true))
-                ? json_decode($data->item_stock, true)
-                : [];
-
-            $kanibalStocks = is_array(json_decode($data->kanibal_stock, true))
-                ? json_decode($data->kanibal_stock, true)
-                : [];
-
-            $assetKanibalIds = is_array(json_decode($data->asset_kanibal_id, true))
-                ? json_decode($data->asset_kanibal_id, true)
-                : [];
-
-            $items = Item::whereIn('id', $itemIds)->get()->map(function ($item) use ($itemStocks, $kanibalStocks, $assetKanibalIds) {
-                $itemId = (string) Crypt::decrypt($item->id);
-
-                $asset_id = $assetKanibalIds[$itemId] ?? 0;
-                $item->stock_in_schedule = $itemStocks[$itemId] ?? 0;
-                $item->kanibal_stock_in_schedule = $kanibalStocks[$itemId] ?? 0;
-                $item->assetKanibalName = isset($assetKanibalIds[$itemId])
-                    ?  $asset_id . ' - ' . Asset::find($assetKanibalIds[$itemId] ?? 0)->name . ' - ' . Asset::find($assetKanibalIds[$itemId] ?? 0)->license_plate
-                    : '-';
-
-                return $item;
-            });
-
-            // foreach ($assetKanibalIds as $key => $value) {
-            //     $asset = Asset::find($value['id']);
-            //     $value['name'] = $asset->id . ' - ' . $asset->name . ' - ' . $asset->asset_number;
-            // }
-
             $comments = InspectionComment::where('inspection_schedule_id', Crypt::decrypt($data->id))->get();
             $maintenanceSparepart = MaintenanceSparepart::where('maintenance_id', Crypt::decrypt($id))->get();
 
-            return view('main.inspection_schedule.edit-maintenance', compact('data', 'maintenance', 'items', 'comments', 'assetKanibalIds', 'maintenanceSparepart'));
+            return view('main.inspection_schedule.edit-maintenance', compact('data', 'maintenance', 'comments', 'maintenanceSparepart'));
         } catch (\Exception $e) {
             return back()->with('error', 'Error loading data: ' . $e->getMessage());
         }
@@ -234,6 +200,7 @@ class MaintenanceController extends Controller
                         'asset_id' => Crypt::decrypt($asset->id),
                         'status_before' => $statusBefore,
                         'status_after' => $asset->status,
+                        'type' => ($asset->status == 'RFU' || $asset->status == 'Scrap' ||  $asset->status == 'Aktif') ? 'maintenance' : null,
                     ]);
 
                     // SEND EMAIL
@@ -255,13 +222,21 @@ class MaintenanceController extends Controller
                     ]);
                 }
 
+                $startMaintenance = Carbon::parse($request->get('start_maintenace'));
+                $endMaintenance = Carbon::parse($request->get('end_maintenace'));
+                $deviasi = $startMaintenance->diffInHours($endMaintenance);
+
+                $start_date = Carbon::parse($maintenance->date);
+                $end_rfu = Carbon::parse($request->get('finish_at'));
+                $delay = $start_date->diffInHours($end_rfu);
+
                 $maintenance->code_delay = $request->get('code_delay');
                 $maintenance->delay_reason = $request->get('delay_reason');
                 $maintenance->estimate_finish = $request->get('estimate_finish');
-                $maintenance->delay_hours = $request->get('delay_hours');
+                $maintenance->delay_hours = $delay;
                 $maintenance->start_maintenace = $request->get('start_maintenace');
                 $maintenance->end_maintenace = $request->get('end_maintenace');
-                $maintenance->deviasi = $request->get('deviasi');
+                $maintenance->deviasi = $deviasi;
                 $maintenance->finish_at = $request->get('finish_at');
                 $maintenance->hm = $request->get('hm');
                 $maintenance->km = $request->get('km');
@@ -272,6 +247,7 @@ class MaintenanceController extends Controller
                 $maintenance->urgention = $request->get('urgention');
                 $maintenance->save();
 
+                
                 MaintenanceSparepart::where('maintenance_id', Crypt::decrypt($maintenance->id))->update([
                     'warehouse_id' => Crypt::decrypt($request['werehouse_id']),
                 ]);
@@ -392,8 +368,10 @@ class MaintenanceController extends Controller
     public function exportExcel()
     {
         $fileName = 'Maintenance ' . now()->format('Ymd_His') . '.xlsx';
-        $data = Maintenance::when(session('selected_project_id'), function ($query) {
-            $query->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+        $data = Maintenance::whereHas('inspection_schedule', function ($query) {
+            if (session('selected_project_id')) {
+                $query->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+            }
         })
         ->get();
 
