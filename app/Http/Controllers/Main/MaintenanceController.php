@@ -368,8 +368,10 @@ class MaintenanceController extends Controller
     public function exportExcel()
     {
         $fileName = 'Maintenance ' . now()->format('Ymd_His') . '.xlsx';
-        $data = Maintenance::when(session('selected_project_id'), function ($query) {
-            $query->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+        $data = Maintenance::whereHas('inspection_schedule', function ($query) {
+            if (session('selected_project_id')) {
+                $query->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+            }
         })
         ->get();
 
