@@ -31,7 +31,7 @@
 
     <div class="col-12 col-md-6">
         <label class="form-label">Tanggal</label>
-        <input type="date" name="date" id="date" class="form-control mb-3 mb-lg-0" placeholder="Masukan data"
+        <input type="datetime-local" name="date" id="date" class="form-control mb-3 mb-lg-0" placeholder="Masukan data"
             value="{{ date('Y-m-d') }}" required />
     </div>
 

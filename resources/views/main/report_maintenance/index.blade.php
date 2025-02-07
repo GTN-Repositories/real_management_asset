@@ -174,7 +174,10 @@
                     @endphp
                     @foreach ($dataByDate as $item)
                         <tr>
-                            <td>{{ 'AST - '.$item['asset_id'] }}</td>
+                            @php
+                                $asset = \App\Models\Asset::find($item['asset_id']);
+                            @endphp
+                            <td>{{ 'AST - '.$item['asset_id']. ' - ' . ($asset->name ?? null) . ' - ' . ($asset->serial_number ?? '-') }}</td>
                             @foreach ($item['data'] as $value)
                                 <td style="background-color: {{ $color[$value] ?? '#FFFFFF' }}; color: {{ ($value == 'Uncertain') ? '#000000' : '#FFFFFF' }};" class="text-center">{{ $value }}</td>
                             @endforeach
@@ -446,7 +449,7 @@
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
             // Ekspor workbook ke file Excel
-            XLSX.writeFile(workbook, 'data-export.xlsx');
+            XLSX.writeFile(workbook, 'Asset Maintenance History by Category {{ \Carbon\Carbon::parse((int)$year."-".(int)$month."-01")->format("F Y") }}.xlsx');
         }
 
         function init_table() {

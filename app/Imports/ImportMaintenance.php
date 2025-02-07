@@ -28,7 +28,7 @@ class ImportMaintenance implements ToModel, WithHeadingRow
                         'date' => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['date'] ?? ''),
                         'workshop' => $row['workshop'],
                         'inspection_schedule_id' => $inspection_schedule_id,
-                        'employee_id' => json_encode($row['mekanik']),
+                        'employee_id' => json_encode([$row['mekanik']]),
                         'status' => $row['status'],
                         'code_delay' => $row['code_delay'],
                         'delay_reason' => $row['delay_reason'],
@@ -46,23 +46,44 @@ class ImportMaintenance implements ToModel, WithHeadingRow
                         'urgention' => $row['urgention'],
                         'pic' => $row['pic'],
                     ];
-    
-                    $maintenance = new Maintenance($data);
+                    // dd($data);
+                    $maintenance = Maintenance::create($data);
 
                     $warehouse = Werehouse::where('name', $row['warehouse'] ?? '')->first();
 
-                    $dataSparepart = [
-                        'maintenance_id' => Crypt::decrypt($maintenance->id),
-                        'warehouse_id' => Crypt::decrypt($warehouse->id),
-                        'item_id' => $row['item_id'],
-                        'asset_id' => $row['asset_id'],
-                        'quantity' => $row['quantity'],
-                        'type' => $row['type'],
-                    ];
+                    $createSparepart = false;
+                    $success = '';
+                    $i = 1;
+                    while ($createSparepart == false) {
+                        if (isset($row["item_id_$i"]) && $row["item_id_$i"] != '' && isset($row["qty_item_$i"]) && $row["qty_item_$i"] != '') {
+                            $item_id = isset($row["item_id_$i"]) ? explode('SPR-', $row["item_id_$i"])[1] ?? '' : '';
+                            $asset_id = isset($row["replacing_asset_id_$i"]) ? (int)explode('AST - ', $row["replacing_asset_id_$i"])[1] ?? null : null;
+                            $qty = $row["qty_item_$i"];
 
-                    MaintenanceSparepart::create($dataSparepart);
+                            if (isset($asset_id) && $asset_id != null) {
+                                $type = 'Replacing';
+                            } else {
+                                $type = 'Stock';
+                            }
 
-                    return TRUE;
+                            $dataSparepart = [
+                                'maintenance_id' => Crypt::decrypt($maintenance->id),
+                                'warehouse_id' => Crypt::decrypt($warehouse->id),
+                                'item_id' => $item_id,
+                                'asset_id' => $asset_id,
+                                'quantity' => $qty,
+                                'type' => $type,
+                            ];
+
+                            $success = new MaintenanceSparepart($dataSparepart);
+
+                            $i++;
+                        } else {
+                            $createSparepart = true;
+                        }
+                    }
+
+                    return $success;
                 }
             }
 

@@ -1,9 +1,9 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Import Karyawan</h3>
+    <h3 class="mb-2">Import Maintenance</h3>
     <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
-<form method="POST" class="row g-3" id="formCreate" action="{{ route('employee.import') }}" enctype="multipart/form-data">
+<form method="POST" class="row g-3" id="formCreate" action="{{ route('maintenances.import') }}" enctype="multipart/form-data">
     @csrf
 
     <div class="col-12 col-md-12">
@@ -11,7 +11,7 @@
         <input type="file" class="form-control" id="excel_file" name="excel_file" accept=".xlsx, .xls" required>
     </div>
     <div class="col-12 text-center">
-        <a href="{{ asset('assets/import/Format Import Employee.xlsx') }}" class="btn btn-info me-sm-3 me-1" download="Format Import Asset">
+        <a href="{{ asset('assets/import/Format Import Maintenance.xlsx') }}" class="btn btn-info me-sm-3 me-1" download="Format Import Maintenance">
             Download Template
         </a>
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
