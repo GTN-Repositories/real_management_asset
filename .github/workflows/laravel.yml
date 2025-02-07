@@ -28,7 +28,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /var/www/html/real
+            cd /var/www/html/management_asset
             git checkout main
             git pull origin main
             git push all main
@@ -44,7 +44,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /var/www/html/dev.real
+            cd /var/www/html/dev_management_asset
             git checkout dev
             git pull origin dev
             git push all dev
