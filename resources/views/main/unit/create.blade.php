@@ -443,7 +443,7 @@
           <div class="col-md-4">
             <div class="input-group">
               <input type="text" name="custom_field_value[]" class="form-control" placeholder="Masukkan nilai field" id="custom_field_value_${count}">
-              <button class="btn btn-danger remove-field">Hapus</button>
+              <button class="btn btn-danger remove-field"><i class="ti ti-trash ti-sm"></i></button>
             </div>
           </div>
         </div>
