@@ -1,6 +1,6 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Edit Jadwal Maintenance</h3>
+    <h3 class="mb-2">Edit Jadwal Work Order</h3>
     <p class="text-muted">Edit Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
 
