@@ -129,8 +129,9 @@
                     inspectionScheduleId: inspectionScheduleId
                 },
                 success: function(data) {
-                    console.log(data);
-
+                    var date = data.inspection_schedule.date;
+                    $('#date').val(date);
+                    
                     if (data && typeof data === 'object' && Object.keys(data).length) {
                         var assetOptions = [{
                             id: data.status,
