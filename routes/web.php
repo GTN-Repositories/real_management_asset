@@ -30,6 +30,7 @@ use App\Http\Controllers\Main\MonitoringController;
 use App\Http\Controllers\Main\NotificationController;
 use App\Http\Controllers\Main\OumController;
 use App\Http\Controllers\Main\PermisionController;
+use App\Http\Controllers\Main\Procurement\RequestOrderController;
 use App\Http\Controllers\Main\ReminderEmailController;
 use App\Http\Controllers\Main\ReportFuelController;
 use App\Http\Controllers\Main\ReportLoadsheetController;
@@ -41,6 +42,7 @@ use App\Http\Controllers\Main\SoilTypeController;
 use App\Http\Controllers\Main\StatusAssetController;
 use App\Http\Controllers\Main\SupplierController;
 use App\Http\Controllers\Main\UserController;
+use App\Http\Controllers\Main\VendorController;
 use App\Http\Controllers\Main\WerehouseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportManPowerController;
@@ -286,6 +288,19 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
 
     Route::get('/detail-notification', [NotificationController::class, 'index'])->name('notification.index');
     Route::get('/detail-notification/{id}', [NotificationController::class, 'show'])->name('notification.show');
+
+    Route::get('/vendor/import', [VendorController::class, 'importForm'])->name('vendor.import.form');
+    Route::get('/vendor/export-excel', [VendorController::class, 'exportExcel'])->name('vendor.export-excel');
+    Route::post('/vendor/import', [VendorController::class, 'importExcel'])->name('vendor.import');
+    Route::get('/vendor/data', [VendorController::class, 'data'])->name('vendor.data');
+    Route::delete('/vendor/destroy-all', [VendorController::class, 'destroyAll'])->name('vendor.destroyAll');
+    Route::resource('vendor', VendorController::class);
+
+    Route::prefix('procurement')->name('procurement.')->group(function () {
+        Route::get('/request-order/data', [RequestOrderController::class, 'data'])->name('request-order.data');
+        Route::delete('/request-order/destroy-all', [RequestOrderController::class, 'destroyAll'])->name('request-order.destroyAll');
+        Route::resource('request-order', RequestOrderController::class);
+    });
 });
 
 require __DIR__ . '/auth.php';

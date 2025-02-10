@@ -74,11 +74,11 @@
 
         <div class="d-flex justify-content-end mb-3 gap-3">
             <button type="button" class="btn btn-success btn-md d-flex align-items-center" onclick="importMaintenanceExcel()">
-                <i class="fas fa-file-excel me-2"></i> Import Maintenance
+                <i class="fas fa-file-excel me-2"></i> Import Work Order
             </button>
 
             <button onclick="exportMaintenanceExcel()" class="btn btn-success btn-md">
-                <i class="fa-solid fa-file-excel me-1"></i>Export Maintenance
+                <i class="fa-solid fa-file-excel me-1"></i>Export Work Order
             </button>
         </div>
 
@@ -92,7 +92,7 @@
                                 @if (auth()->user()->hasPermissionTo('inspection-schedule-create-maintenance'))
                                     <button class="btn btn-primary btn-toggle-sidebar" onclick="createDataMaintenance()">
                                         <i class="ti ti-plus me-1"></i>
-                                        <span class="align-middle">Tambah Maintenance</span>
+                                        <span class="align-middle">Tambah Work Order</span>
                                     </button>
                                 @endif
                             @endif

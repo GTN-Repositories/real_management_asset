@@ -1,69 +1,23 @@
 @extends('layouts.global')
 
-@section('title', 'Fuel Stock')
-@section('title_page', 'Track and Monitoring / Fuel Stock')
+@section('title', 'Request Order')
+@section('title_page', 'Procurement / Request Order')
 
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
-        <div class="row">
-            <div class="col mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="avatar me-2">
-                                <img src="{{ asset('images/truck.png') }}" alt="">
-                            </div>
-                            <strong class="mb-0 text-primary">Issued (Liter)</strong>
-                        </div>
-                        <h4 class="ms-1 mb-0 text-muted" id="total-asset">{{ number_format($data['issued_liter']) }}</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="avatar me-1">
-                                <img src="{{ asset('images/fuel.png') }}" alt="">
-                            </div>
-                            <strong class="mb-0 text-primary">Usage (Liter)</strong>
-                        </div>
-                        <h4 class="ms-1 mb-0 text-muted" id="total-fuel">{{ number_format($data['usage_liter']) }}</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="avatar me-2">
-                                <img src="{{ asset('images/productivity.png') }}" alt="">
-                            </div>
-                            <strong class="mb-0 text-primary">Balance</strong>
-                        </div>
-                        <h4 class="ms-1 mb-0 text-muted">{{ number_format($data['balance']) }}</h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Tombol Filter --}}
-        <div class="d-flex justify-content-end align-items-end mb-3 mb-4 gap-3">
+        <div class="d-flex justify-content-end align-items-end gap-3 mb-4">
+            <!-- Tombol Hapus Masal -->
             <div>
-                <label for="date-range-picker" class="form-label">filter dengan jangka waktu</label>
+                <label for="date-range-picker" class="form-label">Filter Dengan Jangka Waktu</label>
                 <input type="text" id="date-range-picker" class="form-control" placeholder="Select Date Range">
             </div>
             @if (!auth()->user()->hasRole('Read only'))
                 <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
                     <i class="fas fa-trash-alt"></i> Hapus Masal
                 </button>
-                <!-- Tombol Tambah -->
-                <button type="button" class="btn btn-primary btn-md" onclick="synchronize()">
-                    <i class="ti ti-refresh me-2"></i> Synchronize
-                </button>
-                @if (auth()->user()->hasPermissionTo('fuel-ipb-create'))
-                    <button type="button" class="btn btn-primary btn-md" onclick="createData()">
-                        <i class="fas fa-plus me-2"></i> Tambah
+                @if (auth()->user()->hasPermissionTo('item-request'))
+                    <button type="button" class="btn btn-warning btn-md" onclick="createData()">
+                        <i class="fas fa-box me-2"></i> Request Order
                     </button>
                 @endif
             @endif
@@ -79,19 +33,15 @@
                                     <input class="form-check-input" type="checkbox" id="checkAll" />
                                 </div>
                             </th>
-                            <th>Project</th>
-                            <th>date</th>
-                            <th>issued (liter)</th>
-                            <th>usage (liter)</th>
-                            <th>balance</th>
-                            <th>harga satuan</th>
-                            <th>total harga</th>
-                            {{-- <th>ppn 11%</th> --}}
-                            <th>jumlah</th>
-                            <th>fuel truck</th>
-                            <th>received by</th>
-                            <th>created by</th>
-                            <th>location</th>
+                            <th>No</th>
+                            <th>No RO</th>
+                            <th>Pengajuan Oleh</th>
+                            <th>Tanggal</th>
+                            <th>Gudang</th>
+                            <th>Tanggal Dibuat</th>
+                            <th>Total Item</th>
+                            <th>Total Harga</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -100,10 +50,9 @@
         </div>
 
         <div class="modal fade" id="modal-ce" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-simple">
+            <div class="modal-dialog modal-xl modal-simple">
                 <div class="modal-content p-3 p-md-5">
                     <div class="modal-body" id="content-modal-ce">
-
                     </div>
                 </div>
             </div>
@@ -155,26 +104,26 @@
                 const startDate = picker.startDate.format('YYYY-MM-DD');
                 const endDate = picker.endDate.format('YYYY-MM-DD');
                 $(this).val(startDate + ' - ' + endDate);
-                reloadTableWithFilters(startDate, endDate);
+                reloadTableWithFilters(startDate, endDate, '');
             });
 
             $('#date-range-picker').on('cancel.daterangepicker', function() {
                 $(this).val('');
-                reloadTableWithFilters(); // Reload without date range
+                reloadTableWithFilters();
             });
 
         });
 
         function reloadTableWithFilters(startDate = '', endDate = '', predefinedFilter = '') {
             $('#data-table').DataTable().destroy();
-            init_table(startDate, endDate, predefinedFilter);
+            init_table('', startDate, endDate, predefinedFilter);
         }
 
         $(document).on('input', '#searchData', function() {
             init_table($(this).val());
         })
 
-        function init_table(startDate = '', endDate = '', predefinedFilter = '', keyword = '') {
+        function init_table(keyword = '', startDate = '', endDate = '', predefinedFilter = '') {
             var csrf_token = $('meta[name="csrf-token"]').attr('content');
 
             var table = $('#data-table').DataTable({
@@ -188,12 +137,12 @@
 
                 ajax: {
                     type: "GET",
-                    url: "{{ route('fuel-ipb.data') }}",
+                    url: "{{ route('procurement.request-order.data') }}",
                     data: {
-                        'keyword': keyword,
-                        'startDate': startDate,
-                        'endDate': endDate,
-                        'predefinedFilter': predefinedFilter
+                        keyword: keyword,
+                        startDate: startDate,
+                        endDate: endDate,
+                        predefinedFilter: predefinedFilter
                     }
                 },
                 columns: [{
@@ -203,56 +152,40 @@
                         searchable: false
                     },
                     {
-                        data: 'management_project_id',
-                        name: 'management_project_id'
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex'
+                    },
+                    {
+                        data: 'code',
+                        name: 'code'
+                    },
+                    {
+                        data: 'created_by',
+                        name: 'created_by'
                     },
                     {
                         data: 'date',
                         name: 'date'
                     },
                     {
-                        data: 'issued_liter',
-                        name: 'issued_liter'
+                        data: 'warehouse',
+                        name: 'warehouse'
                     },
                     {
-                        data: 'usage_liter',
-                        name: 'usage_liter'
+                        data: 'created_at',
+                        name: 'created_at'
                     },
                     {
-                        data: 'balance',
-                        name: 'balance'
+                        data: 'total_item',
+                        name: 'total_item'
                     },
                     {
-                        data: 'unit_price',
-                        name: 'unit_price'
+                        data: 'total_price',
+                        name: 'total_price'
                     },
                     {
-                        data: 'total_harga',
-                        name: 'total_harga'
-                    },
-                    // {
-                    //     data: 'ppn',
-                    //     name: 'ppn'
-                    // },
-                    {
-                        data: 'jumlah',
-                        name: 'jumlah'
-                    },
-                    {
-                        data: 'fuel_truck',
-                        name: 'fuel_truck'
-                    },
-                    {
-                        data: 'employee_id',
-                        name: 'employee_id'
-                    },
-                    {
-                        data: 'user_id',
-                        name: 'user_id'
-                    },
-                    {
-                        data: 'location',
-                        name: 'location'
+                        data: 'status',
+                        name: 'status'
                     },
                     {
                         data: 'action',
@@ -281,7 +214,7 @@
                         '_method': 'DELETE',
                     };
                     $.ajax({
-                            url: "{{ route('fuel-ipb.destroy', ':id') }}".replace(':id', id),
+                            url: "{{ route('procurement.request-order.destroy', ':id') }}".replace(':id', id),
                             type: 'POST',
                             data: postForm,
                             dataType: 'json',
@@ -314,7 +247,7 @@
                         'ids': ids
                     };
                     $.ajax({
-                            url: "{{ route('fuel-ipb.destroyAll') }}",
+                            url: "{{ route('procurement.request-order.destroyAll') }}",
                             type: 'POST',
                             data: postForm,
                             dataType: 'json',
@@ -332,7 +265,7 @@
 
         function createData() {
             $.ajax({
-                    url: "{{ route('fuel-ipb.create') }}",
+                    url: "{{ route('procurement.request-order.create') }}",
                     type: 'GET',
                 })
                 .done(function(data) {
@@ -346,8 +279,9 @@
         }
 
         function editData(id) {
+
             $.ajax({
-                    url: "{{ route('fuel-ipb.edit', ':id') }}".replace(':id', id),
+                    url: "{{ route('procurement.request-order.edit', ':id') }}".replace(':id', id),
                     type: 'GET',
                 })
                 .done(function(data) {
@@ -360,17 +294,31 @@
                 });
         }
 
-        function synchronize() {
+        function showData(id) {
             $.ajax({
-                    url: "{{ route('fuel-ipb.synchronize') }}",
+                    url: "{{ route('procurement.request-order.show', ':id') }}".replace(':id', id),
                     type: 'GET',
                 })
                 .done(function(data) {
-                    Swal.fire('Synchronize!', data['message'], 'success');
-                    $('#data-table').DataTable().ajax.reload();
+                    window.location.href = "{{ route('procurement.request-order.show', ':id') }}".replace(':id', id);
                 })
                 .fail(function() {
-                    Swal.fire('Error!', 'An error occurred while deleting the record.', 'error');
+                    Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
+                });
+        }
+
+        function create(id) {
+            $.ajax({
+                    url: "{{ route('procurement.request-order.create') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
                 });
         }
     </script>

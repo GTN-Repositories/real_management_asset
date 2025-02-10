@@ -69,14 +69,14 @@
                     </div>
                 </div>
             </div>
-            <div class="card my-3">
+            {{-- <div class="card my-3">
                 <div class="card-body">
                     <h6>Fuel Price Over Time</h6>
                     <div id="price-chart-section" class="chart-container">
                         <!-- Price chart will be rendered here dynamically -->
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
 
         <!-- Product List Table -->
@@ -270,23 +270,39 @@
                 },
                 success: function(response) {
                     // Render the scorecard
+
+                    // <div class="col-6 col-md-3">
+                    //     <div class="card h-100">
+                    //         <div class="card-body">
+                    //             <div class="d-flex align-items-center mb-2">
+                    //                 <div class="avatar me-2">
+                    //                     <img src="{{ asset('images/truck.png') }}" alt="">
+                    //                 </div>
+                    //                 <strong class="mb-0 text-primary">Avg Per Day</strong>
+                    //             </div>
+                    //             <h4 class="ms-1 mb-0 text-muted">${response.avgPerDay ? response.avgPerDay.toFixed(2) : '0'} Liters
+                    //             </h4>
+                    //         </div>
+                    //     </div>
+                    // </div>
+                    // <div class="col-6 col-md-3">
+                    //     <div class="card h-100">
+                    //         <div class="card-body">
+                    //             <div class="d-flex align-items-center mb-2">
+                    //                 <div class="avatar me-2">
+                    //                     <img src="{{ asset('images/productivity.png') }}" alt="">
+                    //                 </div>
+                    //                 <strong class="mb-0 text-primary">Avg Per Liter</strong>
+                    //             </div>
+                    //             <h4 class="ms-1 mb-0 text-muted">${response.avgPerLiter ?
+                    //                 response.avgPerLiter.toLocaleString('id-ID', { style:
+                    //                 'currency', currency: 'IDR' }) : 'Rp0'}</h4>
+                    //         </div>
+                    //     </div>
+                    // </div>
                     const scorecard = `
                     <div class="row g-3">
     <div class="row g-3">
-        <div class="col-6 col-md-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="avatar me-2">
-                            <img src="{{ asset('images/truck.png') }}" alt="">
-                        </div>
-                        <strong class="mb-0 text-primary">Avg Per Day</strong>
-                    </div>
-                    <h4 class="ms-1 mb-0 text-muted">${response.avgPerDay ? response.avgPerDay.toFixed(2) : '0'} Liters
-                    </h4>
-                </div>
-            </div>
-        </div>
 
         <div class="col-6 col-md-3">
             <div class="card h-100">
@@ -299,21 +315,6 @@
                     </div>
                     <h4 class="ms-1 mb-0 text-muted">${response.avgPerTrip ? response.avgPerTrip.toFixed(2) : '0'}
                         Liters</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="avatar me-2">
-                            <img src="{{ asset('images/productivity.png') }}" alt="">
-                        </div>
-                        <strong class="mb-0 text-primary">Avg Per Liter</strong>
-                    </div>
-                    <h4 class="ms-1 mb-0 text-muted">${response.avgPerLiter ?
-                        response.avgPerLiter.toLocaleString('id-ID', { style:
-                        'currency', currency: 'IDR' }) : 'Rp0'}</h4>
                 </div>
             </div>
         </div>

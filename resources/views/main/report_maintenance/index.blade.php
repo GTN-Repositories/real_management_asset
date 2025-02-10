@@ -179,7 +179,17 @@
                             @endphp
                             <td>{{ 'AST - '.$item['asset_id']. ' - ' . ($asset->name ?? null) . ' - ' . ($asset->serial_number ?? '-') }}</td>
                             @foreach ($item['data'] as $value)
-                                <td style="background-color: {{ $color[$value] ?? '#FFFFFF' }}; color: {{ ($value == 'Uncertain') ? '#000000' : '#FFFFFF' }};" class="text-center">{{ $value }}</td>
+                                <td>
+                                    @foreach ($value as $detail)
+                                        @php
+                                            $status = $detail->status_after ?? 'Uncertain';
+                                        @endphp
+                                        <div class="p-3 m-1" style="background-color: {{ $color[$status] ?? '#FFFFFF' }}; color: {{ ($status == 'Uncertain') ? '#000000' : '#FFFFFF' }};" class="text-center">
+                                            {{ $detail->status_after ?? 'Uncertain' }}
+                                        </div>
+                                    @endforeach
+                                </td>
+                                {{-- <td style="background-color: {{ $color[$value] ?? '#FFFFFF' }}; color: {{ ($value == 'Uncertain') ? '#000000' : '#FFFFFF' }};" class="text-center">{{ $value }}</td> --}}
                             @endforeach
                         </tr>
                     @endforeach

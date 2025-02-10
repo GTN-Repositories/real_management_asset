@@ -498,6 +498,7 @@ class InspectionScheduleController extends Controller
 
         return response()->json([
             'status' => $before->status ?? null,
+            'inspection_schedule' => $now,
             'maintenance' => $maintenance,
         ]);
     }
