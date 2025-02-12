@@ -1,6 +1,6 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Edit Kategori Barang</h3>
+    <h3 class="mb-2">Set Target</h3>
     <p class="text-muted">Edit Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
 <form method="POST" class="row g-3" id="formEdit" action="{{ route('report-asset-performance.update', $data->id) }}"
@@ -9,7 +9,7 @@
     @method('put')
 
     <div class="col-12 col-md-12">
-        <label class="form-label" for="target">Target Perbulan <span class="text-danger">*</span></label>
+        <label class="form-label" for="target">Target <span class="text-danger">*</span></label>
         <input type="text" id="target" name="target" class="form-control" placeholder="Masukkan target"
             value="{{ $data->target }}" />
     </div>

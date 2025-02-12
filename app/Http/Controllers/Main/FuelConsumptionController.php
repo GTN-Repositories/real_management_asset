@@ -65,6 +65,9 @@ class FuelConsumptionController extends Controller
             ->addColumn('hm', function ($data) {
                 return number_format($data->hm, 0, ',', '.') ?? null;
             })
+            ->addColumn('km', function ($data) {
+                return number_format($data->lasted_km_asset, 0, ',', '.') ?? null;
+            })
             ->addColumn('loadsheet', function ($data) {
                 return number_format($data->loadsheet, 0, ',', '.') ?? null;
             })
@@ -113,6 +116,7 @@ class FuelConsumptionController extends Controller
             'user_id',
             'date',
             'liter',
+            'lasted_km_asset',
             'hm',
             'price',
             'category',
@@ -426,5 +430,21 @@ class FuelConsumptionController extends Controller
         }
 
         return Excel::download(new FuelConsumptionExport($data), $fileName);
+    }
+
+    public function sumFuelConsumption()
+    {
+        $data = FuelConsumption::query();
+
+        if(session('selected_project_id')) {
+            $data = $data->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+        }
+
+        $result = number_format($data->sum('liter'));
+
+        return response()->json([
+            'status' => true,
+            'data' => $result,
+        ]);
     }
 }

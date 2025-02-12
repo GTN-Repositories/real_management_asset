@@ -31,4 +31,9 @@ class Maintenance extends Model
     {
         return implode(', ', json_decode($value));
     }
+
+    public function maintenanceSparepart()
+    {
+        return $this->hasMany(MaintenanceSparepart::class, 'maintenance_id', 'id');
+    }
 }

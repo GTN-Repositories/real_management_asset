@@ -473,7 +473,7 @@ class ReportFuelController extends Controller implements HasMiddleware
                 return 'AST-' . Crypt::decrypt($row->id) . ' - ' . $row->name . ' - ' . $row->license_plate;
             })
             ->addColumn('total_liter', function ($row) {
-                return $row->total_liter;
+                return number_format($row->total_liter);
             })
             ->addIndexColumn()
             ->rawColumns(['action'])

@@ -86,7 +86,7 @@
                             <th>balance</th>
                             <th>harga satuan</th>
                             <th>total harga</th>
-                            <th>ppn 11%</th>
+                            {{-- <th>ppn 11%</th> --}}
                             <th>jumlah</th>
                             <th>fuel truck</th>
                             <th>received by</th>
@@ -230,10 +230,10 @@
                         data: 'total_harga',
                         name: 'total_harga'
                     },
-                    {
-                        data: 'ppn',
-                        name: 'ppn'
-                    },
+                    // {
+                    //     data: 'ppn',
+                    //     name: 'ppn'
+                    // },
                     {
                         data: 'jumlah',
                         name: 'jumlah'

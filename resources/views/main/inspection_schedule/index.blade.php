@@ -20,7 +20,7 @@
 
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
-        <div class="d-flex justify-content-end mb-3 gap-2">
+        <div class="d-flex justify-content-end mb-3 gap-3">
             <!-- Tombol Hapus Masal -->
             {{-- <button type="button" class="btn btn-danger btn-sm" id="delete-btn"
                 style="display: none !important;">
@@ -28,6 +28,14 @@
             </button> --}}
             @if (!auth()->user()->hasRole('Read only'))
                 @if (auth()->user()->hasPermissionTo('inspection-schedule-create'))
+                    <button type="button" class="btn btn-success btn-md d-flex align-items-center" onclick="importInspectionExcel()">
+                        <i class="fas fa-file-excel me-2"></i> Import Inspeksi
+                    </button>
+
+                    <button onclick="exportInspectionExcel()" class="btn btn-success btn-md">
+                        <i class="fa-solid fa-file-excel me-1"></i>Export Inspeksi
+                    </button>
+
                     <button type="button" class="btn btn-primary btn-md" onclick="createData()">
                         <i class="fas fa-plus"></i> Tambah
                     </button>
@@ -64,6 +72,16 @@
             </div>
         </div>
 
+        <div class="d-flex justify-content-end mb-3 gap-3">
+            <button type="button" class="btn btn-success btn-md d-flex align-items-center" onclick="importMaintenanceExcel()">
+                <i class="fas fa-file-excel me-2"></i> Import Work Order
+            </button>
+
+            <button onclick="exportMaintenanceExcel()" class="btn btn-success btn-md">
+                <i class="fa-solid fa-file-excel me-1"></i>Export Work Order
+            </button>
+        </div>
+
         <div class="card app-calendar-wrapper">
             <div class="row g-0">
                 <!-- Calendar Sidebar -->
@@ -74,7 +92,7 @@
                                 @if (auth()->user()->hasPermissionTo('inspection-schedule-create-maintenance'))
                                     <button class="btn btn-primary btn-toggle-sidebar" onclick="createDataMaintenance()">
                                         <i class="ti ti-plus me-1"></i>
-                                        <span class="align-middle">Tambah Maintenance</span>
+                                        <span class="align-middle">Tambah Work Order</span>
                                     </button>
                                 @endif
                             @endif
@@ -98,6 +116,13 @@
                         </div>
 
                         <div class="app-calendar-events-filter ms-3">
+                            {{-- @foreach ($assets as $asset)
+                                <div class="form-check form-check-info">
+                                    <input class="form-check-input input-filter" type="checkbox" id="select-{{ $asset->ids }}"
+                                        data-value="{{ $asset->ids }}" checked />
+                                    <label class="form-check-label" for="select-{{ $asset->ids }}">{{ $asset->text }}</label>
+                                </div>
+                            @endforeach --}}
                             <div class="form-check form-check-info">
                                 <input class="form-check-input input-filter" type="checkbox" id="select-p2h"
                                     data-value="p2h" checked />
@@ -172,6 +197,16 @@
             <div class="modal-dialog modal-xl modal-simple">
                 <div class="modal-content p-3 p-md-5">
                     <div class="modal-body" id="content-modal-ce">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modal-ce-maintenance" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-simple">
+                <div class="modal-content p-3 p-md-5">
+                    <div class="modal-body" id="content-modal-ce-maintenance">
 
                     </div>
                 </div>
@@ -378,9 +413,11 @@
                     type: 'GET',
                 })
                 .done(function(data) {
-                    $('#content-modal-ce').html(data);
+                    $('#content-modal-ce-maintenance').html(data);
+                    console.log(data);
+                    
 
-                    $("#modal-ce").modal("show");
+                    $("#modal-ce-maintenance").modal("show");
                 })
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
@@ -393,9 +430,9 @@
                     type: 'GET',
                 })
                 .done(function(data) {
-                    $('#content-modal-ce').html(data);
+                    $('#content-modal-ce-maintenance').html(data);
 
-                    $("#modal-ce").modal("show");
+                    $("#modal-ce-maintenance").modal("show");
                 })
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
@@ -466,6 +503,48 @@
                         });
                 }
             });
+        }
+
+        function importInspectionExcel() {
+            $.ajax({
+                    url: "{{ route('inspection-schedule.import.form') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+                });
+        }
+
+        function importMaintenanceExcel() {
+            $.ajax({
+                    url: "{{ route('maintenances.import.form') }}",
+                    type: 'GET',
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+                });
+        }
+
+        function exportInspectionExcel() {
+            var url = "{{ route('inspection-schedule.export-excel') }}";
+
+            window.open(url);
+        }
+
+        function exportMaintenanceExcel() {
+            var url = "{{ route('maintenances.export-excel') }}";
+
+            window.open(url);
         }
     </script>
     <script>

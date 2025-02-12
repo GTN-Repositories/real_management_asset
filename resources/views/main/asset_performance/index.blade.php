@@ -23,7 +23,7 @@
             </button>
             <!-- Tombol Tambah -->
             <button type="button" class="btn btn-primary btn-md" onclick="createData()">
-                <i class="fas fa-plus me-2"></i> Ubah Target
+                <i class="fas fa-plus me-2"></i> Set Target
             </button>
         </div>
         <!-- Product List Table -->

@@ -64,41 +64,65 @@
         </div>
     </div>
     <div class="row mb-4">
-        <div class="col-12 col-md-6 col-lg-3" style="">
+        {{-- <div class="col-12 col-md-4 col-lg-4 mb-3" style="">
             <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #D59A01;">
-                <h4 class="text-white card-title m-0 fw-bold">Scheduled</h4>
+                <h4 class="text-white card-title m-0 fw-bold">Active</h4>
             </div>
             <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(213, 153, 1, 0.35); text-align: end;">
-                <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="scheduled">Loading...</h5>
+                <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="active">Loading...</h5>
             </div>
         </div>            
-        <div class="col-12 col-md-6 col-lg-3" style="">
+        <div class="col-12 col-md-4 col-lg-4 mb-3" style="">
             <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #7F2DE8;">
-                <h4 class="text-white card-title m-0 fw-bold">In Progress</h4>
+                <h4 class="text-white card-title m-0 fw-bold">Inactive</h4>
             </div>
             <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(127, 45, 232, 0.35); text-align: end;">
-                <h5 class="text-white card-title p-1 p-lg-4 m-0 fw-bold" id="inProgress">Loading...</h5>
+                <h5 class="text-white card-title p-1 p-lg-4 m-0 fw-bold" id="inactive">Loading...</h5>
             </div>
-        </div>            
-        <div class="col-12 col-md-6 col-lg-3" style="">
+        </div>             --}}
+        <div class="col-12 col-md-4 col-lg-4 mb-3" style="">
             <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #01A5DB;">
-                <h4 class="text-white card-title m-0 fw-bold">On Hold</h4>
+                <h4 class="text-white card-title m-0 fw-bold">Under Maintenance</h4>
             </div>
             <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(1, 165, 219, 0.35); text-align: end;">
-                <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="onHold">Loading...</h5>
+                <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="underMaintenance">Loading...</h5>
             </div>
         </div>
-        <div class="col-12 col-md-6 col-lg-3" style="">
+        <div class="col-12 col-md-4 col-lg-3 mb-3" style="">
             <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #3BBF56;">
-                <h4 class="text-white card-title m-0 fw-bold">Finished</h4>
+                <h4 class="text-white card-title m-0 fw-bold">Under Repair</h4>
             </div>
             <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(59, 191, 86, 0.35); text-align: end;">
-                <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="finish">Loading...</h5>
+                <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="underRepair">Loading...</h5>
+            </div>
+        </div>
+        <div class="col-12 col-md-4 col-lg-3 mb-3" style="">
+            <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #3BBF56;">
+                <h4 class="text-white card-title m-0 fw-bold">Waiting</h4>
+            </div>
+            <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(59, 191, 86, 0.35); text-align: end;">
+                <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="waiting">Loading...</h5>
+            </div>
+        </div>
+        <div class="col-12 col-md-4 col-lg-4 mb-3" style="">
+            <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #3BBF56;">
+                <h4 class="text-white card-title m-0 fw-bold">Scrap</h4>
+            </div>
+            <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(59, 191, 86, 0.35); text-align: end;">
+                <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="scrap">Loading...</h5>
+            </div>
+        </div>
+        <div class="col-12 col-md-4 col-lg-4 mb-3" style="">
+            <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #3BBF56;">
+                <h4 class="text-white card-title m-0 fw-bold">RFU</h4>
+            </div>
+            <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(59, 191, 86, 0.35); text-align: end;">
+                <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="rfu">Loading...</h5>
             </div>
         </div>
     </div>
 
-    <div class="card mb-4">
+    {{-- <div class="card mb-4">
         <div class="card-header flex-nowrap header-elements">
             <h5 class="card-title mb-0">Top Asset Maintenance Over Time</h5>
             <div class="card-header-elements ms-auto py-0 d-none d-sm-block">
@@ -107,7 +131,7 @@
         <div class="card-body pt-2">
             <canvas id="lineChart"></canvas>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Product List Table -->
     <div class="card mb-4">
@@ -128,7 +152,7 @@
                     <tr>
                         <th rowspan="2" class="text-center align-middle">Asset ID</th>
                         <th colspan="{{ $daysInMonth }}" class="text-center">{{
-                            \Carbon\Carbon::parse($month)->format('F') }}</th>
+                            \Carbon\Carbon::parse((int)$year.'-'.(int)$month.'-01')->format('F Y') }}</th>
                     </tr>
                     <tr>
                         @for ($i = 1; $i <= $daysInMonth; $i++)
@@ -150,9 +174,22 @@
                     @endphp
                     @foreach ($dataByDate as $item)
                         <tr>
-                            <td>{{ 'AST - '.$item['asset_id'] }}</td>
+                            @php
+                                $asset = \App\Models\Asset::find($item['asset_id']);
+                            @endphp
+                            <td>{{ 'AST - '.$item['asset_id']. ' - ' . ($asset->name ?? null) . ' - ' . ($asset->serial_number ?? '-') }}</td>
                             @foreach ($item['data'] as $value)
-                                <td style="background-color: {{ $color[$value] ?? '#FFFFFF' }}; color: {{ ($value == 'Uncertain') ? '#000000' : '#FFFFFF' }};" class="text-center">{{ $value }}</td>
+                                <td>
+                                    @foreach ($value as $detail)
+                                        @php
+                                            $status = $detail->status_after ?? 'Uncertain';
+                                        @endphp
+                                        <div class="p-3 m-1" style="background-color: {{ $color[$status] ?? '#FFFFFF' }}; color: {{ ($status == 'Uncertain') ? '#000000' : '#FFFFFF' }};" class="text-center">
+                                            {{ $detail->status_after ?? 'Uncertain' }}
+                                        </div>
+                                    @endforeach
+                                </td>
+                                {{-- <td style="background-color: {{ $color[$value] ?? '#FFFFFF' }}; color: {{ ($value == 'Uncertain') ? '#000000' : '#FFFFFF' }};" class="text-center">{{ $value }}</td> --}}
                             @endforeach
                         </tr>
                     @endforeach
@@ -195,45 +232,48 @@
                     <h3 class="role-title mb-2">Filter By Month</h3>
                     <p class="text-muted">Filter data by month</p>
                 </div>
+                
+                <form action='{{ route('report-maintenance.index') }}' method='GET' enctype='multipart/form-data'>
+                    <div class="row">
+                        <div class="me-2 mb-2">
+                            <label for="month" class="form-label">Bulan</label>
+                            <select id="month" class="form-select select2" name="month">
+                                <option value="">Pilih Bulan</option>
+                                <option value="1" {{ (int)$month == 1 ? 'selected' : '' }}>Januari</option>
+                                <option value="2" {{ (int)$month == 2 ? 'selected' : '' }}>Februari</option>
+                                <option value="3" {{ (int)$month == 3 ? 'selected' : '' }}>Maret</option>
+                                <option value="4" {{ (int)$month == 4 ? 'selected' : '' }}>April</option>
+                                <option value="5" {{ (int)$month == 5 ? 'selected' : '' }}>Mei</option>
+                                <option value="6" {{ (int)$month == 6 ? 'selected' : '' }}>Juni</option>
+                                <option value="7" {{ (int)$month == 7 ? 'selected' : '' }}>Juli</option>
+                                <option value="8" {{ (int)$month == 8 ? 'selected' : '' }}>Agustus</option>
+                                <option value="9" {{ (int)$month == 9 ? 'selected' : '' }}>September</option>
+                                <option value="10" {{ (int)$month == 10 ? 'selected' : '' }}>Oktober</option>
+                                <option value="11" {{ (int)$month == 11 ? 'selected' : '' }}>November</option>
+                                <option value="12" {{ (int)$month == 12 ? 'selected' : '' }}>Desember</option>
+                            </select>
+                        </div>
+                        <div class="me-2 mb-2">
+                            <label for="year" class="form-label">Tahun</label>
+                            <select id="year" class="form-select select2" name="year">
+                                <option value="">Pilih Tahun</option>
+                                @for ($i = date('Y'); $i >= now()->subYear(10)->year; $i--)
+                                    <option value="{{ $i }}" {{ $year == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                @endfor
+                            </select>
+                        </div>
 
-                <div class="row">
-                    <div class="me-2 mb-2">
-                        <label for="month" class="form-label">Bulan</label>
-                        <select id="month" class="form-select select2">
-                            <option value="">Pilih Bulan</option>
-                            <option value="01">Januari</option>
-                            <option value="02">Februari</option>
-                            <option value="03">Maret</option>
-                            <option value="04">April</option>
-                            <option value="05">Mei</option>
-                            <option value="06">Juni</option>
-                            <option value="07">Juli</option>
-                            <option value="08">Agustus</option>
-                            <option value="09">September</option>
-                            <option value="10">Oktober</option>
-                            <option value="11">November</option>
-                            <option value="12">Desember</option>
-                        </select>
-                    </div>
-                    <div class="me-2 mb-2">
-                        <label for="year" class="form-label">Tahun</label>
-                        <select id="year" class="form-select select2">
-                            <option value="">Pilih Tahun</option>
-                            @for ($i = date('Y'); $i >= 1985; $i--)
-                                <option value="{{ $i }}">{{ $i }}</option>
-                            @endfor
-                        </select>
-                    </div>
+                        <div class="col-12 text-center mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-file-excel me-1"></i> Submit
+                            </button>
 
-                    <div class="col-12 text-center mt-4">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa-solid fa-file-excel me-1"></i> Submit
-                        </button>
+                            <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
 
-                        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">
-                            Cancel
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -297,6 +337,14 @@
                 type: 'GET',
                 dataType: 'json',
                 success: function(data) {
+                    $('#active').text(data.active);
+                    $('#inactive').text(data.inactive);
+                    $('#underMaintenance').text(data.underMaintenance);
+                    $('#underRepair').text(data.underRepair);
+                    $('#waiting').text(data.waiting);
+                    $('#scrap').text(data.scrap);
+                    $('#rfu').text(data.rfu);
+                    
                     $('#scheduled').text(data.scheduled);
                     $('#inProgress').text(data.inProgress);
                     $('#onHold').text(data.onHold);
@@ -411,7 +459,7 @@
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
             // Ekspor workbook ke file Excel
-            XLSX.writeFile(workbook, 'data-export.xlsx');
+            XLSX.writeFile(workbook, 'Asset Maintenance History by Category {{ \Carbon\Carbon::parse((int)$year."-".(int)$month."-01")->format("F Y") }}.xlsx');
         }
 
         function init_table() {

@@ -7,6 +7,7 @@ use App\Models\Asset;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
 use App\Models\Maintenance;
+use App\Models\MaintenanceSparepart;
 use App\Models\ManagementProject;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -35,7 +36,10 @@ class ReportSparepartController extends Controller
                 return $data->name ?? '-';
             })
             ->addColumn('stock', function ($data) {
-                return $data->stock ?? '-';
+                $stock_warehouse = new WerehouseController();
+                $stock = $stock_warehouse->getStock(Crypt::decrypt($data->id));
+
+                return $stock ?? null;
             })
             ->addColumn('price', function ($data) {
                 return 'Rp.' . number_format($data->price, 0, ',', '.') ?? '-';
@@ -118,7 +122,7 @@ class ReportSparepartController extends Controller
 
     public function getInspectionData(Request $request)
     {
-        $query = DB::table('inspection_schedules');
+        $query = Maintenance::query();
 
         if ($request->filled('predefinedFilter')) {
             switch ($request->predefinedFilter) {
@@ -156,29 +160,29 @@ class ReportSparepartController extends Controller
         }
 
         if (session('selected_project_id')) {
-            $query->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+            // $query->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+            $query->whereHas('inspectionSchedule', function ($q) {
+                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+            });
         }
 
-        $inspectionSchedules = $query->get();
+        $maintenance = $query->get();
 
         $result = [];
 
-        foreach ($inspectionSchedules as $schedule) {
-            $itemIds = json_decode($schedule->item_id, true);
-            $itemStock = json_decode($schedule->item_stock, true);
+        foreach ($maintenance as $schedule) {
+            $maintenanceSparepart = MaintenanceSparepart::where('maintenance_id', Crypt::decrypt($schedule->id))->get();
 
-            if (is_array($itemIds) && is_array($itemStock)) {
-                foreach ($itemIds as $itemId) {
-                    $category = DB::table('items')
+            foreach ($maintenanceSparepart as $sparepart) {
+                $category = DB::table('items')
                         ->join('category_items', 'items.category_id', '=', 'category_items.id')
-                        ->where('items.id', $itemId)
+                        ->where('items.id', $sparepart->item_id)
                         ->value('category_items.name');
 
-                    if (in_array($category, ['Filters', 'Oil', 'Tires'])) {
-                        $month = Carbon::parse($schedule->date)->format('Y-m');
-
-                        $result[$month][$category] = ($result[$month][$category] ?? 0) + ($itemStock[$itemId] ?? 0);
-                    }
+                if (in_array($category, ['Filters', 'Oil', 'Tires'])) {
+                    $month = Carbon::parse($schedule->date)->format('Y-m');
+    
+                    $result[$month][$category] = ($result[$month][$category] ?? 0) + ($$sparepart->quantity ?? 0);
                 }
             }
         }
@@ -206,55 +210,71 @@ class ReportSparepartController extends Controller
 
     public function dataProjectItem(Request $request)
     {
-        $query = InspectionSchedule::selectRaw('management_project_id, GROUP_CONCAT(item_id) as item_ids, GROUP_CONCAT(asset_id) as asset_ids')
-            ->groupBy('management_project_id')
-            ->get()
-            ->map(function ($row) {
-                $itemIds = array_map(function ($value) {
-                    return trim($value, '[]');
-                }, explode(',', $row->item_ids));
-                $assetIds = array_map(function ($value) {
-                    return trim($value, '[]');
-                }, explode(',', $row->asset_ids ?? ''));
-                $uniqueItemIds = array_unique($itemIds);
-                $itemNamesWithCount = [];
-                foreach ($uniqueItemIds as $itemId) {
-                    $itemName = Item::where('id', $itemId)->value('name');
-                    if ($itemName !== null) {
-                        $itemNamesWithCount[] = $itemName . ' (' . count(array_keys($itemIds, $itemId)) . ')';
-                    }
-                }
-                $uniqueAssetIds = array_unique($assetIds);
-                $assetNamesWithCount = [];
-                foreach ($uniqueAssetIds as $assetId) {
-                    $assetName = Asset::where('id', $assetId)->value('name');
-                    if ($assetName !== null) {
-                        $assetNamesWithCount[] = $assetName;
-                    }
-                }
-                $projectName = DB::table('management_projects')->where('id', $row->management_project_id)->value('name');
-                $row->project_name = $projectName;
-                $row->item_names = implode(', ', $itemNamesWithCount);
-                $row->asset_names = implode(', ', $assetNamesWithCount);
-                return $row;
-            });
-
+        $inspeksi = InspectionSchedule::query();
         if (session('selected_project_id')) {
-            $query = $query->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+            $inspeksi = $inspeksi->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+            $inspeksi->whereHas('inspection_schedule', function ($q) {
+                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+            });
         }
 
-        return datatables()->of($query)
+        $groupBy = $inspeksi->get()->groupBy('management_project_id');
+
+        $inspeksi_ids = [];
+        foreach ($groupBy as $key => $value) {
+            foreach ($value->pluck('id') as $ckey => $value) {
+                $inspeksi_ids[$key][] = Crypt::decrypt($value);
+            }
+        }
+        $asset_ids = [];
+        foreach ($groupBy as $key => $value) {
+            $asset_ids[$key][] = $value->pluck('asset_id')->toArray();
+        }
+
+        $data = [];
+        foreach ($inspeksi_ids as $key => $value) {
+            $data[$key]['project_name'] = ManagementProject::find($key)->name ?? '-';
+            $maintenance_ids = Maintenance::whereIn('inspection_schedule_id', $value)->pluck('id');
+            $data[$key]['item'] = '';
+            $item_elem = '<ul>';
+            foreach ($maintenance_ids as $ckey => $value) {
+                $maintenanceSparepart = MaintenanceSparepart::where('maintenance_id', Crypt::decrypt($value))->get()->groupBy('item_id');
+                foreach ($maintenanceSparepart as $item_id => $value) {
+                    $item_name = Item::find($item_id)->name ?? null;
+                    $quantity = $value->sum('quantity');
+                    $item_elem .= '<li>' . $item_name . ' : ' . $quantity . '</li>';
+                }
+            }
+            $item_elem .= '</ul>';
+            $data[$key]['item'] = $item_elem;
+            $asset_elem = '<ul>';
+
+            if (isset($asset_ids[$key])) {
+                foreach ($asset_ids[$key] as $ckey => $cvalue) {
+                    foreach ($cvalue as $keyasset => $asset_id) {
+                        $asset_name = Asset::find($asset_id)->name ?? null;
+                        $asset_elem .= '<li> AST - ' . $asset_id . ' ' . $asset_name . '</li>';
+                    }
+                }
+            }else{
+                $data[$key]['asset_id'] = [];
+            }
+            $asset_elem .= '</ul>';
+            $data[$key]['asset_id'] = $asset_elem;
+        }
+
+        return datatables()->of($data)
+            ->addColumn('asset_id', function ($row) {
+                return $row['asset_id'] ?? null;
+            })
             ->addColumn('item_id', function ($row) {
-                return $row->item_names ?: '-';
+                return $row['item'] ?? null;
             })
             ->addColumn('management_project_id', function ($row) {
-                return $row->project_name ?: '-';
-            })
-            ->addColumn('asset_id', function ($row) {
-                return $row->asset_names ?: '-';
+                return $row['project_name'] ?? null;
             })
             ->addIndexColumn()
-            ->rawColumns(['action'])
+            ->rawColumns(['asset_id', 'item_id', 'action'])
             ->make(true);
     }
 
@@ -271,12 +291,22 @@ class ReportSparepartController extends Controller
             ->count();
         $totalItems = Item::count();
         $currentYear = Carbon::now()->year;
-        $totalInspectionItemsYear = $query->whereYear('created_at', $currentYear)
+        $totalInspectionItemsYear = MaintenanceSparepart::whereYear('created_at', $currentYear)
+            ->when(session('selected_project_id'), function ($querys) {
+                $querys->whereHas('maintenance.inspectionSchedule', function ($q) {
+                    $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                });
+            })
             ->pluck('item_id')
             ->flatten()
             ->unique()
             ->count();
-        $totalInspectionItemsWeek = $query->whereYear('created_at', $currentYear)
+        $totalInspectionItemsWeek = MaintenanceSparepart::whereYear('created_at', $currentYear)
+            ->when(session('selected_project_id'), function ($querys) {
+                $querys->whereHas('maintenance.inspectionSchedule', function ($q) {
+                    $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                });
+            })
             ->whereBetween('created_at', [
                 Carbon::now()->startOfWeek(),
                 Carbon::now()->endOfWeek(),
@@ -287,12 +317,58 @@ class ReportSparepartController extends Controller
             ->count();
         $percentageItemsYear = ($totalInspectionItemsYear / $totalItems) * 100;
         $percentageItemsWeek = ($totalInspectionItemsWeek / $totalItems) * 100;
+
         return response()->json([
-            'scheduled' => $query->where('status', 'Scheduled')->count(),
-            'inProgress' => $query->where('status', 'InProgress')->count(),
-            'onHold' => $query->where('status', 'OnHold')->count(),
-            'finish' => $query->where('status', 'Finish')->count(),
-            'overdue' => $query->where('status', 'Overdue')->count(),
+            'scheduled' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'Scheduled')->count(),
+            'inProgress' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'InProgress')->count(),
+            'onHold' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'OnHold')->count(),
+            'finish' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'Finish')->count(),
+            'overdue' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'Overdue')->count(),
+            
+            'active' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'Active')->count() ?? 0,
+            'inactive' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'Inactive')->count() ?? 0,
+            'underMaintenance' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'UnderMaintenance')->count() ?? 0,
+            'underRepair' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'UnderRepair')->count() ?? 0,
+            'waiting' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'Waiting')->count() ?? 0,
+            'scrap' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'Scrap')->count() ?? 0,
+            'rfu' => InspectionSchedule::when(session('selected_project_id'), function ($q) {
+                                $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+                            })
+                            ->where('status', 'RFU')->count() ?? 0,
+
             'underMaintenanceSecondDay' => $underMaintenanceSecondDayCount,
             'percentageItemsYear' => $percentageItemsYear,
             'percentageItemsWeek' => $percentageItemsWeek,

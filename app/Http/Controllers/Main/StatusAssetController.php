@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\InspectionComment;
 use App\Models\InspectionSchedule;
 use App\Models\Item;
+use App\Models\Maintenance;
+use App\Models\MaintenanceSparepart;
 use App\Models\StatusAsset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -62,6 +64,7 @@ class StatusAssetController extends Controller
     public function dataSparepartHistory(Request $request)
     {
         $data = $this->getDataSparepartHistory($request);
+        $inspection_ids = $data->pluck('id')->toArray();
 
         return datatables()
             ->of($data)
@@ -73,26 +76,23 @@ class StatusAssetController extends Controller
                 return $data->date ?? "kosong";
             })
             ->addColumn('item_stock', function ($data) {
-                $item_id = json_decode($data->item_id) ?? [];
-                $kanibal = json_decode($data->kanibal_stock) ?? [];
-                $stock = json_decode($data->item_stock) ?? [];
-                $item = '';
-
-                // foreach ($item_id as $key => $value) {
-                //     $item .= Item::find($value)->name ?? null;
-                // }
-
-                foreach ($kanibal as $key => $value) {
-                    $item_name = Item::find($key)->name ?? null;
-                    $qty = $value;
-                    $item .= 'Kanibal : ' . $item_name . ' - ' . $qty . '<br>';
+                $maintenance_ids = Maintenance::where('inspection_schedule_id', Crypt::decrypt($data->id))->pluck('id')->toArray();
+                $maintenance_ids_decrypted = [];
+                foreach ($maintenance_ids as $key => $value) {
+                    $maintenance_ids_decrypted[$key] = Crypt::decrypt($value);
                 }
+                $sparepart_out = MaintenanceSparepart::whereIn('maintenance_id', $maintenance_ids_decrypted)->get();
 
-                foreach ($stock as $key => $value) {
-                    $item_name = Item::find($key)->name ?? null;
-                    $qty = $value;
-                    $item .= 'Stock : ' . $item_name . ' - ' . $qty . '<br>';
+                $item = '<ul>';
+                foreach ($sparepart_out as $value) {
+                    $item_name = Item::find($value->item_id)->name ?? null;
+                    if ($value->type == 'Replacing') {
+                        $item .= '<li> Replacing From : ' . $item_name . ' - ' . $value->quantity . '</li>';
+                    }else if ($value->type == 'Stock') {
+                        $item .= '<li> Stock : ' . $item_name . ' - ' . $value->quantity . '</li>';
+                    }
                 }
+                $item .= '</ul>';
 
                 return $item;
             })
@@ -105,10 +105,7 @@ class StatusAssetController extends Controller
         $columns = [
             'id',
             'name',
-            'item_id',
             'asset_id',
-            'item_stock',
-            'kanibal_stock',
             'management_project_id',
             'date',
         ];
@@ -126,7 +123,7 @@ class StatusAssetController extends Controller
                 }
             })
             ->where('asset_id', $assetId);
-            
+
         if (session('selected_project_id')) {
             $data->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
         }
@@ -147,11 +144,11 @@ class StatusAssetController extends Controller
             ->addColumn('inspection_schedule_id', function ($data) {
                 return 'INS - '. $data->inspection_schedule_id ?? "-";
             })
-            ->addColumn('comment', function ($data) {
-                return $data->comment ?? "-";
+            ->addColumn('action_to_do', function ($data) {
+                return $data->action_to_do ?? "-";
             })
-            ->addColumn('user_id', function ($data) {
-                return $data->user->name ?? "-";
+            ->addColumn('urgention', function ($data) {
+                return $data->urgention ?? "-";
             })
             ->escapeColumns([])
             ->make(true);
@@ -159,33 +156,38 @@ class StatusAssetController extends Controller
 
     public function getDataInspectionComment(Request $request)
     {
-        $inspection_ids = $this->getDataSparepartHistory($request)->pluck('id')->toArray();
+        // $inspection_ids = $this->getDataSparepartHistory($request)->pluck('id')->toArray();
 
-        foreach ($inspection_ids as $key => $value) {
-            $inspection_ids[$key] = Crypt::decrypt($value);
-        }
+        // foreach ($inspection_ids as $key => $value) {
+        //     $inspection_ids[$key] = Crypt::decrypt($value);
+        // }
 
-        $columns = [
-            'id',
-            'inspection_schedule_id',
-            'comment',
-            'created_at',
-            'updated_at',
-            'user_id',
-            'time_note',
-        ];
+        // $columns = [
+        //     'id',
+        //     'inspection_schedule_id',
+        //     'comment',
+        //     'created_at',
+        //     'updated_at',
+        //     'user_id',
+        //     'time_note',
+        // ];
 
-        $keyword = $request->search['value'] ?? "";
+        // $keyword = $request->search['value'] ?? "";
 
-        $data = InspectionComment::orderBy('created_at', 'desc')
-            ->select($columns)
-            ->whereIn('inspection_schedule_id', $inspection_ids)
-            ->where(function ($query) use ($keyword, $columns) {
-                if ($keyword != '') {
-                    foreach ($columns as $column) {
-                        $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
-                    }
-                }
+        // $data = InspectionComment::orderBy('created_at', 'desc')
+        //     ->select($columns)
+        //     ->whereIn('inspection_schedule_id', $inspection_ids)
+        //     ->where(function ($query) use ($keyword, $columns) {
+        //         if ($keyword != '') {
+        //             foreach ($columns as $column) {
+        //                 $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
+        //             }
+        //         }
+        //     });
+
+        $data = Maintenance::orderBy('date')
+            ->when(session('management_project_id'), function ($query) {
+                $query->where('management_project_id', Crypt::decrypt(session('management_project_id')));
             });
             
         return $data;
