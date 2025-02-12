@@ -33,12 +33,12 @@
     </div>
 
     <div class="col-12" id="selectAsset">
-        <label for="asset_id" class="form-label">Plat Nomor</label>
+        <label for="asset_id" class="form-label">Asset</label>
         <select id="asset_id" class="form-select" name="asset_id" >
             {{-- DISABLED --}}
             @if ($data->asset)
                 <option value="{{ encrypt($data->asset_id) }}" selected>
-                    {{ $data->asset->license_plate . ' - ' . $data->asset->name . ' - ' . $data->asset->asset_number }}
+                    {{ 'AST - '. $data->asset_id . ' - ' . $data->asset->name . ' - ' . $data->asset->serial_number }}
                 </option>
             @endif
         </select>

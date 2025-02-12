@@ -151,7 +151,7 @@
                             ]) {
                                 return {
                                     id: id,
-                                    text: name
+                                    text: 'AST - '+ name
                                 };
                             });
 

@@ -72,14 +72,30 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-end mb-3 gap-3">
-            <button type="button" class="btn btn-success btn-md d-flex align-items-center" onclick="importMaintenanceExcel()">
-                <i class="fas fa-file-excel me-2"></i> Import Work Order
-            </button>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <form action="" method="" enctype="multipart/form-data" class="row">
+                    <div class="col-md-8">
+                        <div class="select2-primary" id="relationIdAssetFilter">
+                            <select id="asset_id_filter" name="asset_id[]" class="select2 form-select" multiple>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </form>
+            </div>
 
-            <button onclick="exportMaintenanceExcel()" class="btn btn-success btn-md">
-                <i class="fa-solid fa-file-excel me-1"></i>Export Work Order
-            </button>
+            <div class="col-md-6 d-flex justify-content-end">
+                <button type="button" class="btn btn-success btn-md m-2" onclick="importMaintenanceExcel()">
+                    <i class="fas fa-file-excel me-2"></i> Import Work Order
+                </button>
+    
+                <button onclick="exportMaintenanceExcel()" class="btn btn-success btn-md m-2">
+                    <i class="fa-solid fa-file-excel me-1"></i>Export Work Order
+                </button>
+            </div>
         </div>
 
         <div class="card app-calendar-wrapper">
@@ -116,13 +132,6 @@
                         </div>
 
                         <div class="app-calendar-events-filter ms-3">
-                            {{-- @foreach ($assets as $asset)
-                                <div class="form-check form-check-info">
-                                    <input class="form-check-input input-filter" type="checkbox" id="select-{{ $asset->ids }}"
-                                        data-value="{{ $asset->ids }}" checked />
-                                    <label class="form-check-label" for="select-{{ $asset->ids }}">{{ $asset->text }}</label>
-                                </div>
-                            @endforeach --}}
                             <div class="form-check form-check-info">
                                 <input class="form-check-input input-filter" type="checkbox" id="select-p2h"
                                     data-value="p2h" checked />
@@ -230,6 +239,46 @@
     <script>
         $(document).ready(function() {
             init_table();
+
+            $('#asset_id_filter').select2({
+                dropdownParent: $('#relationIdAssetFilter'),
+                placeholder: 'Pilih Asset',
+                ajax: {
+                    url: "{{ route('asset.data') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            'search[value]': params.term,
+                            start: 0,
+                            length: 10
+                        };
+                    },
+                    processResults: function(data) {
+                        apiResults = data.data.map(function(item) {
+                            return {
+                                text: item.nameWithNumber,
+                                id: parseInt(item.relationId),
+                            };
+                        });
+
+                        return {
+                            results: apiResults
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            var assetSelected = {!! json_encode(request('asset_id')) !!};
+
+            if (assetSelected) {
+                assetSelected.forEach(function(item) {
+                    var option = new Option("Asset " + item, item, true, true); // Tambahkan teks default
+                    $('#asset_id_filter').append(option);
+                });
+            }
+
 
             $('#checkAll').on('click', function() {
                 $('tbody input[type="checkbox"]').prop('checked', $(this).prop('checked'));

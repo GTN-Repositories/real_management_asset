@@ -147,7 +147,7 @@
             </div>
         </div>
         <div class="card-datatable table-responsive">
-            <table class="datatables table table-striped table-poppins" id="data-table-by-date">
+            <table class="datatables table table-striped table-bordered table-poppins" id="data-table-by-date">
                 <thead class="border-top">
                     <tr>
                         <th rowspan="2" class="text-center align-middle">Asset ID</th>
@@ -178,14 +178,19 @@
                                 $asset = \App\Models\Asset::find($item['asset_id']);
                             @endphp
                             <td>{{ 'AST - '.$item['asset_id']. ' - ' . ($asset->name ?? null) . ' - ' . ($asset->serial_number ?? '-') }}</td>
+                            
                             @foreach ($item['data'] as $value)
                                 <td>
+                                    @if ($value == '[]')
+                                        Uncertain
+                                    @endif
                                     @foreach ($value as $detail)
                                         @php
-                                            $status = $detail->status_after ?? 'Uncertain';
+                                            $status = isset($detail->status_after) && $detail->status_after != null ? $detail->status_after : 'Uncertain';
                                         @endphp
-                                        <div class="p-3 m-1" style="background-color: {{ $color[$status] ?? '#FFFFFF' }}; color: {{ ($status == 'Uncertain') ? '#000000' : '#FFFFFF' }};" class="text-center">
-                                            {{ $detail->status_after ?? 'Uncertain' }}
+                                        <div class="p-3 m-1 text-center" style="background-color: {{ $color[$status] ?? '#FFFFFF' }}; color: {{ ($status == 'Uncertain') ? '#000000' : '#FFFFFF' }};" class="text-center">
+                                            {{ $status }}
+                                            <p style="font-size: 10px;">{{ $detail->created_at->format('H:i') ?? '-' }}</p>
                                         </div>
                                     @endforeach
                                 </td>
