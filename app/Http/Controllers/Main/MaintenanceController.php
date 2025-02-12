@@ -247,10 +247,11 @@ class MaintenanceController extends Controller
                 $maintenance->urgention = $request->get('urgention');
                 $maintenance->save();
 
-                
-                MaintenanceSparepart::where('maintenance_id', Crypt::decrypt($maintenance->id))->update([
-                    'warehouse_id' => Crypt::decrypt($request['werehouse_id']),
-                ]);
+                if (isset($request['werehouse_id'])) {
+                    MaintenanceSparepart::where('maintenance_id', Crypt::decrypt($maintenance->id))->update([
+                        'warehouse_id' => Crypt::decrypt($request['werehouse_id']),
+                    ]);
+                }
 
                 if (isset($request['selected_items'])) {
                     foreach ($request['selected_items'] as $key => $value) {
