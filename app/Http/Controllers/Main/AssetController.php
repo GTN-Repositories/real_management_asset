@@ -769,10 +769,11 @@ class AssetController extends Controller
 
             // Rest of the response building code remains the same...
 
+            $inactive = $operationalStatus->inactive + $maintenanceStatus->underMaintenance + $maintenanceStatus->underRepair + $maintenanceStatus->waiting;
             $response = [
                 // Operational Status
                 'active' => (int) $operationalStatus->active,
-                'inactive' => (int) $operationalStatus->inactive,
+                'inactive' => (int) $inactive,
                 'scrap' => (int) $operationalStatus->scrap,
                 'active' => $active,
 

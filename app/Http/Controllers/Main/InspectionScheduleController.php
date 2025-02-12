@@ -28,7 +28,22 @@ class InspectionScheduleController extends Controller
         $data = new MaintenanceController();
         $data = $data->data($request);
 
-        return view('main.inspection_schedule.index', compact('data'));
+        $assets = Asset::orderBy('created_at', 'asc')
+            ->select('id', 'name', 'serial_number', 'status');
+
+        if (session('selected_project_id')) {
+            $assets->whereHas('management_project', function ($q) {
+                $q->where('id', Crypt::decrypt(session('selected_project_id')));
+            });
+        }
+
+        $assets = $assets->get();
+        foreach ($assets as $key => $value) {
+            $value['ids'] = Crypt::encrypt($value->id);
+            $value['text'] = 'AST - ' . Crypt::decrypt($value->id) . ' - ' . $value->name . ' - ' . $value->serial_number;
+        }
+
+        return view('main.inspection_schedule.index', compact('data', 'assets'));
     }
 
     public function data(Request $request)

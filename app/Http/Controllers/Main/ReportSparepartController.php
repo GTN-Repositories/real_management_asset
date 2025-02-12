@@ -292,21 +292,21 @@ class ReportSparepartController extends Controller
         $totalItems = Item::count();
         $currentYear = Carbon::now()->year;
         $totalInspectionItemsYear = MaintenanceSparepart::whereYear('created_at', $currentYear)
-            ->when(session('selected_project_id'), function ($querys) {
-                $querys->whereHas('maintenance.inspectionSchedule', function ($q) {
-                    $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
-                });
-            })
+            // ->when(session('selected_project_id'), function ($querys) {
+            //     $querys->whereHas('maintenance.inspectionSchedule', function ($q) {
+            //         $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+            //     });
+            // })
             ->pluck('item_id')
             ->flatten()
             ->unique()
             ->count();
         $totalInspectionItemsWeek = MaintenanceSparepart::whereYear('created_at', $currentYear)
-            ->when(session('selected_project_id'), function ($querys) {
-                $querys->whereHas('maintenance.inspectionSchedule', function ($q) {
-                    $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
-                });
-            })
+            // ->when(session('selected_project_id'), function ($querys) {
+            //     $querys->whereHas('maintenance.inspectionSchedule', function ($q) {
+            //         $q->where('management_project_id', Crypt::decrypt(session('selected_project_id')));
+            //     });
+            // })
             ->whereBetween('created_at', [
                 Carbon::now()->startOfWeek(),
                 Carbon::now()->endOfWeek(),

@@ -144,11 +144,11 @@ class StatusAssetController extends Controller
             ->addColumn('inspection_schedule_id', function ($data) {
                 return 'INS - '. $data->inspection_schedule_id ?? "-";
             })
-            ->addColumn('comment', function ($data) {
-                return $data->comment ?? "-";
+            ->addColumn('action_to_do', function ($data) {
+                return $data->action_to_do ?? "-";
             })
-            ->addColumn('user_id', function ($data) {
-                return $data->user->name ?? "-";
+            ->addColumn('urgention', function ($data) {
+                return $data->urgention ?? "-";
             })
             ->escapeColumns([])
             ->make(true);
@@ -156,33 +156,38 @@ class StatusAssetController extends Controller
 
     public function getDataInspectionComment(Request $request)
     {
-        $inspection_ids = $this->getDataSparepartHistory($request)->pluck('id')->toArray();
+        // $inspection_ids = $this->getDataSparepartHistory($request)->pluck('id')->toArray();
 
-        foreach ($inspection_ids as $key => $value) {
-            $inspection_ids[$key] = Crypt::decrypt($value);
-        }
+        // foreach ($inspection_ids as $key => $value) {
+        //     $inspection_ids[$key] = Crypt::decrypt($value);
+        // }
 
-        $columns = [
-            'id',
-            'inspection_schedule_id',
-            'comment',
-            'created_at',
-            'updated_at',
-            'user_id',
-            'time_note',
-        ];
+        // $columns = [
+        //     'id',
+        //     'inspection_schedule_id',
+        //     'comment',
+        //     'created_at',
+        //     'updated_at',
+        //     'user_id',
+        //     'time_note',
+        // ];
 
-        $keyword = $request->search['value'] ?? "";
+        // $keyword = $request->search['value'] ?? "";
 
-        $data = InspectionComment::orderBy('created_at', 'desc')
-            ->select($columns)
-            ->whereIn('inspection_schedule_id', $inspection_ids)
-            ->where(function ($query) use ($keyword, $columns) {
-                if ($keyword != '') {
-                    foreach ($columns as $column) {
-                        $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
-                    }
-                }
+        // $data = InspectionComment::orderBy('created_at', 'desc')
+        //     ->select($columns)
+        //     ->whereIn('inspection_schedule_id', $inspection_ids)
+        //     ->where(function ($query) use ($keyword, $columns) {
+        //         if ($keyword != '') {
+        //             foreach ($columns as $column) {
+        //                 $query->orWhere($column, 'LIKE', '%' . $keyword . '%');
+        //             }
+        //         }
+        //     });
+
+        $data = Maintenance::orderBy('date')
+            ->when(session('management_project_id'), function ($query) {
+                $query->where('management_project_id', Crypt::decrypt(session('management_project_id')));
             });
             
         return $data;

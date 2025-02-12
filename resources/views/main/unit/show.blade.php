@@ -341,7 +341,7 @@
                                     <th>Tanggal</th>
                                     <th>ID Inspeksi</th>
                                     <th>Problem</th>
-                                    <th>Dibuat Oleh</th>
+                                    <th>Urgensi</th>
                                 </tr>
                             </thead>
                         </table>
@@ -740,12 +740,12 @@
                         name: 'inspection_schedule_id'
                     },
                     {
-                        data: 'comment',
-                        name: 'comment'
+                        data: 'action_to_do',
+                        name: 'action_to_do'
                     },
                     {
-                        data: 'user_id',
-                        name: 'user_id'
+                        data: 'urgention',
+                        name: 'urgention'
                     },
                 ]
             });
