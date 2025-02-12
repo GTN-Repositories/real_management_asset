@@ -71,13 +71,13 @@
     <div class="col-12 col-md-12">
         <label for="statusMaintenance" class="form-label">Status</label>
         <select class="form-select select2" id="statusMaintenance" name="status" aria-label="Select Status">
-            <option value="Active" {{ $data->status == 'Active' ? 'selected' : '' }}>Active</option>
-            <option value="Inactive" {{ $data->status == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+            {{-- <option value="Active" {{ $data->status == 'Active' ? 'selected' : '' }}>Active</option> --}}
+            {{-- <option value="Inactive" {{ $data->status == 'Inactive' ? 'selected' : '' }}>Inactive</option> --}}
             <option value="UnderMaintenance" {{ $data->status == 'UnderMaintenance' ? 'selected' : '' }}>Under Maintenance</option>
             <option value="UnderRepair" {{ $data->status == 'UnderRepair' ? 'selected' : '' }}>Under Repair</option>
             <option value="Waiting" {{ $data->status == 'Waiting' ? 'selected' : '' }}>Waiting</option>
             <option value="Scrap" {{ $data->status == 'Scrap' ? 'selected' : '' }}>Scrap</option>
-            <option value="RFU" {{ $data->status == 'RFU' ? 'selected' : '' }}>RFU</option>
+            <option value="Finish" {{ $data->status == 'Finish' ? 'selected' : '' }}>RFU</option>
         </select>
     </div>
 
@@ -200,7 +200,7 @@
                             {{ $item->quantity }}
                         </td>
                         <td>
-                            {{ ($item->asset_id == null) ? '-' :  'AST - '.$item->asset_id. ' - '. $item->asset->name . ' - '. ($item->asset->serial_number ?? '') }}
+                            {{ ($item->asset_id == null) ? '-' :  'AST - '.$item->asset_id. ' - '. ($item->asset->name ?? null) . ' - '. ($item->asset->serial_number ?? '') }}
                         </td>
                     </tr>
                 @endforeach

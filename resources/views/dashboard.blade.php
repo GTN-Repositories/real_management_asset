@@ -85,7 +85,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col mb-4">
+            {{-- <div class="col mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
@@ -97,7 +97,7 @@
                         <h4 class="ms-1 mb-0 text-muted" id="asset-value">Loading...</h4>
                     </div>
                 </div>
-            </div>
+            </div> --}}
             <div class="col mb-4">
                 <div class="card">
                     <div class="card-body">
@@ -135,7 +135,7 @@
             <div class="col mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="m-0">Maintenance Status</h5>
+                        <h5 class="m-0">Inactive Status</h5>
                         <div class="btn-group">
                             <button class="btn btn-sm btn-outline-secondary" id="maintenance-download">
                                 <i class="ti ti-download"></i>
@@ -196,7 +196,7 @@
             <div class="col mb-4">
                 <div class='card'>
                     <div class='card-header'>
-                        <h5 class="m-0" style="font-weight: 900;">Maintenance Status</h5>
+                        <h5 class="m-0" style="font-weight: 900;">Breakdown Count</h5>
                     </div>
                     <div class='card-body'>
                         <table class="datatables table table-striped table-poppins  border-top" id="data-table-maintenance-status">

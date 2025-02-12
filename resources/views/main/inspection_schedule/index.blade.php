@@ -116,6 +116,13 @@
                         </div>
 
                         <div class="app-calendar-events-filter ms-3">
+                            {{-- @foreach ($assets as $asset)
+                                <div class="form-check form-check-info">
+                                    <input class="form-check-input input-filter" type="checkbox" id="select-{{ $asset->ids }}"
+                                        data-value="{{ $asset->ids }}" checked />
+                                    <label class="form-check-label" for="select-{{ $asset->ids }}">{{ $asset->text }}</label>
+                                </div>
+                            @endforeach --}}
                             <div class="form-check form-check-info">
                                 <input class="form-check-input input-filter" type="checkbox" id="select-p2h"
                                     data-value="p2h" checked />

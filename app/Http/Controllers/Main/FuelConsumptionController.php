@@ -65,6 +65,9 @@ class FuelConsumptionController extends Controller
             ->addColumn('hm', function ($data) {
                 return number_format($data->hm, 0, ',', '.') ?? null;
             })
+            ->addColumn('km', function ($data) {
+                return number_format($data->lasted_km_asset, 0, ',', '.') ?? null;
+            })
             ->addColumn('loadsheet', function ($data) {
                 return number_format($data->loadsheet, 0, ',', '.') ?? null;
             })
@@ -113,6 +116,7 @@ class FuelConsumptionController extends Controller
             'user_id',
             'date',
             'liter',
+            'lasted_km_asset',
             'hm',
             'price',
             'category',

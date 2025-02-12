@@ -64,7 +64,7 @@
         </div>
     </div>
     <div class="row mb-4">
-        <div class="col-12 col-md-4 col-lg-4 mb-3" style="">
+        {{-- <div class="col-12 col-md-4 col-lg-4 mb-3" style="">
             <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #D59A01;">
                 <h4 class="text-white card-title m-0 fw-bold">Active</h4>
             </div>
@@ -79,7 +79,7 @@
             <div class="card d-flex align-items-end justify-content-center" style="height: 100px; margin-top: -100px; z-index: 10; border-radius: 20px; background-color: rgba(127, 45, 232, 0.35); text-align: end;">
                 <h5 class="text-white card-title p-1 p-lg-4 m-0 fw-bold" id="inactive">Loading...</h5>
             </div>
-        </div>            
+        </div>             --}}
         <div class="col-12 col-md-4 col-lg-4 mb-3" style="">
             <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #01A5DB;">
                 <h4 class="text-white card-title m-0 fw-bold">Under Maintenance</h4>
@@ -104,7 +104,7 @@
                 <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="waiting">Loading...</h5>
             </div>
         </div>
-        <div class="col-12 col-md-4 col-lg-3 mb-3" style="">
+        <div class="col-12 col-md-4 col-lg-4 mb-3" style="">
             <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #3BBF56;">
                 <h4 class="text-white card-title m-0 fw-bold">Scrap</h4>
             </div>
@@ -112,7 +112,7 @@
                 <h5 class="text-black card-title p-1 p-lg-4 m-0 fw-bold" id="scrap">Loading...</h5>
             </div>
         </div>
-        <div class="col-12 col-md-4 col-lg-3 mb-3" style="">
+        <div class="col-12 col-md-4 col-lg-4 mb-3" style="">
             <div class="card d-flex align-items-center justify-content-center" style="height: 100px; width: 50%; z-index: 20; border-radius: 20px; background-color: #3BBF56;">
                 <h4 class="text-white card-title m-0 fw-bold">RFU</h4>
             </div>
@@ -122,7 +122,7 @@
         </div>
     </div>
 
-    <div class="card mb-4">
+    {{-- <div class="card mb-4">
         <div class="card-header flex-nowrap header-elements">
             <h5 class="card-title mb-0">Top Asset Maintenance Over Time</h5>
             <div class="card-header-elements ms-auto py-0 d-none d-sm-block">
@@ -131,7 +131,7 @@
         <div class="card-body pt-2">
             <canvas id="lineChart"></canvas>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Product List Table -->
     <div class="card mb-4">
