@@ -55,6 +55,12 @@ class MaintenanceController extends Controller
                         }
                     });
                 }
+            })
+            ->when($request->asset_id, function ($query) use ($request) {
+                $query->whereHas('inspection_schedule', function ($q) use ($request) {
+                    $assetIds = array_map('intval', (array) $request->asset_id);
+                    $q->whereIn('asset_id', $assetIds);
+                });
             });
 
         if (session('selected_project_id')) {

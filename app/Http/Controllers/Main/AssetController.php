@@ -68,7 +68,7 @@ class AssetController extends Controller
                 return $data->image ? '<img src="' . asset('storage/' . $data->image) . '" alt="Image" width="50" height="50"/>' : "-";
             })
             ->addColumn('nameWithNumber', function ($data) {
-                return Crypt::decrypt($data->id) . '-' . $data->name . " - " . $data->license_plate ?? "-";
+                return 'AST - '. Crypt::decrypt($data->id) . '-' . $data->name . " - " . $data->serial_number ?? "-";
             })
             ->addColumn('management_project', function ($data) {
                 if ($data->management_project_id) {

@@ -101,7 +101,7 @@ class ReportMaintenanceController extends Controller
         $data = [];
         
         foreach ($schedules as $key => $value) {
-            $data_date = [];
+            $data_date = null;
             foreach (range(1, $daysInMonth) as $day) {
                 $date = Carbon::parse($year.'-'.$month.'-'.$day)->format('Y-m-d');
                 $data_date[] = StatusAsset::where('asset_id', $key)->whereDate('created_at', $date)->where('type', 'maintenance')->orderBy('created_at', 'desc')->get();
