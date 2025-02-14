@@ -95,7 +95,7 @@
 
     <div class="col-12 col-md-6" id="estimate_finish_form">
         <label class="form-label">DateTime Estimate Finish/RFU</label>
-        <input type="date" name="estimate_finish" value="{{ $maintenance->estimate_finish }}" id="estimate_finish" class="form-control mb-3 mb-lg-0"
+        <input type="datetime-local" name="estimate_finish" value="{{ ($maintenance->estimate_finish == null) ? $data->estimate_finish : $maintenance->estimate_finish }}" id="estimate_finish" class="form-control mb-3 mb-lg-0"
             placeholder="Masukan DateTime Estimate Finish/RFU" />
     </div>
 

@@ -751,7 +751,7 @@ class AssetController extends Controller
                 DB::raw('COUNT(CASE WHEN status = "Finish" THEN 1 END) as finish'),
             )->first();
 
-            $active = $operationalStatus->active + $operationalStatus->finish;
+            $active = $operationalStatus->active + (int)$operationalStatus->finish;
 
             $maintenanceStatus = (clone $baseQuery)->select(
                 DB::raw('COUNT(CASE WHEN status = "UnderMaintenance" THEN 1 END) as underMaintenance'),
@@ -773,7 +773,6 @@ class AssetController extends Controller
             $inactive = $operationalStatus->inactive + $maintenanceStatus->underMaintenance + $maintenanceStatus->underRepair + $maintenanceStatus->waiting;
             $response = [
                 // Operational Status
-                'active' => (int) $operationalStatus->active,
                 'inactive' => (int) $inactive,
                 'scrap' => (int) $operationalStatus->scrap,
                 'active' => $active,
