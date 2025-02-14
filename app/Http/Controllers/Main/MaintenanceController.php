@@ -123,6 +123,7 @@ class MaintenanceController extends Controller
                     Mail::to($generalEmailSmtp)->send(new ChangeStatusAssetEmail($asset));
                 }
 
+                $data['estimate_finish'] = $inspection_schedule->estimate_finish ?? now();
                 $maintenance = Maintenance::create($data);
 
                 if (isset($data['selected_items'])) {
@@ -333,7 +334,11 @@ class MaintenanceController extends Controller
                 return $data['name'];
             })
             ->addColumn('status', function ($data) {
-                return $data['status'];
+                if ($data['status'] == 'Finish') {
+                    return 'RFU';
+                } else {
+                    return $data['status'];
+                }
             })
             ->addColumn('total', function ($data) {
                 return $data['total'];
