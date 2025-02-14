@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('maintenances', function (Blueprint $table) {
             $table->dropColumn('deviasi');
 
-            $table->integer('deviasi')->nullable();
+            $table->float('deviasi')->nullable();
         });
     }
 

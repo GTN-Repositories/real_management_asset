@@ -47,8 +47,8 @@
                 <td>{{ $item->end_maintenace ?? null }}</td>
                 <td>{{ $item->deviasi ?? null }}</td>
                 <td>{{ $item->finish_at ?? null }}</td>
-                <td>{{ $item->hm ?? null }}</td>
                 <td>{{ $item->km ?? null }}</td>
+                <td>{{ $item->hm ?? null }}</td>
                 <td>{{ $item->location ?? null }}</td>
                 <td>{{ $item->detail_problem ?? null }}</td>
                 <td>{{ $item->action_to_do ?? null }}</td>
