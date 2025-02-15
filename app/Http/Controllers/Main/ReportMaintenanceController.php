@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Models\Asset;
 use App\Models\InspectionSchedule;
 use App\Models\Maintenance;
 use App\Models\StatusAsset;
@@ -18,8 +19,82 @@ class ReportMaintenanceController extends Controller
         $year = $request->year ?? now()->year;
         $daysInMonth = Carbon::createFromDate($year, $month)->daysInMonth;
 
-        $dataByDate = $this->dataByDate($daysInMonth, $month, $year);
-        
+        // $dataByDate = $this->getMaintenanceSchedule();
+
+        // Hitung tanggal awal dan akhir
+        $start = Carbon::create($year, $month, 1);
+        $end = $start->copy()->endOfMonth();
+        $startDate = Carbon::create($year, $month, 1);
+        $endDate = $startDate->copy()->endOfMonth();
+        $daysInMonth = $startDate->daysInMonth;
+
+        // Ambil semua asset
+        $assets = Asset::get();
+
+        $dataByDate = [];
+
+        foreach ($assets as $asset) {
+            $assetId = decrypt($asset->id);
+            $dataByDate[$assetId] = [
+                'name' => $asset->name,
+                'code' => $asset->code,
+                'days' => [],
+            ];
+
+            // Inisialisasi semua hari dengan status 'Aktif'
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $dayKey = str_pad($day, 2, '0', STR_PAD_LEFT);
+                $assetId = decrypt($asset->id);
+                $dataByDate[$assetId]['days'][$dayKey] = [
+                    'DS' => 'Aktif',
+                    'NS' => 'Aktif',
+                ];
+            }
+
+            // Proses maintenance untuk asset ini
+            $assetMaintenance = Maintenance::where('asset_id', decrypt($asset->id))
+                                            ->where(function($query) use ($startDate, $endDate) {
+                                                $query->whereBetween('date', [$startDate, $endDate])
+                                                    ->orWhereBetween('finish_at', [$startDate, $endDate]);
+                                            })
+                                            ->get();
+            foreach ($assetMaintenance as $maintenance) {
+                $currentDay = Carbon::parse($maintenance->date)->copy();
+
+                while ($currentDay <= $maintenance->finish_at) {
+                    $dayKey = $currentDay->format('d');
+                    $shift = ($currentDay->hour >= 6 && $currentDay->hour < 18) ? 'DS' : 'NS';
+
+                    $status = 'Aktif';
+                    $maintenanceDate = Carbon::parse($maintenance->date);
+                    $maintenanceFinish = Carbon::parse($maintenance->finish_at);
+                    
+                    if ($maintenanceDate->format('Y-m-d') == now()->format('Y-m-d')){
+                        $diffInDays = $maintenanceDate->diffInDays($maintenanceFinish);
+                    }else{
+                        $diffInDays = $maintenanceDate->diffInDays($currentDay);
+                    }
+                    
+                    if ($diffInDays <= 1) {
+                        $status = 'Ringan';
+                    } elseif ($diffInDays > 1 && $diffInDays <= 2) {
+                        $status = 'Sedang';
+                    } elseif ($diffInDays > 2) {
+                        $status = 'Berat';
+                    }
+
+                    // Update status hanya jika maintenance berlaku untuk shift ini
+                    if ($status !== 'Aktif') {
+                        $assetId = decrypt($asset->id);
+                        $dataByDate[$assetId]['days'][$dayKey][$shift] = $status;
+                    }
+
+                    // Progress per 12 jam untuk mencakup kedua shift
+                    $currentDay->addHours(12);
+                }
+            }
+        }
+
         return view('main.report_maintenance.index', compact('daysInMonth', 'month', 'year', 'dataByDate'));
     }
 
@@ -63,28 +138,17 @@ class ReportMaintenanceController extends Controller
 
     // public function dataByDate($daysInMonth, $month, $year)
     // {
-    //     $schedules = InspectionSchedule::get()->groupBy('asset_id')->sortDesc();
+    //     $schedules = StatusAsset::get()->groupBy('asset_id')->sortDesc();
 
     //     $data = [];
-    //     $color = [
-    //         'Ringan' => '#00BD2C',
-    //         'Sedang' => '#FABE29',
-    //         'Berat' => '#FF0004',
-    //         'Aktif' => '#248FD6',
-    //         'RFU' => '#7F2DE8',
-    //         'Scrap' => '#666666',
-    //         'Uncertain' => '#FFFFFF'
-    //     ];
         
     //     foreach ($schedules as $key => $value) {
-    //         $inspection = InspectionSchedule::where('asset_id', $key);
-
-    //         $data_date = [];
+    //         $data_date = null;
     //         foreach (range(1, $daysInMonth) as $day) {
-    //             $date = $year.'-'.$month.'-'.$day;
-    //             $data_date[] = $inspection->whereDate('date', $date)->orderBy('created_at', 'desc')->first()->urgention ?? 'Uncertain';
+    //             $date = Carbon::parse($year.'-'.$month.'-'.$day)->format('Y-m-d');
+    //             $data_date[] = StatusAsset::where('asset_id', $key)->whereDate('created_at', $date)->where('type', 'maintenance')->orderBy('created_at', 'desc')->get();
     //         }
-
+            
     //         $data[] = [
     //             'asset_id' => $key,
     //             'data' => $data_date,
@@ -94,27 +158,66 @@ class ReportMaintenanceController extends Controller
     //     return $data;
     // }
 
-    public function dataByDate($daysInMonth, $month, $year)
+
+    public function getMaintenanceSchedule()
     {
-        $schedules = StatusAsset::get()->groupBy('asset_id')->sortDesc();
+        // $data = Maintenance::select(
+        //     'date',
+        //     'status',
+        //     'finish_at',
+        //     'detail_problem',
+        //     'urgention',
+        //     'inspection_schedule_id',
+        // )->get();
 
-        $data = [];
+        // $schedule = [];
         
-        foreach ($schedules as $key => $value) {
-            $data_date = null;
-            foreach (range(1, $daysInMonth) as $day) {
-                $date = Carbon::parse($year.'-'.$month.'-'.$day)->format('Y-m-d');
-                $data_date[] = StatusAsset::where('asset_id', $key)->whereDate('created_at', $date)->where('type', 'maintenance')->orderBy('created_at', 'desc')->get();
-            }
-            
-            $data[] = [
-                'asset_id' => $key,
-                'data' => $data_date,
-            ];
-        }
+        // foreach ($data as $maintenance) {
+        //     $inspectionShedjule = InspectionSchedule::find($maintenance->inspection_schedule_id);
+        //     $assetId = 'AST-' . ($inspectionShedjule->asset_id ?? null);
+        //     $date = Carbon::parse($maintenance->date)->format('Y-m-d');
+        //     $shift = Carbon::parse($maintenance->date)->hour < 18 ? 'DS' : 'NS';
 
-        return $data;
+        //     if (!isset($schedule[$assetId])) {
+        //         $schedule[$assetId] = [];
+        //     }
+
+        //     if (!isset($schedule[$assetId][$shift])) {
+        //         $schedule[$assetId][$shift] = [];
+        //     }
+
+        //     $status = 'Aktif'; // Default status
+        //     if ($maintenance->finish_at) {
+        //         $start = Carbon::parse($maintenance->date);
+        //         $finish = Carbon::parse($maintenance->finish_at);
+        //         $diffDays = $finish->diffInDays($start);
+
+        //         if ($diffDays <= 1) {
+        //             $status = 'Ringan';
+        //         } elseif ($diffDays == 2) {
+        //             $status = 'Sedang';
+        //         } else {
+        //             $status = 'Berat';
+        //         }
+        //     }
+
+        //     $schedule[$assetId][$shift][$date] = $status;
+        // }
+
+        // return $schedule;
+
+        $startDate = Carbon::create(2023, 1, 1); // Contoh bulan Januari
+        $endDate = Carbon::create(2023, 1, 31);
+        
+        $maintenances = Maintenance::whereBetween('date', [$startDate, $endDate])
+            ->get()
+            ->groupBy(['asset_id', function ($item) {
+                return $item->date->format('d');
+            }, 'shift']);
+
+        return $maintenances;
     }
+
 
     public function data(Request $request)
     {

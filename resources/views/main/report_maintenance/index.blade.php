@@ -2,6 +2,23 @@
 
 @section('title', 'Laporan Loadsheet')
 
+@push('css')
+    <style>
+        .light-style table.dataTable th, .light-style table.dataTable td .aktif{
+            background-color: '#ff00ff' !important;
+        }
+        .ringan{
+            background-color: '#00ff00' !important;
+        }
+        .sedang{
+            background-color: '#ffaa00' !important;
+        }
+        .berat{
+            background-color: '#ff0000' !important;
+        }
+    </style>
+@endpush
+
 @section('content')
 <div class="mx-5 flex-grow-1 container-p-y">
     <div class="row g-3 text-center mb-4">
@@ -146,60 +163,56 @@
                 </button>
             </div>
         </div>
+
         <div class="card-datatable table-responsive">
             <table class="datatables table table-striped table-bordered table-poppins" id="data-table-by-date">
-                <thead class="border-top">
+                <thead class="bg-gray-200">
                     <tr>
-                        <th rowspan="2" class="text-center align-middle">Asset ID</th>
-                        <th colspan="{{ $daysInMonth }}" class="text-center">{{
-                            \Carbon\Carbon::parse((int)$year.'-'.(int)$month.'-01')->format('F Y') }}</th>
+                        <th colspan="{{ $daysInMonth + 2 }}" class="border text-center p-2">{{ \Carbon\Carbon::parse((int)$year.'-'.(int)$month.'-01')->format('F Y') }}</th>
                     </tr>
                     <tr>
-                        @for ($i = 1; $i <= $daysInMonth; $i++)
-                            <th class="text-center">{{ $i }}</th>
+                        <th rowspan="2" class="border p-2">Asset</th>
+                        @for($day = 1; $day <= $daysInMonth; $day++)
+                            <th colspan="2" class="border p-2 text-center">{{ $day }}</th>
+                        @endfor
+                    </tr>
+                    <tr>
+                        @for($day = 1; $day <= $daysInMonth; $day++)
+                            <th class="border p-2">DS</th>
+                            <th class="border p-2">NS</th>
                         @endfor
                     </tr>
                 </thead>
+                
                 <tbody>
-                    @php
-                        $color = [
-                            'Ringan' => '#00BD2C',
-                            'Sedang' => '#FABE29',
-                            'Berat' => '#FF0004',
-                            'Aktif' => '#248FD6',
-                            'RFU' => '#7F2DE8',
-                            'Scrap' => '#666666',
-                            'Uncertain' => '#FFFFFF'
-                        ];
-                    @endphp
-                    @foreach ($dataByDate as $item)
-                        <tr>
-                            @php
-                                $asset = \App\Models\Asset::find($item['asset_id']);
-                            @endphp
-                            <td>{{ 'AST - '.$item['asset_id']. ' - ' . ($asset->name ?? null) . ' - ' . ($asset->serial_number ?? '-') }}</td>
+                    @foreach($dataByDate as $assetId => $assetData)
+                        <tr class="hover:bg-gray-50">
+                            <td class="border p-2">AST - {{ $assetId }}</td>
+                            @for($day = 1; $day <= $daysInMonth; $day++)
+                                {{-- @if ((int)$day > (int)now()->day())
+                                    <td></td>
+                                    <td></td>
+                                @else --}}
+                                    @php
+                                        $dayKey = str_pad($day, 2, '0', STR_PAD_LEFT);
+                                        $dsStatus = $assetData['days'][$dayKey]['DS'] ?? 'Aktif';
+                                        $nsStatus = $assetData['days'][$dayKey]['NS'] ?? 'Aktif';
+                                    @endphp
+                                    <td class="border p-2 text-center text-white" style="background-color: {{ match($dsStatus) {'Ringan' => '#00BD2C', 'Sedang' => '#FABE29', 'Berat' => '#FF0004', default => '#248FD6'} }}">
+                                        {{ $dsStatus }}
+                                    </td>
                             
-                            @foreach ($item['data'] as $value)
-                                <td>
-                                    @if ($value == '[]')
-                                        Uncertain
-                                    @endif
-                                    @foreach ($value as $detail)
-                                        @php
-                                            $status = isset($detail->status_after) && $detail->status_after != null ? $detail->status_after : 'Uncertain';
-                                        @endphp
-                                        <div class="p-3 m-1 text-center" style="background-color: {{ $color[$status] ?? '#FFFFFF' }}; color: {{ ($status == 'Uncertain') ? '#000000' : '#FFFFFF' }};" class="text-center">
-                                            {{ $status }}
-                                            <p style="font-size: 10px;">{{ $detail->created_at->format('H:i') ?? '-' }}</p>
-                                        </div>
-                                    @endforeach
-                                </td>
-                                {{-- <td style="background-color: {{ $color[$value] ?? '#FFFFFF' }}; color: {{ ($value == 'Uncertain') ? '#000000' : '#FFFFFF' }};" class="text-center">{{ $value }}</td> --}}
-                            @endforeach
+                                    <td class="border p-2 text-center text-white" style="background-color: {{ match($nsStatus) {'Ringan' => '#00BD2C', 'Sedang' => '#FABE29', 'Berat' => '#FF0004', default => '#248FD6'} }}">
+                                        {{ $nsStatus }}
+                                    </td>
+                                {{-- @endif --}}
+                            @endfor
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+            
+
         </div>
     </div>
 
