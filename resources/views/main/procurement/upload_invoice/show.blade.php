@@ -1,7 +1,7 @@
 @extends('layouts.global')
 
-@section('title', 'Request Order')
-@section('title_page', 'Procurement / Request Order / Pengajuan')
+@section('title', 'Upload Invoice')
+@section('title_page', 'Procurement / Upload Invoice')
 
 
 @section('content')
@@ -145,6 +145,7 @@
                                         <th>Code</th>
                                         <th>Item</th>
                                         <th>Harga</th>
+                                        <th>Vendor</th>
                                         <th>Jumlah</th>
                                         <th>Total Harga</th>
                                         <th>Action</th>
@@ -157,11 +158,11 @@
                                         <td>{{ $data->item?->code ?? '-' }}</td>
                                         <td>{{ $data->item?->name ?? '-' }}</td>
                                         <td>Rp {{ number_format($data->price ?? 0, 0, ',', '.') }}</td>
+                                        <td>{{ $data->vendorComparation?->vendor?->name ?? '-' }}</td>
                                         <td>{{ $data->qty ?? '-' }}</td>
                                         <td>Rp {{ number_format($data->total_price ?? 0, 0, ',', '.') }}</td>
                                         <td>
-                                            <button class="btn btn-sm btn-primary" onclick="editItem('{{ $data->id }}')"><i class="fas fa-pencil"></i></button>
-                                            <button class="btn btn-sm btn-danger" onclick="deleteItem('{{ $data->id }}')"><i class="fas fa-trash"></i></button>
+                                            <button class="btn btn-sm btn-primary" onclick="editItem('{{ $data->id }}')"><i class="fas fa-plus me-2"></i>Lampiran</button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -175,12 +176,10 @@
                                 onclick="sendRo('{{ $backlog->id }}')">Ajukan RO</a>
                             @elseif ($backlog->status == 101)
                             <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3"
-                                onclick="process('{{ $backlog->id }}')">Kirim</a>
+                                onclick="sendRfq('{{ $backlog->id }}')">Submit</a>
                             @elseif ($backlog->status == 102)
                             <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
-                                onclick="noArchiveBacklog('{{ $backlog->id }}')">Tidak</a>
-                            <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3"
-                                onclick="archiveBacklog('{{ $backlog->id }}')">Sesuai</a>
+                                onclick="sendUploadInvoice('{{ $backlog->id }}')">Submit</a>
                             @elseif ($backlog->status == 103)
                             <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
                                 onclick="spb('{{ $backlog->id }}')">Buatkan SPB</a>
@@ -217,6 +216,9 @@
 @endsection
 
 @push('js')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
     <script>
         $(document).ready(function() {
             $('#data-table-item').DataTable({
@@ -227,8 +229,9 @@
                     [0, "asc"]
                 ],
             });
-        })
-        function sendRo(id) {
+        });
+
+        function sendUploadInvoice(id) {
             // Confirmation
             event.preventDefault();
             Swal.fire({
@@ -242,7 +245,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "{{ route('procurement.request-order.request-ro', ':id') }}".replace(':id', id),
+                        url: "{{ route('procurement.upload-invoice.sendInvoice', ':id') }}".replace(':id', id),
                         type: 'POST',
                         data: {
                             '_token': '{{ csrf_token() }}',
@@ -254,7 +257,7 @@
                             title: 'Success',
                             text: data.message
                         }).then(() => {
-                            window.location.href = "{{ route('procurement.request-order.index') }}";
+                            window.location.href = "{{ route('procurement.upload-invoice.index') }}";
                         });
                     })
                     .fail(function() {
@@ -281,7 +284,7 @@
                         '_method': 'DELETE',
                     };
                     $.ajax({
-                            url: "{{ route('procurement.request-order.destroyItem', ':id') }}".replace(':id', id),
+                            url: "{{ route('procurement.upload-invoice.destroyItem', ':id') }}".replace(':id', id),
                             type: 'POST',
                             data: postForm,
                             dataType: 'json',
@@ -296,9 +299,10 @@
                 }
             });
         }
+
         function editItem(id) {
             $.ajax({
-                    url: "{{ route('procurement.request-order.editItem', ':id') }}".replace(':id', id),
+                    url: "{{ route('procurement.upload-invoice.editItem', ':id') }}".replace(':id', id),
                     type: 'GET',
                 })
                 .done(function(data) {

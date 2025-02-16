@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
 
-class RequestOrder extends Model
+class UploadInvoice extends Model
 {
     protected $guarded = ['id'];
 
@@ -19,15 +19,5 @@ class RequestOrder extends Model
         $decryptedId = Crypt::decrypt($encryptedId);
 
         return self::findOrFail($decryptedId);
-    }
-
-    public function warehouse()
-    {
-        return $this->belongsTo(Werehouse::class, 'warehouse_id', 'id');
-    }
-
-    public function createdBy()
-    {
-        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 }

@@ -1,9 +1,9 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Edit Request Order</h3>
+    <h3 class="mb-2">Edit Request For Quotation</h3>
     <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
-<form method="POST" class="row g-3" id="fromEdit" action="{{ route('procurement.request-order.updateItem', $data->id) }}"
+<form method="POST" class="row g-3" id="fromEdit" action="{{ route('procurement.rfq.updateItem', $data->id) }}"
     enctype="multipart/form-data">
     @csrf
     @method('PUT')
@@ -19,16 +19,21 @@
             placeholder="Masukan Nama Item" value="{{ $data->item?->name ?? '' }}" disabled />
     </div>
 
+    <div class="col-12 col-md-12" id="vendorRelation">
+        <label class="form-label" for="vendor_comparation_id">Vendor<span class="text-danger">*</span></label>
+        <select id="vendor_comparation_id" name="vendor_comparation_id"
+            class="select2 form-select select2-primary" data-allow-clear="true" required>    
+        </select>
+    </div>
+
     <div class="col-12 col-md-6">
         <label class="form-label">Qty</label>
-        <input type="text" name="qty" class="form-control mb-3 mb-lg-0" placeholder="Jumlah"
-            value="{{ $data->qty }}" required />
+        <input type="text" name="qty" class="form-control mb-3 mb-lg-0" placeholder="Jumlah" value="{{ $data->qty }}" />
     </div>
 
     <div class="col-12 col-md-6">
         <label class="form-label">Harga</label>
-        <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0" placeholder="Harga"
-            required value="{{ $data->price }}" />
+        <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0" placeholder="Harga" value="{{ $data->price }}" />
     </div>
 
     <div class="col-12 text-center">
@@ -43,6 +48,63 @@
         $('#price').each(function() {
             const value = $(this).val();
             $(this).val(formatCurrency(value));
+        });
+
+        $('#vendor_comparation_id').select2({
+            dropdownParent: $('#vendorRelation'),
+            placeholder: 'Pilih Vendor',
+            ajax: {
+                url: "{{ route('procurement.rfq.vendorComparationData') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10,
+                        request_order_id: '{{ $data->request_order_id }}'
+                    };
+                },
+                processResults: function(data) {
+                    apiResults = data.data
+                        .map(function(item) {
+                            return {
+                                text: item.name,
+                                id: item.relationId,
+                            };
+                        });
+
+                    return {
+                        results: apiResults
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $('#vendor_comparation_id').on('change', function() {
+            var id = $(this).val();
+            $.ajax({
+                url: "{{ route('procurement.rfq.vendorComparationFilter') }}",
+                dataType: 'json',
+                delay: 250,
+                data: {
+                    id: id,
+                    request_order_id: '{{ $data->request_order_id }}'
+                },
+                success: function(data) {
+                    var price = data.price;
+                    $('#price').val(formatCurrency(price));
+                },
+                error: function(xhr) {
+                    console.error('Error fetching assets:', xhr);
+                    $('#asset_id').select2({
+                        dropdownParent: $('#assetRelation'),
+                        data: [],
+                        allowClear: true
+                    }).trigger('change');
+                }
+            });
         });
     });
 

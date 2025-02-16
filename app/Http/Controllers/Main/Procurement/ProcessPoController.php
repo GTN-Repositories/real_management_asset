@@ -3,17 +3,19 @@
 namespace App\Http\Controllers\Main\Procurement;
 
 use App\Http\Controllers\Controller;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderDetail;
 use App\Models\RequestOrder;
 use App\Models\RequestOrderDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
-class RequestOrderController extends Controller
+class ProcessPoController extends Controller
 {
     public function index()
     {
-        return view('main.procurement.request_order.index');
+        return view('main.procurement.process_po.index');
     }
 
     public function data(Request $request)
@@ -69,7 +71,7 @@ class RequestOrderController extends Controller
                 $btn = '<div class="d-flex">';
                 if (auth()->user()->hasPermissionTo('employee-edit')) {
                     if (!auth()->user()->hasRole('Read only')) {
-                        $btn .= '<a href="' . route('procurement.request-order.show', $data->id) . '" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data"><i class="ti ti-eye"></i></a>';
+                        $btn .= '<a href="' . route('procurement.process-po.show', $data->id) . '" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data"><i class="ti ti-eye"></i></a>';
                     }
                 }
                 if (auth()->user()->hasPermissionTo('employee-delete')) {
@@ -122,7 +124,7 @@ class RequestOrderController extends Controller
 
     public function create()
     {
-        return view('main.procurement.request_order.create');
+        return view('main.procurement.process_po.create');
     }
 
     /**
@@ -150,7 +152,6 @@ class RequestOrderController extends Controller
                     'date' => $data['date'],
                     'warehouse_id' => $warehouse_id,
                     'created_by' => Auth::user()->id,
-                    'status' => 100
                 ];
 
                 $requestOrder = RequestOrder::create($createRo);
@@ -196,7 +197,7 @@ class RequestOrderController extends Controller
         $backlog = RequestOrder::findByEncryptedId($id);
         $item = RequestOrderDetail::where('request_order_id', Crypt::decrypt($backlog->id))->get();
 
-        return view('main.procurement.request_order.show', compact('backlog', 'item'));
+        return view('main.procurement.process_po.show', compact('backlog', 'item'));
     }
 
     /**
@@ -206,14 +207,14 @@ class RequestOrderController extends Controller
     {
         $data = RequestOrder::findByEncryptedId($id);
 
-        return view('main.procurement.request_order.edit', compact('data'));
+        return view('main.procurement.process_po.edit', compact('data'));
     }
 
     public function editItem($id)
     {
         $data = RequestOrderDetail::findByEncryptedId($id);
 
-        return view('main.procurement.request_order.edit', compact('data'));
+        return view('main.procurement.process_po.edit', compact('data'));
     }
 
     /**
@@ -311,15 +312,79 @@ class RequestOrderController extends Controller
         }
     }
 
-    public function sendRo($id)
+    public function sendPo(Request $request, $id)
     {
-        $data = RequestOrder::findByEncryptedId($id);
-        $data->status = 101;
-        $data->save();
+        try {
+            return $this->atomic(function () use ($request, $id) {
+                $ro = RequestOrder::findByEncryptedId($id);
+                $ro->status = $request->status;
+                $ro->reason = $request->reason;
+                $ro->save();
+    
+                if ($request->status == 104) {
+                    $this->storePo($ro);
+                }
+    
+                return response([
+                    'status' => true,
+                    'message' => 'Data berhasil dikirim!',
+                ]);
+            });
+        } catch (\Throwable $th) {
+            return response([
+                'status' => false,
+                'message' => 'Data gagal dikirim! ' . $th->getMessage(),
+            ]);
+        }
+    }
 
-        return response([
-            'status' => true,
-            'message' => 'Data berhasil dikirim!',
-        ]);
+    public function storePo($ro)
+    {
+        $data = RequestOrder::findByEncryptedId($ro->id);
+
+        try {
+            return $this->atomic(function () use ($data) {
+                $countRo = PurchaseOrder::count() + 1;
+                $code = "PO-".now()->format('ymd')."-".sprintf('%04d', $countRo);
+                $warehouse_id = $data['warehouse_id'];
+
+                $totalPrice = $data->total_price;
+                $totalItem = $data->total_item;
+
+                $createPo = [
+                    'request_order_id' => decrypt($data->id),
+                    'code' => $code,
+                    'total_item' => $totalItem,
+                    'total_price' => $totalPrice,
+                    'date' => $data['date'],
+                    'warehouse_id' => $warehouse_id,
+                    'created_by' => Auth::user()->id,
+                    'status' => 104
+                ];
+
+                $purchaseOrder = PurchaseOrder::create($createPo);
+                $purchase_order_id = Crypt::decrypt($purchaseOrder->id);
+                
+                $requestOrderDetail = RequestOrderDetail::where('request_order_id', decrypt($data->id))->get();
+
+                foreach ($requestOrderDetail as $key => $value) {
+                    $createPod = [
+                        'purchase_order_id' => $purchase_order_id,
+                        'item_id' => $value->item_id,
+                        'warehouse_id' => $value->warehouse_id,
+                        'qty' => $value->qty,
+                        'price' => $value->price,
+                        'total_price' => $value->total_price,
+                        'request_order_detail_id' => decrypt($value->id)
+                    ];
+
+                    $purchaseOrderDetail = PurchaseOrderDetail::create($createPod);
+                }
+
+                return true;
+            });
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 }

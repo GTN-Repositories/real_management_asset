@@ -1,7 +1,7 @@
 @extends('layouts.global')
 
-@section('title', 'Request Order')
-@section('title_page', 'Procurement / Request Order')
+@section('title', 'Process Purchase Order')
+@section('title_page', 'Procurement / Process Purchase Order')
 
 @section('content')
     <div class="mx-5 flex-grow-1 container-p-y">
@@ -15,11 +15,6 @@
                 <button type="button" class="btn btn-danger btn-md" id="delete-btn" style="display: none !important;">
                     <i class="fas fa-trash-alt"></i> Hapus Masal
                 </button>
-                @if (auth()->user()->hasPermissionTo('item-request'))
-                    <button type="button" class="btn btn-warning btn-md" onclick="createData()">
-                        <i class="fas fa-box me-2"></i> Request Order
-                    </button>
-                @endif
             @endif
         </div>
         <!-- Product List Table -->
@@ -137,7 +132,7 @@
 
                 ajax: {
                     type: "GET",
-                    url: "{{ route('procurement.request-order.data') }}",
+                    url: "{{ route('procurement.process-po.data') }}",
                     data: {
                         keyword: keyword,
                         startDate: startDate,
@@ -214,7 +209,7 @@
                         '_method': 'DELETE',
                     };
                     $.ajax({
-                            url: "{{ route('procurement.request-order.destroy', ':id') }}".replace(':id', id),
+                            url: "{{ route('procurement.process-po.destroy', ':id') }}".replace(':id', id),
                             type: 'POST',
                             data: postForm,
                             dataType: 'json',
@@ -247,7 +242,7 @@
                         'ids': ids
                     };
                     $.ajax({
-                            url: "{{ route('procurement.request-order.destroyAll') }}",
+                            url: "{{ route('procurement.process-po.destroyAll') }}",
                             type: 'POST',
                             data: postForm,
                             dataType: 'json',
@@ -265,7 +260,7 @@
 
         function createData() {
             $.ajax({
-                    url: "{{ route('procurement.request-order.create') }}",
+                    url: "{{ route('procurement.process-po.create') }}",
                     type: 'GET',
                 })
                 .done(function(data) {
@@ -280,7 +275,7 @@
 
         function editData(id) {
             $.ajax({
-                    url: "{{ route('procurement.request-order.edit', ':id') }}".replace(':id', id),
+                    url: "{{ route('procurement.process-po.edit', ':id') }}".replace(':id', id),
                     type: 'GET',
                 })
                 .done(function(data) {
@@ -295,11 +290,11 @@
 
         function showData(id) {
             $.ajax({
-                    url: "{{ route('procurement.request-order.show', ':id') }}".replace(':id', id),
+                    url: "{{ route('procurement.process-po.show', ':id') }}".replace(':id', id),
                     type: 'GET',
                 })
                 .done(function(data) {
-                    window.location.href = "{{ route('procurement.request-order.show', ':id') }}".replace(':id', id);
+                    window.location.href = "{{ route('procurement.process-po.show', ':id') }}".replace(':id', id);
                 })
                 .fail(function() {
                     Swal.fire('Error!', 'An error occurred while editing the record.', 'error');
@@ -308,7 +303,7 @@
 
         function create(id) {
             $.ajax({
-                    url: "{{ route('procurement.request-order.create') }}",
+                    url: "{{ route('procurement.process-po.create') }}",
                     type: 'GET',
                 })
                 .done(function(data) {

@@ -1,7 +1,7 @@
 @extends('layouts.global')
 
-@section('title', 'Request Order')
-@section('title_page', 'Procurement / Request Order / Pengajuan')
+@section('title', 'Process Purchase Order')
+@section('title_page', 'Procurement / Process Purchase Order')
 
 
 @section('content')
@@ -145,9 +145,9 @@
                                         <th>Code</th>
                                         <th>Item</th>
                                         <th>Harga</th>
+                                        <th>Vendor</th>
                                         <th>Jumlah</th>
                                         <th>Total Harga</th>
-                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -157,12 +157,9 @@
                                         <td>{{ $data->item?->code ?? '-' }}</td>
                                         <td>{{ $data->item?->name ?? '-' }}</td>
                                         <td>Rp {{ number_format($data->price ?? 0, 0, ',', '.') }}</td>
+                                        <td>{{ $data->vendorComparation?->vendor?->name ?? '-' }}</td>
                                         <td>{{ $data->qty ?? '-' }}</td>
                                         <td>Rp {{ number_format($data->total_price ?? 0, 0, ',', '.') }}</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-primary" onclick="editItem('{{ $data->id }}')"><i class="fas fa-pencil"></i></button>
-                                            <button class="btn btn-sm btn-danger" onclick="deleteItem('{{ $data->id }}')"><i class="fas fa-trash"></i></button>
-                                        </td>
                                     </tr>
                                 </tbody>
                                 @endforeach
@@ -175,29 +172,15 @@
                                 onclick="sendRo('{{ $backlog->id }}')">Ajukan RO</a>
                             @elseif ($backlog->status == 101)
                             <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3"
-                                onclick="process('{{ $backlog->id }}')">Kirim</a>
+                                onclick="sendRfq('{{ $backlog->id }}')">Submit</a>
                             @elseif ($backlog->status == 102)
                             <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
-                                onclick="noArchiveBacklog('{{ $backlog->id }}')">Tidak</a>
-                            <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3"
-                                onclick="archiveBacklog('{{ $backlog->id }}')">Sesuai</a>
+                                onclick="sendUploadInvoice('{{ $backlog->id }}')">Submit</a>
                             @elseif ($backlog->status == 103)
+                            <a href="javascript:void(0)" type="button" class="btn btn-danger btn-md mt-3 me-3"
+                                onclick="processPo('{{ $backlog->id }}', 100)">Reject</a>
                             <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
-                                onclick="spb('{{ $backlog->id }}')">Buatkan SPB</a>
-                            @elseif ($backlog->status == 104)
-                            <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
-                                onclick="sign('{{ $backlog->id }}')">Tanda Tangan</a>
-                            <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
-                                onclick="pdf('{{ $backlog->id }}')">Buat PDF</a>
-                            @elseif ($backlog->status == 105)
-                            <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
-                                onclick="baps('{{ $backlog->id }}')">Kirim BAPS</a>
-                            @elseif ($backlog->status == 106)
-                            <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
-                                onclick="invoice('{{ $backlog->id }}')">Kirim Invoice</a>
-                            @elseif ($backlog->status == 200)
-                            <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md me-3"
-                                onclick="completed('{{ $backlog->id }}')">Ubah Payemnt</a>
+                                onclick="processPo('{{ $backlog->id }}', 104)">Approve</a>
                             @endif
                         </div>
                     </div>
@@ -217,8 +200,13 @@
 @endsection
 
 @push('js')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
     <script>
         $(document).ready(function() {
+            init_table();
+
             $('#data-table-item').DataTable({
                 "paging": false,
                 "searching": true,
@@ -227,8 +215,9 @@
                     [0, "asc"]
                 ],
             });
-        })
-        function sendRo(id) {
+        });
+
+        function processPo(id, status) {
             // Confirmation
             event.preventDefault();
             Swal.fire({
@@ -242,10 +231,11 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "{{ route('procurement.request-order.request-ro', ':id') }}".replace(':id', id),
+                        url: "{{ route('procurement.process-po.sendPo', ':id') }}".replace(':id', id),
                         type: 'POST',
                         data: {
                             '_token': '{{ csrf_token() }}',
+                            'status': status
                         },
                     })
                     .done(function(data) {
@@ -254,7 +244,7 @@
                             title: 'Success',
                             text: data.message
                         }).then(() => {
-                            window.location.href = "{{ route('procurement.request-order.index') }}";
+                            window.location.href = "{{ route('procurement.process-po.index') }}";
                         });
                     })
                     .fail(function() {
@@ -281,7 +271,7 @@
                         '_method': 'DELETE',
                     };
                     $.ajax({
-                            url: "{{ route('procurement.request-order.destroyItem', ':id') }}".replace(':id', id),
+                            url: "{{ route('procurement.process-po.destroyItem', ':id') }}".replace(':id', id),
                             type: 'POST',
                             data: postForm,
                             dataType: 'json',
@@ -296,9 +286,10 @@
                 }
             });
         }
+
         function editItem(id) {
             $.ajax({
-                    url: "{{ route('procurement.request-order.editItem', ':id') }}".replace(':id', id),
+                    url: "{{ route('procurement.process-po.editItem', ':id') }}".replace(':id', id),
                     type: 'GET',
                 })
                 .done(function(data) {
