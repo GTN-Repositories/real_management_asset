@@ -3,17 +3,18 @@
 namespace App\Http\Controllers\Main\Procurement;
 
 use App\Http\Controllers\Controller;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderDetail;
 use App\Models\RequestOrder;
-use App\Models\RequestOrderDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
-class RequestOrderController extends Controller
+class GoodsReceiptController extends Controller
 {
     public function index()
     {
-        return view('main.procurement.request_order.index');
+        return view('main.procurement.goods_receipt.index');
     }
 
     public function data(Request $request)
@@ -44,6 +45,9 @@ class RequestOrderController extends Controller
             ->addColumn('code', function ($data) {
                 return $data->code ?? null;
             })
+            ->addColumn('request_order_code', function ($data) {
+                return $data->requestOrder?->code ?? null;
+            })
             ->addColumn('total_item', function ($data) {
                 return $data->total_item ?? null;
             })
@@ -69,7 +73,7 @@ class RequestOrderController extends Controller
                 $btn = '<div class="d-flex">';
                 if (auth()->user()->hasPermissionTo('employee-edit')) {
                     if (!auth()->user()->hasRole('Read only')) {
-                        $btn .= '<a href="' . route('procurement.request-order.show', $data->id) . '" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data"><i class="ti ti-eye"></i></a>';
+                        $btn .= '<a href="' . route('procurement.goods-receipt.show', $data->id) . '" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data"><i class="ti ti-eye"></i></a>';
                     }
                 }
                 if (auth()->user()->hasPermissionTo('employee-delete')) {
@@ -89,6 +93,7 @@ class RequestOrderController extends Controller
     {
         $columns = [
             'id',
+            'request_order_id',
             'code',
             'total_item',
             'total_price',
@@ -104,7 +109,7 @@ class RequestOrderController extends Controller
         $startDate = $request->startDate ?? null;
         $endDate = $request->endDate ?? null;
 
-        $data = RequestOrder::orderBy('date', 'asc')
+        $data = PurchaseOrder::orderBy('date', 'asc')
             ->select($columns)
             ->where(function ($query) use ($keyword, $columns) {
                 if ($keyword != '') {
@@ -122,7 +127,7 @@ class RequestOrderController extends Controller
 
     public function create()
     {
-        return view('main.procurement.request_order.create');
+        return view('main.procurement.goods_receipt.create');
     }
 
     /**
@@ -134,7 +139,7 @@ class RequestOrderController extends Controller
 
         try {
             return $this->atomic(function () use ($data) {
-                $countRo = RequestOrder::count() + 1;
+                $countRo = PurchaseOrder::count() + 1;
                 $code = "RO-".now()->format('ymd')."-".sprintf('%04d', $countRo);
                 $warehouse_id = Crypt::decrypt($data['warehouse_id']);
 
@@ -150,10 +155,9 @@ class RequestOrderController extends Controller
                     'date' => $data['date'],
                     'warehouse_id' => $warehouse_id,
                     'created_by' => Auth::user()->id,
-                    'status' => 100
                 ];
 
-                $requestOrder = RequestOrder::create($createRo);
+                $requestOrder = PurchaseOrder::create($createRo);
                 $request_order_id = Crypt::decrypt($requestOrder->id);
                 
                 foreach ($data['item_id'] as $key => $item) {
@@ -171,7 +175,7 @@ class RequestOrderController extends Controller
                         'total_price' => $total_price,
                     ];
 
-                    $requestOrderDetail = RequestOrderDetail::create($createRod);
+                    $requestOrderDetail = PurchaseOrderDetail::create($createRod);
                 }
 
                 return response()->json([
@@ -193,10 +197,10 @@ class RequestOrderController extends Controller
      */
     public function show($id)
     {
-        $backlog = RequestOrder::findByEncryptedId($id);
-        $item = RequestOrderDetail::where('request_order_id', Crypt::decrypt($backlog->id))->get();
+        $backlog = PurchaseOrder::findByEncryptedId($id);
+        $item = PurchaseOrderDetail::where('purchase_order_id', Crypt::decrypt($backlog->id))->get();
 
-        return view('main.procurement.request_order.show', compact('backlog', 'item'));
+        return view('main.procurement.goods_receipt.show', compact('backlog', 'item'));
     }
 
     /**
@@ -204,16 +208,23 @@ class RequestOrderController extends Controller
      */
     public function edit($id)
     {
-        $data = RequestOrder::findByEncryptedId($id);
+        $data = PurchaseOrder::findByEncryptedId($id);
 
-        return view('main.procurement.request_order.edit', compact('data'));
+        return view('main.procurement.goods_receipt.edit', compact('data'));
     }
 
-    public function editItem($id)
+    public function editItem(Request $request)
     {
-        $data = RequestOrderDetail::findByEncryptedId($id);
+        $ids = $request->ids;
+        $decryptedIds = [];
 
-        return view('main.procurement.request_order.edit', compact('data'));
+        foreach ($ids as $encryptedId) {
+            $decryptedIds[] = decrypt($encryptedId);
+        }
+
+        $data = PurchaseOrderDetail::whereIn('id', $decryptedIds)->get();
+
+        return view('main.procurement.goods_receipt.edit', compact('data'));
     }
 
     /**
@@ -225,7 +236,7 @@ class RequestOrderController extends Controller
 
         try {
             return $this->atomic(function () use ($data, $id) {
-                $data = RequestOrder::findByEncryptedId($id)->update($data);
+                $data = PurchaseOrder::findByEncryptedId($id)->update($data);
 
                 return response()->json([
                     'status' => true,
@@ -240,24 +251,27 @@ class RequestOrderController extends Controller
         }
     }
 
-    public function updateItem(Request $request, $id)
+    public function updateItem(Request $request)
     {
         $data = $request->all();
 
         try {
-            return $this->atomic(function () use ($data, $id) {
-                $price = str_replace('.', '', $data['price']);
-                $data['total_price'] = $data['qty'] * $price;
+            return $this->atomic(function () use ($data) {
+                foreach ($data['id'] as $key => $value) {
+                    
+                    $dataUpdate = [
+                        'accepted' => $data['accepted'][$key],
+                        'note_accepted' => $data['note_accepted'][$key],
+                        'status' => $data['status'],
+                    ];
 
-                $data['price'] = str_replace('.', '', $data['price']);
-                $requestOrderDetail = RequestOrderDetail::findByEncryptedId($id);
-                $requestOrderDetail->update($data);
+                    if (isset($data['attachment_accepted'][$key])) {
+                        $file = $data['attachment_accepted'][$key]->store('goods-receipt', 'public');
+                        $dataUpdate['attachment_accepted'] = $file;
+                    }
 
-                $requestOrderDetailCheck = RequestOrderDetail::where('request_order_id', $requestOrderDetail['request_order_id'])->get();
-                $requestOrder = RequestOrder::find($requestOrderDetail['request_order_id']);
-                $requestOrder->total_price = $requestOrderDetailCheck->sum('total_price');
-                $requestOrder->total_item = $requestOrderDetailCheck->count();
-                $requestOrder->save();
+                    $update = PurchaseOrderDetail::findByEncryptedId($value)->update($dataUpdate);
+                }
 
                 return response()->json([
                     'status' => true,
@@ -278,7 +292,7 @@ class RequestOrderController extends Controller
     public function destroy($id)
     {
         try {
-            $data = RequestOrder::findByEncryptedId($id);
+            $data = PurchaseOrder::findByEncryptedId($id);
             $data->delete();
 
             return response()->json([
@@ -296,7 +310,7 @@ class RequestOrderController extends Controller
     public function destroyItem($id)
     {
         try {
-            $data = RequestOrderDetail::findByEncryptedId($id);
+            $data = PurchaseOrderDetail::findByEncryptedId($id);
             $data->delete();
 
             return response()->json([
@@ -311,15 +325,28 @@ class RequestOrderController extends Controller
         }
     }
 
-    public function sendRo($id)
+    public function sendGoodsReceipt($id)
     {
-        $data = RequestOrder::findByEncryptedId($id);
-        $data->status = 101;
-        $data->save();
+        try {
+            return $this->atomic(function () use ($id) {
+                $po = PurchaseOrder::findByEncryptedId($id);
+                $po->status = 106;
+                $po->save();
 
-        return response([
-            'status' => true,
-            'message' => 'Data berhasil dikirim!',
-        ]);
+                $ro = RequestOrder::find($po->request_order_id);
+                $ro->status = 106;
+                $ro->save();
+    
+                return response([
+                    'status' => true,
+                    'message' => 'Data berhasil dikirim!',
+                ]);
+            });
+        } catch (\Throwable $th) {
+            return response([
+                'status' => false,
+                'message' => 'Data gagal dikirim! ' . $th->getMessage(),
+            ]);
+        }
     }
 }

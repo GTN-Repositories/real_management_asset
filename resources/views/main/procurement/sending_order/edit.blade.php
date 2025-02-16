@@ -1,12 +1,13 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Edit Request Order</h3>
+    <h3 class="mb-2">Tambah Sending Order</h3>
     <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
-<form method="POST" class="row g-3" id="fromEdit" action="{{ route('procurement.request-order.updateItem', $data->id) }}"
+<form method="POST" class="row g-3" id="fromEdit" action="{{ route('procurement.upload-invoice.updateItem', $data->id) }}"
     enctype="multipart/form-data">
     @csrf
     @method('PUT')
+    <input type="hidden" name="request_order_id" id="request_order_id" value="{{ $data->request_order_id }}">
     <div class="col-12 col-md-6">
         <label class="form-label">Kode Barang</label>
         <input type="text" name="code" id="code" class="form-control mb-3 mb-lg-0"
@@ -19,16 +20,74 @@
             placeholder="Masukan Nama Item" value="{{ $data->item?->name ?? '' }}" disabled />
     </div>
 
+    <div class="col-12 col-md-12" id="vendorRelation">
+        <label class="form-label" for="vendor_comparation_id">Vendor<span class="text-danger">*</span></label>
+        <input type="text" name="vendor_comparation_id" id="vendor_comparation_id" class="form-control" value="{{ $data->vendorComparation?->vendor?->name ?? '' }}" disabled readonly="readonly">
+    </div>
+
     <div class="col-12 col-md-6">
         <label class="form-label">Qty</label>
-        <input type="text" name="qty" class="form-control mb-3 mb-lg-0" placeholder="Jumlah"
-            value="{{ $data->qty }}" required />
+        <input type="text" name="qty" class="form-control mb-3 mb-lg-0" placeholder="Jumlah" value="{{ $data->qty }}" disabled />
     </div>
 
     <div class="col-12 col-md-6">
         <label class="form-label">Harga</label>
-        <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0" placeholder="Harga"
-            required value="{{ $data->price }}" />
+        <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0" placeholder="Harga" value="{{ $data->price }}" disabled />
+    </div>
+
+    <hr>
+
+    @foreach ($uploadInvoice as $item)
+        <div class='card'>
+            <div class='card-header'>
+                <h5 class='card-title'>Upload Invoice</h5>
+            </div>
+            <div class='card-body'>
+                <div class="row">
+                    <input type="hidden" name="id[]" value="{{ $item->id }}">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label">Nama</label>
+                        <input type="text" name="name[]" id="name" class="form-control mb-3 mb-lg-0" value="{{ $item->name }}" placeholder="Masukan Nama Item" />
+                    </div>
+        
+                    <div class="col-12 col-md-6">
+                        <label class="form-label mr-2">Lampiran</label>
+                        <small>*Only For Change</small>
+                        <input type="file" name="attachment[]" id="attachment" class="form-control mb-3 mb-lg-0" placeholder="Masukan Attachment" />
+                        <a href="{{ asset($item->attachment) }}" class="badge bg-label-primary mt-2" download="{{ $item->name }}"><i class="fas fa-download me-2"></i> Download</a>
+                    </div>
+
+                    <div class="col-12 col-md-12">
+                        <label class="form-label">Catatan</label>
+                        <textarea name="note[]" id="note" class="form-control mb-3 mb-lg-0" placeholder="Catatan">{{ $item->note }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+    <div class='card'>
+        <div class='card-header'>
+            <h5 class='card-title'>Upload Invoice</h5>
+        </div>
+        <div class='card-body'>
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <label class="form-label">Nama</label>
+                    <input type="text" name="name[]" id="name" class="form-control mb-3 mb-lg-0" placeholder="Masukan Nama Item" />
+                </div>
+    
+                <div class="col-12 col-md-6">
+                    <label class="form-label">Lampiran</label>
+                    <input type="file" name="attachment[]" id="attachment" class="form-control mb-3 mb-lg-0" placeholder="Masukan Attachment" />
+                </div>
+
+                <div class="col-12 col-md-12">
+                    <label class="form-label">Catatan</label>
+                    <textarea name="note[]" id="note" class="form-control mb-3 mb-lg-0" placeholder="Catatan"></textarea>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="col-12 text-center">
@@ -40,6 +99,8 @@
 
 <script>
     $(document).ready(function() {
+        CKEDITOR.replace('note');
+
         $('#price').each(function() {
             const value = $(this).val();
             $(this).val(formatCurrency(value));

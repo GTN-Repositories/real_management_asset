@@ -1,34 +1,33 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Edit Request Order</h3>
-    <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
+    <h3 class="mb-2">Tambah Vendor Comparation</h3>
+    <p class="text-muted">Silahkan isi form untuk melakukan Request Order</p>
 </div>
-<form method="POST" class="row g-3" id="fromEdit" action="{{ route('procurement.request-order.updateItem', $data->id) }}"
+<form method="POST" class="row g-3" id="formCreate" action="{{ route('procurement.rfq.store') }}"
     enctype="multipart/form-data">
     @csrf
-    @method('PUT')
-    <div class="col-12 col-md-6">
-        <label class="form-label">Kode Barang</label>
-        <input type="text" name="code" id="code" class="form-control mb-3 mb-lg-0"
-            placeholder="Kode Barang (Otomatis)" value="{{ $data->item?->code ?? '' }}" disabled />
-    </div>
 
-    <div class="col-12 col-md-6">
-        <label class="form-label">Nama Barang</label>
-        <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" value="{{ $data->item?->name ?? '' }}" disabled />
-    </div>
-
-    <div class="col-12 col-md-6">
-        <label class="form-label">Qty</label>
-        <input type="text" name="qty" class="form-control mb-3 mb-lg-0" placeholder="Jumlah"
-            value="{{ $data->qty }}" required />
+    <input type="hidden" name="request_order_id" id="request_order_id" value="{{ $ro->id }}">
+    <div class="col-12 col-md-12" id="vendorRelation">
+        <label class="form-label" for="vendor_id">Vendor<span class="text-danger">*</span></label>
+        <select id="vendor_id" name="vendor_id"
+            class="select2 form-select select2-primary" data-allow-clear="true" required>    
+        </select>
     </div>
 
     <div class="col-12 col-md-6">
         <label class="form-label">Harga</label>
-        <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0" placeholder="Harga"
-            required value="{{ $data->price }}" />
+        <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0" placeholder="Harga" required />
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Lampiran</label>
+        <input type="file" name="attachment" id="attachment" class="form-control mb-3 mb-lg-0" placeholder="Harga" required />
+    </div>
+
+    <div class="col-12 col-md-12">
+        <label class="form-label">Catatan</label>
+        <textarea name="note" id="note" class="form-control mb-3 mb-lg-0" placeholder="Catatan"></textarea>
     </div>
 
     <div class="col-12 text-center">
@@ -38,17 +37,56 @@
     </div>
 </form>
 
+@include('components.select2_js')
+
 <script>
     $(document).ready(function() {
-        $('#price').each(function() {
+        CKEDITOR.replace('note');
+
+        $(document).on('input', '#price', function() {
             const value = $(this).val();
             $(this).val(formatCurrency(value));
         });
+
+        $('#vendor_id').select2({
+            dropdownParent: $('#vendorRelation'),
+            placeholder: 'Pilih Vendor',
+            ajax: {
+                url: "{{ route('vendor.data') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        'search[value]': params.term,
+                        start: 0,
+                        length: 10
+                    };
+                },
+                processResults: function(data) {
+                    apiResults = data.data
+                        .map(function(item) {
+                            return {
+                                text: item.name,
+                                id: item.relationId,
+                            };
+                        });
+
+                    return {
+                        results: apiResults
+                    };
+                },
+                cache: true
+            }
+        });
     });
 
-    $(document).on('input', '#price', function() {
-        const value = $(this).val();
-        $(this).val(formatCurrency(value));
+    $(document).on('input', '.price', function() {
+        const value = formatCurrency($(this).val());
+        $(this).val(value);
+    });
+
+    $(document).on('click', '.remove-row', function() {
+        $(this).closest('tr').remove();
     });
 
     function formatCurrency(angka, prefix) {
@@ -64,7 +102,6 @@
             rupiah = split[0].substr(0, sisa),
             ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-        // tambahkan titik jika yang di input sudah menjadi angka ribuan
         if (ribuan) {
             const separator = sisa ? '.' : '';
             rupiah += separator + ribuan.join('.');
@@ -73,9 +110,8 @@
         rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
         return prefix === undefined ? rupiah : rupiah ? (prefix || '') + rupiah : '';
     }
-</script>
-<script>
-    document.getElementById('fromEdit').addEventListener('submit', function(event) {
+
+    document.getElementById('formCreate').addEventListener('submit', function(event) {
         event.preventDefault();
 
         const form = event.target;
