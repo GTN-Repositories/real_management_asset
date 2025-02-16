@@ -1,35 +1,51 @@
 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 <div class="text-center mb-4">
-    <h3 class="mb-2">Edit Request Order</h3>
+    <h3 class="mb-2">Penerimaan Barang</h3>
     <p class="text-muted">Tambahkan Data Sesuai Dengan Informasi Yang Tersedia</p>
 </div>
-<form method="POST" class="row g-3" id="fromEdit" action="{{ route('procurement.request-order.updateItem', $data->id) }}"
+<form method="POST" class="row g-3" id="fromEdit" action="{{ route('procurement.goods-receipt.updateItem') }}"
     enctype="multipart/form-data">
     @csrf
     @method('PUT')
-    <div class="col-12 col-md-6">
-        <label class="form-label">Kode Barang</label>
-        <input type="text" name="code" id="code" class="form-control mb-3 mb-lg-0"
-            placeholder="Kode Barang (Otomatis)" value="{{ $data->item?->code ?? '' }}" disabled />
+    
+    <div class="col-12 col-md-12" id="vendorRelation">
+        <label class="form-label" for="status">Status<span class="text-danger">*</span></label>
+        <select id="status" name="status" class="select2 form-select select2-primary" data-allow-clear="true" required>
+            <option value="1" selected>Diterima</option>
+            <option value="2">Issue</option>
+            <option value="3">Return</option>
+        </select>
     </div>
 
-    <div class="col-12 col-md-6">
-        <label class="form-label">Nama Barang</label>
-        <input type="text" name="name" id="name" class="form-control mb-3 mb-lg-0"
-            placeholder="Masukan Nama Item" value="{{ $data->item?->name ?? '' }}" disabled />
-    </div>
-
-    <div class="col-12 col-md-6">
-        <label class="form-label">Qty</label>
-        <input type="text" name="qty" class="form-control mb-3 mb-lg-0" placeholder="Jumlah"
-            value="{{ $data->qty }}" required />
-    </div>
-
-    <div class="col-12 col-md-6">
-        <label class="form-label">Harga</label>
-        <input type="text" name="price" id="price" class="form-control mb-3 mb-lg-0" placeholder="Harga"
-            required value="{{ $data->price }}" />
-    </div>
+    <table class="table table-borderless table-poppins table-striped table-hover mb-3">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Diterima</th>
+                <th>Lampiran</th>
+                <th>Catatan</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($data as $value)
+                <tr>
+                    <td>
+                        <input type="hidden" name="id[]" value="{{ $value->id }}">
+                        {{ $value->item?->code ?? '' }} - {{ $value->item?->name ?? '' }}
+                    </td>
+                    <td>
+                        <input type="text" name="accepted[]" class="form-control mb-3 mb-lg-0 qty" placeholder="Jumlah" value="{{ ($value->accepted != 0) ? $value->accepted : $value->qty }}" />
+                    </td>
+                    <td>
+                        <input type="file" name="attachment_accepted[]" id="attachment" class="form-control mb-3 mb-lg-0" placeholder="Masukan Attachment" />
+                    </td>
+                    <td>
+                        <textarea name="note_accepted[]" cols="30" rows="3" id="note" class="form-control mb-3 mb-lg-0" placeholder="Catatan">{{ $value->note_accepted }}</textarea>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 
     <div class="col-12 text-center">
         <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
@@ -40,13 +56,10 @@
 
 <script>
     $(document).ready(function() {
-        $('#price').each(function() {
-            const value = $(this).val();
-            $(this).val(formatCurrency(value));
-        });
+        
     });
 
-    $(document).on('input', '#price', function() {
+    $(document).on('input', '.qty', function() {
         const value = $(this).val();
         $(this).val(formatCurrency(value));
     });

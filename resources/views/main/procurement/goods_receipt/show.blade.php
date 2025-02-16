@@ -1,8 +1,7 @@
 @extends('layouts.global')
 
-@section('title', 'Request Order')
-@section('title_page', 'Procurement / Request Order / Pengajuan')
-
+@section('title', 'Penerimaan Barang')
+@section('title_page', 'Procurement / Penerimaan Barang')
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -136,33 +135,50 @@
                         </div>
                     @endif
                     
+                    <div class="text-end mb-3">
+                        <button type="button" class="btn btn-warning btn-md" id="bulk-action" style="display: none !important;">
+                            <i class="fas fa-bolt"></i> Bulk Action
+                        </button>
+                    </div>
                     <div class="card table-responsive">
                         <div class="card-body">
                             <table class="datatables table table-striped table-poppins mb-3" id="data-table-item">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
+                                        <th>
+                                            <div class="form-check form-check-sm form-check-custom form-check-solid">
+                                                <input class="form-check-input" type="checkbox" id="checkAll" />
+                                            </div>
+                                        </th>
                                         <th>Code</th>
                                         <th>Item</th>
                                         <th>Harga</th>
+                                        <th>Vendor</th>
                                         <th>Jumlah</th>
+                                        <th>Diterima</th>
+                                        <th>Balance</th>
                                         <th>Total Harga</th>
-                                        <th>Action</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($item as $data)
                                     <tr>
-                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input checkbox" id="checkbox{{ $data->id }}" type="checkbox" value="{{ $data->id }}" />
+                                                <label class="custom-control-label" for="checkbox{{ $data->id }}"></label>
+                                            </div>
+                                        </td>
                                         <td>{{ $data->item?->code ?? '-' }}</td>
                                         <td>{{ $data->item?->name ?? '-' }}</td>
                                         <td>Rp {{ number_format($data->price ?? 0, 0, ',', '.') }}</td>
+                                        <td>{{ $data->requestOrderDetail?->vendorComparation?->vendor?->name ?? '-' }}</td>
                                         <td>{{ $data->qty ?? '-' }}</td>
+                                        <td>{{ $data->accepted ?? '-' }}</td>
+                                        <td>{{ $data->accepted - $data->accepted }}</td>
                                         <td>Rp {{ number_format($data->total_price ?? 0, 0, ',', '.') }}</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-primary" onclick="editItem('{{ $data->id }}')"><i class="fas fa-pencil"></i></button>
-                                            <button class="btn btn-sm btn-danger" onclick="deleteItem('{{ $data->id }}')"><i class="fas fa-trash"></i></button>
-                                        </td>
+                                        <td>{{ $data->status ?? '-' }}</td>
                                     </tr>
                                 </tbody>
                                 @endforeach
@@ -175,29 +191,21 @@
                                 onclick="sendRo('{{ $backlog->id }}')">Ajukan RO</a>
                             @elseif ($backlog->status == 101)
                             <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3"
-                                onclick="process('{{ $backlog->id }}')">Kirim</a>
+                                onclick="sendRfq('{{ $backlog->id }}')">Submit</a>
                             @elseif ($backlog->status == 102)
                             <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
-                                onclick="noArchiveBacklog('{{ $backlog->id }}')">Tidak</a>
-                            <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3"
-                                onclick="archiveBacklog('{{ $backlog->id }}')">Sesuai</a>
+                                onclick="sendUploadInvoice('{{ $backlog->id }}')">Submit</a>
                             @elseif ($backlog->status == 103)
+                            <a href="javascript:void(0)" type="button" class="btn btn-danger btn-md mt-3 me-3"
+                                onclick="processPo('{{ $backlog->id }}', 100)">Reject</a>
                             <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
-                                onclick="spb('{{ $backlog->id }}')">Buatkan SPB</a>
+                                onclick="processPo('{{ $backlog->id }}', 104)">Approve</a>
                             @elseif ($backlog->status == 104)
                             <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
-                                onclick="sign('{{ $backlog->id }}')">Tanda Tangan</a>
+                                onclick="sendPo('{{ $backlog->id }}')">Kirim PO</a>
+                                @elseif ($backlog->status == 105)
                             <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
-                                onclick="pdf('{{ $backlog->id }}')">Buat PDF</a>
-                            @elseif ($backlog->status == 105)
-                            <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
-                                onclick="baps('{{ $backlog->id }}')">Kirim BAPS</a>
-                            @elseif ($backlog->status == 106)
-                            <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
-                                onclick="invoice('{{ $backlog->id }}')">Kirim Invoice</a>
-                            @elseif ($backlog->status == 200)
-                            <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md me-3"
-                                onclick="completed('{{ $backlog->id }}')">Ubah Payemnt</a>
+                                onclick="sendGoodsReceipt('{{ $backlog->id }}')">Submit</a>
                             @endif
                         </div>
                     </div>
@@ -206,7 +214,7 @@
         </div>
     </div>
     <div class="modal fade" id="modal-ce" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-simple">
+        <div class="modal-dialog modal-xl modal-simple">
             <div class="modal-content p-3 p-md-5">
                 <div class="modal-body" id="content-modal-ce">
 
@@ -217,8 +225,41 @@
 @endsection
 
 @push('js')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
     <script>
         $(document).ready(function() {
+            $('#checkAll').on('click', function() {
+                console.log('checkAll');
+                
+                $('tbody input[type="checkbox"]').prop('checked', $(this).prop('checked'));
+
+                if ($('tbody input[type="checkbox"]:checked').length > 0) {
+                    $('#bulk-action').attr('style', 'display: inline-block !important;');
+                } else {
+                    $('#bulk-action').attr('style', 'display: none !important;');
+                }
+            });
+
+            $('tbody').on('click', 'input[type="checkbox"]', function() {
+                if ($('tbody input[type="checkbox"]:checked').length > 0) {
+                    $('#bulk-action').attr('style', 'display: inline-block !important;');
+                } else {
+                    $('#bulk-action').attr('style', 'display: none !important;');
+                }
+            });
+
+            $('#bulk-action').on('click', function() {
+                var elem = $('tbody input[type="checkbox"]:checked');
+                var ids = [];
+                elem.map(function() {
+                    ids.push($(this).val());
+                });
+
+                editItem(ids);
+            });
+
             $('#data-table-item').DataTable({
                 "paging": false,
                 "searching": true,
@@ -227,8 +268,9 @@
                     [0, "asc"]
                 ],
             });
-        })
-        function sendRo(id) {
+        });
+
+        function sendGoodsReceipt(id) {
             // Confirmation
             event.preventDefault();
             Swal.fire({
@@ -242,10 +284,11 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "{{ route('procurement.request-order.request-ro', ':id') }}".replace(':id', id),
+                        url: "{{ route('procurement.goods-receipt.sendGoodsReceipt', ':id') }}".replace(':id', id),
                         type: 'POST',
                         data: {
                             '_token': '{{ csrf_token() }}',
+                            'status': status
                         },
                     })
                     .done(function(data) {
@@ -254,7 +297,7 @@
                             title: 'Success',
                             text: data.message
                         }).then(() => {
-                            window.location.href = "{{ route('procurement.request-order.index') }}";
+                            window.location.href = "{{ route('procurement.goods-receipt.index') }}";
                         });
                     })
                     .fail(function() {
@@ -281,7 +324,7 @@
                         '_method': 'DELETE',
                     };
                     $.ajax({
-                            url: "{{ route('procurement.request-order.destroyItem', ':id') }}".replace(':id', id),
+                            url: "{{ route('procurement.goods-receipt.destroyItem', ':id') }}".replace(':id', id),
                             type: 'POST',
                             data: postForm,
                             dataType: 'json',
@@ -296,10 +339,14 @@
                 }
             });
         }
-        function editItem(id) {
+
+        function editItem(ids) {
             $.ajax({
-                    url: "{{ route('procurement.request-order.editItem', ':id') }}".replace(':id', id),
+                    url: "{{ route('procurement.goods-receipt.editItem') }}",
                     type: 'GET',
+                    data: {
+                        'ids': ids
+                    },
                 })
                 .done(function(data) {
                     $('#content-modal-ce').html(data);

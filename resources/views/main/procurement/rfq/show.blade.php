@@ -1,7 +1,7 @@
 @extends('layouts.global')
 
-@section('title', 'Request Order')
-@section('title_page', 'Procurement / Request Order / Pengajuan')
+@section('title', 'Request For Quotation')
+@section('title_page', 'Procurement / Request For Quotation / Vendor Comparation')
 
 
 @section('content')
@@ -64,6 +64,42 @@
                     </div>
                 </div>
                 <div class="col-9">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class='card'>
+                                <div class='card-header'>
+                                    <div class="text-end">
+                                        <button type="button" class="btn btn-primary btn-md" onclick="createVendor()">
+                                            <i class="fas fa-box me-2"></i> Tambah
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class='card-body'>
+                                    <table class="table table-borderless table-poppins table-striped table-hover" id="vendor-comparation-data">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Nama Vendor</th>
+                                                <th>Harga</th>
+                                                <th>Catatan</th>
+                                                <th>Lampiran</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+        
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div id="chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mb-4">
                         <div class="accordion mt-3" id="accordionExample">
                             <div class="card accordion-item active">
@@ -145,6 +181,7 @@
                                         <th>Code</th>
                                         <th>Item</th>
                                         <th>Harga</th>
+                                        <th>Vendor</th>
                                         <th>Jumlah</th>
                                         <th>Total Harga</th>
                                         <th>Action</th>
@@ -157,6 +194,7 @@
                                         <td>{{ $data->item?->code ?? '-' }}</td>
                                         <td>{{ $data->item?->name ?? '-' }}</td>
                                         <td>Rp {{ number_format($data->price ?? 0, 0, ',', '.') }}</td>
+                                        <td>{{ $data->vendorComparation?->vendor?->name ?? '-' }}</td>
                                         <td>{{ $data->qty ?? '-' }}</td>
                                         <td>Rp {{ number_format($data->total_price ?? 0, 0, ',', '.') }}</td>
                                         <td>
@@ -175,7 +213,7 @@
                                 onclick="sendRo('{{ $backlog->id }}')">Ajukan RO</a>
                             @elseif ($backlog->status == 101)
                             <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3"
-                                onclick="process('{{ $backlog->id }}')">Kirim</a>
+                                onclick="sendRfq('{{ $backlog->id }}')">Submit</a>
                             @elseif ($backlog->status == 102)
                             <a href="javascript:void(0)" type="button" class="btn btn-primary btn-md mt-3 me-3"
                                 onclick="noArchiveBacklog('{{ $backlog->id }}')">Tidak</a>
@@ -217,8 +255,13 @@
 @endsection
 
 @push('js')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
     <script>
         $(document).ready(function() {
+            init_table();
+
             $('#data-table-item').DataTable({
                 "paging": false,
                 "searching": true,
@@ -227,8 +270,65 @@
                     [0, "asc"]
                 ],
             });
-        })
-        function sendRo(id) {
+        });
+
+        function init_table(keyword = '') {
+            var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+            if ($.fn.DataTable.isDataTable('#vendor-comparation-data')) {
+                $('#vendor-comparation-data').DataTable().clear().destroy();
+            }
+
+            var table = $('#vendor-comparation-data').DataTable({
+                processing: true,
+                serverSide: true,
+                columnDefs: [{
+                    target: 0,
+                    visible: true,
+                    searchable: false
+                }, ],
+
+                ajax: {
+                    type: "GET",
+                    url: "{{ route('procurement.rfq.vendorComparationData') }}",
+                    data: {
+                        'keyword': keyword,
+                        'request_order_id': '{{ decrypt($backlog->id) }}'
+                    }
+                },
+                columns: [
+                    {
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex'
+                    },
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    
+                    {
+                        data: 'price',
+                        name: 'price'
+                    },
+                    {
+                        data: 'note',
+                        name: 'note'
+                    },
+                    {
+                        data: 'attachment',
+                        name: 'attachment'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+        }
+
+        function sendRfq(id) {
             // Confirmation
             event.preventDefault();
             Swal.fire({
@@ -242,7 +342,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "{{ route('procurement.request-order.request-ro', ':id') }}".replace(':id', id),
+                        url: "{{ route('procurement.rfq.request-rfq', ':id') }}".replace(':id', id),
                         type: 'POST',
                         data: {
                             '_token': '{{ csrf_token() }}',
@@ -254,7 +354,7 @@
                             title: 'Success',
                             text: data.message
                         }).then(() => {
-                            window.location.href = "{{ route('procurement.request-order.index') }}";
+                            window.location.href = "{{ route('procurement.rfq.index') }}";
                         });
                     })
                     .fail(function() {
@@ -262,6 +362,24 @@
                     });
                 }
             });
+        }
+
+        function createVendor() {
+            $.ajax({
+                    url: "{{ route('procurement.rfq.create') }}",
+                    type: 'GET',
+                    data: {
+                        'request_order_id': '{{ $backlog->id }}'
+                    }
+                })
+                .done(function(data) {
+                    $('#content-modal-ce').html(data);
+
+                    $("#modal-ce").modal("show");
+                })
+                .fail(function() {
+                    Swal.fire('Error!', 'An error occurred while creating the record.', 'error');
+                });
         }
 
         function deleteItem(id) {
@@ -281,7 +399,7 @@
                         '_method': 'DELETE',
                     };
                     $.ajax({
-                            url: "{{ route('procurement.request-order.destroyItem', ':id') }}".replace(':id', id),
+                            url: "{{ route('procurement.rfq.destroyItem', ':id') }}".replace(':id', id),
                             type: 'POST',
                             data: postForm,
                             dataType: 'json',
@@ -296,9 +414,10 @@
                 }
             });
         }
+
         function editItem(id) {
             $.ajax({
-                    url: "{{ route('procurement.request-order.editItem', ':id') }}".replace(':id', id),
+                    url: "{{ route('procurement.rfq.editItem', ':id') }}".replace(':id', id),
                     type: 'GET',
                 })
                 .done(function(data) {

@@ -30,7 +30,13 @@ use App\Http\Controllers\Main\MonitoringController;
 use App\Http\Controllers\Main\NotificationController;
 use App\Http\Controllers\Main\OumController;
 use App\Http\Controllers\Main\PermisionController;
+use App\Http\Controllers\Main\Procurement\FinishController;
+use App\Http\Controllers\Main\Procurement\GoodsReceiptController;
+use App\Http\Controllers\Main\Procurement\ProcessPoController;
 use App\Http\Controllers\Main\Procurement\RequestOrderController;
+use App\Http\Controllers\Main\Procurement\RfqController;
+use App\Http\Controllers\Main\Procurement\SendingOrderController;
+use App\Http\Controllers\Main\Procurement\UploadInvoiceController;
 use App\Http\Controllers\Main\ReminderEmailController;
 use App\Http\Controllers\Main\ReportFuelController;
 use App\Http\Controllers\Main\ReportLoadsheetController;
@@ -297,9 +303,72 @@ Route::middleware(['auth', 'check_menu_permission', 'log_activity'])->group(func
     Route::resource('vendor', VendorController::class);
 
     Route::prefix('procurement')->name('procurement.')->group(function () {
+        // Request Order
+        Route::get('/request-order/editItem/{id}', [RequestOrderController::class, 'editItem'])->name('request-order.editItem');
+        Route::put('/request-order/updateItem/{id}', [RequestOrderController::class, 'updateItem'])->name('request-order.updateItem');
+        Route::delete('/request-order/destroyItem/{id}', [RequestOrderController::class, 'destroyItem'])->name('request-order.destroyItem');
+
+        Route::post('/request-order/send-ro/{id}', [RequestOrderController::class, 'sendRo'])->name('request-order.request-ro');
         Route::get('/request-order/data', [RequestOrderController::class, 'data'])->name('request-order.data');
         Route::delete('/request-order/destroy-all', [RequestOrderController::class, 'destroyAll'])->name('request-order.destroyAll');
         Route::resource('request-order', RequestOrderController::class);
+
+        // RFQ
+        Route::get('/rfq/vendor-comparation', [RfqController::class, 'vendorComparationData'])->name('rfq.vendorComparationData');
+        Route::get('/rfq/vendor-comparation/filter', [RfqController::class, 'vendorComparation'])->name('rfq.vendorComparationFilter');
+        Route::get('/rfq/editItem/{id}', [RfqController::class, 'editItem'])->name('rfq.editItem');
+        Route::put('/rfq/updateItem/{id}', [RfqController::class, 'updateItem'])->name('rfq.updateItem');
+        Route::delete('/rfq/destroyItem/{id}', [RfqController::class, 'destroyItem'])->name('rfq.destroyItem');
+
+        Route::post('/rfq/send-rfq/{id}', [RfqController::class, 'sendRfq'])->name('rfq.request-rfq');
+        Route::get('/rfq/data', [RfqController::class, 'data'])->name('rfq.data');
+        Route::delete('/rfq/destroy-all', [RfqController::class, 'destroyAll'])->name('rfq.destroyAll');
+        Route::resource('rfq', RfqController::class);
+
+        // Upload Invoice
+        Route::get('/upload-invoice/editItem/{id}', [UploadInvoiceController::class, 'editItem'])->name('upload-invoice.editItem');
+        Route::put('/upload-invoice/updateItem/{id}', [UploadInvoiceController::class, 'updateItem'])->name('upload-invoice.updateItem');
+        Route::delete('/upload-invoice/destroyItem/{id}', [UploadInvoiceController::class, 'destroyItem'])->name('upload-invoice.destroyItem');
+
+        Route::post('/upload-invoice/send-upload-invoice/{id}', [UploadInvoiceController::class, 'sendInvoice'])->name('upload-invoice.sendInvoice');
+        Route::get('/upload-invoice/data', [UploadInvoiceController::class, 'data'])->name('upload-invoice.data');
+        Route::delete('/upload-invoice/destroy-all', [UploadInvoiceController::class, 'destroyAll'])->name('upload-invoice.destroyAll');
+        Route::resource('upload-invoice', UploadInvoiceController::class);
+
+        // PROCESS PO
+        Route::get('/process-po/editItem/{id}', [ProcessPoController::class, 'editItem'])->name('process-po.editItem');
+        Route::put('/process-po/updateItem/{id}', [ProcessPoController::class, 'updateItem'])->name('process-po.updateItem');
+        Route::delete('/process-po/destroyItem/{id}', [ProcessPoController::class, 'destroyItem'])->name('process-po.destroyItem');
+
+        Route::post('/process-po/send-process-po/{id}', [ProcessPoController::class, 'sendPo'])->name('process-po.sendPo');
+        Route::get('/process-po/data', [ProcessPoController::class, 'data'])->name('process-po.data');
+        Route::delete('/process-po/destroy-all', [ProcessPoController::class, 'destroyAll'])->name('process-po.destroyAll');
+        Route::resource('process-po', ProcessPoController::class);
+
+        // Sending Order
+        Route::get('/sending-order/editItem/{id}', [SendingOrderController::class, 'editItem'])->name('sending-order.editItem');
+        Route::put('/sending-order/updateItem/{id}', [SendingOrderController::class, 'updateItem'])->name('sending-order.updateItem');
+        Route::delete('/sending-order/destroyItem/{id}', [SendingOrderController::class, 'destroyItem'])->name('sending-order.destroyItem');
+
+        Route::post('/sending-order/sending-order/{id}', [SendingOrderController::class, 'sendPo'])->name('sending-order.sendPo');
+        Route::get('/sending-order/data', [SendingOrderController::class, 'data'])->name('sending-order.data');
+        Route::delete('/sending-order/destroy-all', [SendingOrderController::class, 'destroyAll'])->name('sending-order.destroyAll');
+        Route::resource('sending-order', SendingOrderController::class);
+
+        // Penerimaan Barang
+        Route::get('/goods-receipt/editItem', [GoodsReceiptController::class, 'editItem'])->name('goods-receipt.editItem');
+        Route::put('/goods-receipt/updateItem', [GoodsReceiptController::class, 'updateItem'])->name('goods-receipt.updateItem');
+        Route::delete('/goods-receipt/destroyItem/{id}', [GoodsReceiptController::class, 'destroyItem'])->name('goods-receipt.destroyItem');
+
+        Route::post('/goods-receipt/goods-receipt/{id}', [GoodsReceiptController::class, 'sendGoodsReceipt'])->name('goods-receipt.sendGoodsReceipt');
+        Route::get('/goods-receipt/data', [GoodsReceiptController::class, 'data'])->name('goods-receipt.data');
+        Route::delete('/goods-receipt/destroy-all', [GoodsReceiptController::class, 'destroyAll'])->name('goods-receipt.destroyAll');
+        Route::resource('goods-receipt', GoodsReceiptController::class);
+
+        // Finish
+        Route::get('/finish/data', [FinishController::class, 'data'])->name('finish.data');
+        Route::delete('/finish/destroy-all', [FinishController::class, 'destroyAll'])->name('finish.destroyAll');
+        Route::resource('finish', FinishController::class);
     });
 });
 

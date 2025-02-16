@@ -3,17 +3,20 @@
 namespace App\Http\Controllers\Main\Procurement;
 
 use App\Http\Controllers\Controller;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderDetail;
 use App\Models\RequestOrder;
 use App\Models\RequestOrderDetail;
+use App\Models\UploadInvoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
-class RequestOrderController extends Controller
+class UploadInvoiceController extends Controller
 {
     public function index()
     {
-        return view('main.procurement.request_order.index');
+        return view('main.procurement.upload_invoice.index');
     }
 
     public function data(Request $request)
@@ -69,7 +72,7 @@ class RequestOrderController extends Controller
                 $btn = '<div class="d-flex">';
                 if (auth()->user()->hasPermissionTo('employee-edit')) {
                     if (!auth()->user()->hasRole('Read only')) {
-                        $btn .= '<a href="' . route('procurement.request-order.show', $data->id) . '" class="btn-edit-data btn-sm me-1 shadow me-2" title="Edit Data"><i class="ti ti-eye"></i></a>';
+                        $btn .= '<a href="' . route('procurement.upload-invoice.show', $data->id) . '" class="btn-edit-data btn-sm me-1 shadow me-2" title="Lihat Data"><i class="ti ti-eye"></i></a>';
                     }
                 }
                 if (auth()->user()->hasPermissionTo('employee-delete')) {
@@ -120,9 +123,11 @@ class RequestOrderController extends Controller
         return $data;
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        return view('main.procurement.request_order.create');
+        $ro = RequestOrder::findByEncryptedId($request->request_order_id);
+
+        return view('main.procurement.upload_invoice.create', compact('ro'));
     }
 
     /**
@@ -133,46 +138,15 @@ class RequestOrderController extends Controller
         $data = $request->all();
 
         try {
-            return $this->atomic(function () use ($data) {
-                $countRo = RequestOrder::count() + 1;
-                $code = "RO-".now()->format('ymd')."-".sprintf('%04d', $countRo);
-                $warehouse_id = Crypt::decrypt($data['warehouse_id']);
+            return $this->atomic(function () use ($data, $request) {
+                $data['price'] = str_replace('.', '', $data['price']);
 
-                $totalPrice = array_sum(array_map(function ($price, $quantity) {
-                    $price = (int)str_replace('.', '', $price); // Hapus simbol titik
-                    return $price * $quantity; // Kalikan harga dengan qty
-                }, $data['price'], $data['quantity']));
-
-                $createRo = [
-                    'code' => $code,
-                    'total_item' => count($data['item_id']),
-                    'total_price' => $totalPrice,
-                    'date' => $data['date'],
-                    'warehouse_id' => $warehouse_id,
-                    'created_by' => Auth::user()->id,
-                    'status' => 100
-                ];
-
-                $requestOrder = RequestOrder::create($createRo);
-                $request_order_id = Crypt::decrypt($requestOrder->id);
-                
-                foreach ($data['item_id'] as $key => $item) {
-                    $item = Crypt::decrypt($item);
-                    $qty = $data['quantity'][$key];
-                    $price = str_replace('.', '', $data['price'][$key]);
-                    $total_price = $qty * $price;
-
-                    $createRod = [
-                        'request_order_id' => $request_order_id,
-                        'item_id' => $item,
-                        'warehouse_id' => $warehouse_id,
-                        'qty' => $qty,
-                        'price' => $price,
-                        'total_price' => $total_price,
-                    ];
-
-                    $requestOrderDetail = RequestOrderDetail::create($createRod);
+                if ($request->hasFile('attachment')) {
+                    $file = $request->file('attachment')->store('rfq', 'public');
+                    $data['attachment'] = $file;
                 }
+                $data['request_order_id'] = Crypt::decrypt($data['request_order_id']);
+                $data['vendor_id'] = Crypt::decrypt($data['vendor_id']);
 
                 return response()->json([
                     'status' => true,
@@ -196,7 +170,7 @@ class RequestOrderController extends Controller
         $backlog = RequestOrder::findByEncryptedId($id);
         $item = RequestOrderDetail::where('request_order_id', Crypt::decrypt($backlog->id))->get();
 
-        return view('main.procurement.request_order.show', compact('backlog', 'item'));
+        return view('main.procurement.upload_invoice.show', compact('backlog', 'item'));
     }
 
     /**
@@ -206,14 +180,15 @@ class RequestOrderController extends Controller
     {
         $data = RequestOrder::findByEncryptedId($id);
 
-        return view('main.procurement.request_order.edit', compact('data'));
+        return view('main.procurement.upload_invoice.edit', compact('data'));
     }
 
     public function editItem($id)
     {
         $data = RequestOrderDetail::findByEncryptedId($id);
+        $uploadInvoice = UploadInvoice::where('request_order_id', $data->request_order_id)->get();
 
-        return view('main.procurement.request_order.edit', compact('data'));
+        return view('main.procurement.upload_invoice.edit', compact('data', 'uploadInvoice'));
     }
 
     /**
@@ -245,19 +220,38 @@ class RequestOrderController extends Controller
         $data = $request->all();
 
         try {
-            return $this->atomic(function () use ($data, $id) {
-                $price = str_replace('.', '', $data['price']);
-                $data['total_price'] = $data['qty'] * $price;
+            return $this->atomic(function () use ($data, $id, $request) {
+                foreach ($data['name'] as $key => $value) {
+                    $updateItem = $value['id'][$key] ?? null;
+                    if ($updateItem != null) {
+                        $uploadInvoice = UploadInvoice::findByEncryptedId($updateItem);
+    
+                        if (isset($data['attachment'][$key])) {
+                            $file = $request->file('attachment')->store('upload-invoice', 'public');
+                            $data['attachment'] = $file;
+                        }
+    
+                        $uploadInvoice->update([
+                            'name' => $data['name'][$key],
+                            'attachment' => $data['attachment'][$key],
+                            'note' => $data['note'][$key],
+                        ]);
+                    } else {
+                        $create = [
+                            'name' => $data['name'][$key],
+                            'note' => $data['note'][$key],
+                            'request_order_id' => $data['request_order_id'],
+                        ];
 
-                $data['price'] = str_replace('.', '', $data['price']);
-                $requestOrderDetail = RequestOrderDetail::findByEncryptedId($id);
-                $requestOrderDetail->update($data);
+                        if (isset($data['attachment'][$key])) {
+                            $file = $data['attachment'][$key]->store('upload-invoice', 'public');
+                            $create['attachment'] = $file;
+                        }
+                        $create['user_id'] = Auth::user()->id;
 
-                $requestOrderDetailCheck = RequestOrderDetail::where('request_order_id', $requestOrderDetail['request_order_id'])->get();
-                $requestOrder = RequestOrder::find($requestOrderDetail['request_order_id']);
-                $requestOrder->total_price = $requestOrderDetailCheck->sum('total_price');
-                $requestOrder->total_item = $requestOrderDetailCheck->count();
-                $requestOrder->save();
+                        $UploadInvoice = UploadInvoice::create($create);
+                    }
+                }
 
                 return response()->json([
                     'status' => true,
@@ -311,12 +305,12 @@ class RequestOrderController extends Controller
         }
     }
 
-    public function sendRo($id)
+    public function sendInvoice($id)
     {
         $data = RequestOrder::findByEncryptedId($id);
-        $data->status = 101;
+        $data->status = 103;
         $data->save();
-
+        
         return response([
             'status' => true,
             'message' => 'Data berhasil dikirim!',
